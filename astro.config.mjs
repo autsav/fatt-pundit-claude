@@ -1,12 +1,14 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@astrojs/react';
 
 const at = './src/assets/fonts/american-typewriter';
 
 export default defineConfig({
   site: 'https://www.fattpundit.co.uk',
   trailingSlash: 'always',
+  integrations: [react()],
   vite: { plugins: [tailwindcss()] },
   fonts: [
     {

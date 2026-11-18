@@ -60,6 +60,9 @@
   }
 }
 
+@keyframes fp-pill-in { from { transform: translateY(16px); opacity: 0; filter: blur(4px); } to { transform: none; opacity: 1; filter: none; } }
+.fp-pill-swap { display: inline-block; animation: fp-pill-in 0.35s cubic-bezier(0.23, 1, 0.32, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

@@ -1,0 +1,89 @@
+---
+// Scene 0: arrival. First visit only, skippable, ~2 s.
+// A departure board clatters into FATT PUNDIT, the tiger stamp thuds down,
+// and the board splits open onto the rainy street.
+import { getImage } from 'astro:assets';
+import ArrivalBoard from './ArrivalBoard.tsx';
+import stamp from '../../assets/images/brand/logo-stamp-distressed-left.png';
+// Negative logo = tiger orange on dark (guidelines p.15): drawn as a mask so the colour is exact.
+const stampImg = await getImage({ src: stamp, width: 400, format: 'webp' });
+---
+<script is:inline>
+  // Decide before first paint, so returning guests never see a flash of the board.
+  (function () {
+    var d = document.documentElement, play = true;
+    try { play = !sessionStorage.getItem('fp-arrived'); } catch (e) {}
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) play = false;
+    d.dataset.arrival = play ? 'play' : 'skip';
+  })();
+</script>
+
+<div class="arrival" data-arrival-overlay aria-hidden="true">
+  <div class="half top"></div>
+  <div class="half bottom"></div>
+  <div class="center">
+    <p class="kicker">Now arriving</p>
+    <div class="board"><ArrivalBoard client:load /></div>
+    <p class="route">Canton · Kolkata · London · Dubai</p>
+    <div class="stamp" data-stamp style={`-webkit-mask-image:url(${stampImg.src});mask-image:url(${stampImg.src})`}></div>
+  </div>
+  <button class="skip-arrival" type="button" data-skip>Skip</button>
+</div>
+
+<style>
+  .arrival { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; pointer-events: auto; }
+  :global(html[data-arrival='skip']) .arrival { display: none; }
+  .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
+  .half.top { top: 0; border-bottom: 1px solid rgb(203 160 82 / 0.25); }
+  .half.bottom { bottom: 0; }
+  .center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 24px; text-align: center; }
+  .kicker { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; color: var(--color-gold); font-size: 13px; }
+  .route { margin: 0; font-family: var(--font-note); font-style: italic; color: rgb(218 199 181 / 0.75); font-size: 17px; letter-spacing: 0.04em; }
+  .stamp { position: absolute; right: -6%; bottom: -34%; width: clamp(110px, 16vw, 200px); aspect-ratio: 1046 / 1369; opacity: 0; transform: scale(2.6) rotate(-18deg); background: var(--color-tiger); -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; pointer-events: none; }
+  .skip-arrival { position: absolute; right: 20px; bottom: 20px; min-height: 44px; padding: 0 18px; background: transparent; border: 1px solid rgb(218 199 181 / 0.4); color: var(--color-sand); font: inherit; font-size: 14px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; }
+  .skip-arrival:hover { border-color: var(--color-gold); color: var(--color-gold); }
+</style>
+
+<script>
+  import { createTimeline } from 'animejs';
+
+  const root = document.querySelector<HTMLElement>('[data-arrival-overlay]');
+  const html = document.documentElement;
+
+  function finish() {
+    if (!root || !root.isConnected) return;
+    root.remove();
+    html.dataset.arrival = 'done';
+    try { sessionStorage.setItem('fp-arrived', '1'); } catch {}
+    window.dispatchEvent(new Event('fp:arrived'));
+  }
+
+  if (root && html.dataset.arrival === 'play') {
+    document.body.style.overflow = 'hidden';
+    let started = false;
+    const open = (fast = false) => {
+      if (started) return;
+      started = true;
+      const tl = createTimeline({
+        onComplete: () => { document.body.style.overflow = ''; finish(); },
+      });
+      if (!fast) {
+        // The stamp thuds onto the board…
+        tl.add('[data-stamp]', { opacity: [0, 0.9], scale: [2.6, 1], rotate: [-18, -8], duration: 380, ease: 'inQuad' })
+          // …the whole board jolts from the impact…
+          .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, '-=40')
+          // …a breath, then it splits open like a station shutter.
+          .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, '+=220');
+      }
+      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 680, ease: 'inOutExpo' }, fast ? 0 : '-=120')
+        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 680, ease: 'inOutExpo' }, '<<')
+        .add('.arrival .skip-arrival', { opacity: 0, duration: 150 }, '<<');
+    };
+    window.addEventListener('fp:board-done', () => open(false), { once: true });
+    root.querySelector('[data-skip]')?.addEventListener('click', () => open(true));
+    // Safety net: never trap a guest behind the board.
+    window.setTimeout(() => open(true), 4500);
+  } else {
+    finish();
+  }
+</script>

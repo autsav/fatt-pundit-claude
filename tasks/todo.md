@@ -27,6 +27,18 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 - [x] /styleguide/ renders fonts, colours, branches, à la carte from data (screenshot checked, desktop + 375 px)
 - [x] `astro check` 0 errors; `npm run build` passes
 
+## Motion plan · Day 1: hero slice ✅ done 18 Nov (plan doc: "Fatt Pundit Motion & Experience Plan")
+- [x] React islands (@astrojs/react), shadcn components.json, cn(), motion tokens, calm mode
+- [x] KokonutUI (MIT) vendored + restyled: split-flap-text (+ onSettled, maxFlips), rain-glass-background, attract-button
+- [x] Scene 0 arrival: board → orange stamp thud (approved negative colour via mask) → shutter; first visit only, skip, 4.5 s safety
+- [x] Scene 1 rain hero: wipeable fogged glass over dining room, title rises (anime.js split), cycling board, magnetic Book button, live open-now pill
+- [x] Scene 2 doors: Motion scroll() drives hinge swing, camera push, warm flood into sand
+- [x] hours.ts + tests (GMT/BST, closed days) run in prebuild
+- [x] JS budget: 113 KB gzipped for whole page (target 120 first load)
+- [x] Checked desktop, 390 px phone (no sideways scroll), reduced motion (no arrival, doors static), demo from sub-path (0 errors, 0 404s)
+- [ ] Not checked: real phones and Safari (only headless Chrome here). Mid-range Android frame rate still to test.
+- Deviation: Status Island not used (built for task progress); a small CSS pill does the open-now job without 30 KB of Motion on first load.
+
 ## Day 2: journey storyboard (next)
 - [ ] docs/journey-storyboard.md: 7 scenes, copy ≤ 25 words each, asset per scene, motion note, reduced-motion still
 - [ ] Client approves direction

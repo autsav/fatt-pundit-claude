@@ -1,12 +1,13 @@
 ---
 // Homepage: the "Through the door" journey (plan: Creative concept, scenes 1–7).
-import { Image } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
+import Arrival from '../components/scenes/Arrival.astro';
+import Doors from '../components/scenes/Doors.astro';
+import RainHero from '../components/scenes/RainHero.tsx';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { formatPrice } from '../lib/format';
 
-import tigerLeft from '../assets/images/brand/tiger-head-left.png';
-import tigerRight from '../assets/images/brand/tiger-head-right.png';
 import stampLeft from '../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../assets/images/brand/logo-stamp-distressed-right.png';
 import map from '../assets/images/brand/map.webp';
@@ -61,6 +62,8 @@ function hoursLines(hours: NonNullable<(typeof branches)[number]['hours']>) {
   return lines;
 }
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
+const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
+const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status }));
 ---
 <Base
   title="Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai"
@@ -83,34 +86,14 @@ const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-gard
   </header>
 
   <main>
-    <!-- 1 + 2 · The street, the door -->
-    <section id="top" class="hero" data-hero>
-      <div class="hero-pin">
-        <div class="wrap hero-grid">
-          <div class="hero-copy reveal is-in">
-            <p class="kicker gold">Soho · Covent Garden · Dubai</p>
-            <h1 class="hero-title">Fatt<br />Pundit</h1>
-            <p class="hero-lede">The Chinese-Indian Hakka restaurant you never knew you needed.</p>
-            <div class="row">
-              <a class="btn btn-orange" href="#tables">Book a table</a>
-              <a class="btn btn-ghost-light" href="#kitchen">See the menus</a>
-            </div>
-            <p class="step-in" data-hint>Scroll to step inside ↓</p>
-          </div>
-
-          <div class="door-wrap">
-            <div class="door" role="img" aria-label="The Fatt Pundit front door: two doors with the Indian and Chinese tigers open onto the dining room">
-              <div class="door-sign">Est. Soho 2019</div>
-              <div class="door-way">
-                <Image src={inside} alt="" widths={[480, 800, 1100]} sizes="(min-width: 900px) 520px, 90vw" class="door-inside" loading="eager" />
-                <div class="leaf leaf-l"><Image src={tigerLeft} alt="" width={360} class="leaf-tiger" loading="eager" /><span class="handle handle-l"></span></div>
-                <div class="leaf leaf-r"><Image src={tigerRight} alt="" width={360} class="leaf-tiger" loading="eager" /><span class="handle handle-r"></span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- 0 · Arrival -->
+    <Arrival />
+    <!-- 1 · Rain on the window -->
+    <section id="top" class="rain" aria-label="Fatt Pundit">
+      <RainHero client:load src={rainSrc} branches={branchesLite} />
     </section>
+    <!-- 2 · The doors -->
+    <Doors />
 
     <!-- 3 · The journey -->
     <section id="story" class="sec sand">
@@ -286,36 +269,6 @@ const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-gard
 <script>
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Doors: open as the hero scrolls. Pinned on wide screens, inline on phones.
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  const door = hero?.querySelector<HTMLElement>('.door-way');
-  const hint = hero?.querySelector<HTMLElement>('[data-hint]');
-  const wide = window.matchMedia('(min-width: 900px)');
-  const clamp = (n: number) => Math.min(1, Math.max(0, n));
-  function update() {
-    if (!hero || !door) return;
-    const vh = window.innerHeight;
-    let p: number;
-    if (wide.matches) {
-      const r = hero.getBoundingClientRect();
-      p = clamp(-r.top / Math.max(1, r.height - vh));
-    } else {
-      const r = door.getBoundingClientRect();
-      p = clamp((vh * 0.85 - r.top) / (vh * 0.7));
-    }
-    const open = reduce ? 1 : 0.06 + p * 0.94;
-    door.style.setProperty('--open', String(open));
-    if (hint) hint.style.opacity = String(1 - Math.min(1, p * 3));
-  }
-  if (reduce) update();
-  else {
-    let ticking = false;
-    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { update(); ticking = false; }); } };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    update();
-  }
-
   // Reveal sections, draw the map route, drop the stamp cards.
   const io = new IntersectionObserver(
     (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
@@ -372,33 +325,6 @@ const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-gard
   .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; text-transform: uppercase; letter-spacing: 0.12em; font-size: 15px; }
   .nav a:not(.btn) { color: var(--color-sand); text-decoration: none; }
   .nav a:not(.btn):hover { color: var(--color-gold); }
-
-  /* Hero + door */
-  .hero { background: var(--color-ink); color: var(--color-sand); }
-  .hero-pin { padding-block: clamp(40px, 6vw, 80px); }
-  .hero-grid { display: flex; flex-wrap: wrap; align-items: center; gap: 40px 64px; }
-  .hero-copy { flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 22px; }
-  .hero-title { margin: 0; font-size: clamp(52px, 8vw, 104px); line-height: 0.92; }
-  .hero-lede { font-size: clamp(20px, 2vw, 26px); line-height: 1.35; max-width: 520px; }
-  .step-in { font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: 19px; transition: opacity .2s; }
-  .door-wrap { flex: 1 1 360px; min-width: 0; display: flex; justify-content: center; }
-  .door { width: min(500px, 100%); background: var(--color-gold); padding: 12px; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
-  .door-sign { background: var(--color-ink); border: 2px solid var(--color-gold); color: var(--color-gold); text-align: center; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; font-size: 14px; padding: 10px; margin-bottom: 10px; }
-  .door-way { --open: 0.06; position: relative; aspect-ratio: 5 / 6; overflow: hidden; background: var(--color-ink); perspective: 1400px; }
-  .door-inside { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.15 - var(--open) * 0.15)); filter: brightness(calc(0.55 + var(--open) * 0.45)); }
-  .leaf { position: absolute; top: 0; bottom: 0; width: 50%; background: var(--color-sand); border: 3px solid var(--color-ink); box-sizing: border-box; display: flex; align-items: center; justify-content: center; will-change: transform; }
-  .leaf-l { left: 0; transform-origin: left center; transform: rotateY(calc(var(--open) * -96deg)); }
-  .leaf-r { right: 0; transform-origin: right center; transform: rotateY(calc(var(--open) * 96deg)); }
-  .leaf-tiger { width: 78%; height: auto; }
-  .handle { position: absolute; top: 56%; width: 9px; height: 40px; background: var(--color-gold); }
-  .handle-l { right: 10px; } .handle-r { left: 10px; }
-
-  @media (min-width: 900px) {
-    .hero { height: 210vh; }
-    .hero-pin { position: sticky; top: 70px; min-height: calc(100vh - 70px); box-sizing: border-box; display: flex; align-items: center; }
-    .hero-grid { width: 100%; }
-    .door { width: min(470px, 100%, calc((100vh - 220px) * 0.83)); }
-  }
 
   /* Journey */
   .split { display: flex; flex-wrap: wrap; align-items: center; gap: 48px 72px; }
