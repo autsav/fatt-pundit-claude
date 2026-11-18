@@ -144,10 +144,12 @@ Decisions taken from the doc's "my pick" column (user said go without answering)
 - Result B (launch build, PUBLIC_LAUNCH=true): Accessibility 100, Best practices 100, SEO 100 on home, 3 branches, allergens, private dining. Launch switch = PUBLIC_LAUNCH env (robots, noindex, preview banner). Share cards: `node scripts/make-og.mjs` → public/og/.
 - Client to confirm (marked in pages as drafts): allergen wording, privacy controller details, booking hold time/deposits, step-free access.
 ### Phase C — Book and come back (gate: link → booked in 3 taps)
-- [ ] C1 Book drawer per branch (party/date → booking URL) + sticky Book bar on phones + home hero Book
-- [ ] C2 Menu list view: search, dietary + spice filters, allergen note, print, /[branch]/menu/
-- [ ] C3 Find us: directions links, nearest station, static map
-- [ ] C4 Private dining enquiry, gift card link, newsletter
+- [x] C1 Book drawer per branch (party/date → booking URL) + sticky Book bar on phones + home hero Book
+- [x] C2 Menu list view: search, dietary + spice filters, allergen note, print, /[branch]/menu/
+- [x] C3 Find us: directions links, nearest station, static map
+- [x] C4 Private dining enquiry, gift card link, newsletter
+- Result C: Book drawer (home hero, header, branch hero, phone dock) → party, day, time → OpenTable restref / SevenRooms explore link pre-filled; 2–3 taps. /soho/menu/, /covent-garden/menu/ list menus with search + V/VG/GF/DF/H filters + print + Menu schema. Google + Apple Maps.
+- Waiting on client: vouchersUrl in branches.json, PUBLIC_NEWSLETTER_ACTION (email tool), check deep-link params with OpenTable/SevenRooms, spice data per dish (for a spice filter). Static map skipped (map tiles blocked here).
 ### Phase D — Signature and handover
 - [ ] D1 Tonight's board (Sheet CSV → split-flap)
 - [ ] D2 Branch clocks (local time → day/after-dark)

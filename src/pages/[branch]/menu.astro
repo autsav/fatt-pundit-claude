@@ -1,0 +1,178 @@
+---
+/**
+ * /<branch>/menu/ — every menu for one room as a plain, searchable list.
+ * Fast to scan on a phone, filters for diets, prints cleanly, and gives
+ * search engines a real menu page per branch. The page-flip book stays the
+ * showpiece; this is the practical twin.
+ */
+import type { GetStaticPaths } from 'astro';
+import { getEntry } from 'astro:content';
+import InfoShell from '../../layouts/InfoPage.astro';
+import { dish, getBranches, MENU_TABS, priceOf, type Branch } from '../../lib/site-data';
+
+export const getStaticPaths = (async () => {
+  const branches = await getBranches();
+  return branches.filter((b) => b.status === 'open').map((b) => ({ params: { branch: b.id }, props: { b } }));
+}) satisfies GetStaticPaths;
+
+const { b } = Astro.props as { b: Branch };
+const menus = await Promise.all(
+  b.menus.map(async (id) => {
+    const m = (await getEntry('menus', id))!.data;
+    return {
+      id,
+      title: MENU_TABS[id] ?? m.title,
+      intro: m.title,
+      allergyNote: m.allergyNote,
+      sections: await Promise.all(
+        m.sections.map(async (sec) => ({
+          title: sec.title,
+          note: sec.note,
+          items: await Promise.all(
+            sec.items.map(async ({ dish: did }) => {
+              const d = await dish(did);
+              return { id: did, name: d.name, desc: d.description ?? '', price: m.showPrices ? priceOf(d) : null, tags: d.tags as string[] };
+            }),
+          ),
+        })),
+      ),
+    };
+  }),
+);
+const TAGS = [
+  ['V', 'Vegetarian'],
+  ['VG', 'Vegan'],
+  ['GF', 'Gluten free'],
+  ['DF', 'Dairy free'],
+  ['H', 'Halal'],
+] as const;
+
+// Search engines: the menu as schema.org Menu → sections → items.
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'Menu',
+  name: `Fatt Pundit ${b.shortName} menus`,
+  url: new URL(`/${b.id}/menu/`, Astro.site).href,
+  isPartOf: { '@id': new URL(`/${b.id}/#restaurant`, Astro.site).href },
+  hasMenuSection: menus.map((m) => ({
+    '@type': 'MenuSection',
+    name: m.title,
+    hasMenuItem: m.sections.flatMap((s) => s.items).map((i) => ({ '@type': 'MenuItem', name: i.name, ...(i.desc ? { description: i.desc } : {}) })),
+  })),
+};
+---
+<InfoShell
+  title={`${b.shortName} menu`}
+  description={`Every Fatt Pundit ${b.shortName} menu as a list: à la carte, set and pre-theatre menus, drinks, with vegetarian, vegan, gluten-free, dairy-free and halal marks.`}
+  kicker={`Fatt Pundit ${b.shortName}`}
+  heading="The menu"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <div class="menu-tools" data-menu-tools>
+    <nav class="menu-jump" aria-label="Menus">
+      {menus.map((m) => <a href={`#${m.id}`}>{m.title}</a>)}
+    </nav>
+    <label class="menu-search">
+      <span class="sr-only">Search the menu</span>
+      <input type="search" placeholder="Search dishes, e.g. momo, chilli, paneer" data-menu-q autocomplete="off" />
+    </label>
+    <fieldset class="menu-diet">
+      <legend class="sr-only">Show only</legend>
+      {TAGS.map(([t, label]) => <label class="diet-chip"><input type="checkbox" value={t} data-menu-tag /><span><b>{t}</b> {label}</span></label>)}
+    </fieldset>
+    <p class="menu-count" data-menu-count aria-live="polite"></p>
+  </div>
+
+  {menus.map((m) => (
+    <section class="menu-block" id={m.id} aria-labelledby={`${m.id}-h`} data-menu-block>
+      <h2 id={`${m.id}-h`}>{m.title}</h2>
+      {m.intro !== m.title && <p class="menu-intro">{m.intro}</p>}
+      {m.sections.map((s) => (
+        <div class="menu-sec" data-menu-sec>
+          <h3>{s.title}</h3>
+          {s.note && <p class="menu-note">{s.note}</p>}
+          <ul>
+            {s.items.map((i) => (
+              <li class="menu-item" data-dish={i.id} data-tags={i.tags.join(' ')} data-text={`${i.name} ${i.desc}`.toLowerCase()}>
+                <div class="mi-head">
+                  <span class="mi-name">{i.name}</span>
+                  {i.tags.length > 0 && <span class="mi-tags" aria-label={i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}>{i.tags.join(' · ')}</span>}
+                  {i.price && <span class="mi-price">{i.price}</span>}
+                </div>
+                {i.desc && <p class="mi-desc">{i.desc}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <p class="menu-allergy">{m.allergyNote} <a href="/allergens/">Allergens and dietary needs</a>.</p>
+    </section>
+  ))}
+  <p class="menu-empty" data-menu-empty hidden>No dishes match. Clear a filter or try another word.</p>
+  <p class="menu-foot"><a href={`/${b.id}/`}>Back to {b.shortName}</a> · <a href={b.booking?.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a> · <button type="button" class="linkish" onclick="print()">Print this menu</button></p>
+</InfoShell>
+
+<style>
+  .menu-tools { position: relative; z-index: 5; display: grid; gap: 10px; margin: 0 calc(-1 * clamp(28px, 5vw, 64px)) 8px; padding: 12px clamp(28px, 5vw, 64px); background: #faf6ef; border-bottom: 2px solid var(--color-ink); }
+  .menu-jump { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .menu-jump a { flex: none; padding: 8px 12px; border: 2px solid var(--color-ink); font-size: 14px; font-weight: 700; text-decoration: none; color: var(--color-ink); white-space: nowrap; }
+  .menu-search input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 14px; font: inherit; font-size: 17px; border: 2px solid var(--color-ink); background: #fff; color: var(--color-ink); }
+  .menu-search input:focus-visible, .diet-chip input:focus-visible + span { outline: 3px solid var(--color-tiger); outline-offset: 2px; }
+  .menu-diet { display: flex; gap: 6px; overflow-x: auto; border: 0; padding: 0 0 2px; margin: 0; }
+  .diet-chip { flex: none; }
+  /* Big screens: the tools ride along under the header while you read. */
+  @media (min-width: 900px) and (min-height: 700px) { .menu-tools { position: sticky; top: 66px; } }
+  .diet-chip input { position: absolute; opacity: 0; }
+  .diet-chip span { white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; min-height: 40px; padding: 0 12px; border: 2px solid var(--color-ink); font-size: 14px; cursor: pointer; background: #fff; }
+  .diet-chip input:checked + span { background: var(--color-ink); color: var(--color-sand); }
+  .menu-count { margin: 0; font-size: 14px; min-height: 1em; }
+  .menu-block { padding-top: 28px; scroll-margin-top: 200px; }
+  .menu-block h2 { margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 3px double var(--color-ink); padding-bottom: 8px; }
+  .menu-intro, .menu-note { font-family: var(--font-note); font-style: italic; }
+  .menu-sec h3 { margin: 22px 0 6px; font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-tiger-deep); }
+  .menu-sec ul { list-style: none; padding: 0; margin: 0; }
+  .menu-item { padding: 10px 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); }
+  .mi-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+  .mi-name { font-weight: 700; }
+  .mi-tags { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: var(--color-gold-deep); }
+  .mi-price { margin-left: auto; font-weight: 700; }
+  .mi-desc { margin: 2px 0 0 !important; font-size: 16px; }
+  .menu-allergy { margin-top: 16px !important; font-size: 14px; }
+  .menu-empty { font-family: var(--font-note); font-style: italic; }
+  .menu-foot { margin-top: 32px !important; }
+  .linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--color-tiger-deep); font-weight: 700; text-decoration: underline; cursor: pointer; }
+  [hidden] { display: none !important; }
+  @media print {
+    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), .menu-tools, .menu-foot, :global([data-dock]) { display: none !important; }
+    :global(.info) { padding: 0 !important; background: none !important; }
+    :global(.sheet) { border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+    .menu-block { break-before: page; }
+    .menu-item { break-inside: avoid; }
+  }
+</style>
+
+<script>
+  const items = [...document.querySelectorAll<HTMLElement>('[data-dish]')];
+  const q = document.querySelector<HTMLInputElement>('[data-menu-q]');
+  const tags = [...document.querySelectorAll<HTMLInputElement>('[data-menu-tag]')];
+  const count = document.querySelector<HTMLElement>('[data-menu-count]')!;
+  const empty = document.querySelector<HTMLElement>('[data-menu-empty]')!;
+  const run = () => {
+    const words = (q?.value ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+    const need = tags.filter((t) => t.checked).map((t) => t.value);
+    let shown = 0;
+    for (const li of items) {
+      const have = (li.dataset.tags ?? '').split(' ');
+      const ok = need.every((t) => have.includes(t)) && words.every((w) => li.dataset.text!.includes(w));
+      li.hidden = !ok;
+      if (ok) shown++;
+    }
+    for (const sec of document.querySelectorAll<HTMLElement>('[data-menu-sec]')) sec.hidden = !sec.querySelector('[data-dish]:not([hidden])');
+    for (const blk of document.querySelectorAll<HTMLElement>('[data-menu-block]')) blk.hidden = !blk.querySelector('[data-dish]:not([hidden])');
+    const filtering = words.length > 0 || need.length > 0;
+    count.textContent = filtering ? `${shown} dish${shown === 1 ? '' : 'es'} match` : '';
+    empty.hidden = shown > 0;
+  };
+  q?.addEventListener('input', run);
+  tags.forEach((t) => t.addEventListener('change', run));
+</script>

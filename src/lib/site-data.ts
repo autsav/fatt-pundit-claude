@@ -53,6 +53,9 @@ export const fullAddress = (b: Branch) =>
 export const directionsUrl = (b: Branch) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Fatt Pundit, ${fullAddress(b)}`)}`;
 
+/** Same, for iPhones that prefer Apple Maps. */
+export const appleMapsUrl = (b: Branch) => `https://maps.apple.com/?q=${encodeURIComponent(`Fatt Pundit, ${fullAddress(b)}`)}`;
+
 export const BOOKING_NAMES = { opentable: 'OpenTable', sevenrooms: 'SevenRooms', resdiary: 'ResDiary', other: 'online' } as const;
 
 /** Bookmark label for each menu in the menu book. */

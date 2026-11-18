@@ -1,0 +1,256 @@
+---
+/**
+ * Book a table in three taps: party size, day, time → the restaurant's own
+ * booking page opens with those filled in (OpenTable / SevenRooms). One drawer
+ * per page; anything with [data-book] opens it ("soho", "covent-garden", or
+ * "" to let the guest choose). Without JavaScript the triggers are plain links
+ * to the booking page, so nothing breaks.
+ *
+ * Deep-link formats (check with each provider at launch):
+ *   OpenTable  /restref/client/?rid=&restref=&datetime=YYYY-MM-DDTHH:MM&covers=N
+ *   SevenRooms /explore/<venue>/reservations/create/search/?date=&party_size=&start_time=HH:MM
+ */
+import { getBranches, prettyPhone } from '@/lib/site-data';
+
+const branches = (await getBranches()).filter((b) => b.status === 'open' && b.booking);
+// Bigger parties go to the groups page (Covent Garden asks above 4).
+const GROUP_AT = 9;
+const data = branches.map((b) => ({
+  id: b.id,
+  name: b.shortName,
+  tz: b.timezone,
+  hours: b.hours,
+  provider: b.booking!.provider,
+  url: b.booking!.url,
+  widgetId: b.booking!.widgetId,
+  phone: b.phone,
+  phonePretty: b.phone ? prettyPhone(b.phone) : '',
+  maxOnline: b.groupsNote ? 4 : GROUP_AT - 1,
+}));
+---
+<dialog class="book" data-book-drawer aria-labelledby="book-title">
+  <form method="dialog" class="book-sheet" data-book-form>
+    <div class="book-head">
+      <p class="book-kicker">Your table</p>
+      <h2 id="book-title" class="book-title">Book <span data-book-name>a table</span></h2>
+      <button class="book-x" value="close" aria-label="Close">×</button>
+    </div>
+
+    <fieldset class="book-field" data-book-where>
+      <legend>Where</legend>
+      <div class="book-choices">
+        {data.map((b, i) => <label class="book-chip"><input type="radio" name="where" value={b.id} checked={i === 0} /><span>{b.name}</span></label>)}
+      </div>
+    </fieldset>
+
+    <fieldset class="book-field">
+      <legend>How many</legend>
+      <div class="book-step">
+        <button type="button" class="book-pm" data-step="-1" aria-label="One fewer guest">−</button>
+        <output data-book-size aria-live="polite">2</output>
+        <button type="button" class="book-pm" data-step="1" aria-label="One more guest">+</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="book-field">
+      <legend>Which day</legend>
+      <div class="book-days" data-book-days role="radiogroup" aria-label="Day"></div>
+    </fieldset>
+
+    <fieldset class="book-field">
+      <legend>Time</legend>
+      <div class="book-times" data-book-times></div>
+      <p class="book-closed" data-book-closed hidden>Closed that day. Pick another day.</p>
+    </fieldset>
+
+    <p class="book-group" data-book-group hidden>
+      For <span data-book-group-n></span> or more, the restaurant plans your table with you:
+      <a href="/private-dining/">send a group enquiry</a> or call <a data-book-tel href="#"></a>.
+    </p>
+
+    <button type="submit" class="btn btn-orange book-go" data-book-go value="go">Find a table</button>
+    <p class="book-small">Opens <span data-book-provider></span> in a new tab with your choices filled in. Or call <a data-book-tel2 href="#"></a>.</p>
+  </form>
+</dialog>
+
+<script is:inline type="application/json" data-book-data set:html={JSON.stringify(data)} />
+
+<style>
+  .book { padding: 0; border: 0; margin: auto 0 0 auto; width: min(460px, 100vw); max-width: none; height: 100dvh; max-height: 100dvh; background: transparent; color: var(--color-ink); overflow-y: auto; overscroll-behavior: contain; }
+  .book::backdrop { background: rgb(26 23 20 / 0.6); }
+  .book[open] { animation: book-in 260ms cubic-bezier(.2,.8,.2,1); }
+  @keyframes book-in { from { transform: translateX(100%); } }
+  @media (max-width: 640px) {
+    .book { width: 100vw; height: auto; max-height: 92dvh; margin: auto 0 0; }
+    .book[open] { animation-name: book-up; }
+    @keyframes book-up { from { transform: translateY(100%); } }
+  }
+  @media (prefers-reduced-motion: reduce) { .book[open] { animation: none; } }
+  .book-sheet { box-sizing: border-box; min-height: 100%; background: var(--color-sand); padding: 24px clamp(18px, 4vw, 32px) 28px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; border-left: 3px solid var(--color-ink); }
+  @media (max-width: 640px) { .book-sheet { border-left: 0; border-top: 3px solid var(--color-ink); } }
+  .book-head { position: relative; padding-right: 48px; }
+  .book-kicker { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 19px; color: var(--color-tiger-deep); }
+  .book-title { margin: 2px 0 0; font-size: clamp(26px, 6vw, 34px); text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
+  .book-x { position: absolute; top: -4px; right: -6px; width: 48px; height: 48px; font-size: 32px; line-height: 1; background: none; border: 2px solid var(--color-ink); color: var(--color-ink); cursor: pointer; }
+  .book-field { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .book-field legend { padding: 0; margin-bottom: 8px; font-weight: 700; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; }
+  .book-choices, .book-times { display: flex; flex-wrap: wrap; gap: 8px; }
+  .book-chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .book-chip span, .book :global(.book-time), .book :global(.book-day) { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 2px solid var(--color-ink); background: #faf6ef; font: inherit; font-weight: 700; color: var(--color-ink); cursor: pointer; }
+  .book-chip input:checked + span, .book :global(.book-time[aria-checked='true']), .book :global(.book-day[aria-checked='true']) { background: var(--color-ink); color: var(--color-sand); }
+  .book-chip input:focus-visible + span, .book :global(.book-time:focus-visible), .book :global(.book-day:focus-visible), .book-pm:focus-visible { outline: 3px solid var(--color-tiger); outline-offset: 2px; }
+  .book-step { display: inline-flex; align-items: center; border: 2px solid var(--color-ink); background: #faf6ef; }
+  .book-pm { width: 52px; height: 48px; font-size: 26px; background: none; border: 0; color: var(--color-ink); cursor: pointer; }
+  .book-pm:disabled { opacity: 0.35; cursor: default; }
+  .book-step output { min-width: 56px; text-align: center; font-size: 24px; font-weight: 700; }
+  .book-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+  .book :global(.book-day) { flex: none; flex-direction: column; min-width: 64px; padding: 6px 10px; line-height: 1.15; scroll-snap-align: start; }
+  .book :global(.book-day small) { display: block; font-size: 12px; font-weight: 400; }
+  .book :global(.book-time) { min-width: 84px; padding: 0 10px; }
+  .book-closed, .book-group { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  .book-group a, .book-small a { color: var(--color-tiger-deep); font-weight: 700; }
+  .book-go { width: 100%; margin-top: 4px; }
+  .book-go[aria-disabled='true'] { opacity: 0.45; pointer-events: none; }
+  .book-small { margin: 0; font-size: 14px; }
+</style>
+
+<script>
+  type Span = [string, string];
+  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number }
+  const dlg = document.querySelector<HTMLDialogElement>('[data-book-drawer]');
+  const raw = document.querySelector('[data-book-data]')?.textContent;
+  if (dlg && raw) {
+    const all: B[] = JSON.parse(raw);
+    const $ = <T extends Element>(s: string) => dlg.querySelector<T>(s)!;
+    const form = $<HTMLFormElement>('[data-book-form]');
+    const sizeOut = $<HTMLOutputElement>('[data-book-size]');
+    const daysEl = $<HTMLElement>('[data-book-days]');
+    const timesEl = $<HTMLElement>('[data-book-times]');
+    const go = $<HTMLButtonElement>('[data-book-go]');
+    const KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const PROVIDER: Record<string, string> = { opentable: 'OpenTable', sevenrooms: 'SevenRooms', resdiary: 'ResDiary' };
+    let b = all[0];
+    let size = 2;
+    let day = '';
+    let time = '';
+    let opener: HTMLElement | null = null;
+
+    // "Now" in the restaurant's own time zone, as Y-M-D and minutes past midnight.
+    const local = (tz: string, d = new Date()) => {
+      const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d).map((x) => [x.type, x.value]));
+      return { ymd: `${p.year}-${p.month}-${p.day}`, mins: +p.hour * 60 + +p.minute };
+    };
+    const addDays = (ymd: string, n: number) => { const d = new Date(`${ymd}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+    const wd = (ymd: string) => new Date(`${ymd}T12:00:00Z`).getUTCDay();
+    const toMin = (s: string) => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+    const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    const pretty = (m: number) => { const h = Math.floor(m / 60) % 24; return `${h % 12 || 12}${m % 60 ? '.' + String(m % 60).padStart(2, '0') : ''}${h < 12 ? 'am' : 'pm'}`; };
+
+    // Last booking 45 minutes before closing, every half hour.
+    const slots = (ymd: string) => {
+      const spans = b.hours[KEYS[wd(ymd)]] ?? [];
+      const now = local(b.tz);
+      const out: number[] = [];
+      for (const [a, z] of spans) {
+        let end = toMin(z); if (end <= toMin(a)) end += 24 * 60;
+        for (let m = toMin(a); m <= end - 45; m += 30) if (ymd !== now.ymd || m > now.mins + 30) out.push(m);
+      }
+      return out;
+    };
+
+    const radio = (el: HTMLElement, cls: string, on: boolean, label: string, html: string, onPick: () => void) => {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = cls; btn.setAttribute('role', 'radio'); btn.setAttribute('aria-checked', String(on)); btn.setAttribute('aria-label', label);
+      btn.innerHTML = html; btn.addEventListener('click', onPick); el.append(btn);
+    };
+
+    const drawDays = () => {
+      daysEl.replaceChildren();
+      const today = local(b.tz).ymd;
+      for (let i = 0; i < 21; i++) {
+        const ymd = addDays(today, i);
+        const d = new Date(`${ymd}T12:00:00Z`);
+        const wdName = i === 0 ? 'Today' : i === 1 ? 'Tmrw' : d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
+        const full = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+        radio(daysEl, 'book-day', ymd === day, full, `${wdName}<small>${d.getUTCDate()} ${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</small>`, () => { day = ymd; time = ''; draw(); });
+      }
+    };
+    const drawTimes = () => {
+      timesEl.replaceChildren();
+      const list = slots(day);
+      $<HTMLElement>('[data-book-closed]').hidden = list.length > 0;
+      if (!list.some((m) => hhmm(m) === time)) time = list.find((m) => m >= 19 * 60) !== undefined ? hhmm(list.find((m) => m >= 19 * 60)!) : list[0] !== undefined ? hhmm(list[0]) : '';
+      for (const m of list) radio(timesEl, 'book-time', hhmm(m) === time, pretty(m), pretty(m), () => { time = hhmm(m); drawTimes(); update(); });
+    };
+    const update = () => {
+      const tooMany = size > b.maxOnline;
+      $<HTMLElement>('[data-book-group]').hidden = !tooMany;
+      $<HTMLElement>('[data-book-group-n]').textContent = String(b.maxOnline + 1);
+      for (const a of dlg.querySelectorAll<HTMLAnchorElement>('[data-book-tel],[data-book-tel2]')) { a.href = `tel:${b.phone}`; a.textContent = b.phonePretty; }
+      $<HTMLElement>('[data-book-name]').textContent = b.name;
+      $<HTMLElement>('[data-book-provider]').textContent = PROVIDER[b.provider] ?? 'the booking page';
+      sizeOut.value = String(size);
+      dlg.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = size <= 1;
+      dlg.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = size >= 20;
+      go.setAttribute('aria-disabled', String(tooMany || !time));
+    };
+    const draw = () => { drawDays(); drawTimes(); update(); };
+
+    const link = () => {
+      const u = new URL(b.url);
+      if (b.provider === 'opentable' && b.widgetId) {
+        const q = new URL(`https://www.opentable.co.uk/restref/client/`);
+        q.search = new URLSearchParams({ rid: b.widgetId, restref: b.widgetId, datetime: `${day}T${time}`, covers: String(size), lang: 'en-GB' }).toString();
+        return q.href;
+      }
+      if (b.provider === 'sevenrooms' && b.widgetId) {
+        const q = new URL(`https://www.sevenrooms.com/explore/${b.widgetId}/reservations/create/search/`);
+        q.search = new URLSearchParams({ date: day, party_size: String(size), start_time: time }).toString();
+        return q.href;
+      }
+      return u.href;
+    };
+
+    const pick = (id: string) => {
+      b = all.find((x) => x.id === id) ?? b;
+      const r = dlg.querySelector<HTMLInputElement>(`input[name="where"][value="${b.id}"]`);
+      if (r) r.checked = true;
+      day = local(b.tz).ymd;
+      if (!slots(day).length) for (let i = 1; i < 8 && !slots(day).length; i++) day = addDays(local(b.tz).ymd, i);
+      draw();
+    };
+
+    dlg.querySelectorAll<HTMLInputElement>('input[name="where"]').forEach((r) => r.addEventListener('change', () => pick(r.value)));
+    dlg.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => btn.addEventListener('click', () => { size = Math.min(20, Math.max(1, size + Number(btn.dataset.step))); update(); }));
+    form.addEventListener('submit', (e) => {
+      const submitter = (e as SubmitEvent).submitter as HTMLButtonElement | null;
+      if (submitter?.value !== 'go') return;
+      e.preventDefault();
+      if (go.getAttribute('aria-disabled') === 'true') return;
+      const href = link();
+      // Same pattern as the boarding passes: new tab, no opener; same tab if blocked.
+      const w = window.open(href, '_blank');
+      if (w) w.opener = null; else location.href = href;
+      window.dispatchEvent(new CustomEvent('fp:booking-click', { detail: { branch: b.id, size } }));
+      dlg.close();
+    });
+    dlg.addEventListener('close', () => opener?.focus());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+
+    // Any [data-book] link opens the drawer; its value picks the restaurant
+    // (empty = let the guest choose). Delegated, so links added later work too.
+    document.addEventListener('click', (e) => {
+      const t = (e.target as Element).closest<HTMLElement>('[data-book]');
+      if (!t || e.defaultPrevented || (e as MouseEvent).metaKey || (e as MouseEvent).ctrlKey) return;
+      const id = t.dataset.book ?? '';
+      if (id && !all.some((x) => x.id === id)) return;
+      e.preventDefault();
+      opener = t;
+      $<HTMLElement>('[data-book-where]').hidden = Boolean(id) || all.length < 2;
+      let saved: string | null = null;
+      try { saved = localStorage.getItem('fp-menu-at'); } catch {}
+      pick(id || saved || all[0].id);
+      dlg.showModal();
+    });
+  }
+</script>

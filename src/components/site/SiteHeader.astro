@@ -4,6 +4,7 @@
  * on a branch page they lead home, list the three rooms, and Book goes straight to that room.
  */
 import type { Branch } from '@/lib/site-data';
+import BookDrawer from './BookDrawer.astro';
 
 interface Props {
   branches: Branch[];
@@ -11,22 +12,26 @@ interface Props {
   current?: Branch;
 }
 const { branches, current } = Astro.props;
-const home = !current;
+// Home page = the long story page; other pages without a branch (allergens,
+// privacy…) link back to its sections.
+const home = !current && Astro.url.pathname === '/';
+const at = (hash: string) => (home ? hash : `/${hash}`);
 const book = current?.booking
   ? { href: current.booking.url, label: `Book ${current.shortName}`, external: true }
   : current
     ? { href: '#waitlist', label: 'Join the list', external: false }
-    : { href: '#tables', label: 'Book a table', external: false };
+    : { href: at('#tables'), label: 'Book a table', external: false };
+const bookAttr = current?.booking ? current.id : current ? undefined : '';
 ---
 {import.meta.env.PUBLIC_LAUNCH !== 'true' && <p class="preview-flag">Website preview for Fatt Pundit · not the live site · prices and photos to be confirmed</p>}
 <header class="bar">
   <div class="wrap bar-in">
     <a class="brand" href={home ? '#top' : '/'}>FATT PUNDIT</a>
     <nav aria-label="Main" class="nav">
-      {home ? (
+      {!current ? (
         <>
-          <a href="#menu">Menus</a>
-          <a href="#story">Our story</a>
+          <a href={at('#menu')}>Menus</a>
+          <a href={at('#story')}>Our story</a>
           {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}
         </>
       ) : (
@@ -34,7 +39,8 @@ const book = current?.booking
           <a href={`/${b.id}/`} aria-current={b.id === current?.id ? 'page' : undefined}>{b.shortName}</a>
         ))
       )}
-      <a class="btn btn-orange btn-sm" href={book.href} aria-label={book.label} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="lbl-long">{book.label}</span><span class="lbl-short" aria-hidden="true">{book.external || home ? 'Book' : 'Join'}</span></a>
+      <a class="btn btn-orange btn-sm" href={book.href} aria-label={book.label} data-book={bookAttr} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="lbl-long">{book.label}</span><span class="lbl-short" aria-hidden="true">{current && !current.booking ? 'Join' : 'Book'}</span></a>
     </nav>
   </div>
 </header>
+<BookDrawer />

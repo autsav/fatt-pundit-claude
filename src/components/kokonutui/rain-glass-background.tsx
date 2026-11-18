@@ -591,11 +591,10 @@ export default function RainGlassBackground({
       woken = true;
       start();
     };
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(wake, { timeout: 2500 });
-    } else {
-      window.setTimeout(wake, 1200);
-    }
+    // Safari has no requestIdleCallback.
+    const ric = (window as Window & { requestIdleCallback?: Window["requestIdleCallback"] }).requestIdleCallback;
+    if (ric) ric.call(window, wake, { timeout: 2500 });
+    else setTimeout(wake, 1200);
 
     const image = new Image();
     image.crossOrigin = "anonymous";

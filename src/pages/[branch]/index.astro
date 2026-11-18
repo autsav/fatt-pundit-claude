@@ -22,7 +22,7 @@ import lightsOnClip from '../../assets/video/cg-lights-on.mp4';
 import lightsOffStill from '../../assets/video/cg-lights-on-off.jpg';
 import lightsLitStill from '../../assets/video/cg-lights-on-lit.jpg';
 import boothsLoop from '../../assets/video/cg-booths-glow.mp4';
-import { BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, hoursLines, menuBooks, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
+import { appleMapsUrl, BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, hoursLines, menuBooks, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
 import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../../assets/images/brand/logo-stamp-distressed-right.png';
 import stampGoldArt from '../../assets/images/brand/stamp-gold.png';
@@ -163,7 +163,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         <p class="arrival-addr">{fullAddress(b)}</p>
         <div class="row arrival-actions">
           {open && b.booking ? (
-            <a class="btn btn-orange" href={b.booking.url} target="_blank" rel="noopener">Book a table</a>
+            <a class="btn btn-orange" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
           ) : (
             <a class="btn btn-orange" href="#waitlist">Join the list</a>
           )}
@@ -250,6 +250,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
     <!-- 4 · The menus here -->
     {books.length > 0 && <MenuBook client:visible menus={books} art={menuArt} next={{ href: '#visit', label: 'Continue to visit' }} />}
+    {open && <p class="menu-list-link"><a href={`/${b.id}/menu/`}>Read every {b.shortName} menu as a list</a> · search, diet filters, print</p>}
 
     <!-- 5 · Visit -->
     <section id="visit" class="sec ink visit" aria-labelledby="visit-title">
@@ -260,7 +261,8 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
           <p>{fullAddress(b)}</p>
           <p class="small">Nearest {p.stations.length > 1 ? 'stations' : 'station'}: {p.stations.join(', ')}</p>
           <div class="row">
-            <a class="btn btn-orange btn-sm" href={directionsUrl(b)} target="_blank" rel="noopener">Directions</a>
+            <a class="btn btn-orange btn-sm" href={directionsUrl(b)} target="_blank" rel="noopener">Google Maps</a>
+            <a class="btn btn-ghost-light btn-sm" href={appleMapsUrl(b)} target="_blank" rel="noopener">Apple Maps</a>
             {b.phone && <a class="btn btn-ghost-light btn-sm" href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}
             {b.email && <a class="btn btn-ghost-light btn-sm" href={`mailto:${b.email}`}>Email</a>}
           </div>
@@ -331,10 +333,32 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     </section>
   </main>
 
+  <!-- Phones: Book, Menu and Directions stay one thumb away once the hero has scrolled by. -->
+  <nav class="dock" data-dock aria-label={`${b.shortName} quick actions`}>
+    {b.booking
+      ? <a class="dock-book" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener" aria-label={`Book a table at ${b.shortName}`}>Book a table</a>
+      : <a class="dock-book" href="#waitlist">Join the list</a>}
+    <a href={open ? `/${b.id}/menu/` : '#menu'}>Menu</a>
+    <a href={directionsUrl(b)} target="_blank" rel="noopener">Directions</a>
+  </nav>
   <SiteFooter branches={branches} />
 </Base>
 
 <script>
+  // The dock shows once the arrival hero has scrolled away and hides over the
+  // footer (whose own links take over there).
+  {
+    const dock = document.querySelector<HTMLElement>('[data-dock]');
+    const hero = document.querySelector('.arrival');
+    const foot = document.querySelector('footer.foot');
+    if (dock && hero) {
+      let pastHero = false, atFoot = false;
+      const set = () => dock.classList.toggle('is-on', pastHero && !atFoot);
+      new IntersectionObserver(([e]) => { pastHero = !e.isIntersecting && e.boundingClientRect.top < 0; set(); }).observe(hero);
+      if (foot) new IntersectionObserver(([e]) => { atFoot = e.isIntersecting; set(); }).observe(foot);
+    }
+  }
+
   // Today's line in the hours list, in the branch's own time zone.
   for (const dl of document.querySelectorAll<HTMLElement>('[data-tz]')) {
     const day = new Intl.DateTimeFormat('en-GB', { timeZone: dl.dataset.tz, weekday: 'short' }).format(new Date()).slice(0, 3).toLowerCase();
@@ -459,4 +483,12 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .other-name { font-size: 34px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
   .other-addr { font-family: var(--font-note); font-style: italic; }
   .other-go { margin-top: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-tiger-bright); }
+  .dock { position: fixed; z-index: 40; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); display: none; grid-template-columns: 1.4fr 1fr 1fr; gap: 6px; padding: 6px; background: var(--color-ink); border: 2px solid var(--color-gold); box-shadow: 0 10px 30px rgb(0 0 0 / 0.35); transform: translateY(140%); transition: transform .25s ease; }
+  .dock.is-on { transform: none; }
+  .dock a { display: grid; place-items: center; min-height: 48px; padding: 0 8px; color: var(--color-sand); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; text-align: center; border: 1px solid rgb(218 199 181 / 0.35); }
+  .dock .dock-book { background: var(--color-tiger); color: var(--color-ink-deep); border-color: var(--color-tiger); }
+  @media (max-width: 760px) { .dock { display: grid; } }
+  @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }
+  .menu-list-link { margin: 0; padding: 18px 16px 0; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  .menu-list-link a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
 </style>

@@ -161,7 +161,12 @@ const orgLd = {
     <Arrival />
     <!-- 1 · Rain on the window -->
     <section id="top" class="rain" aria-label="Fatt Pundit">
-      <RainHero client:load src={rainSrc}><GateBoard branches={branches} /></RainHero>
+      <RainHero client:load src={rainSrc}>
+        <div class="hero-choose">
+          <GateBoard branches={branches} />
+          <a class="btn btn-orange hero-book" href="#tables" data-book="">Book a table</a>
+        </div>
+      </RainHero>
     </section>
     <!-- 2 · The doors -->
     <Doors />
@@ -174,6 +179,7 @@ const orgLd = {
 
     <!-- 5 · The menu book -->
     <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} next={{ href: '#bar', label: 'Continue to the bar' }} />
+    <p class="menu-list-link">Menus as a list: {branches.filter((b) => b.status === 'open').map((b, i) => <>{i > 0 && ' · '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}</p>
 
     <!-- 6 · The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />
@@ -269,4 +275,8 @@ const orgLd = {
     .reveal { opacity: 1; transform: none; }
     .steam { display: none; }
   }
+  .hero-choose { display: grid; gap: 12px; justify-items: center; }
+  .hero-book { min-width: min(280px, 100%); }
+  .menu-list-link { margin: 0; padding: 18px 16px 8px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; background: var(--color-sand); }
+  .menu-list-link a { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
 </style>
