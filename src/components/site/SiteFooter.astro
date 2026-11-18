@@ -1,5 +1,6 @@
 ---
 import { prettyPhone, type Branch } from '@/lib/site-data';
+import Goodbye from './Goodbye.astro';
 
 interface Props {
   branches: Branch[];
@@ -10,10 +11,18 @@ const h = (hash: string) => (home ? hash : `/${hash}`);
 ---
 <footer class="foot">
   <div class="wrap stack-lg">
+    <!-- 9 · Goodbye: the bill holder opens and the receipt prints our hours. -->
+    <div class="goodbye">
+      <Goodbye branches={branches} />
+      <div class="stack goodbye-text">
+        <p class="kicker gold">Goodbye, for now</p>
+        <p class="goodbye-h">Thank you for travelling with Fatt Pundit</p>
+        <p class="note gold">Hakka cooking from Tangra, Kolkata's Chinatown.</p>
+      </div>
+    </div>
     <div class="foot-grid">
       <div class="stack-sm">
         <p class="brand">FATT PUNDIT</p>
-        <p class="note gold">Hakka cooking from Tangra, Kolkata's Chinatown.</p>
       </div>
       {branches.map((b) => (
         <div class="stack-sm small">
@@ -34,6 +43,9 @@ const h = (hash: string) => (home ? hash : `/${hash}`);
 </footer>
 <style>
   .foot :global(p) { margin: 0; }
+  .goodbye { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(32px, 6vw, 96px); padding-bottom: clamp(40px, 6vw, 72px); border-bottom: 1px solid rgb(203 160 82 / 0.35); }
+  .goodbye-h { font-family: var(--font-display); font-size: clamp(28px, 4vw, 54px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-sand); }
+  @media (max-width: 760px) { .goodbye { grid-template-columns: 1fr; text-align: center; } .goodbye-text { order: -1; align-items: center; } }
   .foot-h { text-decoration: none; }
   .foot-h:hover { text-decoration: underline; }
 </style>

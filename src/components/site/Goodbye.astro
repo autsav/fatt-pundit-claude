@@ -1,0 +1,132 @@
+---
+/**
+ * Scene 9: goodbye. The black bill holder from the brand guidelines (p.38–39): linen, a gold-foil
+ * stamp, "Thank you!" in gold. When it comes into view it opens and a receipt prints the opening hours.
+ * Calm mode: already open, receipt in place. No JS: same, nothing hidden.
+ */
+import { getImage } from 'astro:assets';
+import { hoursLines, prettyPhone, type Branch } from '@/lib/site-data';
+import stampArt from '@/assets/images/brand/logo-stamp-distressed-left.png';
+
+interface Props {
+  branches: Branch[];
+}
+const { branches } = Astro.props;
+const stamp = (await getImage({ src: stampArt, width: 360, format: 'png' })).src;
+const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1];
+---
+<div class="bill" data-bill>
+  <div class="bill-pocket">
+    <div class="receipt-slot" aria-hidden="true"></div>
+    <div class="receipt-clip">
+      <div class="receipt" role="group" aria-label="Receipt with our opening hours">
+        <p class="r-c r-big">Fatt Pundit</p>
+        <p class="r-c">Hakka cooking from Tangra</p>
+        <p class="r-c r-date" data-receipt-date>&nbsp;</p>
+        <p class="r-rule" aria-hidden="true"></p>
+        {branches.map((b) => (
+          <div class="r-branch">
+            <p class="r-name">{b.shortName}</p>
+            {b.hours ? (
+              <dl>
+                {hoursLines(b.hours).map((l) => (
+                  <div><dt>{l.days}</dt><dd>{l.text}</dd></div>
+                ))}
+              </dl>
+            ) : (
+              <p>Opening soon</p>
+            )}
+            {b.phone && <p class="r-phone">{prettyPhone(b.phone)}</p>}
+          </div>
+        ))}
+        <p class="r-rule" aria-hidden="true"></p>
+        <p class="r-row"><span>Table</span><span>Yours</span></p>
+        <p class="r-row r-total"><span>Total</span><span>One good night</span></p>
+        <p class="r-rule" aria-hidden="true"></p>
+        <p class="r-c">Thank you for travelling with Fatt Pundit</p>
+        <svg class="r-bars" viewBox="0 0 90 18" preserveAspectRatio="none" aria-hidden="true">
+          {BARS.reduce<{ x: number; w: number }[]>((acc, w) => [...acc, { x: (acc.at(-1)?.x ?? -2) + (acc.at(-1)?.w ?? 0) + 1, w }], []).map((r) => <rect x={r.x} width={r.w} height="18" />)}
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="bill-cover" aria-hidden="true">
+    <div class="bill-face bill-front">
+      <span class="foil foil-stamp" style={`-webkit-mask-image: url(${stamp}); mask-image: url(${stamp});`}></span>
+      <span class="foil-thanks">Thank you!</span>
+    </div>
+    <div class="bill-face bill-back">
+      <span class="lining">Hakka cooking from Tangra, Kolkata's Chinatown.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stamp = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date());
+  for (const d of document.querySelectorAll('[data-receipt-date]')) d.textContent = stamp.replace(',', '');
+  for (const bill of document.querySelectorAll<HTMLElement>('[data-bill]')) {
+    if (calm) {
+      bill.classList.add('is-open');
+      continue;
+    }
+    // Closed until it is on screen; then the cover swings open and the receipt prints.
+    bill.classList.add('is-closed');
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        bill.classList.replace('is-closed', 'is-open');
+      },
+      { threshold: 0.45 },
+    );
+    io.observe(bill);
+  }
+</script>
+
+<style>
+  /* Two panels side by side when open: the cover's inside (left) and the pocket with the receipt (right).
+     Closed, the cover sits over the pocket and the folder is centred. */
+  .bill { --p: clamp(150px, 19vw, 210px); position: relative; width: calc(var(--p) * 2); margin-inline: auto; perspective: 1600px; transition: translate .9s cubic-bezier(.2, .8, .2, 1); }
+  .bill.is-closed { translate: calc(var(--p) * -0.5) 0; }
+  .bill-pocket { position: relative; margin-left: var(--p); width: var(--p); min-height: calc(var(--p) * 1.9); padding: 26px 12px 18px; border-radius: 3px; box-sizing: border-box;
+    background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgb(0 0 0 / 0.3) 0 1px, transparent 1px 3px), #141210;
+    box-shadow: 0 30px 60px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(203 160 82 / 0.25); }
+  /* The slot the receipt prints out of. */
+  .receipt-slot { position: absolute; left: 8px; right: 8px; top: 16px; height: 6px; border-radius: 3px; background: #000; box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.9), 0 1px 0 rgb(203 160 82 / 0.3); }
+  .receipt-clip { position: relative; clip-path: inset(0 -20px -100vh -20px); }
+  .receipt { --ink: #2c2925; text-align: left; background: #fbf8f2; color: var(--ink); padding: 12px 10px 18px; font-family: var(--font-label); font-size: 11.5px; line-height: 1.35; letter-spacing: 0.04em;
+    box-shadow: 0 6px 14px rgb(0 0 0 / 0.35);
+    -webkit-mask: linear-gradient(#000, #000) top / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at 50% 0, #000 90deg, transparent 0) bottom / 10px 6px repeat-x;
+    mask: linear-gradient(#000, #000) top / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at 50% 0, #000 90deg, transparent 0) bottom / 10px 6px repeat-x; }
+  .bill.is-closed .receipt { translate: 0 -105%; }
+  .bill.is-open .receipt { translate: 0 0; transition: translate 2.2s steps(14, end) .75s; }
+  .receipt p, .receipt dl { margin: 0; }
+  .r-c { text-align: center; }
+  .r-big { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+  .r-date { margin-top: 4px !important; }
+  .r-rule { height: 0; margin: 8px 0 !important; border-top: 1.5px dashed var(--ink); }
+  .r-branch { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+  .r-name { font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
+  .r-branch dl div { display: flex; flex-direction: column; }
+  .r-branch dd { margin: 0 0 2px; padding-left: 8px; }
+  .r-row { display: flex; justify-content: space-between; gap: 8px; text-transform: uppercase; }
+  .r-total { font-weight: 700; }
+  .r-bars { display: block; width: 100%; height: 22px; margin-top: 10px; fill: var(--ink); }
+
+  /* The cover: front has the foil; turning it shows the lining. Hinge on its left edge. */
+  .bill-cover { position: absolute; top: 0; bottom: 0; left: var(--p); width: var(--p); transform-origin: 0 50%; transform-style: preserve-3d; transition: transform 1s cubic-bezier(.3, .7, .2, 1); }
+  .bill.is-open .bill-cover { transform: rotateY(-178deg); }
+  .bill-face { position: absolute; inset: 0; border-radius: 3px; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgb(0 0 0 / 0.3) 0 1px, transparent 1px 3px), #1b1916;
+    box-shadow: inset 0 0 0 1px rgb(203 160 82 / 0.2), 0 20px 40px rgb(0 0 0 / 0.45); }
+  .bill-back { transform: rotateY(180deg); background-color: #2a2621; }
+  .foil { background: linear-gradient(135deg, #8a6a2c 0%, #e9cf8f 30%, #b88e42 50%, #f3dca6 68%, #9a7735 100%); }
+  .foil-stamp { width: 62%; aspect-ratio: 0.764; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+  .foil-thanks { font-family: var(--font-note); font-style: italic; font-size: clamp(18px, 2vw, 24px); background: linear-gradient(135deg, #b88e42, #f3dca6 50%, #a8803a); -webkit-background-clip: text; background-clip: text; color: transparent; rotate: -6deg; }
+  .lining { padding: 18px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 15px; color: rgb(203 160 82 / 0.75); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bill, .bill-cover, .bill.is-open .receipt { transition: none; }
+  }
+</style>

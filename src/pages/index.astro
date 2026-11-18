@@ -9,6 +9,7 @@ import Kitchen, { type KitchenDish } from '../components/scenes/Kitchen.tsx';
 import MenuBook, { type MenuLite } from '../components/scenes/MenuBook.tsx';
 import BarAfterDark from '../components/scenes/BarAfterDark.tsx';
 import RoomContactSheet from '../components/scenes/RoomContactSheet.tsx';
+import BoardingPasses from '../components/scenes/BoardingPasses.astro';
 import Base from '../layouts/Base.astro';
 import { getBranches, dish, priceOf, hoursLines, menuBooks, prettyPhone } from '../lib/site-data';
 import SiteHeader from '../components/site/SiteHeader.astro';
@@ -165,46 +166,15 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
       </div>
     </section>
 
-    <!-- 7 · Your table -->
-    <section id="tables" class="sec gold-bg">
+    <!-- 8 · Your boarding pass -->
+    <section id="tables" class="sec gold-bg" aria-labelledby="tables-title">
       <div class="wrap stack-lg">
         <div class="stack center reveal">
           <p class="kicker">Your table</p>
-          <h2 class="h2">Choose your door</h2>
+          <h2 id="tables-title" class="h2">Choose your gate</h2>
+          <p>Three passes, one for each room. Tear off a stub to book.</p>
         </div>
-        <div class="cards">
-          {branches.map((b, i) => (
-            <article class={`card stamp-in ${b.status === 'opening-soon' ? 'card-dark' : ''}`} style={`--d:${i * 120}ms; view-transition-name: branch-${b.id}`}>
-              {stamps[b.id] && <Image src={stamps[b.id]} alt="" width={180} class="card-stamp" />}
-              {b.status === 'opening-soon' && <p class="soon">Opening soon</p>}
-              <h3 class="card-title"><a href={`/${b.id}/`} class="card-link">{b.shortName}</a></h3>
-              <p>{b.address.street}<br />{b.address.city}{b.address.postcode ? ` ${b.address.postcode}` : ''}</p>
-              {b.hours && (
-                <dl class="hours">
-                  {hoursLines(b.hours).map((l) => (<><dt>{l.days}</dt><dd>{l.text}</dd></>))}
-                </dl>
-              )}
-              {b.status === 'open' && b.booking && (
-                <div class="row card-actions">
-                  <a class="btn btn-ink" href={b.booking.url} target="_blank" rel="noopener">Book {b.shortName}</a>
-                  {b.phone && <a class="btn btn-line" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
-                </div>
-              )}
-              <a class="card-more" href={`/${b.id}/`}>{b.status === 'open' ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`} →</a>
-              {b.status === 'opening-soon' && (
-                <form class="waitlist" data-waitlist>
-                  <p>Be first through the door. Leave your email and we'll tell you when bookings open.</p>
-                  <label for={`wl-${b.id}`}>Email address</label>
-                  <div class="row">
-                    <input id={`wl-${b.id}`} type="email" required placeholder="you@example.com" autocomplete="email" />
-                    <button class="btn btn-orange" type="submit">Join</button>
-                  </div>
-                  <p class="wl-msg" role="status" hidden>Thanks. (Demo only: nothing was sent.)</p>
-                </form>
-              )}
-            </article>
-          ))}
-        </div>
+        <BoardingPasses branches={branches} stamps={stamps} />
         <p class="center small reveal">Five or more guests? Please call the restaurant. Larger bookings need a deposit.</p>
       </div>
     </section>
@@ -215,25 +185,6 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
 
 <script>
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Stepping into a room: the card's stamp thuds before the page morphs (skipped in calm mode).
-  for (const a of document.querySelectorAll<HTMLAnchorElement>('.card-link, .card-more')) {
-    a.addEventListener('click', (e) => {
-      if (reduce || e.metaKey || e.ctrlKey || e.shiftKey) return;
-      const card = a.closest('.card');
-      if (!card) return;
-      e.preventDefault();
-      card.classList.add('is-stamped');
-      setTimeout(() => (location.href = a.href), 240);
-    });
-  }
-
-  // Reveal sections, draw the map route, drop the stamp cards.
-  const io = new IntersectionObserver(
-    (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
-    { threshold: 0.18 },
-  );
-  document.querySelectorAll('.reveal, .stamp-in').forEach((el) => (reduce ? el.classList.add('is-in') : io.observe(el)));
-
   // Demo waitlist: no backend yet, so say so honestly.
   document.querySelectorAll<HTMLFormElement>('[data-waitlist]').forEach((f) =>
     f.addEventListener('submit', (ev) => {
@@ -241,6 +192,13 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
       f.querySelector<HTMLElement>('.wl-msg')?.removeAttribute('hidden');
     }),
   );
+  // Reveal sections.
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
+    { threshold: 0.18 },
+  );
+  document.querySelectorAll('.reveal').forEach((el) => (reduce ? el.classList.add('is-in') : io.observe(el)));
+
 </script>
 
 <style>
@@ -271,26 +229,6 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   .rating-n { font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
 
   /* Tables */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 28px; }
-  .card { background: var(--color-sand); color: var(--color-ink); padding: 28px; display: flex; flex-direction: column; gap: 14px; outline: 3px dashed var(--color-sand); outline-offset: 7px; }
-  .card-dark { background: var(--color-ink); color: var(--color-sand); outline-color: var(--color-ink); }
-  .card :global(.card-stamp) { width: 92px; height: auto; }
-  .card.is-stamped :global(.card-stamp) { animation: card-thud .24s cubic-bezier(.2, 1.6, .4, 1); }
-  @keyframes card-thud { 0% { transform: scale(1.7) rotate(-12deg); opacity: .4; } 100% { transform: none; opacity: 1; } }
-  .card-title { margin: 0; font-size: 30px; }
-  .card-link { color: inherit; text-decoration: none; }
-  .card-link:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
-  .card-more { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 15px; color: inherit; }
-  .card-dark .card-more { color: var(--color-gold); }
-  .soon { align-self: flex-start; border: 2px solid var(--color-gold); color: var(--color-gold); padding: 6px 12px; font-family: var(--font-label); font-weight: 700; font-size: 14px; letter-spacing: 0.24em; text-transform: uppercase; }
-  .card-actions { margin-top: auto; padding-top: 6px; }
-  .waitlist { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
-  .waitlist label { font-size: 14px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-gold); }
-  .waitlist input { flex: 1 1 170px; min-width: 0; min-height: 50px; padding: 0 14px; border: 2px solid var(--color-sand); background: var(--color-ink); color: var(--color-sand); font: inherit; font-size: 16px; }
-  .wl-msg { color: var(--color-gold); }
-  .card-dark .waitlist { margin-top: 8px; }
-  .stamp-in { opacity: 0; transform: translateY(-40px) rotate(-4deg) scale(1.05); transition: opacity .5s ease var(--d), transform .6s cubic-bezier(.2,1.4,.4,1) var(--d); }
-  .stamp-in.is-in { opacity: 1; transform: none; }
 
   /* Reveal */
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
@@ -300,7 +238,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal, .stamp-in { opacity: 1; transform: none; }
+    .reveal { opacity: 1; transform: none; }
     .steam { display: none; }
   }
 </style>

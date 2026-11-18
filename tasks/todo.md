@@ -68,8 +68,15 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 - [x] Day 4 room: contact sheet on halftone, 2 grease-pencil picks, <dialog> lightbox (arrows, swipe, Esc, focus return).
 - [x] Verified desk/phone/calm, no page errors, JS home 161 KB gz / branch 113 KB; demo sub-path test clean; published v1794993077-db07.
 
-## Motion plan · Day 5: boarding pass + goodbye (next)
-- [ ] Boarding pass, tear-to-book, receipt goodbye, bill holder (guidelines p.38–39)
+## Motion plan · Day 5: boarding pass + goodbye ✅ done 18 Nov
+- [x] Scene 8 "Your boarding pass": 3 passes (Soho, Covent Garden, Dubai) replace the table cards; stamp in (anime.js, staggered thud)
+- [x] Tear-to-book: stub is a real link; tap/drag tears it off, then opens the booking page (new tab, fallback same tab). Dubai stub opens the waitlist
+- [x] Pass shows: route, gate (address), today's hours (live, branch time zone), flight no. (year opened), call, step-inside link
+- [x] Scene 9 goodbye in the footer: black bill holder (p.38–39: gold foil stamp, "Thank you!") opens, receipt prints opening hours + "Thank you for travelling with Fatt Pundit"
+- [x] Calm mode: passes and receipt shown still, stub = plain link
+- [x] Polish: phone check all pages, JS budget, calm check, no page errors
+- [x] Export demo, sub-path test, publish v3, commit, lessons
+- Verified: 4 pages × phone/desktop/calm, no overflow or page errors; tear opens booking in a new tab and keeps this page; Dubai stub focuses the waitlist; today's hours correct (Wed). JS: home 161 KB, branches 89–116 KB gz. Published v1794994034-f3c0. Not run: Lighthouse, real mid-range Android.
 
 ## Day 2: journey storyboard (next)
 - [ ] docs/journey-storyboard.md: 7 scenes, copy ≤ 25 words each, asset per scene, motion note, reduced-motion still

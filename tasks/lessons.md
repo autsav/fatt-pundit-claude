@@ -26,4 +26,5 @@ Review at the start of every session. Add a line after any correction.
 - A camera over a big detailed map: one pre-drawn image moved by transform only (will-change), plus a light SVG overlay whose viewBox follows the same camera. Draw the chart wider than the route so the camera never sees its edge.
 - Thin line art (the gold junk) disappears on a busy background: put it on a solid badge.
 - Test touch gestures with the target fully on screen and clear of the sticky header, or the test swipes the header.
+- window.open(url, '_blank', 'noopener') ALWAYS returns null, so it can't detect a blocked pop-up. Open without the feature, then set w.opener = null; fall back to same-tab only when w is null.
 

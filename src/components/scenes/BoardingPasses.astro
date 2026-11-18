@@ -1,0 +1,262 @@
+---
+/**
+ * Scene 8: your boarding pass. One pass per branch; the passes thud in like stamps (anime.js).
+ * The stub is a real booking link: tap it and it tears off, then the booking page opens.
+ * Dubai's stub tears to the waitlist instead. Calm mode / no JS: plain links, nothing hidden.
+ */
+import { Image } from 'astro:assets';
+import { BOOKING_NAMES, hoursLines, prettyPhone, type Branch } from '@/lib/site-data';
+
+interface Props {
+  branches: Branch[];
+  stamps: Record<string, ImageMetadata>;
+}
+const { branches, stamps } = Astro.props;
+
+const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', dubai: 'DXB' };
+
+/** A barcode that is the same every build: bar widths from the branch id. */
+function bars(seed: string) {
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  const out: { x: number; w: number }[] = [];
+  let x = 0;
+  while (x < 196) {
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    const w = 1 + (Math.abs(h) % 4);
+    out.push({ x, w });
+    x += w + 1 + (Math.abs(h >> 4) % 3);
+  }
+  return out;
+}
+
+/** Today's hours per weekday key, so the script can show the guest's "today" in the branch's time zone. */
+function byDay(b: Branch) {
+  if (!b.hours) return null;
+  const map: Record<string, string> = {};
+  for (const l of hoursLines(b.hours)) for (const k of l.keys) map[k] = l.text;
+  return JSON.stringify(map);
+}
+---
+<div class="passes">
+  {branches.map((b, i) => {
+    const open = b.status === 'open' && b.booking;
+    const via = b.booking ? BOOKING_NAMES[b.booking.provider as keyof typeof BOOKING_NAMES] : '';
+    return (
+      <article class={`pass pass-${b.page.lead}`} data-pass style={`--i: ${i}; view-transition-name: branch-${b.id}`} aria-labelledby={`pass-${b.id}`}>
+        <div class="pass-main">
+          <header class="pass-head">
+            <span>Fatt Pundit</span>
+            <span>Boarding pass</span>
+          </header>
+          <div class="pass-route">
+            <div class="pass-end">
+              <span class="pass-lbl">From</span>
+              <span class="pass-code">You</span>
+            </div>
+            <span class="pass-line" aria-hidden="true"></span>
+            <div class="pass-end pass-to">
+              <span class="pass-lbl">To</span>
+              <span class="pass-code">{CODES[b.id] ?? b.shortName}</span>
+            </div>
+          </div>
+          <h3 id={`pass-${b.id}`} class="pass-name"><a href={`/${b.id}/`} class="pass-more" data-step>{b.shortName}</a></h3>
+          <dl class="pass-fields">
+            <div><dt>Gate</dt><dd>{b.address.street}</dd></div>
+            <div><dt>Flight</dt><dd>FP {b.page.opened ?? '——'}</dd></div>
+            <div><dt>Seat</dt><dd>{open ? 'Any table' : 'Soon'}</dd></div>
+            <div>
+              <dt>Today</dt>
+              <dd data-today={byDay(b)} data-tz={b.timezone}>{b.hours ? 'See hours below' : 'Opening soon'}</dd>
+            </div>
+          </dl>
+          {b.status === 'opening-soon' && (
+            <form class="pass-waitlist" data-waitlist id={`wl-form-${b.id}`}>
+              <label for={`wl-${b.id}`}>Be first through the gate</label>
+              <div class="pass-wl-row">
+                <input id={`wl-${b.id}`} type="email" required placeholder="you@example.com" autocomplete="email" />
+                <button class="btn btn-orange btn-sm" type="submit">Join</button>
+              </div>
+              <p class="wl-msg" role="status" hidden>Thanks. (Demo only: nothing was sent.)</p>
+            </form>
+          )}
+          <p class="pass-links">
+            {b.phone && <a href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
+            <a href={`/${b.id}/`} class="pass-more" data-step>{open ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`} →</a>
+          </p>
+          <span class="pass-boarding" aria-hidden="true">{open ? 'Boarding' : 'Opening soon'}</span>
+        </div>
+
+        <a
+          class="pass-stub"
+          data-tear
+          href={open ? b.booking!.url : `#wl-${b.id}`}
+          {...(open ? { target: '_blank', rel: 'noopener' } : {})}
+          aria-label={open ? `Book a table at ${b.shortName} on ${via} (opens in a new tab)` : `Join the ${b.shortName} waitlist`}
+        >
+          {stamps[b.id] ? <Image src={stamps[b.id]} alt="" width={120} class="stub-stamp" /> : <span class="stub-stamp stub-gate">{CODES[b.id]}</span>}
+          <span class="stub-text">
+            <span class="stub-cta">{open ? 'Tear to book' : 'Tear for the list'}</span>
+            <span class="stub-via">{open ? `via ${via}` : 'Bookings open soon'}</span>
+          </span>
+          <svg class="stub-bars" viewBox="0 0 196 28" preserveAspectRatio="none" aria-hidden="true">
+            {bars(b.id).map((r) => <rect x={r.x} y="0" width={r.w} height="28" />)}
+          </svg>
+        </a>
+      </article>
+    );
+  })}
+</div>
+
+<script>
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const passes = [...document.querySelectorAll<HTMLElement>('[data-pass]')];
+
+  // Today's hours, in each branch's own time zone.
+  for (const dd of document.querySelectorAll<HTMLElement>('[data-today]')) {
+    const map = dd.dataset.today ? (JSON.parse(dd.dataset.today) as Record<string, string>) : null;
+    if (!map) continue;
+    const day = new Intl.DateTimeFormat('en-GB', { timeZone: dd.dataset.tz, weekday: 'short' }).format(new Date()).slice(0, 3).toLowerCase();
+    dd.textContent = map[day] ?? 'Closed';
+  }
+
+  // Stamp in: each pass thuds down, then its "Boarding" stamp lands.
+  if (!calm && passes.length) {
+    passes.forEach((p) => p.classList.add('is-waiting'));
+    const io = new IntersectionObserver(
+      async ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        const { animate, stagger } = await import('animejs');
+        passes.forEach((p) => p.classList.remove('is-waiting'));
+        animate(passes, {
+          opacity: [0, 1],
+          translateY: [-36, 0],
+          rotate: { from: (_?: unknown, i = 0) => [-5, 3, -2][i % 3], to: 0 },
+          scale: [1.12, 1],
+          duration: 650,
+          delay: stagger(140),
+          ease: 'outBack(1.6)',
+        });
+        animate(passes.map((p) => p.querySelector('.pass-boarding')!), {
+          opacity: [0, 0.9],
+          scale: [2.2, 1],
+          duration: 380,
+          delay: stagger(140, { start: 520 }),
+          ease: 'outBack(2.2)',
+        });
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(passes[0].parentElement!);
+  }
+
+  // Tear the stub, then go: booking in a new tab (same tab if pop-ups are blocked), or the waitlist.
+  for (const stub of document.querySelectorAll<HTMLAnchorElement>('[data-tear]')) {
+    stub.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      const pass = stub.closest<HTMLElement>('[data-pass]')!;
+      const external = stub.target === '_blank';
+      e.preventDefault();
+      const go = () => {
+        if (external) {
+          // Not the 'noopener' feature: with it window.open always returns null, so a blocked
+          // pop-up could not be told apart. Cut the link back to us by hand instead.
+          const w = window.open(stub.href, '_blank');
+          if (w) w.opener = null;
+          else location.href = stub.href;
+        } else {
+          const input = document.querySelector<HTMLInputElement>(stub.hash);
+          input?.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
+          input?.focus({ preventScroll: true });
+        }
+      };
+      if (calm) return go();
+      pass.classList.add('is-torn');
+      window.setTimeout(go, 380);
+      // The stub grows back, so the guest can book again later.
+      window.setTimeout(() => {
+        pass.classList.replace('is-torn', 'is-back');
+        window.setTimeout(() => pass.classList.remove('is-back'), 500);
+      }, 2400);
+    });
+  }
+
+  // Stepping inside: the pass's stamp thuds, then the page morphs (view transition).
+  for (const a of document.querySelectorAll<HTMLAnchorElement>('[data-step]')) {
+    a.addEventListener('click', (e) => {
+      if (calm || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      a.closest('[data-pass]')?.classList.add('is-stamped');
+      window.setTimeout(() => (location.href = a.href), 240);
+    });
+  }
+</script>
+
+<style>
+  .passes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(20px, 3vw, 36px); align-items: start; }
+  .pass { --band: var(--color-tiger); position: relative; display: flex; flex-direction: column; color: var(--color-ink); filter: drop-shadow(0 18px 30px rgb(44 41 37 / 0.35)); }
+  .pass-gold { --band: var(--color-gold); }
+  .pass-slate { --band: var(--color-slate); }
+  .pass.is-waiting { opacity: 0; }
+
+  .pass-main { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 0 22px 22px; background: #f6efe4;
+    background-image: radial-gradient(rgb(44 41 37 / 0.05) 1px, transparent 1.3px); background-size: 6px 6px; border-radius: 10px 10px 0 0; overflow: hidden; }
+  .pass-head { display: flex; justify-content: space-between; margin: 0 -22px; padding: 10px 22px; background: var(--band); color: #f6efe4; font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
+  .pass-slate .pass-head, .pass-tiger .pass-head { color: #fff; }
+  .pass-route { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 12px; }
+  .pass-end { display: flex; flex-direction: column; gap: 2px; }
+  .pass-to { text-align: right; }
+  .pass-lbl, .pass-fields dt { font-family: var(--font-label); font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgb(44 41 37 / 0.6); }
+  .pass-code { font-size: clamp(34px, 3.4vw, 46px); font-weight: 700; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; }
+  .pass-to .pass-code { color: var(--band); }
+  .pass-gold .pass-to .pass-code { color: #a87f33; }
+  .pass-line { position: relative; height: 2px; margin-bottom: 14px; background: repeating-linear-gradient(90deg, var(--color-ink) 0 6px, transparent 6px 11px); }
+  .pass-line::after { content: '✈'; position: absolute; right: -2px; top: 50%; translate: 0 -54%; font-size: 15px; line-height: 1; color: var(--color-ink); }
+  .pass-name { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(26px, 2.4vw, 32px); text-transform: none; letter-spacing: 0; }
+  .pass-name a { color: inherit; text-decoration: none; }
+  .pass-name a:hover { text-decoration: underline; text-underline-offset: 5px; }
+  .pass-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; padding-top: 12px; border-top: 1px dashed rgb(44 41 37 / 0.35); }
+  .pass-fields dd { margin: 2px 0 0; font-size: 15px; font-weight: 700; }
+  .pass-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin: 0; font-size: 14px; }
+  .pass-links a { color: inherit; font-weight: 700; text-underline-offset: 4px; }
+  .pass-links .pass-more { text-transform: uppercase; letter-spacing: 0.08em; }
+  .pass-boarding { position: absolute; right: 16px; top: 112px; padding: 2px 10px; border: 3px double var(--band); color: var(--band); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -10deg; opacity: 0.9; pointer-events: none; }
+  .pass-gold .pass-boarding { color: #a87f33; border-color: #a87f33; }
+  .pass.is-stamped .pass-boarding { animation: pass-thud .24s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes pass-thud { 0% { scale: 1.6; } 100% { scale: 1; } }
+
+  .pass-waitlist { display: flex; flex-direction: column; gap: 8px; }
+  .pass-waitlist label { font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+  .pass-wl-row { display: flex; gap: 8px; }
+  .pass-wl-row input { flex: 1 1 auto; min-width: 0; min-height: 46px; padding: 0 12px; border: 2px solid var(--color-ink); background: #fff; color: var(--color-ink); font: inherit; font-size: 16px; }
+  .wl-msg { margin: 0; font-weight: 700; color: var(--color-slate); }
+
+  /* The stub, below a perforated line with punched notches at each end. */
+  .pass-stub { position: relative; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: center; gap: 10px 14px; padding: 18px 22px 16px; background: #f6efe4; color: var(--color-ink); text-decoration: none; border-radius: 0 0 10px 10px;
+    -webkit-mask: radial-gradient(circle 11px at 0 0, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 11px at 100% 0, transparent 98%, #000) right / 51% 100% no-repeat;
+    mask: radial-gradient(circle 11px at 0 0, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 11px at 100% 0, transparent 98%, #000) right / 51% 100% no-repeat;
+    transform-origin: 12% 0; transition: transform .18s ease; }
+  .pass-stub::before { content: ''; position: absolute; left: 14px; right: 14px; top: 0; border-top: 2px dashed rgb(44 41 37 / 0.45); }
+  .pass-stub:hover { transform: rotate(-1.5deg) translateY(2px); }
+  .pass-stub:focus-visible { outline: 3px solid var(--color-tiger); outline-offset: 3px; }
+  .pass-stub :global(.stub-stamp) { width: 58px; height: auto; grid-row: span 2; rotate: -6deg; }
+  .stub-gate { display: grid; place-items: center; width: 58px; aspect-ratio: 0.8; border: 2px dashed var(--band); color: var(--band); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; }
+  .stub-text { display: flex; flex-direction: column; gap: 2px; }
+  .stub-cta { font-size: 19px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink); }
+  .pass-stub:hover .stub-cta { color: var(--band); }
+  .pass-gold .pass-stub:hover .stub-cta { color: #a87f33; }
+  .stub-via { font-family: var(--font-note); font-style: italic; font-size: 15px; color: rgb(44 41 37 / 0.7); }
+  .stub-bars { width: 100%; height: 26px; fill: var(--color-ink); opacity: 0.85; }
+  .pass.is-torn .pass-stub { animation: stub-tear .9s cubic-bezier(.5, 0, .7, .4) forwards; pointer-events: none; }
+  @keyframes stub-tear {
+    0% { transform: none; opacity: 1; }
+    22% { transform: translate(4px, 8px) rotate(7deg); opacity: 1; }
+    100% { transform: translate(40px, 160px) rotate(24deg); opacity: 0; }
+  }
+  .pass.is-back .pass-stub { animation: stub-back .45s ease; }
+  @keyframes stub-back { from { opacity: 0; transform: translateY(-8px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .pass-stub, .pass-stub:hover { transition: none; transform: none; }
+  }
+</style>
