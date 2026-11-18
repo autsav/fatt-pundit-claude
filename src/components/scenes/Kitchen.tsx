@@ -114,9 +114,9 @@ export default function Kitchen({ dishes, art }: Props) {
           items={items}
           title="Signature dishes"
           head={
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="m-0 font-note text-[19px] text-tiger">On the pass</p>
-              <h2 className="m-0 mt-1 text-[clamp(26px,3.4vw,40px)] uppercase leading-none tracking-[0.06em]">Signature dishes</h2>
+              <h2 className="m-0 mt-1 text-balance text-[clamp(24px,3.4vw,40px)] uppercase leading-[1.05] tracking-[0.04em]">Signature dishes</h2>
             </div>
           }
         />

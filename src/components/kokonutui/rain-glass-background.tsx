@@ -336,9 +336,13 @@ function createPane(gl: WebGL2RenderingContext): Pane | null {
   };
 }
 
+// Fatt Pundit: new drops land on the outer 30% of each side, so the words in the middle stay readable.
+const EDGE = 0.3;
+
 function rainDrop(width: number, height: number): Drop {
+  const band = Math.random() * width * EDGE;
   return {
-    x: Math.random() * width,
+    x: Math.random() < 0.5 ? band : width - band,
     y: Math.random() * height * 0.95,
     r: 2.5 + Math.random() ** 2 * 6,
     vy: 0,
@@ -690,6 +694,12 @@ export default function RainGlassBackground({
           ref={canvasRef}
         />
       </div>
+      {/* Fatt Pundit: a soft dark pool behind the words, for 4.5:1 contrast over the glass. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "radial-gradient(ellipse 60% 55% at 50% 50%, rgb(28 25 22 / 0.78) 0%, rgb(28 25 22 / 0.55) 45%, transparent 80%)" }}
+      />
       <div className="relative flex min-h-[inherit] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
         {title && <h2 className="max-w-3xl text-balance text-5xl sm:text-7xl">{title}</h2>}
         {children}

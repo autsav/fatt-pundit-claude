@@ -44,6 +44,8 @@ export interface SplitFlapTextProps {
   onSettled?: () => void;
   /** Fatt Pundit: cap each tile's trip round the drum, so a change reads as a crisp clatter, not a long spin. */
   maxFlips?: number;
+  /** Fatt Pundit: centre shorter words on the board instead of starting them at the left. */
+  align?: "start" | "center";
 }
 
 const clean = (value: string) =>
@@ -191,10 +193,13 @@ function Tile({
 
   const front = flip ? flip.to : shown;
   const back = flip ? flip.from : shown;
+  // Fatt Pundit: a resting blank flap is not drawn, so short words never show a row of empty tiles.
+  const blank = !flip && shown === " ";
 
   return (
     <span
       aria-hidden="true"
+      style={blank ? { visibility: "hidden" } : undefined}
       className={cn(
         "relative inline-block h-[1.15em] w-[0.72em] rounded-[0.08em] bg-ink text-sand shadow-[inset_0_0_0_1px_rgb(203_160_82/0.25)] [perspective:5em]",
         className
@@ -245,6 +250,7 @@ export default function SplitFlapText({
   tileClassName,
   onSettled,
   maxFlips,
+  align = "start",
 }: SplitFlapTextProps) {
   const [index, setIndex] = useState(0);
   const settled = useRef(new Set<number>());
@@ -279,7 +285,7 @@ export default function SplitFlapText({
       value.length,
       ...(text === undefined ? words.map((w) => w.length) : [0])
     );
-  const padded = value.padEnd(size, " ");
+  const padded = align === "center" ? value.padStart(value.length + Math.floor((size - value.length) / 2), " ").padEnd(size, " ") : value.padEnd(size, " ");
   if (settledFor.current !== padded) {
     // Tiles whose letter doesn't change won't flip (or report), so count them as settled now.
     const prev = settledFor.current;

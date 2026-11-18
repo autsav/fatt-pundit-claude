@@ -513,9 +513,9 @@ export default function CarouselCards({ items, title, className, head }: Carouse
   return (
     <section aria-label={title} aria-roledescription="carousel" className={cn("@container/rail w-full [--rail-card:15rem] @3xl/rail:[--rail-card:17.5rem]", className)}>
       <div className="mx-auto mb-2 flex max-w-[1200px] items-end justify-between gap-4 px-5">
-        <div className="min-w-0">{head}</div>
+        <div className="min-w-0 flex-1">{head}</div>
         <div className="flex shrink-0 items-center gap-2">
-          <span aria-live="polite" className="mr-2 font-label text-sm font-bold tabular-nums tracking-[0.2em]">
+          <span aria-live="polite" className="mr-2 font-label text-sm font-bold tabular-nums tracking-[0.2em] max-[420px]:sr-only">
             <span className="sr-only">Dish </span>
             {String(active + 1).padStart(2, "0")}
             <span aria-hidden="true"> / </span>

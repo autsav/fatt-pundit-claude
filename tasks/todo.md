@@ -107,3 +107,12 @@ See plan doc.
     - Play only in view; never in calm mode (poster photo instead)
 - [ ] Higgsfield still open: rain on Soho street front (needs Soho night photo), 2 textures (tile pattern, Dubai dusk sky, ~13 credits), stopgap upscales
 - [ ] Not built yet: brand street map (needs OSM data; network blocked here), wall-lettering translations, pre-theatre clock (needs times), graffiti line drawing (needs Soho photos)
+
+## Quality pass + menu by location (plan doc: "Fatt Pundit Quality Pass + Menu by Location") ✅ done 18 Nov
+- [x] 1 Every page: start at top on new visits; header one line at 360px; flap boards sized to word
+- [x] 2 Heroes: phone photo band + ink text, no tint/glow on hero photos, stamp on dark round field, name once, rain cleared behind words
+- [x] 3 Plate wall: tight glows, lighter dusk; dish names fit plates; overflow script reads SVG text
+- [x] 4 Upscale 16 photos (Higgsfield, 2 credits each = 32), check each vs original
+- [x] 5 Menu by location on home: branch tags, ?at= deep link, Dubai card, remembered choice
+- [x] 6 QA at 360/390/768/1440, calm, budget, demo test, publish, commit, lessons
+- Verified: overflow script (incl. text in round shapes) at 360/390/768/1440 on 4 pages clean except intentional off-screen (book back page, Soho pan); 3-mode sweep no errors/overflow; JS home 163 KB, branches ≤117 KB; pages land at top even when forced to bottom; menu-at flows (tag, arrows, reload, ?at=, pass link). 15/16 upscales kept, gallery-08 original (upscaler invented Chinese glyphs). Published v1795007885-3104.

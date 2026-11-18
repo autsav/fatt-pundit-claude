@@ -52,10 +52,14 @@ body { font-size: 17px; line-height: 1.55; }
 
 
 .nav a[aria-current='page'] { color: var(--color-gold); }
+.brand { white-space: nowrap; }
+.nav .lbl-short { display: none; }
 
 @media (max-width: 640px) {
   .nav a:not(.btn) { display: none; }
   .brand { font-size: 17px; letter-spacing: 0.14em; }
   .bar-in { flex-wrap: nowrap; }
-  .nav .btn-sm { font-size: 15px; padding: 0 12px; }
+  .nav .btn-sm { font-size: 15px; padding: 0 16px; }
+  .nav .lbl-long { display: none; }
+  .nav .lbl-short { display: inline; }
 }

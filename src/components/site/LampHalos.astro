@@ -30,10 +30,10 @@ const { lamps, ratio, cover = false, class: className } = Astro.props;
     opacity: var(--glow, 0);
     transition: opacity 2.6s cubic-bezier(0.3, 0, 0.2, 1) calc(0.2s + var(--i) * 0.25s);
   }
-  /* A soft pool of light thrown down the wall under each lamp. */
+  /* A narrow cone of light thrown down the wall under each lamp. */
   .halo::after {
-    content: ''; position: absolute; left: 50%; top: 40%; width: 150%; height: 190%; translate: -50% 0;
-    background: radial-gradient(50% 50% at 50% 20%, rgb(255 190 110 / 0.55), rgb(255 170 90 / 0.18) 45%, transparent 75%);
+    content: ''; position: absolute; left: 50%; top: 55%; width: 120%; height: 240%; translate: -50% 0;
+    background: radial-gradient(40% 50% at 50% 12%, rgb(255 196 120 / 0.32), transparent 72%);
   }
   :global([data-glow='on']) .halo { --glow: 1; }
   :global([data-glow='lit']) .halo { --glow: 1; transition: none; animation: breathe 4.8s ease-in-out calc(var(--i) * -1.3s) infinite; }

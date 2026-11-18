@@ -116,7 +116,19 @@ const kitchenDishes = await Promise.all([
 const kitchenArt = { greaseproof: greaseproofOrange.src, stampGold: await img(stampGoldArt, 200) };
 
 // Scene 5: the menu book, straight from menus.json + dishes.json.
-const menuBooksHome = await menuBooks(['a-la-carte', 'vegan', 'halal', 'gluten-free', 'dairy-free', 'drinks']);
+// Menu by location: every menu any branch serves, and each branch's own list.
+const menuIds = [...new Set(branches.flatMap((b) => b.menus))];
+const menuBooksHome = await menuBooks(menuIds);
+const menuPlaces = await Promise.all(
+  branches.map(async (b) => ({
+    id: b.id,
+    name: b.shortName,
+    street: b.address.street,
+    menus: b.menus,
+    book: b.status === 'open' && b.booking ? { href: b.booking.url, label: `Book ${b.shortName}` } : undefined,
+    soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: `/${b.id}/#waitlist` },
+  })),
+);
 const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
 const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status }));
 ---
@@ -145,7 +157,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <Kitchen client:visible dishes={kitchenDishes} art={kitchenArt} />
 
     <!-- 5 · The menu book -->
-    <MenuBook client:visible menus={menuBooksHome} art={menuArt} next={{ href: '#bar', label: 'Continue to the bar' }} />
+    <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} next={{ href: '#bar', label: 'Continue to the bar' }} />
 
     <!-- 6 · The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />

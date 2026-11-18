@@ -84,6 +84,7 @@ function byDay(b: Branch) {
             {b.phone && <a href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
             <a href={`/${b.id}/`} class="pass-more" data-step>{open ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`} →</a>
           </p>
+          {open && <p class="pass-links"><a href={`?at=${b.id}#menu`} data-menu-at={b.id}>See the {b.shortName} menu</a></p>}
           <span class="pass-boarding" aria-hidden="true">{open ? 'Boarding' : 'Opening soon'}</span>
         </div>
 
@@ -179,6 +180,22 @@ function byDay(b: Branch) {
         pass.classList.replace('is-torn', 'is-back');
         window.setTimeout(() => pass.classList.remove('is-back'), 500);
       }, 2400);
+    });
+  }
+
+  // "See the Soho menu": pick the branch in the menu book above without reloading the page.
+  for (const a of document.querySelectorAll<HTMLAnchorElement>('[data-menu-at]')) {
+    a.addEventListener('click', (e) => {
+      const menu = document.getElementById('menu');
+      if (!menu) return;
+      e.preventDefault();
+      // Put the pick in the address too, so a menu book that hydrates later still opens on it.
+      const url = new URL(location.href);
+      url.searchParams.set('at', a.dataset.menuAt!);
+      url.hash = 'menu';
+      history.replaceState(history.state, '', url);
+      window.dispatchEvent(new CustomEvent('fp:menu-at', { detail: a.dataset.menuAt }));
+      menu.scrollIntoView({ behavior: calm ? 'auto' : 'smooth' });
     });
   }
 

@@ -9,7 +9,8 @@ export interface PillBranch {
 }
 
 /** Live "Soho · Open now · until 10.30pm" pill, cycling through branches. */
-export default function OpenNowPill({ branches }: { branches: PillBranch[] }) {
+/** `nameless`: drop the branch name, for pages that already say it ("Open now · until 10.30pm"). */
+export default function OpenNowPill({ branches, nameless = false }: { branches: PillBranch[]; nameless?: boolean }) {
   const [lines, setLines] = useState<{ text: string; open: boolean }[]>([]);
   const [i, setI] = useState(0);
 
@@ -17,9 +18,10 @@ export default function OpenNowPill({ branches }: { branches: PillBranch[] }) {
     const compute = () =>
       setLines(
         branches.map((b) => {
-          if (b.status === 'opening-soon' || !b.hours) return { text: `${b.shortName} · Opening soon`, open: false };
+          const drop = (t: string) => (nameless ? t.replace(`${b.shortName} · `, '') : t);
+          if (b.status === 'opening-soon' || !b.hours) return { text: drop(`${b.shortName} · Opening soon`), open: false };
           const s = openStatus(b.hours, b.timezone);
-          return { text: statusLine(b.shortName, s), open: s.open };
+          return { text: drop(statusLine(b.shortName, s)), open: s.open };
         }),
       );
     compute();
@@ -29,7 +31,7 @@ export default function OpenNowPill({ branches }: { branches: PillBranch[] }) {
       window.clearInterval(tick);
       window.clearInterval(cycle);
     };
-  }, [branches]);
+  }, [branches, nameless]);
 
   if (!lines.length) return <span className="h-11" aria-hidden="true" />;
   const line = lines[i % lines.length];

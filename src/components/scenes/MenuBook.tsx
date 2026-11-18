@@ -6,7 +6,7 @@
  * map page on the back, as on the real menu. Bookmark tabs swap the menu.
  * Everything printed comes from menus.json + dishes.json via index.astro; nothing is typed here.
  */
-import { type ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PageFlip from '@/components/kokonutui/page-flip';
 
 export interface MenuItemLite {
@@ -24,6 +24,17 @@ export interface MenuLite {
   sections: { title: string; note?: string; items: MenuItemLite[] }[];
   allergyNote: string;
 }
+/** A branch the guest can pick: its own menus, its booking link, or (opening soon) a preview. */
+export interface MenuPlace {
+  id: string;
+  name: string;
+  street: string;
+  menus: string[];
+  book?: { href: string; label: string };
+  soon?: { dishes: string[]; href: string };
+}
+const PLACE_KEY = 'fp-menu-at';
+
 interface Art {
   frame: string;
   stampGold: string;
@@ -210,7 +221,7 @@ function MenuPage({ menu, data, n, art }: { menu: MenuLite; data: PageData; n: n
   );
 }
 
-function Cover({ menu, art }: { menu: MenuLite; art: Art }) {
+function Cover({ menu, art, place }: { menu: MenuLite; art: Art; place?: MenuPlace }) {
   return (
     <div className="relative flex size-full flex-col items-center justify-center gap-[5cqw] bg-ink px-[10cqw] text-center text-sand">
       <div className="pointer-events-none absolute inset-[3cqw] border-[0.5cqw] border-gold/60" />
@@ -218,6 +229,7 @@ function Cover({ menu, art }: { menu: MenuLite; art: Art }) {
       <div>
         <p className="m-0 text-[8cqw] font-bold uppercase leading-none tracking-[0.12em]">Fatt Pundit</p>
         <p className="m-0 mt-[3cqw] font-note text-[5.4cqw] text-gold">{menu.title}</p>
+        {place && <p className="m-0 mt-[4cqw] font-label text-[3.2cqw] font-bold uppercase tracking-[0.22em] text-sand/85">{place.name} · {place.street}</p>}
       </div>
       <p className="absolute bottom-[9cqw] m-0 font-label text-[2.8cqw] font-bold uppercase tracking-[0.26em] text-sand/70">Turn the corner →</p>
     </div>
@@ -244,20 +256,66 @@ function Back({ art }: { art: Art }) {
 
 const TAB_COLORS = ['bg-tiger text-white', 'bg-gold text-ink', 'bg-sand text-ink', 'bg-slate text-white', 'bg-[#efe6d8] text-ink', 'bg-ink text-sand'];
 
-export default function MenuBook({ menus, art, next }: { menus: MenuLite[]; art: Art; next?: { href: string; label: string } }) {
+export default function MenuBook({ menus, art, next, places }: { menus: MenuLite[]; art: Art; next?: { href: string; label: string }; places?: MenuPlace[] }) {
+  const [placeId, setPlaceId] = useState(places?.[0]?.id);
+  const place = places?.find((p) => p.id === placeId);
+  // The menus this branch serves, in the book's order. No places = every menu given.
+  const shown = useMemo(() => (place ? menus.filter((m) => place.menus.includes(m.id)) : menus), [menus, place]);
   const [active, setActive] = useState(menus[0]?.id);
   const [opened, setOpened] = useState(false);
-  const menu = menus.find((m) => m.id === active) ?? menus[0];
+  const menu = shown.find((m) => m.id === active) ?? shown[0] ?? menus[0];
+  const tagRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Which branch: a shared link (?at=soho) first, then the guest's last pick on this device.
+  useEffect(() => {
+    if (!places?.length) return;
+    const pick = (id: string | null | undefined) => (id && places.some((p) => p.id === id) ? id : null);
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(PLACE_KEY);
+    } catch {}
+    const first = pick(new URLSearchParams(location.search).get('at')) ?? pick(saved);
+    if (first) setPlaceId(first);
+    // Other parts of the page (a boarding pass link) can pick a branch without a reload.
+    const onPick = (e: Event) => {
+      const id = pick((e as CustomEvent<string>).detail);
+      if (id) choose(id);
+    };
+    window.addEventListener('fp:menu-at', onPick);
+    return () => window.removeEventListener('fp:menu-at', onPick);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [places]);
+
+  const choose = (id: string) => {
+    setPlaceId(id);
+    setOpened(false);
+    try {
+      localStorage.setItem(PLACE_KEY, id);
+    } catch {}
+    const url = new URL(location.href);
+    url.searchParams.set('at', id);
+    history.replaceState(history.state, '', url);
+  };
+  // Radio group keys: arrows move and pick, like any set of radio buttons.
+  const onTagKey = (e: KeyboardEvent, i: number) => {
+    if (!places) return;
+    const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const n = (i + d + places.length) % places.length;
+    choose(places[n].id);
+    tagRefs.current[n]?.focus();
+  };
   const [sizes, setSizes] = useState<{ id: string; z: Sizes } | null>(null);
   const onSizes = useCallback((z: Sizes) => setSizes({ id: menu.id, z }), [menu.id]);
   const z = sizes?.id === menu.id ? sizes.z : estimate(menu);
 
   const pages = useMemo(() => {
-    const out: ReactNode[] = [<Cover key="cover" menu={menu} art={art} />];
+    const out: ReactNode[] = [<Cover key="cover" menu={menu} art={art} place={place} />];
     paginate(menu, z).forEach((p, i) => out.push(<MenuPage key={`p${i}`} menu={menu} data={p} n={i + 1} art={art} />));
     out.push(<Back key="back" art={art} />);
     return out;
-  }, [menu, art, z]);
+  }, [menu, art, z, place]);
 
   return (
     <section id="menu" className="relative overflow-hidden bg-sand py-[clamp(56px,6vw,88px)] text-ink" aria-label="The menus">
@@ -266,13 +324,55 @@ export default function MenuBook({ menus, art, next }: { menus: MenuLite[]; art:
       <div className="relative mx-auto flex max-w-[1200px] flex-col items-center px-5">
         <p className="m-0 font-note text-[22px] text-tiger">The menu</p>
         <h2 className="m-0 mt-2 text-center text-[clamp(30px,4.4vw,56px)] uppercase leading-none tracking-[0.06em]">Turn the pages</h2>
-        <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">The menu you'll be handed at the table. Pick yours from the bookmarks.</p>
+        <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">{places ? 'Pick a restaurant, then a menu from the bookmarks.' : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
 
+        {places && (
+          <div role="radiogroup" aria-label="Restaurant" className="mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">
+            {places.map((p, i) => {
+              const on = p.id === place?.id;
+              return (
+                <button
+                  key={p.id}
+                  ref={(el) => {
+                    tagRefs.current[i] = el;
+                  }}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  tabIndex={on ? 0 : -1}
+                  onClick={() => choose(p.id)}
+                  onKeyDown={(e) => onTagKey(e, i)}
+                  className={`menu-tag ${on ? 'is-on' : ''}`}
+                >
+                  <span className="menu-tag-hole" aria-hidden="true" />
+                  {p.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {place?.soon ? (
+          <div className="menu-soon mt-8 w-full max-w-[560px]">
+            <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.24em] text-tiger">Opening soon</p>
+            <h3 className="m-0 mt-2 font-note text-[clamp(26px,3vw,34px)] font-medium normal-case italic leading-tight tracking-normal">{place.name}, {place.street}</h3>
+            <p className="m-0 mt-3 text-[16px] leading-snug">The menu is being written. These are coming with us:</p>
+            <ul className="m-0 mt-3 list-none p-0">
+              {place.soon.dishes.map((d) => (
+                <li key={d} className="border-b border-dashed border-ink/30 py-2.5 text-[17px] font-bold uppercase tracking-[0.06em]">
+                  {d}
+                </li>
+              ))}
+            </ul>
+            <a href={place.soon.href} className="btn btn-orange mt-6">Join the list</a>
+          </div>
+        ) : (
+        <>
         {/* Phones show one page: capped near half the screen so there is room to scroll past. */}
         <div className="mx-auto mt-7 w-full max-sm:!max-w-[40svh]" style={{ maxWidth: 'min(1000px, calc((100svh - 340px) * 1.5))' }}>
           {/* Bookmarks: paper tabs standing up from the top edge of the book. */}
-          <div role="tablist" aria-label="Menus" className="relative z-10 flex flex-wrap items-end justify-center gap-[6px] px-4">
-            {menus.map((m, i) => {
+          <div role="tablist" aria-label="Menus" className="relative z-10 flex items-end gap-[6px] overflow-x-auto px-4 [scrollbar-width:none] sm:flex-wrap sm:justify-center sm:overflow-visible">
+            {shown.map((m, i) => {
               const on = m.id === menu.id;
               return (
                 <button
@@ -284,7 +384,7 @@ export default function MenuBook({ menus, art, next }: { menus: MenuLite[]; art:
                     setActive(m.id);
                     setOpened(true);
                   }}
-                  className={`${TAB_COLORS[i % TAB_COLORS.length]} min-h-11 px-4 font-label text-[13px] font-bold uppercase tracking-[0.18em] shadow-[0_-2px_6px_rgb(0_0_0/0.12)] transition-[padding,transform] duration-200 ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 opacity-90 hover:translate-y-0'}`}
+                  className={`${TAB_COLORS[i % TAB_COLORS.length]} min-h-11 shrink-0 whitespace-nowrap px-4 font-label text-[13px] font-bold uppercase tracking-[0.18em] shadow-[0_-2px_6px_rgb(0_0_0/0.12)] transition-[padding,transform] duration-200 ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 opacity-90 hover:translate-y-0'}`}
                 >
                   {m.tab}
                 </button>
@@ -292,10 +392,17 @@ export default function MenuBook({ menus, art, next }: { menus: MenuLite[]; art:
             })}
           </div>
           <div className="relative drop-shadow-[0_24px_30px_rgb(0_0_0/0.35)]">
-            <PageFlip key={menu.id} pages={pages} label={`${menu.title} menu`} start={opened ? 1 : 0} />
+            <PageFlip key={`${place?.id}-${menu.id}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
           </div>
         </div>
         <p className="m-0 mt-5 text-center font-label text-[12.5px] font-bold uppercase tracking-[0.2em] text-ink/70 sm:hidden">Swipe sideways or tap a page edge to turn</p>
+        {place?.book && (
+          <a href={place.book.href} target="_blank" rel="noopener" className="btn btn-orange mt-6">
+            {place.book.label}
+          </a>
+        )}
+        </>
+        )}
         {next && (
           <a href={next.href} className="mt-6 inline-flex min-h-11 items-center gap-2 border-b-2 border-ink pb-0.5 font-bold uppercase tracking-[0.1em] text-ink no-underline">
             {next.label} <span aria-hidden="true">↓</span>

@@ -17,7 +17,6 @@ import VoyageToDubai from '../../components/branch/VoyageToDubai.tsx';
 import MenuBook from '../../components/scenes/MenuBook.tsx';
 import LoopVideo from '../../components/site/LoopVideo.astro';
 import LightsOn from '../../components/site/LightsOn.astro';
-import LampHalos from '../../components/site/LampHalos.astro';
 import lightsOnClip from '../../assets/video/cg-lights-on.mp4';
 import lightsOffStill from '../../assets/video/cg-lights-on-off.jpg';
 import lightsLitStill from '../../assets/video/cg-lights-on-lit.jpg';
@@ -60,6 +59,7 @@ const ALTS: Record<string, string> = {
   'gallery-08': 'Hindi lettering over teal banquettes and wooden tables',
 };
 const heroImg = p.hero && photo(p.hero) ? await getImage({ src: photo(p.hero)!, width: 2000, format: 'webp', quality: 80 }) : null;
+const heroSet = heroImg ? (await Promise.all([800, 1200, 1600, 2400].map(async (w) => `${(await getImage({ src: photo(p.hero!)!, width: w, format: 'webp', quality: 80 })).src} ${w}w`))).join(', ') : undefined;
 const gallery = p.gallery.map((k) => ({ key: k, src: photo(k)!, alt: ALTS[k] ?? '' })).filter((g) => g.src);
 
 const LEAD = { tiger: 'var(--color-tiger)', gold: 'var(--color-gold)', slate: 'var(--color-slate)' }[p.lead];
@@ -89,8 +89,7 @@ const books = open ? await menuBooks(b.menus) : [];
 const wallOff = (await getImage({ src: lightsOffStill, width: 1280, format: 'webp', quality: 80 })).src;
 const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'webp', quality: 80 })).src;
 // Bulb positions (% of each photo), measured from the frames.
-const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 1.5 }, { x: 65.9, y: 13.3, size: 1.5 }];
-const HERO_LAMPS = [{ x: 10, y: 20, size: 0.7 }, { x: 36.2, y: 23, size: 0.6 }, { x: 55.6, y: 24.7, size: 0.6 }];
+const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 0.6 }, { x: 65.9, y: 13.3, size: 0.6 }];
 const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
 const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await img(stampGoldArt, 260), compass: await img(compassArt, 240) };
 
@@ -127,28 +126,27 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --second: ${p.second};`}>
     <!-- 1 · Arrival: the guest facts work before any animation. -->
     <section class="arrival" style={`view-transition-name: branch-${b.id}`} aria-labelledby="branch-title">
-      {heroImg ? (
-        <>
-          <img class="arrival-bg" src={heroImg.src} alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
-          {b.id === 'covent-garden' && (
-            <>
-              <LoopVideo src={boothsLoop} poster={heroImg.src} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />
-              <div class="evening" aria-hidden="true"></div>
-              <div class="hero-glow" data-glow="off"><LampHalos lamps={HERO_LAMPS} ratio={1024 / 683} cover /></div>
-            </>
-          )}
-        </>
-      ) : b.id === 'soho' ? (
-        <div class="arrival-bg art-soho" aria-hidden="true">
-          <div class="street-sign"><span class="sign-name">Berwick Street</span><span class="sign-code">W1</span><span class="sign-city">City of Westminster</span></div>
-        </div>
-      ) : (
-        <div class="arrival-bg art-gate" aria-hidden="true"><span class="gate-code">DXB</span></div>
-      )}
-      {heroImg && <div class="arrival-shade" aria-hidden="true"></div>}
+      <!-- Phones: a photo band shown at its true sharpness, then the facts on solid ink.
+           Wider screens: the photo fills the hero behind a dark fade on the text side. -->
+      <div class={`arrival-media ${heroImg ? 'is-photo' : 'is-art'}`}>
+        {heroImg ? (
+          <>
+            <img class="arrival-bg" src={heroImg.src} srcset={heroSet} sizes="100vw" alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
+            {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroImg.src} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />}
+          </>
+        ) : b.id === 'soho' ? (
+          <div class="arrival-bg art-soho" aria-hidden="true">
+            <div class="street-sign"><span class="sign-name">Berwick Street</span><span class="sign-code">W1</span><span class="sign-city">City of Westminster</span></div>
+          </div>
+        ) : (
+          <div class="arrival-bg art-gate" aria-hidden="true"><span class="gate-code">DXB</span></div>
+        )}
+      </div>
+      <div class="arrival-shade" aria-hidden="true"></div>
       <div class="wrap arrival-in">
-        {mark && <span class="arrival-mark" aria-hidden="true" style={`-webkit-mask-image: url(${mark}); mask-image: url(${mark});`}></span>}
-        <h1 id="branch-title" class="arrival-h1">Fatt Pundit <span>{b.shortName}</span></h1>
+        {mark && <span class="mark-badge" aria-hidden="true"><span class="arrival-mark" style={`-webkit-mask-image: url(${mark}); mask-image: url(${mark});`}></span></span>}
+        <h1 id="branch-title" class="sr-only">Fatt Pundit {b.shortName}</h1>
+        <p class="arrival-brand" aria-hidden="true">Fatt Pundit</p>
         <div aria-hidden="true" class="board-slot"><BranchArrival client:load words={words} branch={pill} /></div>
         <p class="arrival-addr">{fullAddress(b)}</p>
         <div class="row arrival-actions">
@@ -339,11 +337,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       f.reset();
     });
   }
-  // Hero shelf lamps come on just after arrival, then breathe.
-  for (const g of document.querySelectorAll<HTMLElement>('.hero-glow')) {
-    window.setTimeout(() => { g.dataset.glow = 'on'; }, 500);
-    window.setTimeout(() => { g.dataset.glow = 'lit'; }, 4200);
-  }
 </script>
 
 <style>
@@ -351,17 +344,32 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .branch :global(p) { margin: 0; }
   .lead-text { color: var(--lead); }
 
-  /* Arrival */
-  .arrival { position: relative; min-height: min(88svh, 860px); display: grid; align-items: end; color: var(--color-sand); background: var(--color-ink); overflow: hidden; }
+  /* Arrival. Phones: media band + facts on ink. 900px and up: media fills, text sits on a dark fade. */
+  .arrival { position: relative; display: flex; flex-direction: column; color: var(--color-sand); background: var(--color-ink); overflow: hidden; }
+  .arrival-media { position: relative; overflow: hidden; }
+  .arrival-media.is-photo { aspect-ratio: 3 / 2; }
+  .arrival-media.is-art { aspect-ratio: 4 / 3; }
   .arrival :global(.arrival-bg) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .arrival-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(44 41 37 / 0.15) 0%, rgb(44 41 37 / 0.35) 40%, rgb(44 41 37 / 0.92) 100%); }
-  .arrival-in { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; padding-block: 56px; width: 100%; }
-  .arrival-mark { display: block; width: clamp(72px, 8vw, 110px); aspect-ratio: 0.764; background: var(--lead); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
-  .arrival-h1 { margin: 0; font-size: clamp(18px, 1.8vw, 22px); letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-sand); }
-  .arrival-h1 span { color: var(--lead); }
+  .arrival-shade { display: none; }
+  .arrival-in { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding-block: 0 44px; width: 100%; }
+  /* The stamp sits on a dark round badge, half over the picture, half on the ink. */
+  .mark-badge { display: grid; place-items: center; width: 96px; aspect-ratio: 1; margin-top: -48px; border-radius: 50%; background: var(--color-ink); box-shadow: inset 0 0 0 2px var(--color-gold), 0 10px 30px rgb(0 0 0 / 0.45); }
+  .arrival-mark { display: block; width: 56%; aspect-ratio: 0.764; background: var(--lead); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+  .arrival-in:not(:has(.mark-badge)) { padding-top: 32px; }
+  .arrival-brand { margin: 0; font-family: var(--font-label); font-size: 14px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: var(--color-sand); }
   .board-slot { min-height: 1.2em; }
-  .arrival-addr { font-family: var(--font-note); font-style: italic; font-size: 20px; }
-  .arrival-actions { margin-top: 6px; }
+  .arrival-addr { font-family: var(--font-note); font-style: italic; font-size: 19px; line-height: 1.4; }
+  .arrival-actions { margin-top: 4px; }
+  @media (min-width: 900px) {
+    .arrival { display: grid; align-items: end; min-height: min(88svh, 860px); }
+    .arrival-media, .arrival-media.is-photo, .arrival-media.is-art { position: absolute; inset: 0; aspect-ratio: auto; }
+    .arrival-shade { display: block; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(44 41 37 / 0.94) 0%, rgb(44 41 37 / 0.82) 34%, rgb(44 41 37 / 0.2) 64%, transparent 80%), linear-gradient(0deg, rgb(44 41 37 / 0.7), transparent 40%); }
+    .arrival-in { padding-block: 64px; }
+    .arrival-in > * { max-width: 560px; }
+    .mark-badge { width: 112px; margin-top: 0; }
+    .arrival-in:not(:has(.mark-badge)) { padding-top: 64px; }
+  }
+  .arrival-media.is-art + .arrival-shade { background: linear-gradient(90deg, rgb(44 41 37 / 0.85), transparent 60%); }
 
   /* Soho without photos: a Westminster street sign on a dark brick wall. */
   .art-soho { background:
@@ -373,12 +381,12 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .sign-name { font-size: clamp(24px, 3.2vw, 50px); font-weight: 700; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; }
   .sign-code { font-size: clamp(24px, 3.2vw, 50px); font-weight: 700; color: #c8102e; line-height: 1; }
   .sign-city { grid-column: 1 / -1; font-size: clamp(10px, 1vw, 14px); letter-spacing: 0.3em; text-transform: uppercase; }
-  @media (max-width: 760px) { .art-soho { place-items: start center; padding: 22% 0 0; } }
+  @media (max-width: 899px) { .art-soho { place-items: center; padding: 0 0 10%; } }
   .art-soho::after, .art-gate::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(180deg, transparent, rgb(44 41 37 / 0.9)); }
 
   /* Dubai: a departure gate in slate and gold. */
   .art-gate { background: radial-gradient(70% 60% at 70% 30%, rgb(203 160 82 / 0.28), transparent 70%), linear-gradient(160deg, #5f6e79, #2c2925 75%); display: grid; place-items: center end; padding-right: 6vw; }
-  @media (max-width: 760px) { .art-gate { place-items: start center; padding: 10% 0 0; } }
+  @media (max-width: 899px) { .art-gate { place-items: center; padding: 0 0 10%; } }
   .gate-code { font-size: clamp(110px, 22vw, 320px); font-weight: 700; letter-spacing: 0.06em; color: transparent; -webkit-text-stroke: 2px rgb(203 160 82 / 0.7); line-height: 1; }
 
   /* The room */
@@ -386,9 +394,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .room-lines span:nth-child(2) { color: var(--lead); }
   .room-lines span:nth-child(3) { font-family: var(--font-note); font-style: italic; text-transform: none; font-size: 0.62em; letter-spacing: 0; color: color-mix(in srgb, var(--color-ink) 75%, transparent); }
 
-  /* Covent Garden hero at evening: a blue-ink grade, then the shelf lamps glow. */
-  .evening { position: absolute; inset: 0; mix-blend-mode: multiply; background: radial-gradient(90% 80% at 35% 25%, #a99cb2, #4a4058 75%); opacity: 0.7; }
-  .hero-glow { position: absolute; inset: 0; overflow: hidden; }
   .wall-intro { text-align: center; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 17px; }
 
   /* Contact sheet of the room's photos */

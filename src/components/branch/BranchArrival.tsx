@@ -23,7 +23,7 @@ export default function BranchArrival({ words, branch }: Props) {
         tileClassName="bg-ink/90 text-gold"
         words={words}
       />
-      <OpenNowPill branches={[branch]} />
+      <OpenNowPill branches={[branch]} nameless />
     </div>
   );
 }

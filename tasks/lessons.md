@@ -28,3 +28,10 @@ Review at the start of every session. Add a line after any correction.
 - Test touch gestures with the target fully on screen and clear of the sticky header, or the test swipes the header.
 - window.open(url, '_blank', 'noopener') ALWAYS returns null, so it can't detect a blocked pop-up. Open without the feature, then set w.opener = null; fall back to same-tab only when w is null.
 
+- User feedback 18 Nov (phone): blur, foggy glows, unreadable logo, text spilling out of plates, page opening at the bottom. Root lesson: review every scene on a real phone-size screenshot before publishing, and never put text or the logo on a busy photo, stretch a 1024px photo full-screen, or let decorative light cover a photo.
+- The Claude app viewer can keep the previous page's scroll on navigation: pages must reset to top themselves (keep back-button restore).
+- AI upscalers invent fine lettering (faint Chinese characters became fake glyphs). Always check text areas side by side at 1:1 before using an upscale; a whole-image drift number won't catch it.
+- Small round labels (plates ~55px on phones) can't hold names: show the short fact (price) on the shape and the full name in a caption line nearby. Size names from the longest word with container units.
+- CSS @container units measure the content box (inside padding/border) — set thresholds and formulas against that, not the outer shape.
+- An overflow checker must skip deliberately hidden things (skip links, off-screen tracks, clipped book pages) and treat zero-size boxes carefully, or the noise hides the real issues.
+

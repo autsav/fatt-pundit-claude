@@ -16,6 +16,15 @@ export interface PlateDish {
 }
 
 /** Where each plate hangs, as % of the wall, and its size. Loosely after the photo. */
+/** Name size in % of the plate back's writing width: the longest word fits the safe width, and the whole name fits about three lines. */
+function nameSize(name: string) {
+  const words = name.split(/\s+/);
+  const longest = Math.max(...words.map((w) => w.length));
+  const total = name.length;
+  // cqi here = the plate's writing area (inside the rim and padding), so the longest word gets ~92% of it.
+  return Math.min(17, 92 / (longest * 0.74), Math.sqrt(5000 / total)).toFixed(2);
+}
+
 const SPOTS: [number, number, number][] = [
   [34, 30, 15], [50, 22, 13], [66, 30, 15], [26, 58, 12], [42, 56, 17], [59, 58, 14], [75, 54, 12], [50, 84, 12], [67, 84, 13],
 ];
@@ -63,6 +72,8 @@ function PlateArt({ v }: { v: number }) {
 export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
   const wallRef = useRef<HTMLDivElement>(null);
   const [flipped, setFlipped] = useState<Set<number>>(new Set());
+  // The plate the guest turned last: its full name is captioned under the wall, where it is always readable.
+  const [last, setLast] = useState<number | null>(null);
   const [calm, setCalm] = useState(false);
 
   const set = (i: number, on: boolean) =>
@@ -127,8 +138,15 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
               aria-label={`${d.name}${d.price ? `, ${d.price}` : ''}`}
               className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full [perspective:800px] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-tiger"
               style={{ left: `${x}%`, top: `${y}%`, width: `${size}%`, aspectRatio: '1' }}
-              onClick={() => set(i, !on)}
-              onPointerEnter={(e) => e.pointerType === 'mouse' && set(i, true)}
+              onClick={() => {
+                set(i, !on);
+                setLast(i);
+              }}
+              onPointerEnter={(e) => {
+                if (e.pointerType !== 'mouse') return;
+                set(i, true);
+                setLast(i);
+              }}
               onPointerLeave={(e) => e.pointerType === 'mouse' && set(i, false)}
             >
               <span
@@ -141,17 +159,28 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                 <span className="absolute inset-0 rounded-full shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden]">
                   <PlateArt v={i % 3} />
                 </span>
-                <span className="absolute inset-0 flex flex-col items-center justify-center rounded-full border-[0.35em] border-[#23428f] bg-[#fbfaf6] p-[12%] text-center shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                  <span className="text-[clamp(8px,1.15vw,14px)] font-bold uppercase leading-tight tracking-[0.04em] text-ink">{d.name}</span>
-                  {d.price && <span className="mt-[0.3em] text-[clamp(8px,1.1vw,14px)] font-bold text-tiger">{d.price}</span>}
+                <span className="@container absolute inset-0 flex flex-col items-center justify-center rounded-full border-[0.35em] border-[#23428f] bg-[#fbfaf6] p-[14%] text-center shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                  {/* Sized so the longest word fits the plate and the name stays within three lines.
+                      Plates whose writing area is under 58px (phones) show only the price; the name is captioned below. */}
+                  <span className="font-bold uppercase leading-[1.1] text-ink @max-[58px]:hidden" style={{ fontSize: `${nameSize(d.name)}cqi` }}>
+                    {d.name}
+                  </span>
+                  {d.price && <span className="mt-[0.35em] text-[13cqi] font-bold text-tiger @max-[58px]:mt-0 @max-[58px]:text-[30cqi]">{d.price}</span>}
                 </span>
               </span>
             </button>
           );
         })}
       </div>
-      <p className="mt-3 text-center font-label text-[12.5px] font-bold uppercase tracking-[0.22em] text-ink/70">
-        {calm ? 'Tap a plate to turn it over' : 'Hover or tap a plate to turn it over'}
+      <p className="mt-4 min-h-[3em] text-center text-[17px] leading-snug text-ink" aria-live="polite">
+        {last !== null && dishes[last] ? (
+          <>
+            <span className="font-bold">{dishes[last].name}</span>
+            {dishes[last].price && <span className="text-tiger"> · {dishes[last].price}</span>}
+          </>
+        ) : (
+          <span className="font-note italic text-ink/75">{calm ? 'Tap a plate to turn it over.' : 'Hover or tap a plate to turn it over.'}</span>
+        )}
       </p>
     </div>
   );

@@ -34,7 +34,7 @@ const book = current?.booking
           <a href={`/${b.id}/`} aria-current={b.id === current?.id ? 'page' : undefined}>{b.shortName}</a>
         ))
       )}
-      <a class="btn btn-orange btn-sm" href={book.href} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}>{book.label}</a>
+      <a class="btn btn-orange btn-sm" href={book.href} aria-label={book.label} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="lbl-long">{book.label}</span><span class="lbl-short" aria-hidden="true">{book.external || home ? 'Book' : 'Join'}</span></a>
     </nav>
   </div>
 </header>

@@ -70,17 +70,18 @@ export default function RainHero({ src, branches }: Props) {
           <SplitFlapText
             className="text-[clamp(20px,3.4vw,40px)]"
             interval={6500}
+            align="center"
             length={13}
             maxFlips={7}
             tileClassName="bg-ink/85 text-gold"
-            words={['Soho', 'Covent Garden', 'Dubai soon']}
+            words={['Soho', 'Covent Garden', 'Dubai']}
           />
         </div>
         <div className="pointer-events-auto mt-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
           <AttractButton onClick={toTables} radius={70}>Book a table</AttractButton>
           <a
-            className="inline-flex min-h-[52px] items-center border-2 border-sand px-7 text-[19px] font-bold uppercase tracking-[0.08em] text-sand no-underline transition-colors hover:bg-sand hover:text-ink"
-            href="#kitchen"
+            className="inline-flex min-h-[52px] items-center border-2 border-sand bg-ink/80 px-7 text-[19px] font-bold uppercase tracking-[0.08em] text-sand no-underline transition-colors hover:bg-sand hover:text-ink"
+            href="#menu"
           >
             See the menus
           </a>

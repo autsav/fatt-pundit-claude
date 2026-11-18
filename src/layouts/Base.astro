@@ -23,6 +23,20 @@ const icon = await getImage({ src: stamp, width: 64, format: 'png' });
     <meta name="theme-color" content="#2c2925" />
     <link rel="icon" type="image/png" href={icon.src} />
     <script is:inline>
+      // A fresh visit starts at the top. Some in-app viewers keep the last page's scroll offset,
+      // which landed guests at the bottom of a shorter page. Back/forward and #links keep theirs.
+      (() => {
+        const nav = performance.getEntriesByType('navigation')[0];
+        if ((nav && nav.type !== 'navigate') || location.hash) return;
+        let touched = false;
+        for (const t of ['wheel', 'touchstart', 'keydown', 'pointerdown']) addEventListener(t, () => (touched = true), { once: true, passive: true });
+        const top = () => { if (!touched && scrollY > 0) scrollTo(0, 0); };
+        addEventListener('DOMContentLoaded', top);
+        addEventListener('pagereveal', top);
+        addEventListener('load', () => { top(); setTimeout(top, 300); });
+      })();
+    </script>
+    <script is:inline>
       // Page-to-page morphs: when the browser skips one (fast double click, calm mode), stay quiet.
       for (const t of ['pageswap', 'pagereveal']) addEventListener(t, (e) => { const v = e.viewTransition; if (v) for (const k of ['ready', 'finished', 'updateCallbackDone']) v[k]?.catch(() => {}); });
     </script>
