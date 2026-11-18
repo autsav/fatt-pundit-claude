@@ -12,7 +12,10 @@ export default defineConfig({
   // made first paint slower (1.2 s -> 2.2 s on home) than three cached files.
   build: { inlineStylesheets: 'auto' },
   integrations: [react()],
-  vite: { plugins: [tailwindcss()] },
+  // Small per-component CSS (header, footer, scene styles) goes inline; only
+  // the big shared sheet stays a file. Images under the limit are unaffected
+  // in practice (the smallest real image is 8 KB of palette PNG and stays a file at 6 KB).
+  vite: { plugins: [tailwindcss()], build: { assetsInlineLimit: 6144 } },
   fonts: [
     {
       // Brand guidelines: titles Bold, copy Regular.

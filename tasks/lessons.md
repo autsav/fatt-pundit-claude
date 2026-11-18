@@ -45,3 +45,9 @@ Review at the start of every session. Add a line after any correction.
 - Inlining all CSS (88 KB) made FCP slower than three cached files. Measure before keeping a "best practice".
 - Distressed one-colour stamps: palette PNG (sharp png quality<100) is 3× smaller than WebP/AVIF; the noise is what costs bytes.
 - To find what janks: record scrollY of slow frames, then trace — `RasterTask` vs `FunctionCall` tells raster from script.
+- Visually hidden inputs (`position:absolute; opacity:0`) inside a horizontal scroller escape it unless their label is `position:relative` — they widened the whole page to 566px.
+- A `<fieldset>` defaults to `min-width: min-content`; give it `min-width:0` inside flex/grid or its nowrap children push the page wide.
+- JS-filled text that changes line count after first paint (live status, clocks) is a layout shift: reserve the width and `nowrap` it. Preloading the font a hero line uses fixed the rest (CLS 0.17 → 0.001).
+- Lab LCP for text adds preloaded fonts; judge real paint by `observedLargestContentfulPaint` and keep CLS fixes.
+- Scoped Astro CSS doesn't reach elements made in JS; use `.parent :global(.child)`.
+- Detached `requestIdleCallback` throws "Illegal invocation"; call it on `window`.

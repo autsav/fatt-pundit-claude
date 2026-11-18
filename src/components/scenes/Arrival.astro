@@ -4,7 +4,9 @@
 // and the board splits open onto the rainy street.
 import { stampSrc } from '../../lib/stamp';
 import ArrivalBoard from './ArrivalBoard.tsx';
-import stamp from '../../assets/images/brand/logo-stamp-distressed-left.png';
+// Tiger-orange stamp as a plain picture (a CSS mask made the browser wait on
+// scripts before it counted as painted).
+import stamp from '../../assets/images/brand/logo-stamp-tiger.png';
 // Negative logo = tiger orange on dark (guidelines p.15): drawn as a mask so the colour is exact.
 const stampImg = { src: await stampSrc(stamp, 320) };
 ---
@@ -27,7 +29,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     <p class="kicker">Now arriving</p>
     <div class="board"><ArrivalBoard client:load /></div>
     <p class="route">Canton · Kolkata · London · Dubai</p>
-    <div class="stamp" data-stamp style={`-webkit-mask-image:url(${stampImg.src});mask-image:url(${stampImg.src})`}></div>
+    <img class="stamp" data-stamp src={stampImg.src} alt="" width="329" height="430" fetchpriority="high" decoding="sync" />
   </div>
   <button class="skip-arrival" type="button" data-skip>Skip</button>
 </div>
@@ -41,7 +43,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   .center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 24px; text-align: center; }
   .kicker { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; color: var(--color-gold); font-size: 13px; }
   .route { margin: 0; font-family: var(--font-note); font-style: italic; color: rgb(218 199 181 / 0.88); font-size: 17px; letter-spacing: 0.04em; }
-  .stamp { position: absolute; right: -6%; bottom: -34%; width: clamp(110px, 16vw, 200px); aspect-ratio: 1046 / 1369; opacity: 0.9; transform: rotate(-8deg); background: var(--color-tiger); -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; pointer-events: none; }
+  .stamp { position: absolute; right: -6%; bottom: -34%; width: clamp(110px, 16vw, 200px); height: auto; opacity: 0.9; transform: rotate(-8deg); pointer-events: none; }
   .skip-arrival { position: absolute; right: 20px; bottom: 20px; min-height: 44px; padding: 0 18px; background: transparent; border: 1px solid rgb(218 199 181 / 0.4); color: var(--color-sand); font: inherit; font-size: 14px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; }
   .skip-arrival:hover { border-color: var(--color-gold); color: var(--color-gold); }
 </style>

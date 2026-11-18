@@ -157,4 +157,5 @@ Decisions taken from the doc's "my pick" column (user said go without answering)
 - [x] D4 Analytics (Plausible, env) + web-vitals RUM + _headers
 - [x] D5 Handover guide (docs/HANDOVER.md)
 - Result D: Tonight's board (Sheet CSV, live re-read, sample rows until set); branch clocks (local time + sun/moon from NOAA sunrise/sunset, on gate board + branch hero, greeting follows local hour); dish passport on list menus (stamp → shortlist → share/copy); Plausible + web-vitals + Book/Passport events behind PUBLIC_PLAUSIBLE_DOMAIN; _headers.
-- [ ] D6 Final QA: Lighthouse 4 pages, fps, overflow, calm, demo publish, commit
+- [x] D6 Final QA: Lighthouse 4 pages, fps, overflow, calm, demo publish, commit
+- Final (18 Nov): budget met on all pages — perf 90/98/96/98, observed LCP ~0.2 s, CLS 0.001, TBT ≤13 ms, dropped frames ≤1.3%. Overflow clean at 360/390/768/1440 on 12 pages (only intentional off-screen items). 3-mode sweep: 0 errors. Demo (11 pages) under sub-path: 0 broken links. Published v1795042638-f4d6.

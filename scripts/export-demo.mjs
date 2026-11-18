@@ -14,7 +14,18 @@ cpSync(join(dist, '_astro'), join(out, 'assets'), { recursive: true });
 // Pages: the home page plus one per branch. Sub-pages get <base href="../"> so the shared
 // assets/ folder and page-relative JS paths resolve from the root, and every internal link
 // becomes an explicit index.html path (hosts may not map /soho/ to /soho/index.html).
-const PAGES = ['', ...readdirSync(dist).filter((d) => !['_astro', 'styleguide'].includes(d) && statSync(join(dist, d)).isDirectory())];
+// Every folder with an index.html, nested ones too (soho/menu), minus build-only pages.
+const SKIP = ['_astro', 'styleguide', 'og'];
+const pagesIn = (rel) =>
+  readdirSync(join(dist, rel))
+    .filter((d) => !SKIP.includes(d) && statSync(join(dist, rel, d)).isDirectory())
+    .flatMap((d) => {
+      const r = rel ? `${rel}/${d}` : d;
+      return [...(statSync(join(dist, r, 'index.html'), { throwIfNoEntry: false }) ? [r] : []), ...pagesIn(r)];
+    });
+const PAGES = ['', ...pagesIn('')];
+// Root files the pages point at (icon, manifest).
+for (const f of ['icon-512.png', 'site.webmanifest']) cpSync(join(dist, f), join(out, f));
 const link = (path) => {
   const [p, hash] = path.split('#');
   const file = p === '' ? 'index.html' : p.endsWith('/') ? `${p}index.html` : p;
@@ -25,7 +36,7 @@ for (const page of PAGES) {
   html = html.replace(/href="\/(?!\/)([^"]*)"/g, (_, path) => `href="${link(path)}"`);
   if (page) {
     html = html.replace(/href="#([^"]*)"/g, (_, hash) => `href="${page}/index.html#${hash}"`);
-    html = html.replace('<head>', '<head><base href="../">');
+    html = html.replace('<head>', `<head><base href="${'../'.repeat(page.split('/').length)}">`);
   }
   mkdirSync(join(out, page), { recursive: true });
   writeFileSync(join(out, page, 'index.html'), html);

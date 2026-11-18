@@ -36,7 +36,7 @@ const branches = await getBranches();
   .sheet { background: #faf6ef; border: 2px solid var(--color-ink); padding: clamp(28px, 5vw, 64px); box-shadow: 8px 8px 0 var(--color-ink); }
   .info-kicker { margin: 0; color: var(--color-tiger-deep); }
   .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
-  .info-body { font-size: 18px; line-height: 1.65; max-width: 64ch; }
+  .info-body { font-size: 18px; line-height: 1.65; max-width: 64ch; overflow-wrap: anywhere; }
   .info-body :global(h2) { margin: 36px 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
   .info-body :global(p), .info-body :global(ul) { margin: 0 0 14px; }
   .info-body :global(a) { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
