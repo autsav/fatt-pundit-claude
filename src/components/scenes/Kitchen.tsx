@@ -18,6 +18,7 @@ export interface KitchenDish {
   price?: string;
   tags: string[];
   image?: string;
+  video?: string;
   imageAlt?: string;
   section: string;
   signature: boolean;
@@ -81,6 +82,7 @@ export default function Kitchen({ dishes, art }: Props) {
     price: d.price,
     tags: d.tags,
     image: d.image,
+    video: d.video,
     imageAlt: d.imageAlt,
     badge: d.signature && d.image ? 'Signature' : undefined,
     slip: d.image ? undefined : <Ticket no={++ticket + 6} name={d.name} section={d.section} stamp={art.stampGold} />,

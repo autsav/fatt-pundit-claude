@@ -19,3 +19,5 @@ Review at the start of every session. Add a line after any correction.
 - Multi-page static demo on a sub-path: give sub-pages <base href="../"> and rewrite internal links to explicit index.html paths; hash-only links on sub-pages must point at their own page or <base> sends them home.
 - import.meta.glob with eager:true emits every matched file: glob only the folders the page needs.
 - Sticky scenes under a sticky site header need top/height offset by the header, or their headings hide under it.
+- Astro scoped styles don't reach elements rendered inside a child component (a <video> from LoopVideo): style them with :global() from the page.
+- Check AI motion clips by numbers, not just eyes: diff each frame against the source photo (mean diff + % pixels changed), then look.

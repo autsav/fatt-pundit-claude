@@ -19,6 +19,8 @@ export interface RailItem {
   tags?: string[];
   /** Photo URL. Without one the card is a typed menu slip. */
   image?: string;
+  /** Optional silent loop of the same photo (only light or steam moves); plays only in view, never in calm mode. */
+  video?: string;
   imageAlt?: string;
   /** Small label on the card, e.g. "Signature". */
   badge?: string;
@@ -446,6 +448,18 @@ const PERF: CSSProperties = {
   mask: "radial-gradient(circle at 6px 6px, #0000 4.2px, #000 4.6px) -6px -6px / 12px 12px round, linear-gradient(#000 0 0) 8px 8px / calc(100% - 16px) calc(100% - 16px) no-repeat",
 };
 
+function CardLoop({ src, poster, alt }: { src: string; poster: string; alt: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.4 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+  return <video ref={ref} aria-label={alt} className="h-full w-full object-cover" disablePictureInPicture loop muted playsInline poster={poster} preload="none" src={src} />;
+}
+
 const StampCard = ({ item }: { item: RailItem }) => (
   <li className="fp-rail-card w-(--rail-card) flex-none snap-center">
     <div className="fp-rail-tilt relative drop-shadow-[0_12px_14px_rgb(44_41_37/0.32)]">
@@ -453,7 +467,11 @@ const StampCard = ({ item }: { item: RailItem }) => (
         <div className="relative aspect-[4/5] overflow-hidden bg-ink">
           {item.image ? (
             <div className="fp-rail-layer absolute inset-[-5%] [--rail-depth:4%]">
-              <img alt={item.imageAlt ?? ""} className="h-full w-full object-cover" decoding="async" draggable={false} height={500} loading="lazy" src={item.image} width={400} />
+              {item.video ? (
+                <CardLoop alt={item.imageAlt ?? ""} poster={item.image} src={item.video} />
+              ) : (
+                <img alt={item.imageAlt ?? ""} className="h-full w-full object-cover" decoding="async" draggable={false} height={500} loading="lazy" src={item.image} width={400} />
+              )}
             </div>
           ) : (
             <div className="absolute inset-0 flex flex-col bg-[#f6efe3] p-5">{item.slip}</div>

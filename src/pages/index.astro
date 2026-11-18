@@ -25,6 +25,7 @@ import mountainAArt from '../assets/images/brand/mountain-a.png';
 import mountainsBArt from '../assets/images/brand/mountains-b.png';
 import mountainsCArt from '../assets/images/brand/mountains-c.png';
 import greaseproofOrange from '../assets/images/brand/greaseproof-orange.png';
+import momoSteam from '../assets/video/momo-steam.mp4';
 import inside from '../assets/images/covent-garden/gallery-01.jpg';
 import barSour from '../assets/images/journey/05-bar-guava-chilli-sour.jpg';
 import barCocktail from '../assets/images/journey/05-bar-cocktail.jpg';
@@ -60,7 +61,7 @@ const voyageArt = {
 };
 // Scene 4: signature dishes for the rail. Photos only where we have the real dish; the rest are order tickets.
 const SECTION_NAMES: Record<string, string> = { momos: 'Momos', veg: 'Veg', seafood: 'Seafood', meat: 'Meat, game + poultry', rice: 'Bread, rice + noodles', sides: 'Sides', desserts: 'Desserts' };
-const railDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string }): Promise<KitchenDish> => {
+const railDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string; video?: string }): Promise<KitchenDish> => {
   const d = await dish(id);
   return {
     id,
@@ -69,13 +70,14 @@ const railDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0
     price: priceOf(d) ?? undefined,
     tags: d.tags,
     image: photo ? await img(photo.src, 640) : undefined,
+    video: photo?.video,
     imageAlt: photo?.alt,
     section: SECTION_NAMES[d.section] ?? d.section,
     signature: !!d.signature,
   };
 };
 const kitchenDishes = await Promise.all([
-  railDish('momo-mix-vegetable', { src: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf' }),
+  railDish('momo-mix-vegetable', { src: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf', video: momoSteam }),
   railDish('momo-kid-goat'),
   railDish('crackling-spinach', { src: imgSpinach, alt: 'Crackling spinach topped with yoghurt and pomegranate in a steel bowl' }),
   railDish('popcorn-cauliflower'),

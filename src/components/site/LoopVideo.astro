@@ -1,0 +1,29 @@
+---
+/**
+ * A short silent loop made from a real photo (Higgsfield, camera locked, only light or steam moves).
+ * Shows the photo first; plays only while on screen and never in calm mode (prefers-reduced-motion).
+ */
+interface Props {
+  src: string;
+  poster: string;
+  /** What the photo shows, for screen readers. */
+  label: string;
+  class?: string;
+}
+const { src, poster, label, class: className } = Astro.props;
+---
+<video class={className} data-loop muted loop playsinline preload="none" poster={poster} aria-label={label} disablepictureinpicture>
+  <source src={src} type="video/mp4" />
+</video>
+
+<script>
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    }
+  }, { threshold: 0.25 });
+  if (!calm) for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-loop]')) io.observe(v);
+</script>

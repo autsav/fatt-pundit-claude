@@ -85,5 +85,10 @@ See plan doc.
 - [x] Moments: Covent Garden plate wall (wave + hover/tap flip, prices from data); Soho walk-the-room (pinned sideways pan, "photo to come" frames); Dubai voyage London → Dubai with Boarding soon stamp; Soho street-sign hero; Dubai gate hero + waitlist (demo only)
 - [x] Home cards link in; stamp thud then cross-page View Transition (CSS); off in calm mode
 - [x] Checked: desktop, 390 px (no sideways scroll), calm mode, demo from sub-path across all 4 pages (0 404s); branch pages ~80 KB JS gz
-- [ ] Higgsfield: uploads blocked from both sandboxes → user uploads the plate-wall photo via the Higgsfield widget, then first cinemagraph (7.5 credits) for review
+- [x] Higgsfield (after user allowed upload.higgsfield.ai + the video CDN): 3 Kling 3.0 Pro loops from real photos, 22.5 credits (77.5 left). Each checked frame by frame vs its photo (≤2% pixels changed, room/dish unchanged). Ping-pong encoded, 130–170 KB each
+    - Covent Garden arrival: booth shelf-lamp glow behind the hero
+    - Covent Garden room: "The real wall" lamp loop above the drawn plate wall (caption says only the lamplight was brought to life)
+    - Home kitchen rail: steam on the mixed-veg momo card
+    - Play only in view; never in calm mode (poster photo instead)
+- [ ] Higgsfield still open: rain on Soho street front (needs Soho night photo), 2 textures (tile pattern, Dubai dusk sky, ~13 credits), stopgap upscales
 - [ ] Not built yet: brand street map (needs OSM data; network blocked here), wall-lettering translations, pre-theatre clock (needs times), graffiti line drawing (needs Soho photos)

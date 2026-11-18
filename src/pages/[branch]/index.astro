@@ -15,6 +15,10 @@ import PlateWall from '../../components/branch/PlateWall.tsx';
 import WalkTheRoom from '../../components/branch/WalkTheRoom.tsx';
 import VoyageToDubai from '../../components/branch/VoyageToDubai.tsx';
 import MenuBook from '../../components/scenes/MenuBook.tsx';
+import LoopVideo from '../../components/site/LoopVideo.astro';
+import plateWallLoop from '../../assets/video/cg-plate-wall-lamps.mp4';
+import plateWallPoster from '../../assets/video/cg-plate-wall-lamps-poster.jpg';
+import boothsLoop from '../../assets/video/cg-booths-glow.mp4';
 import { BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, hoursLines, menuBooks, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
 import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../../assets/images/brand/logo-stamp-distressed-right.png';
@@ -79,6 +83,7 @@ const sohoStops = [
 ];
 
 const books = open ? await menuBooks(b.menus) : [];
+const plateWallStill = (await getImage({ src: plateWallPoster, width: 1280, format: 'webp', quality: 80 })).src;
 const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
 const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await img(stampGoldArt, 260), compass: await img(compassArt, 240) };
 
@@ -116,7 +121,10 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     <!-- 1 · Arrival: the guest facts work before any animation. -->
     <section class="arrival" style={`view-transition-name: branch-${b.id}`} aria-labelledby="branch-title">
       {heroImg ? (
-        <img class="arrival-bg" src={heroImg.src} alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
+        <>
+          <img class="arrival-bg" src={heroImg.src} alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
+          {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroImg.src} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />}
+        </>
       ) : b.id === 'soho' ? (
         <div class="arrival-bg art-soho" aria-hidden="true">
           <div class="street-sign"><span class="sign-name">Berwick Street</span><span class="sign-code">W1</span><span class="sign-city">City of Westminster</span></div>
@@ -149,7 +157,16 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
           <p class="kicker lead-text">{p.opened ? `The room · since ${p.opened}` : 'The room · coming soon'}</p>
           <h2 id="room-title" class="room-lines">{p.lines.map((l) => <span>{l}</span>)}</h2>
         </div>
-        {b.id === 'covent-garden' && <PlateWall client:visible dishes={plates} />}
+        {b.id === 'covent-garden' && (
+          <>
+            <figure class="real-wall">
+              <LoopVideo src={plateWallLoop} poster={plateWallStill} label={ALTS['gallery-02']} class="real-wall-video" />
+              <figcaption><span class="lead-text">The real wall</span>, on Maiden Lane. Our photo, with only the lamplight brought to life.</figcaption>
+            </figure>
+            <p class="wall-intro">Now turn the plates over: each one hides something from the kitchen.</p>
+            <PlateWall client:visible dishes={plates} />
+          </>
+        )}
       </div>
     </section>
     {b.id === 'soho' && <WalkTheRoom client:visible stops={sohoStops} accent={p.second} />}
@@ -321,7 +338,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
   /* Arrival */
   .arrival { position: relative; min-height: min(88svh, 860px); display: grid; align-items: end; color: var(--color-sand); background: var(--color-ink); overflow: hidden; }
-  .arrival-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .arrival :global(.arrival-bg) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .arrival-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(44 41 37 / 0.15) 0%, rgb(44 41 37 / 0.35) 40%, rgb(44 41 37 / 0.92) 100%); }
   .arrival-in { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; padding-block: 56px; width: 100%; }
   .arrival-mark { display: block; width: clamp(72px, 8vw, 110px); aspect-ratio: 0.764; background: var(--lead); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
@@ -353,6 +370,12 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .room-lines { margin: 0; display: flex; flex-direction: column; gap: 0.2em; font-size: clamp(30px, 4.6vw, 62px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; }
   .room-lines span:nth-child(2) { color: var(--lead); }
   .room-lines span:nth-child(3) { font-family: var(--font-note); font-style: italic; text-transform: none; font-size: 0.62em; letter-spacing: 0; color: color-mix(in srgb, var(--color-ink) 75%, transparent); }
+
+  /* The real plate wall (photo loop), above the drawn one */
+  .real-wall { margin: 0; display: flex; flex-direction: column; gap: 10px; max-width: 980px; width: 100%; margin-inline: auto; }
+  .real-wall :global(.real-wall-video) { display: block; width: 100%; height: auto; aspect-ratio: 1760 / 1176; object-fit: cover; border: 2px solid var(--color-gold); background: #e9e1d3; }
+  .real-wall figcaption { font-family: var(--font-note); font-style: italic; font-size: 17px; }
+  .wall-intro { text-align: center; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 17px; }
 
   /* Contact sheet of the room's photos */
   .gallery-sec { padding-bottom: clamp(56px, 8vw, 110px); }
