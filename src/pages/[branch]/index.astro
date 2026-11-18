@@ -15,6 +15,8 @@ import BranchArrival from '../../components/branch/BranchArrival.tsx';
 import PlateWall from '../../components/branch/PlateWall.tsx';
 import WalkTheRoom from '../../components/branch/WalkTheRoom.tsx';
 import VoyageToDubai from '../../components/branch/VoyageToDubai.tsx';
+import TonightBoard from '../../components/branch/TonightBoard.tsx';
+import { loadSpecials } from '../../lib/specials';
 import MenuBook from '../../components/scenes/MenuBook.tsx';
 import LoopVideo from '../../components/site/LoopVideo.astro';
 import LightsOn from '../../components/site/LightsOn.astro';
@@ -99,6 +101,8 @@ const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 0.6 }, { x: 65.9, y: 13.3, size: 0
 const menuArt = { frame: frameArt.src, stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
 const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await stampSrc(stampGoldArt, 260), compass: await img(compassArt, 240) };
 
+// Tonight's board: every row for this branch goes to the page; the board picks today's.
+const specials = open ? (await loadSpecials()).filter((r) => r.branch === b.id || r.branch === 'all') : [];
 const others = branches.filter((o) => o.id !== b.id);
 const words = open ? [b.shortName] : [b.shortName, 'The Hangout', 'Boarding soon'];
 const pill = { shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status };
@@ -161,6 +165,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         <p class="arrival-brand" aria-hidden="true">Fatt Pundit</p>
         <div aria-hidden="true" class="board-slot"><BranchArrival client:idle words={words} branch={pill} /></div>
         <p class="arrival-addr">{fullAddress(b)}</p>
+        {b.geo && <p class="branch-clock" data-branch-clock data-tz={b.timezone} data-lat={b.geo.lat} data-lng={b.geo.lng} data-name={b.shortName}></p>}
         <div class="row arrival-actions">
           {open && b.booking ? (
             <a class="btn btn-orange" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
@@ -174,6 +179,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     </section>
 
     <!-- 2 · The room -->
+    {specials.length > 0 && <TonightBoard client:visible branch={b.id} name={b.shortName} tz={b.timezone} rows={specials} csvUrl={import.meta.env.PUBLIC_SPECIALS_CSV_URL} />}
     <section class="sec room" aria-labelledby="room-title">
       <div class="wrap stack-lg">
         <div class="stack">
@@ -336,7 +342,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   <!-- Phones: Book, Menu and Directions stay one thumb away once the hero has scrolled by. -->
   <nav class="dock" data-dock aria-label={`${b.shortName} quick actions`}>
     {b.booking
-      ? <a class="dock-book" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener" aria-label={`Book a table at ${b.shortName}`}>Book a table</a>
+      ? <a class="dock-book" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener" aria-label={`Book a table at ${b.shortName}`}>Book</a>
       : <a class="dock-book" href="#waitlist">Join the list</a>}
     <a href={open ? `/${b.id}/menu/` : '#menu'}>Menu</a>
     <a href={directionsUrl(b)} target="_blank" rel="noopener">Directions</a>
@@ -345,6 +351,22 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 </Base>
 
 <script>
+  // Branch clock: the time and light in this restaurant's own city.
+  import { clockIn, daypart, ICON, WORD } from '../../lib/clock';
+  {
+    const el = document.querySelector<HTMLElement>('[data-branch-clock]');
+    const tick = () => {
+      if (!el) return;
+      const part = daypart(+el.dataset.lat!, +el.dataset.lng!);
+      const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: el.dataset.tz!, hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+      document.documentElement.dataset.daypart = part;
+      document.documentElement.dataset.hour = String(hour);
+      el.innerHTML = `${ICON[part]}<span>${clockIn(el.dataset.tz!)} in ${el.dataset.name} · ${WORD[part]}</span>`;
+    };
+    tick();
+    setInterval(tick, 60_000);
+  }
+
   // The dock shows once the arrival hero has scrolled away and hides over the
   // footer (whose own links take over there).
   {
@@ -491,4 +513,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }
   .menu-list-link { margin: 0; padding: 18px 16px 0; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; }
   .menu-list-link a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
+  .branch-clock { display: inline-flex; align-items: center; gap: 8px; margin: 0; min-height: 1.4em; font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; color: var(--color-sand); }
+  .branch-clock :global(svg) { color: var(--color-gold); flex: none; }
 </style>

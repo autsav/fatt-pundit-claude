@@ -1,0 +1,10 @@
+{
+  "_note": "Fallback for Tonight's board when no Google Sheet is set (SPECIALS_CSV_URL). Same columns as the sheet: branch (id or 'all'), line (max 24 characters), from / to (YYYY-MM-DD, optional). Rows marked demo show a 'sample' tag.",
+  "rows": [
+    { "branch": "soho", "line": "Kid goat momo", "demo": true },
+    { "branch": "soho", "line": "Crackling spinach", "demo": true },
+    { "branch": "covent-garden", "line": "Malabar monkfish curry", "demo": true },
+    { "branch": "covent-garden", "line": "Bombay chilly prawns", "demo": true },
+    { "branch": "all", "line": "White Tiger at the bar", "demo": true }
+  ]
+}

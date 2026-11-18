@@ -13,7 +13,10 @@
       "postcode": "W1F 8TH",
       "country": "GB"
     },
-    "geo": null,
+    "geo": {
+      "lat": 51.5133,
+      "lng": -0.1353
+    },
     "timezone": "Europe/London",
     "currency": "GBP",
     "locale": "en-GB",
@@ -146,7 +149,10 @@
       "postcode": "WC2E 7NA",
       "country": "GB"
     },
-    "geo": null,
+    "geo": {
+      "lat": 51.511,
+      "lng": -0.1229
+    },
     "timezone": "Europe/London",
     "currency": "GBP",
     "locale": "en-GB",
@@ -269,7 +275,10 @@
       "postcode": null,
       "country": "AE"
     },
-    "geo": null,
+    "geo": {
+      "lat": 25.1181,
+      "lng": 55.2006
+    },
     "timezone": "Asia/Dubai",
     "currency": "AED",
     "locale": "en-AE",

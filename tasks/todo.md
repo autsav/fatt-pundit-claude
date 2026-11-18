@@ -151,9 +151,10 @@ Decisions taken from the doc's "my pick" column (user said go without answering)
 - Result C: Book drawer (home hero, header, branch hero, phone dock) → party, day, time → OpenTable restref / SevenRooms explore link pre-filled; 2–3 taps. /soho/menu/, /covent-garden/menu/ list menus with search + V/VG/GF/DF/H filters + print + Menu schema. Google + Apple Maps.
 - Waiting on client: vouchersUrl in branches.json, PUBLIC_NEWSLETTER_ACTION (email tool), check deep-link params with OpenTable/SevenRooms, spice data per dish (for a spice filter). Static map skipped (map tiles blocked here).
 ### Phase D — Signature and handover
-- [ ] D1 Tonight's board (Sheet CSV → split-flap)
-- [ ] D2 Branch clocks (local time → day/after-dark)
-- [ ] D3 Dish passport (stamp dishes → shortlist, share)
-- [ ] D4 Analytics (Plausible, env) + web-vitals RUM + _headers
-- [ ] D5 Handover guide (docs/HANDOVER.md)
+- [x] D1 Tonight's board (Sheet CSV → split-flap)
+- [x] D2 Branch clocks (local time → day/after-dark)
+- [x] D3 Dish passport (stamp dishes → shortlist, share)
+- [x] D4 Analytics (Plausible, env) + web-vitals RUM + _headers
+- [x] D5 Handover guide (docs/HANDOVER.md)
+- Result D: Tonight's board (Sheet CSV, live re-read, sample rows until set); branch clocks (local time + sun/moon from NOAA sunrise/sunset, on gate board + branch hero, greeting follows local hour); dish passport on list menus (stamp → shortlist → share/copy); Plausible + web-vitals + Book/Passport events behind PUBLIC_PLAUSIBLE_DOMAIN; _headers.
 - [ ] D6 Final QA: Lighthouse 4 pages, fps, overflow, calm, demo publish, commit

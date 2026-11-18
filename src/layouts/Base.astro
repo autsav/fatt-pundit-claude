@@ -2,6 +2,7 @@
 import { Font, getImage } from 'astro:assets';
 // Tiger-orange stamp (alpha of the distressed logo): reads on light and dark tabs.
 import stamp from '../assets/images/brand/logo-stamp-tiger.png';
+import Analytics from '../components/site/Analytics.astro';
 import '../styles/global.css';
 import '../styles/site.css';
 
@@ -71,6 +72,7 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <Font cssVariable="--font-typewriter-condensed" />
     <Font cssVariable="--font-lora" />
     <slot name="head" />
+    <Analytics />
     <!-- Instant page changes (Chrome/Edge): a branch page is rendered in the
          background once the guest hovers its link (desktop) or it sits on
          screen (phones). Other browsers ignore this and load normally. -->

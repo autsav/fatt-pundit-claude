@@ -50,11 +50,18 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
       video.preload = 'metadata';
     }, { rootMargin: '1200px 0px' });
     near.observe(fig);
+    // The greeting follows the restaurant's own clock (the branch page sets
+    // <html data-daypart> and data-hour from its local time).
+    const greet = () => {
+      const h = Number(document.documentElement.dataset.hour ?? 19);
+      const part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      return cue.dataset.cueOn!.replace('Good evening', part);
+    };
     let state: 'off' | 'on' | 'lit' = 'off';
     const set = (s: typeof state) => {
       state = s;
       fig.dataset.glow = s;
-      cue.textContent = s === 'off' ? cue.dataset.cueOff! : cue.dataset.cueOn!;
+      cue.textContent = s === 'off' ? cue.dataset.cueOff! : greet();
     };
 
     if (calm) {

@@ -1,0 +1,125 @@
+---
+/**
+ * Dish passport: tap the stamp beside any dish on the list menu to collect it.
+ * The passport becomes tonight's shortlist: show it to your server, or send it
+ * to the table's group chat. Kept in this browser only (localStorage).
+ */
+interface Props { branch: string; name: string }
+const { branch, name } = Astro.props;
+---
+<div class="pp" data-passport={branch} data-name={name} hidden>
+  <button type="button" class="pp-open" data-pp-open aria-haspopup="dialog">
+    <span class="pp-icon" aria-hidden="true">✦</span> Your passport <span class="pp-n" data-pp-n>0</span>
+  </button>
+  <dialog class="pp-dlg" data-pp-dlg aria-labelledby="pp-h">
+    <div class="pp-sheet">
+      <p class="pp-kicker">Fatt Pundit {name}</p>
+      <h2 id="pp-h" class="pp-title">Your dish passport</h2>
+      <ol class="pp-list" data-pp-list></ol>
+      <p class="pp-empty" data-pp-empty>No stamps yet. Tap the stamp beside a dish to collect it.</p>
+      <p class="pp-hint">Show this to your server, or send it to the table.</p>
+      <div class="pp-actions">
+        <button type="button" class="btn btn-orange btn-sm" data-pp-share>Send the list</button>
+        <button type="button" class="btn btn-sm pp-ghost" data-pp-clear>Clear</button>
+        <button type="button" class="btn btn-sm pp-ghost" data-pp-close>Close</button>
+      </div>
+      <p class="pp-done" data-pp-done aria-live="polite"></p>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  .pp { position: fixed; z-index: 30; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); }
+  .pp-open { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-gold); color: var(--color-ink-deep); font: inherit; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 14px; cursor: pointer; box-shadow: 4px 4px 0 var(--color-ink); }
+  .pp-n { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 50%; background: var(--color-ink); color: var(--color-sand); font-size: 13px; }
+  .pp-open.is-bump { animation: pp-bump .35s ease; }
+  @keyframes pp-bump { 40% { transform: scale(1.12) rotate(-3deg); } }
+  @media (prefers-reduced-motion: reduce) { .pp-open.is-bump { animation: none; } }
+  .pp-dlg { margin: auto; border: 0; padding: 0; max-width: min(520px, calc(100vw - 24px)); width: 100%; background: transparent; }
+  .pp-dlg::backdrop { background: rgb(26 23 20 / 0.6); }
+  .pp-sheet { background: #faf6ef; color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-tiger); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
+  .pp-kicker { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-tiger-deep); }
+  .pp-title { margin: 2px 0 14px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 26px; }
+  .pp-list { margin: 0 0 12px; padding-left: 1.4em; display: grid; gap: 6px; font-weight: 700; }
+  .pp-list :global(button) { margin-left: 8px; font: inherit; font-size: 13px; font-weight: 400; background: none; border: 0; color: var(--color-tiger-deep); text-decoration: underline; cursor: pointer; }
+  .pp-empty, .pp-hint, .pp-done { margin: 0 0 10px; font-family: var(--font-note); font-style: italic; }
+  .pp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pp-ghost { background: transparent; border-color: var(--color-ink); color: var(--color-ink); }
+  /* The stamp button the script adds to each dish row. */
+  :global(.pp-stamp) { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin: -8px 0 -8px 4px; border: 0; background: none; cursor: pointer; color: rgb(44 41 37 / 0.35); }
+  :global(.pp-stamp svg) { width: 30px; height: 30px; transition: transform .2s ease, color .2s ease; }
+  :global(.pp-stamp[aria-pressed='true']) { color: var(--color-tiger-deep); }
+  :global(.pp-stamp[aria-pressed='true'] svg) { transform: rotate(-12deg) scale(1.08); }
+  :global(.pp-stamp:focus-visible) { outline: 3px solid var(--color-tiger); outline-offset: 0; }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-passport]');
+  if (root) {
+    // Lift the floating button out of the page's paper so nothing can sit over it.
+    document.body.append(root);
+    const branch = root.dataset.passport!;
+    const KEY = 'fp-passport';
+    const read = (): Record<string, string[]> => { try { return JSON.parse(localStorage.getItem(KEY) ?? '{}'); } catch { return {}; } };
+    const write = (v: Record<string, string[]>) => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} };
+    const mine = () => read()[branch] ?? [];
+    const save = (ids: string[]) => { const all = read(); all[branch] = ids; write(all); };
+    const nameOf = (id: string) => document.querySelector<HTMLElement>(`[data-dish="${id}"] .mi-name`)?.textContent ?? id;
+    const STAMP = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 4h24v24H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2.2 2.2"/><circle cx="16" cy="16" r="7.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12.5 16.2l2.4 2.4 4.8-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    const btnOpen = root.querySelector<HTMLButtonElement>('[data-pp-open]')!;
+    const dlg = root.querySelector<HTMLDialogElement>('[data-pp-dlg]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-pp-list]')!;
+    const done = root.querySelector<HTMLElement>('[data-pp-done]')!;
+
+    const render = () => {
+      const ids = mine();
+      root.hidden = ids.length === 0 && !dlg.open;
+      root.querySelector('[data-pp-n]')!.textContent = String(ids.length);
+      list.replaceChildren(...ids.map((id) => {
+        const li = document.createElement('li');
+        li.textContent = nameOf(id);
+        const x = document.createElement('button');
+        x.type = 'button'; x.textContent = 'remove'; x.setAttribute('aria-label', `Remove ${nameOf(id)}`);
+        x.addEventListener('click', () => { save(mine().filter((i) => i !== id)); sync(); });
+        li.append(x);
+        return li;
+      }));
+      root.querySelector<HTMLElement>('[data-pp-empty]')!.hidden = ids.length > 0;
+    };
+    const sync = () => {
+      const ids = mine();
+      for (const b of document.querySelectorAll<HTMLButtonElement>('.pp-stamp')) b.setAttribute('aria-pressed', String(ids.includes(b.dataset.id!)));
+      render();
+    };
+
+    for (const li of document.querySelectorAll<HTMLElement>('[data-dish]')) {
+      const id = li.dataset.dish!;
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'pp-stamp'; b.dataset.id = id; b.innerHTML = STAMP;
+      b.setAttribute('aria-label', `Stamp ${nameOf(id)} into your passport`);
+      b.addEventListener('click', () => {
+        const ids = mine();
+        save(ids.includes(id) ? ids.filter((i) => i !== id) : [...ids, id]);
+        sync();
+        btnOpen.classList.remove('is-bump'); void btnOpen.offsetWidth; btnOpen.classList.add('is-bump');
+      });
+      li.querySelector('.mi-head')?.append(b);
+    }
+
+    btnOpen.addEventListener('click', () => { done.textContent = ''; dlg.showModal(); });
+    root.querySelector('[data-pp-close]')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', () => { render(); btnOpen.focus(); });
+    root.querySelector('[data-pp-clear]')!.addEventListener('click', () => { save([]); sync(); });
+    root.querySelector('[data-pp-share]')!.addEventListener('click', async () => {
+      const text = `Tonight at Fatt Pundit ${root.dataset.name}:\n${mine().map((id) => `• ${nameOf(id)}`).join('\n')}`;
+      try {
+        if (navigator.share) { await navigator.share({ title: 'Our Fatt Pundit order', text, url: location.href }); return; }
+        await navigator.clipboard.writeText(`${text}\n${location.href}`);
+        done.textContent = 'Copied. Paste it into your group chat.';
+      } catch { /* share sheet closed */ }
+    });
+    sync();
+  }
+</script>

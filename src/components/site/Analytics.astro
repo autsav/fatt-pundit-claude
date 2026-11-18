@@ -1,0 +1,37 @@
+---
+/**
+ * Cookie-free analytics (Plausible) + real-user speed. Off until the domain
+ * is set: PUBLIC_PLAUSIBLE_DOMAIN=fattpundit.co.uk in the host's build settings.
+ * Sends: page views; "Book" (which restaurant, party size) when the booking
+ * drawer hands off; "Passport" stamps; and "Vitals" (LCP / INP / CLS from real
+ * phones, rated good / needs work / poor) so speed is watched after launch.
+ */
+const domain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN as string | undefined;
+const src = (import.meta.env.PUBLIC_PLAUSIBLE_SRC as string | undefined) ?? 'https://plausible.io/js/script.tagged-events.js';
+---
+{domain && (
+  <>
+    <script defer data-domain={domain} src={src} is:inline></script>
+    <script is:inline>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };</script>
+  </>
+)}
+{domain && (
+  <script>
+    import { onCLS, onINP, onLCP, type Metric } from 'web-vitals';
+    const send = (name: string, props: Record<string, string | number>) => (window as unknown as { plausible: (n: string, o: object) => void }).plausible(name, { props });
+    const vital = (m: Metric) => send('Vitals', { metric: m.name, rating: m.rating, value: Math.round(m.name === 'CLS' ? m.value * 1000 : m.value), page: location.pathname });
+    onLCP(vital);
+    onINP(vital);
+    onCLS(vital);
+    addEventListener('fp:booking-click', (e) => {
+      const d = (e as CustomEvent<{ branch: string; size: number }>).detail;
+      send('Book', { branch: d.branch, size: d.size });
+    });
+    addEventListener('click', (e) => {
+      const stamp = (e.target as Element).closest<HTMLElement>('.pp-stamp');
+      if (stamp) send('Passport', { dish: stamp.dataset.id ?? '' });
+      const tear = (e.target as Element).closest<HTMLAnchorElement>('a[href*="opentable"], a[href*="sevenrooms"]');
+      if (tear && !tear.dataset.book) send('Book', { branch: tear.closest('[data-branch]')?.getAttribute('data-branch') ?? 'link', size: 0 });
+    });
+  </script>
+)}
