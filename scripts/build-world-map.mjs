@@ -39,6 +39,8 @@ const leg2 = [
   [0, 36.8], [-5.6, 35.95], [-9.6, 37.4], [-9.8, 42.5], [-7.5, 45.8], [-6.2, 48.4], [-3, 49.9], [0.6, 50.6], [1.6, 51.2], [0.6, 51.48], [-0.13, 51.51],
 ];
 const dubai = [[64, 14.2], [61.2, 21.4], [59.2, 24.6], [57, 26.1], [55.9, 25.9], [55.27, 25.2]];
+// London to Dubai for the Dubai page: leg 2 sailed backwards to the Arabian Sea, then the Gulf.
+const toDubai = [...leg2.slice(6).reverse(), ...dubai];
 
 const landPath = geoPath(projection).digits(0)(land);
 
@@ -68,6 +70,7 @@ writeFileSync(
       leg1: route(leg1),
       leg2: route(leg2),
       dubai: route(dubai),
+      toDubai: route(toDubai),
     },
     null,
     2,

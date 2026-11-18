@@ -77,3 +77,13 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 
 ## Days 5–10
 See plan doc.
+
+## Location pages (plan doc: Fatt Pundit Location Pages Plan) ✅ L1–L3 built 18 Nov
+- [x] Branch data: `page` block in branches.json (three lines, colours, opened, stations, signature, teaser, hero, gallery), Zod schema + validate-data checks
+- [x] Shared chrome: SiteHeader / SiteFooter components, site.css; lib/site-data.ts (branches, dishes, prices, hours, menu books) used by home + branch pages
+- [x] /soho/, /covent-garden/, /dubai/ from one template: arrival (board + open-now pill + Book/Call/Directions), the room, born here, menu book filtered to the branch's menus, visit (hours with today, stations), good to know, other rooms, Restaurant structured data
+- [x] Moments: Covent Garden plate wall (wave + hover/tap flip, prices from data); Soho walk-the-room (pinned sideways pan, "photo to come" frames); Dubai voyage London → Dubai with Boarding soon stamp; Soho street-sign hero; Dubai gate hero + waitlist (demo only)
+- [x] Home cards link in; stamp thud then cross-page View Transition (CSS); off in calm mode
+- [x] Checked: desktop, 390 px (no sideways scroll), calm mode, demo from sub-path across all 4 pages (0 404s); branch pages ~80 KB JS gz
+- [ ] Higgsfield: uploads blocked from both sandboxes → user uploads the plate-wall photo via the Higgsfield widget, then first cinemagraph (7.5 credits) for review
+- [ ] Not built yet: brand street map (needs OSM data; network blocked here), wall-lettering translations, pre-theatre clock (needs times), graffiti line drawing (needs Soho photos)

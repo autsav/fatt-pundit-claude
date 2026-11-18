@@ -50,6 +50,20 @@ const branches = defineCollection({
       vouchersUrl: z.url().nullable(),
       groupsNote: z.string().nullable(),
       menus: z.array(z.string()),
+      // The branch's own page (/soho/, /covent-garden/, /dubai/).
+      page: z.object({
+        lines: z.array(z.string().min(1)).length(3),
+        lead: z.enum(['tiger', 'gold', 'slate']),
+        second: z.string().regex(/^#[0-9a-f]{6}$/),
+        opened: z.string().regex(/^\d{4}$/).nullable(),
+        stations: z.array(z.string()).min(1),
+        signature: z
+          .object({ dish: z.string(), label: z.enum(['born-here', 'only-here']), story: z.string().min(1) })
+          .nullable(),
+        teaser: z.array(z.string()),
+        hero: z.string().nullable(),
+        gallery: z.array(z.string()),
+      }),
     })
     .refine((b) => b.status !== 'open' || (b.booking && b.hours && b.phone), {
       message: 'an open branch needs booking, hours and phone',

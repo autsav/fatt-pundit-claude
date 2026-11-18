@@ -7,9 +7,10 @@ import RainHero from '../components/scenes/RainHero.tsx';
 import Voyage from '../components/scenes/Voyage.tsx';
 import Kitchen, { type KitchenDish } from '../components/scenes/Kitchen.tsx';
 import MenuBook, { type MenuLite } from '../components/scenes/MenuBook.tsx';
-import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { formatPrice } from '../lib/format';
+import { getBranches, dish, priceOf, hoursLines, menuBooks, prettyPhone } from '../lib/site-data';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
 
 import stampLeft from '../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../assets/images/brand/logo-stamp-distressed-right.png';
@@ -39,34 +40,8 @@ import g6 from '../assets/images/covent-garden/gallery-06.jpg';
 import g7 from '../assets/images/covent-garden/gallery-07.jpg';
 import g8 from '../assets/images/covent-garden/gallery-08.jpg';
 
-const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order).map((b) => b.data);
-const dish = async (id: string) => {
-  const d = (await getEntry('dishes', id))?.data;
-  if (!d) throw new Error(`dish ${id} missing from src/data/dishes.json`);
-  return d;
-};
-
+const branches = await getBranches();
 const drinks = await Promise.all(['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'desi-dragon'].map(dish));
-const priceOf = (d: Awaited<ReturnType<typeof dish>>) =>
-  d.price ? formatPrice(d.price, 'GBP') : d.options?.map((o) => `${o.label} ${formatPrice(o.price, 'GBP')}`).join(' · ');
-
-const DAYS = [['mon', 'Mon'], ['tue', 'Tue'], ['wed', 'Wed'], ['thu', 'Thu'], ['fri', 'Fri'], ['sat', 'Sat'], ['sun', 'Sun']] as const;
-const t = (s: string) => {
-  const [h, m] = s.split(':').map(Number);
-  const hh = h % 12 || 12;
-  return `${hh}${m ? '.' + String(m).padStart(2, '0') : ''}${h < 12 ? 'am' : 'pm'}`;
-};
-// Group consecutive days with the same hours: "Mon–Fri 12–2.30pm, 5–10.30pm"
-function hoursLines(hours: NonNullable<(typeof branches)[number]['hours']>) {
-  const lines: { days: string; text: string }[] = [];
-  for (const [key, label] of DAYS) {
-    const text = hours[key].length ? hours[key].map(([a, b]) => `${t(a).replace(/(am|pm)$/, (x) => (t(b).endsWith(x) ? '' : x))}–${t(b)}`).join(', ') : 'Closed';
-    const last = lines.at(-1);
-    if (last && last.text === text) last.days = last.days.split('–')[0] + '–' + label;
-    else lines.push({ days: label, text });
-  }
-  return lines;
-}
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
@@ -84,10 +59,9 @@ const voyageArt = {
   mountainsC: await img(mountainsCArt, 260),
 };
 // Scene 4: signature dishes for the rail. Photos only where we have the real dish; the rest are order tickets.
-type Dish = Awaited<ReturnType<typeof dish>>;
 const SECTION_NAMES: Record<string, string> = { momos: 'Momos', veg: 'Veg', seafood: 'Seafood', meat: 'Meat, game + poultry', rice: 'Bread, rice + noodles', sides: 'Sides', desserts: 'Desserts' };
 const railDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string }): Promise<KitchenDish> => {
-  const d: Dish = await dish(id);
+  const d = await dish(id);
   return {
     id,
     name: photo?.name ?? d.name,
@@ -114,31 +88,7 @@ const kitchenDishes = await Promise.all([
 const kitchenArt = { greaseproof: greaseproofOrange.src, stampGold: await img(stampGoldArt, 200) };
 
 // Scene 5: the menu book, straight from menus.json + dishes.json.
-const MENU_TABS: [string, string][] = [['a-la-carte', 'À la carte'], ['vegan', 'Vegan'], ['halal', 'Halal'], ['gluten-free', 'Gluten free'], ['dairy-free', 'Dairy free'], ['drinks', 'Drinks']];
-const menuBooks: MenuLite[] = await Promise.all(
-  MENU_TABS.map(async ([id, tab]) => {
-    const m = (await getEntry('menus', id))?.data;
-    if (!m) throw new Error(`menu ${id} missing from src/data/menus.json`);
-    return {
-      id,
-      tab,
-      title: m.kind === 'drinks' ? 'Drinks' : m.title,
-      allergyNote: m.allergyNote,
-      sections: await Promise.all(
-        m.sections.map(async (sec) => ({
-          title: sec.title,
-          note: sec.note,
-          items: await Promise.all(
-            sec.items.map(async ({ dish: did }) => {
-              const d = await dish(did);
-              return { name: d.name, desc: d.description, price: m.showPrices ? (priceOf(d) ?? undefined) : undefined, options: !!d.options, tags: d.tags };
-            }),
-          ),
-        })),
-      ),
-    };
-  }),
-);
+const menuBooksHome = await menuBooks(['a-la-carte', 'vegan', 'halal', 'gluten-free', 'dairy-free', 'drinks']);
 const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
 const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status }));
 ---
@@ -148,19 +98,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   noindex
 >
   <a class="skip" href="#tables">Skip to your table</a>
-  <p class="preview-flag">Website preview for Fatt Pundit · not the live site · prices and photos to be confirmed</p>
-
-  <header class="bar">
-    <div class="wrap bar-in">
-      <a class="brand" href="#top">FATT PUNDIT</a>
-      <nav aria-label="Main" class="nav">
-        <a href="#menu">Menus</a>
-        <a href="#story">Our story</a>
-        <a href="#tables">Locations</a>
-        <a class="btn btn-orange btn-sm" href="#tables">Book a table</a>
-      </nav>
-    </div>
-  </header>
+  <SiteHeader branches={branches} />
 
   <main>
     <!-- 0 · Arrival -->
@@ -179,7 +117,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <Kitchen client:visible dishes={kitchenDishes} art={kitchenArt} />
 
     <!-- 5 · The menu book -->
-    <MenuBook client:visible menus={menuBooks} art={menuArt} />
+    <MenuBook client:visible menus={menuBooksHome} art={menuArt} />
 
     <!-- 5 · The bar -->
     <section class="sec ink bar-sec">
@@ -234,10 +172,10 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
         </div>
         <div class="cards">
           {branches.map((b, i) => (
-            <article class={`card stamp-in ${b.status === 'opening-soon' ? 'card-dark' : ''}`} style={`--d:${i * 120}ms`}>
+            <article class={`card stamp-in ${b.status === 'opening-soon' ? 'card-dark' : ''}`} style={`--d:${i * 120}ms; view-transition-name: branch-${b.id}`}>
               {stamps[b.id] && <Image src={stamps[b.id]} alt="" width={180} class="card-stamp" />}
               {b.status === 'opening-soon' && <p class="soon">Opening soon</p>}
-              <h3 class="card-title">{b.shortName}</h3>
+              <h3 class="card-title"><a href={`/${b.id}/`} class="card-link">{b.shortName}</a></h3>
               <p>{b.address.street}<br />{b.address.city}{b.address.postcode ? ` ${b.address.postcode}` : ''}</p>
               {b.hours && (
                 <dl class="hours">
@@ -247,9 +185,10 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
               {b.status === 'open' && b.booking && (
                 <div class="row card-actions">
                   <a class="btn btn-ink" href={b.booking.url} target="_blank" rel="noopener">Book {b.shortName}</a>
-                  {b.phone && <a class="btn btn-line" href={`tel:${b.phone}`}>Call {b.phone.replace(/^\+44(\d{2})(\d{4})(\d{4})$/, '0$1 $2 $3')}</a>}
+                  {b.phone && <a class="btn btn-line" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
                 </div>
               )}
+              <a class="card-more" href={`/${b.id}/`}>{b.status === 'open' ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`} →</a>
               {b.status === 'opening-soon' && (
                 <form class="waitlist" data-waitlist>
                   <p>Be first through the door. Leave your email and we'll tell you when bookings open.</p>
@@ -269,34 +208,22 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     </section>
   </main>
 
-  <footer class="foot">
-    <div class="wrap stack-lg">
-      <div class="foot-grid">
-        <div class="stack-sm">
-          <p class="brand">FATT PUNDIT</p>
-          <p class="note gold">Hakka cooking from Tangra, Kolkata's Chinatown.</p>
-        </div>
-        {branches.map((b) => (
-          <div class="stack-sm small">
-            <p class="foot-h">{b.shortName}</p>
-            <p>{b.address.street}{b.address.postcode ? `, ${b.address.postcode}` : ''}</p>
-            <p>{b.phone ? b.phone.replace(/^\+44(\d{2})(\d{4})(\d{4})$/, '0$1 $2 $3') : 'Opening soon'}</p>
-          </div>
-        ))}
-      </div>
-      <nav aria-label="Footer" class="foot-nav">
-        <a href="#menu">Menus</a><a href="#story">Our story</a><a href="#tables">Groups</a><a href="#tables">Gift vouchers</a>
-        <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.facebook.com/fattpundit/" target="_blank" rel="noopener">Facebook</a>
-        <a href="https://x.com/FattPundit" target="_blank" rel="noopener">X</a>
-      </nav>
-      <p class="tiny">We make every effort to avoid cross-contamination, but cannot guarantee dishes and drinks are allergen-free. Please tell us about any dietary requirements when you book. Website demo: prices and photos to be confirmed.</p>
-    </div>
-  </footer>
+  <SiteFooter branches={branches} home />
 </Base>
 
 <script>
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Stepping into a room: the card's stamp thuds before the page morphs (skipped in calm mode).
+  for (const a of document.querySelectorAll<HTMLAnchorElement>('.card-link, .card-more')) {
+    a.addEventListener('click', (e) => {
+      if (reduce || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const card = a.closest('.card');
+      if (!card) return;
+      e.preventDefault();
+      card.classList.add('is-stamped');
+      setTimeout(() => (location.href = a.href), 240);
+    });
+  }
 
   // Reveal sections, draw the map route, drop the stamp cards.
   const io = new IntersectionObserver(
@@ -315,45 +242,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
 </script>
 
 <style>
-  .wrap { max-width: 1240px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); }
-  .stack { display: flex; flex-direction: column; gap: 20px; }
-  .stack-sm { display: flex; flex-direction: column; gap: 6px; }
-  .stack-lg { display: flex; flex-direction: column; gap: clamp(32px, 4vw, 52px); }
-  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-  .center { text-align: center; align-items: center; }
-  .narrow { max-width: 720px; }
-  .small { font-size: 15px; }
-  .tiny { font-size: 13px; max-width: 760px; }
   p { margin: 0; }
-  .sec { padding-block: clamp(72px, 10vw, 136px); }
-  .sand { background: var(--color-sand); color: var(--color-ink); }
-  .ink { background: var(--color-ink); color: var(--color-sand); }
-  .gold-bg { background: var(--color-gold); color: var(--color-ink); }
-  .gold { color: var(--color-gold); }
-  .kicker, .note { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 20px; letter-spacing: 0.02em; }
-  .h2 { margin: 0; font-size: clamp(34px, 4.4vw, 58px); }
-  body { font-size: 17px; line-height: 1.55; }
-
-  .preview-flag { background: var(--color-gold); color: var(--color-ink); text-align: center; font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 12px; }
-  .skip { position: absolute; left: -999px; top: 8px; z-index: 50; background: var(--color-tiger); color: var(--color-ink); padding: 10px 16px; font-weight: 700; }
-  .skip:focus { left: 8px; }
-
-  /* Buttons */
-  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 26px; font-weight: 700; font-size: 19px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 2px solid transparent; cursor: pointer; font-family: inherit; transition: transform .15s ease, background-color .15s ease; }
-  .btn:hover { transform: translateY(-2px); }
-  .btn-sm { min-height: 44px; padding: 0 18px; }
-  .btn-orange { background: var(--color-tiger); color: var(--color-ink); }
-  .btn-ink { background: var(--color-ink); color: var(--color-sand); font-size: 17px; }
-  .btn-line { border-color: var(--color-ink); color: var(--color-ink); font-size: 15px; font-weight: 400; letter-spacing: 0.06em; text-transform: none; }
-  .btn-ghost-light { border-color: var(--color-sand); color: var(--color-sand); }
-
-  /* Header */
-  .bar { position: sticky; top: 0; z-index: 40; background: var(--color-ink); color: var(--color-sand); border-bottom: 2px solid var(--color-gold); }
-  .bar-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 28px; padding-block: 12px; }
-  .brand { font-weight: 700; font-size: 22px; letter-spacing: 0.18em; color: var(--color-sand); text-decoration: none; }
-  .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; text-transform: uppercase; letter-spacing: 0.12em; font-size: 15px; }
-  .nav a:not(.btn) { color: var(--color-sand); text-decoration: none; }
-  .nav a:not(.btn):hover { color: var(--color-gold); }
 
   /* Journey */
   .split { display: flex; flex-wrap: wrap; align-items: center; gap: 48px 72px; }
@@ -401,10 +290,14 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   .card { background: var(--color-sand); color: var(--color-ink); padding: 28px; display: flex; flex-direction: column; gap: 14px; outline: 3px dashed var(--color-sand); outline-offset: 7px; }
   .card-dark { background: var(--color-ink); color: var(--color-sand); outline-color: var(--color-ink); }
   .card :global(.card-stamp) { width: 92px; height: auto; }
+  .card.is-stamped :global(.card-stamp) { animation: card-thud .24s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes card-thud { 0% { transform: scale(1.7) rotate(-12deg); opacity: .4; } 100% { transform: none; opacity: 1; } }
   .card-title { margin: 0; font-size: 30px; }
+  .card-link { color: inherit; text-decoration: none; }
+  .card-link:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+  .card-more { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 15px; color: inherit; }
+  .card-dark .card-more { color: var(--color-gold); }
   .soon { align-self: flex-start; border: 2px solid var(--color-gold); color: var(--color-gold); padding: 6px 12px; font-family: var(--font-label); font-weight: 700; font-size: 14px; letter-spacing: 0.24em; text-transform: uppercase; }
-  .hours { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 0; font-size: 15px; }
-  .hours dt { font-weight: 700; } .hours dd { margin: 0; }
   .card-actions { margin-top: auto; padding-top: 6px; }
   .waitlist { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
   .waitlist label { font-size: 14px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-gold); }
@@ -418,19 +311,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
   .reveal.is-in { opacity: 1; transform: none; }
 
-  /* Footer */
-  .foot { background: var(--color-ink); color: var(--color-sand); padding-block: 64px 40px; }
-  .foot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; }
-  .foot-h { font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-gold); }
-  .foot-nav { display: flex; flex-wrap: wrap; gap: 10px 26px; border-top: 1px solid var(--color-gold); padding-top: 22px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.12em; }
-  .foot-nav a { color: var(--color-sand); }
-  .foot-nav a:hover { color: var(--color-gold); }
-
   @media (max-width: 640px) {
-    .nav a:not(.btn) { display: none; }
-    .brand { font-size: 17px; letter-spacing: 0.14em; }
-    .bar-in { flex-wrap: nowrap; }
-    .nav .btn-sm { font-size: 15px; padding: 0 12px; }
     .bar-photos { min-height: 400px; }
   }
 

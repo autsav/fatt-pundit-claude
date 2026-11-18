@@ -84,3 +84,11 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Branch pages: clicking a room morphs its card into that page's arrival (cross-document
+   View Transitions; browsers without them just load the page). Off in calm mode. */
+@view-transition { navigation: auto; }
+::view-transition-group(*) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}

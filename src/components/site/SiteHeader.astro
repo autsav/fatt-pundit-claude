@@ -1,0 +1,40 @@
+---
+/**
+ * The ink bar across the top of every page. On the home page the links jump to sections;
+ * on a branch page they lead home, list the three rooms, and Book goes straight to that room.
+ */
+import type { Branch } from '@/lib/site-data';
+
+interface Props {
+  branches: Branch[];
+  /** The branch whose page this is; absent on the home page. */
+  current?: Branch;
+}
+const { branches, current } = Astro.props;
+const home = !current;
+const book = current?.booking
+  ? { href: current.booking.url, label: `Book ${current.shortName}`, external: true }
+  : current
+    ? { href: '#waitlist', label: 'Join the list', external: false }
+    : { href: '#tables', label: 'Book a table', external: false };
+---
+<p class="preview-flag">Website preview for Fatt Pundit · not the live site · prices and photos to be confirmed</p>
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href={home ? '#top' : '/'}>FATT PUNDIT</a>
+    <nav aria-label="Main" class="nav">
+      {home ? (
+        <>
+          <a href="#menu">Menus</a>
+          <a href="#story">Our story</a>
+          {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}
+        </>
+      ) : (
+        branches.map((b) => (
+          <a href={`/${b.id}/`} aria-current={b.id === current?.id ? 'page' : undefined}>{b.shortName}</a>
+        ))
+      )}
+      <a class="btn btn-orange btn-sm" href={book.href} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}>{book.label}</a>
+    </nav>
+  </div>
+</header>

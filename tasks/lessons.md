@@ -16,3 +16,6 @@ Review at the start of every session. Add a line after any correction.
 - Headless screenshots of a WebGL canvas that is partly off screen can come back black or transparent. Check the real pixels with gl.readPixels before "fixing" the shader.
 - Paginating content into fixed pages: measure real block heights in a hidden copy (cqw units scale with width), don't guess from character counts.
 - Layers that must move together (a paper sheet and its wash) go in ONE element; a separate unrotated overlay leaves a wedge.
+- Multi-page static demo on a sub-path: give sub-pages <base href="../"> and rewrite internal links to explicit index.html paths; hash-only links on sub-pages must point at their own page or <base> sends them home.
+- import.meta.glob with eager:true emits every matched file: glob only the folders the page needs.
+- Sticky scenes under a sticky site header need top/height offset by the header, or their headings hide under it.

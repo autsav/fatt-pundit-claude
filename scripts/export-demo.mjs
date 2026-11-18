@@ -1,4 +1,4 @@
-// Copies the built homepage into demo/ with relative asset paths,
+// Copies the built site (home + branch pages) into demo/ with relative asset paths,
 // so it can be hosted under any sub-path (e.g. a shared preview link).
 // Usage: npm run build && node scripts/export-demo.mjs
 import { cpSync, readFileSync, writeFileSync, rmSync, mkdirSync, readdirSync, statSync } from 'node:fs';
@@ -11,8 +11,25 @@ mkdirSync(out, { recursive: true });
 // Hosts may reserve names starting with "_", so ship assets/ instead of _astro/.
 cpSync(join(dist, '_astro'), join(out, 'assets'), { recursive: true });
 
-const html = readFileSync(join(dist, 'index.html'), 'utf8').replaceAll('"/_astro/', '"./assets/').replaceAll("'/_astro/", "'./assets/").replaceAll('(/_astro/', '(./assets/').replaceAll(' /_astro/', ' ./assets/').replaceAll(',/_astro/', ',./assets/').replaceAll('&quot;/_astro/', '&quot;./assets/');
-writeFileSync(join(out, 'index.html'), html);
+// Pages: the home page plus one per branch. Sub-pages get <base href="../"> so the shared
+// assets/ folder and page-relative JS paths resolve from the root, and every internal link
+// becomes an explicit index.html path (hosts may not map /soho/ to /soho/index.html).
+const PAGES = ['', ...readdirSync(dist).filter((d) => !['_astro', 'styleguide'].includes(d) && statSync(join(dist, d)).isDirectory())];
+const link = (path) => {
+  const [p, hash] = path.split('#');
+  const file = p === '' ? 'index.html' : p.endsWith('/') ? `${p}index.html` : p;
+  return hash !== undefined ? `${file}#${hash}` : file;
+};
+for (const page of PAGES) {
+  let html = readFileSync(join(dist, page, 'index.html'), 'utf8').replaceAll('"/_astro/', '"./assets/').replaceAll("'/_astro/", "'./assets/").replaceAll('(/_astro/', '(./assets/').replaceAll(' /_astro/', ' ./assets/').replaceAll(',/_astro/', ',./assets/').replaceAll('&quot;/_astro/', '&quot;./assets/');
+  html = html.replace(/href="\/(?!\/)([^"]*)"/g, (_, path) => `href="${link(path)}"`);
+  if (page) {
+    html = html.replace(/href="#([^"]*)"/g, (_, hash) => `href="${page}/index.html#${hash}"`);
+    html = html.replace('<head>', '<head><base href="../">');
+  }
+  mkdirSync(join(out, page), { recursive: true });
+  writeFileSync(join(out, page, 'index.html'), html);
+}
 
 const walk = (d) => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)]));
 for (const f of walk(join(out, 'assets'))) {
@@ -33,5 +50,5 @@ for (const f of walk(join(out, 'assets'))) {
     );
   }
 }
-const left = readFileSync(join(out, 'index.html'), 'utf8').match(/_astro\//g);
-console.log(`demo/ ready${left ? ` — WARNING: ${left.length} absolute /_astro/ paths left` : ''}`);
+const left = PAGES.flatMap((pg) => readFileSync(join(out, pg, 'index.html'), 'utf8').match(/_astro\//g) ?? []);
+console.log(`demo/ ready: ${PAGES.length} pages${left.length ? ` — WARNING: ${left.length} absolute /_astro/ paths left` : ''}`);

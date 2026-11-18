@@ -33,6 +33,11 @@ for (const m of menus) {
 
 for (const b of branches) {
   for (const id of b.menus) if (!menuIds.has(id)) errors.push(`branch "${b.id}": unknown menu "${id}"`);
+  const pageDishes = [b.page?.signature?.dish, ...(b.page?.teaser ?? [])].filter(Boolean);
+  for (const id of pageDishes) if (!dishIds.has(id)) errors.push(`branch "${b.id}" page: unknown dish "${id}"`);
+  for (const key of [b.page?.hero, ...(b.page?.gallery ?? [])].filter(Boolean)) {
+    if (!existsSync(new URL(`../src/assets/images/${b.id}/${key}.jpg`, import.meta.url))) errors.push(`branch "${b.id}" page: photo ${b.id}/${key}.jpg missing`);
+  }
   if (b.status === 'open' && !b.geo) warnings.push(`branch "${b.id}": no geo coordinates (needed for schema/map)`);
   if (b.status === 'open' && !b.vouchersUrl && b.id === 'soho') warnings.push(`branch "${b.id}": vouchers URL missing`);
 }

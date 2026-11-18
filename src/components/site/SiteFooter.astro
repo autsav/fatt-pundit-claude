@@ -1,0 +1,39 @@
+---
+import { prettyPhone, type Branch } from '@/lib/site-data';
+
+interface Props {
+  branches: Branch[];
+  home?: boolean;
+}
+const { branches, home = false } = Astro.props;
+const h = (hash: string) => (home ? hash : `/${hash}`);
+---
+<footer class="foot">
+  <div class="wrap stack-lg">
+    <div class="foot-grid">
+      <div class="stack-sm">
+        <p class="brand">FATT PUNDIT</p>
+        <p class="note gold">Hakka cooking from Tangra, Kolkata's Chinatown.</p>
+      </div>
+      {branches.map((b) => (
+        <div class="stack-sm small">
+          <a class="foot-h" href={`/${b.id}/`}>{b.shortName}</a>
+          <p>{b.address.street}{b.address.postcode ? `, ${b.address.postcode}` : ''}</p>
+          <p>{b.phone ? prettyPhone(b.phone) : 'Opening soon'}</p>
+        </div>
+      ))}
+    </div>
+    <nav aria-label="Footer" class="foot-nav">
+      <a href={h('#menu')}>Menus</a><a href={h('#story')}>Our story</a><a href={h('#tables')}>Groups</a><a href={h('#tables')}>Gift vouchers</a>
+      <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.facebook.com/fattpundit/" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://x.com/FattPundit" target="_blank" rel="noopener">X</a>
+    </nav>
+    <p class="tiny">We make every effort to avoid cross-contamination, but cannot guarantee dishes and drinks are allergen-free. Please tell us about any dietary requirements when you book. Website demo: prices and photos to be confirmed.</p>
+  </div>
+</footer>
+<style>
+  .foot :global(p) { margin: 0; }
+  .foot-h { text-decoration: none; }
+  .foot-h:hover { text-decoration: underline; }
+</style>

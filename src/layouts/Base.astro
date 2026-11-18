@@ -2,6 +2,7 @@
 import { Font, getImage } from 'astro:assets';
 import stamp from '../assets/images/brand/logo-stamp-distressed-left.png';
 import '../styles/global.css';
+import '../styles/site.css';
 
 interface Props {
   title: string;
@@ -21,6 +22,10 @@ const icon = await getImage({ src: stamp, width: 64, format: 'png' });
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#2c2925" />
     <link rel="icon" type="image/png" href={icon.src} />
+    <script is:inline>
+      // Page-to-page morphs: when the browser skips one (fast double click, calm mode), stay quiet.
+      for (const t of ['pageswap', 'pagereveal']) addEventListener(t, (e) => { const v = e.viewTransition; if (v) for (const k of ['ready', 'finished', 'updateCallbackDone']) v[k]?.catch(() => {}); });
+    </script>
     <Font cssVariable="--font-typewriter" preload />
     <Font cssVariable="--font-typewriter-condensed" />
     <Font cssVariable="--font-lora" />

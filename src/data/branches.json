@@ -107,7 +107,30 @@
       "pre-theatre",
       "vegetarian-pre-theatre",
       "drinks"
-    ]
+    ],
+    "page": {
+      "lines": [
+        "The first Fatt Pundit.",
+        "A slip of a room on Berwick Street.",
+        "Incense, ginger and a queue on a Thursday."
+      ],
+      "lead": "tiger",
+      "second": "#2f7d78",
+      "opened": "2019",
+      "stations": [
+        "Tottenham Court Road",
+        "Oxford Circus",
+        "Piccadilly Circus"
+      ],
+      "signature": {
+        "dish": "momo-kid-goat",
+        "label": "born-here",
+        "story": "On Berwick Street since 2019: goat spiced with garam masala, cardamom, ginger and garlic, folded by hand."
+      },
+      "teaser": [],
+      "hero": null,
+      "gallery": []
+    }
   },
   {
     "id": "covent-garden",
@@ -199,7 +222,38 @@
       "vegetarian-pre-theatre",
       "set-menu",
       "drinks"
-    ]
+    ],
+    "page": {
+      "lines": [
+        "Colonial Kolkata on Maiden Lane.",
+        "Two bars, two floors.",
+        "Dinner before the curtain goes up."
+      ],
+      "lead": "gold",
+      "second": "#4f7a63",
+      "opened": "2021",
+      "stations": [
+        "Covent Garden",
+        "Charing Cross"
+      ],
+      "signature": {
+        "dish": "white-tiger",
+        "label": "born-here",
+        "story": "One of the signature cocktails this bar opened with in 2021."
+      },
+      "teaser": [],
+      "hero": "gallery-03",
+      "gallery": [
+        "gallery-01",
+        "gallery-02",
+        "gallery-03",
+        "gallery-04",
+        "gallery-05",
+        "gallery-06",
+        "gallery-07",
+        "gallery-08"
+      ]
+    }
   },
   {
     "id": "dubai",
@@ -227,6 +281,27 @@
     "clickAndCollectUrl": null,
     "vouchersUrl": null,
     "groupsNote": null,
-    "menus": []
+    "menus": [],
+    "page": {
+      "lines": [
+        "Next stop: Dubai.",
+        "The Hangout, Mall of the Emirates.",
+        "Boarding soon."
+      ],
+      "lead": "slate",
+      "second": "#cba052",
+      "opened": null,
+      "stations": [
+        "Mall of the Emirates (Red Line)"
+      ],
+      "signature": null,
+      "teaser": [
+        "momo-kid-goat",
+        "crackling-spinach",
+        "vegan-sizzling-brownie"
+      ],
+      "hero": null,
+      "gallery": []
+    }
   }
 ]
