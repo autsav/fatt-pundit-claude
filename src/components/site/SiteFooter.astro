@@ -33,12 +33,15 @@ const h = (hash: string) => (home ? hash : `/${hash}`);
       ))}
     </div>
     <nav aria-label="Footer" class="foot-nav">
-      <a href={h('#menu')}>Menus</a><a href={h('#story')}>Our story</a><a href={h('#tables')}>Groups</a><a href={h('#tables')}>Gift vouchers</a>
+      <a href={h('#menu')}>Menus</a><a href={h('#story')}>Our story</a><a href="/private-dining/">Groups and private dining</a><a href={h('#tables')}>Gift vouchers</a>
       <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">Instagram</a>
       <a href="https://www.facebook.com/fattpundit/" target="_blank" rel="noopener">Facebook</a>
       <a href="https://x.com/FattPundit" target="_blank" rel="noopener">X</a>
     </nav>
-    <p class="tiny">We make every effort to avoid cross-contamination, but cannot guarantee dishes and drinks are allergen-free. Please tell us about any dietary requirements when you book. Website demo: prices and photos to be confirmed.</p>
+    <nav aria-label="Good to know" class="foot-nav foot-nav-small">
+      <a href="/allergens/">Allergens</a><a href="/booking-terms/">Booking terms</a><a href="/accessibility/">Accessibility</a><a href="/privacy/">Privacy</a>
+    </nav>
+    <p class="tiny">We make every effort to avoid cross-contamination, but cannot guarantee dishes and drinks are allergen-free. Please tell us about any dietary requirements when you book.{import.meta.env.PUBLIC_LAUNCH !== 'true' && ' Website demo: prices and photos to be confirmed.'}</p>
   </div>
 </footer>
 <style>
@@ -46,6 +49,7 @@ const h = (hash: string) => (home ? hash : `/${hash}`);
   .goodbye { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(32px, 6vw, 96px); padding-bottom: clamp(40px, 6vw, 72px); border-bottom: 1px solid rgb(203 160 82 / 0.35); }
   .goodbye-h { font-family: var(--font-display); font-size: clamp(28px, 4vw, 54px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-sand); }
   @media (max-width: 760px) { .goodbye { grid-template-columns: 1fr; text-align: center; } .goodbye-text { order: -1; align-items: center; } }
+  .foot-nav-small { font-size: 14px; opacity: 0.85; }
   .foot-h { text-decoration: none; }
   .foot-h:hover { text-decoration: underline; }
 </style>

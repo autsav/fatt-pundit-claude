@@ -1,0 +1,65 @@
+---
+import InfoPage from '../layouts/InfoPage.astro';
+import { getBranches, prettyPhone } from '../lib/site-data';
+const open = (await getBranches()).filter((b) => b.status === 'open' && b.email);
+const today = new Date().toISOString().slice(0, 10);
+---
+<InfoPage title="Groups and private dining" description="Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups and private dining">
+  <p>Big tables, set feasts and whole-room bookings for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible.</p>
+  {open.filter((b) => b.groupsNote).map((b) => <p><strong>{b.shortName}:</strong> {b.groupsNote}</p>)}
+
+  <form class="enquiry" data-enquiry action={`mailto:${open[0]?.email}`} method="post" enctype="text/plain">
+    <fieldset>
+      <legend>Which restaurant?</legend>
+      <div class="choices">
+        {open.map((b, i) => (
+          <label class="choice"><input type="radio" name="restaurant" value={b.id} data-email={b.email} data-name={b.shortName} checked={i === 0} required /> <span>{b.shortName}</span></label>
+        ))}
+      </div>
+    </fieldset>
+    <div class="row">
+      <label>Date<input type="date" name="date" min={today} required /></label>
+      <label>Guests<input type="number" name="guests" min="5" max="120" inputmode="numeric" placeholder="e.g. 12" required /></label>
+    </div>
+    <div class="row">
+      <label>Your name<input name="name" autocomplete="name" required /></label>
+      <label>Phone<input type="tel" name="phone" autocomplete="tel" /></label>
+    </div>
+    <label>Email<input type="email" name="email" autocomplete="email" required /></label>
+    <label>The occasion, dietary needs, anything else<textarea name="notes" rows="4"></textarea></label>
+    <button class="btn btn-orange" type="submit">Send enquiry</button>
+    <p class="hint">This opens your email app with everything filled in, addressed to the restaurant. Prefer to talk? {open.map((b, i) => <>{i > 0 && ' · '}{b.shortName} <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a></>)}</p>
+  </form>
+  <p class="todo">To switch to the restaurant's own enquiry system (SevenRooms events or a form service), change this form's action; the fields stay the same.</p>
+</InfoPage>
+
+<style>
+  .enquiry { display: grid; gap: 16px; margin-top: 28px; }
+  .enquiry fieldset { border: 0; padding: 0; margin: 0; }
+  .enquiry legend { font-weight: 700; margin-bottom: 8px; }
+  .choices { display: flex; flex-wrap: wrap; gap: 10px; }
+  .choice { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 2px solid var(--color-ink); background: #fff; cursor: pointer; font-weight: 700; }
+  .choice:has(input:checked) { background: var(--color-tiger); color: var(--color-ink-deep); border-color: var(--color-tiger); }
+  .choice input { accent-color: var(--color-ink); width: 18px; height: 18px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+  .enquiry label:not(.choice) { display: grid; gap: 6px; font-weight: 700; font-size: 16px; }
+  .enquiry input:not([type='radio']), .enquiry textarea { font: inherit; font-weight: 400; font-size: 17px; padding: 12px 14px; border: 2px solid var(--color-ink); background: #fff; color: var(--color-ink); min-height: 48px; box-sizing: border-box; width: 100%; }
+  .enquiry input:focus-visible, .enquiry textarea:focus-visible { outline: 3px solid var(--color-tiger); outline-offset: 2px; }
+  .enquiry button { justify-self: start; }
+  .hint { font-size: 15px; }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-enquiry]');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    const d = new FormData(form);
+    const pick = form.querySelector<HTMLInputElement>('input[name="restaurant"]:checked')!;
+    const date = new Date(`${d.get('date')}T12:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const subject = `Group enquiry: ${d.get('guests')} guests on ${date}`;
+    const body = [`Restaurant: ${pick.dataset.name}`, `Date: ${date}`, `Guests: ${d.get('guests')}`, `Name: ${d.get('name')}`, `Email: ${d.get('email')}`, `Phone: ${d.get('phone') || '-'}`, '', `${d.get('notes') || ''}`].join('\n');
+    location.href = `mailto:${pick.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+</script>

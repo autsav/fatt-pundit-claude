@@ -165,7 +165,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                   <span className="font-bold uppercase leading-[1.1] text-ink @max-[58px]:hidden" style={{ fontSize: `${nameSize(d.name)}cqi` }}>
                     {d.name}
                   </span>
-                  {d.price && <span className="mt-[0.35em] text-[13cqi] font-bold text-tiger @max-[58px]:mt-0 @max-[58px]:text-[30cqi]">{d.price}</span>}
+                  {d.price && <span className="mt-[0.35em] text-[13cqi] font-bold text-tiger-deep @max-[58px]:mt-0 @max-[58px]:text-[30cqi]">{d.price}</span>}
                 </span>
               </span>
             </button>

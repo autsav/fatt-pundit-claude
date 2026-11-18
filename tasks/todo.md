@@ -137,10 +137,12 @@ Decisions taken from the doc's "my pick" column (user said go without answering)
 - [x] A8 Budget script (lighthouse + fps) — fails on breach (`npm run perf:budget`)
 - Result A: mobile Perf home 98, Soho 98, CG 99, Dubai 100; TBT ≤23 ms; CLS ≤0.031; dropped frames 1.7/0/0/0.2% (4× CPU). Observed LCP ~0.25 s. Kept external CSS (inlining all made FCP slower).
 ### Phase B — Found and trusted (gate: 4 Lighthouse areas 95+ with noindex off in test)
-- [ ] B1 Contrast tokens gold-ink/tiger-ink, heading order, sized images
-- [ ] B2 Share cards (OG image per branch), canonical, sitemap, robots, favicon set
-- [ ] B3 Schema: Organization on home, Restaurant + Menu per branch
-- [ ] B4 404 "Lost luggage" + Privacy, Allergens, Accessibility, Booking terms pages
+- [x] B1 Contrast tokens gold-ink/tiger-ink, heading order, sized images
+- [x] B2 Share cards (OG image per branch), canonical, sitemap, robots, favicon set
+- [x] B3 Schema: Organization on home, Restaurant + Menu per branch
+- [x] B4 404 "Lost luggage" + Privacy, Allergens, Accessibility, Booking terms pages (+ Private dining enquiry, from C4)
+- Result B (launch build, PUBLIC_LAUNCH=true): Accessibility 100, Best practices 100, SEO 100 on home, 3 branches, allergens, private dining. Launch switch = PUBLIC_LAUNCH env (robots, noindex, preview banner). Share cards: `node scripts/make-og.mjs` → public/og/.
+- Client to confirm (marked in pages as drafts): allergen wording, privacy controller details, booking hold time/deposits, step-free access.
 ### Phase C — Book and come back (gate: link → booked in 3 taps)
 - [ ] C1 Book drawer per branch (party/date → booking URL) + sticky Book bar on phones + home hero Book
 - [ ] C2 Menu list view: search, dietary + spice filters, allergen note, print, /[branch]/menu/

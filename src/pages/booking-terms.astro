@@ -1,0 +1,21 @@
+---
+import InfoPage from '../layouts/InfoPage.astro';
+import { BOOKING_NAMES, getBranches, prettyPhone } from '../lib/site-data';
+const open = (await getBranches()).filter((b) => b.status === 'open');
+---
+<InfoPage title="Booking terms" description="Booking a table at Fatt Pundit Soho or Covent Garden: groups, deposits, changes and lateness." kicker="Your table" heading="Booking terms">
+  <p>Book online, by phone, or just walk in: we keep some tables free for guests without a booking.</p>
+  {open.map((b) => (
+    <>
+      <h2>{b.shortName}</h2>
+      <ul>
+        {b.booking && <li>Online through {BOOKING_NAMES[b.booking.provider]}: <a href={b.booking.url} target="_blank" rel="noopener">book {b.shortName}</a>.</li>}
+        {b.phone && <li>By phone: <a href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>.</li>}
+        {b.groupsNote && <li>{b.groupsNote}</li>}
+      </ul>
+    </>
+  ))}
+  <h2>Changes and lateness</h2>
+  <p>Plans change: please let us know as early as you can, using the link in your confirmation or by phone, so we can give the table to someone else.</p>
+  <p class="todo">Draft: hold time for late arrivals, deposit amounts and the cancellation window to be confirmed by Fatt Pundit.</p>
+</InfoPage>

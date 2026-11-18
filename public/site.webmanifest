@@ -1,0 +1,10 @@
+{
+  "name": "Fatt Pundit",
+  "short_name": "Fatt Pundit",
+  "description": "Indo-Chinese Hakka restaurants in Soho, Covent Garden and Dubai.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#2c2925",
+  "theme_color": "#2c2925",
+  "icons": [{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }]
+}

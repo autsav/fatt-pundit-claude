@@ -1,0 +1,44 @@
+---
+/**
+ * Plain pages (allergens, privacy, private dining…): the same header and
+ * footer, one sheet of paper, a typewriter title and short sections.
+ */
+import Base from './Base.astro';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import { getBranches } from '../lib/site-data';
+
+interface Props {
+  title: string;
+  description: string;
+  kicker: string;
+  heading: string;
+  noindex?: boolean;
+}
+const { title, description, kicker, heading, noindex } = Astro.props;
+const branches = await getBranches();
+---
+<Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex}>
+  <a class="skip" href="#content">Skip to content</a>
+  <SiteHeader branches={branches} />
+  <main id="content" class="info">
+    <article class="sheet wrap narrow">
+      <p class="kicker info-kicker">{kicker}</p>
+      <h1 class="h2 info-title">{heading}</h1>
+      <div class="info-body"><slot /></div>
+    </article>
+  </main>
+  <SiteFooter branches={branches} />
+</Base>
+
+<style>
+  .info { background: var(--color-sand); padding-block: clamp(56px, 8vw, 112px); }
+  .sheet { background: #faf6ef; border: 2px solid var(--color-ink); padding: clamp(28px, 5vw, 64px); box-shadow: 8px 8px 0 var(--color-ink); }
+  .info-kicker { margin: 0; color: var(--color-tiger-deep); }
+  .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
+  .info-body { font-size: 18px; line-height: 1.65; max-width: 64ch; }
+  .info-body :global(h2) { margin: 36px 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .info-body :global(p), .info-body :global(ul) { margin: 0 0 14px; }
+  .info-body :global(a) { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
+  .info-body :global(.todo) { font-family: var(--font-note); font-style: italic; color: var(--color-gold-deep); }
+</style>

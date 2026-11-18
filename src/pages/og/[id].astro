@@ -1,0 +1,71 @@
+---
+/**
+ * Share cards (1200 × 630), one per page, drawn as a boarding pass in the
+ * brand's own type. Not linked anywhere: scripts/make-og.mjs photographs each
+ * one into public/og/<id>.png, which the pages point to in their og:image.
+ */
+import type { GetStaticPaths } from 'astro';
+import { Font } from 'astro:assets';
+import { stampSrc } from '../../lib/stamp';
+import { getBranches } from '../../lib/site-data';
+import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
+import stampRight from '../../assets/images/brand/logo-stamp-distressed-right.png';
+import '../../styles/global.css';
+
+export const getStaticPaths = (async () => {
+  const branches = await getBranches();
+  return [
+    { params: { id: 'home' }, props: { gate: 'LDN', place: 'Fatt Pundit', line: 'Soho · Covent Garden · Dubai', note: 'Hakka cooking from Tangra, Kolkata', mark: 'left' as const } },
+    ...branches.map((b) => ({
+      params: { id: b.id },
+      props: {
+        gate: ({ soho: 'W1', 'covent-garden': 'WC2', dubai: 'DXB' } as Record<string, string>)[b.id] ?? b.shortName,
+        place: b.shortName,
+        line: b.status === 'open' ? `${b.address.street}, ${b.address.city ?? 'London'}` : `${b.address.street} · opening soon`,
+        mark: (b.mark === 'tiger-chinese' ? 'right' : 'left') as 'left' | 'right',
+      },
+    })),
+  ];
+}) satisfies GetStaticPaths;
+
+const { gate, place, line, mark, note = 'Canton · Kolkata · London · Dubai' } = Astro.props as { gate: string; place: string; line: string; mark: 'left' | 'right'; note?: string };
+const stamp = await stampSrc(mark === 'right' ? stampRight : stampLeft, 520);
+---
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Share card · {place}</title>
+    <Font cssVariable="--font-typewriter" preload />
+    <Font cssVariable="--font-lora" />
+  </head>
+  <body>
+    <div class="card">
+      <div class="main">
+        <p class="kicker">Boarding pass · Fatt Pundit</p>
+        <h1>{place}</h1>
+        <p class="line">{line}</p>
+        <p class="note">{note}</p>
+      </div>
+      <div class="stub">
+        <span class="gate-label">Gate</span>
+        <span class="gate">{gate}</span>
+        <span class="stamp" style={`-webkit-mask-image:url(${stamp});mask-image:url(${stamp})`}></span>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: var(--color-ink); }
+  .card { box-sizing: border-box; width: 1200px; height: 630px; padding: 44px; display: grid; grid-template-columns: 1fr 330px; }
+  .main { background: var(--color-sand); color: var(--color-ink); padding: 56px 60px; display: flex; flex-direction: column; justify-content: center; gap: 18px; border-right: 4px dashed var(--color-ink); }
+  .kicker { margin: 0; font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-tiger-deep); }
+  h1 { margin: 0; font-family: var(--font-typewriter); font-weight: 700; font-size: 92px; line-height: 0.95; letter-spacing: 0.04em; text-transform: uppercase; }
+  .line { margin: 0; font-family: var(--font-typewriter); font-size: 30px; }
+  .note { margin: 6px 0 0; font-family: var(--font-lora); font-style: italic; font-size: 30px; color: var(--color-gold-deep); }
+  .stub { background: var(--color-tiger); color: var(--color-ink-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; position: relative; }
+  .gate-label { font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: 0.3em; text-transform: uppercase; }
+  .gate { font-family: var(--font-typewriter); font-weight: 700; font-size: 76px; letter-spacing: 0.04em; line-height: 1; text-align: center; padding: 0 12px; }
+  .stamp { width: 200px; aspect-ratio: 1046 / 1369; margin-top: 18px; background: var(--color-ink); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; transform: rotate(-6deg); }
+</style>

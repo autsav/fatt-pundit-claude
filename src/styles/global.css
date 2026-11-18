@@ -19,6 +19,14 @@
   --color-gold: #cba052;         /* Pantone 7407 C  — main */
   --color-sand: #dac7b5;         /* Pantone 482 C   — additional */
   --color-slate: #758591;        /* Pantone 7544 C  — additional */
+  /* Text-safe partners (WCAG AA 4.5:1). The brand hues stay for fills, rules
+     and big type; small words use these. On sand: tiger-deep 4.7, gold-deep
+     4.8, slate-deep 4.8. On ink: tiger-bright 5.8. On tiger or gold: ink-deep 5.4+. */
+  --color-tiger-deep: #93321b;
+  --color-gold-deep: #6b4c18;
+  --color-slate-deep: #465460;
+  --color-tiger-bright: #f5836a;
+  --color-ink-deep: #1a1714;
 
   --font-display: var(--font-typewriter);
   --font-body: var(--font-typewriter);
@@ -93,7 +101,7 @@
   mask: radial-gradient(circle 8px at 0 50%, transparent 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 8px at 100% 50%, transparent 97%, #000) right / 51% 100% no-repeat; }
 .voyage-punch { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed var(--color-ink); transition: background-color .3s, transform .3s cubic-bezier(.2, 1.6, .4, 1); }
 .voyage-hole.is-punched .voyage-punch { background: var(--color-ink); border-style: solid; transform: scale(1.1); }
-.voyage-hole.is-here { color: var(--color-tiger); }
+.voyage-hole.is-here { color: var(--color-tiger-deep); }
 .voyage-hole.is-here .voyage-punch { background: var(--color-tiger); border-color: var(--color-tiger); }
 .voyage-hole:focus-visible { outline: 2px solid var(--color-tiger); outline-offset: 2px; }
 .voyage-sea-note { opacity: 0; transition: opacity .5s ease; width: fit-content; max-width: calc(100% - 24px); margin-inline: auto; padding: 4px 14px; background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.5); }
@@ -112,7 +120,7 @@
   box-shadow: 0 24px 60px rgb(0 0 0 / 0.5); }
 .voyage-card:not(.is-static) .voyage-postcard { max-height: 100%; }
 .voyage-title { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: clamp(34px, 4vw, 52px); line-height: 1; letter-spacing: 0; text-transform: none; }
-.voyage-postmark { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 3px double var(--color-tiger); color: var(--color-tiger); font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; rotate: -12deg; opacity: 0.85; }
+.voyage-postmark { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 3px double var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; rotate: -12deg; opacity: 0.85; }
 .voyage-pic { display: block; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: 62% 58%; border: 1px solid rgb(44 41 37 / 0.3); }
 @media (max-width: 1023px) { .voyage-pic { aspect-ratio: 16 / 5; } }
 .voyage-boarding { display: inline-block; margin-left: 4px; padding: 1px 8px; border: 2px solid var(--color-tiger); color: var(--color-tiger); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; rotate: -4deg; }
@@ -196,7 +204,7 @@
   font-family: var(--font-label); font-size: 14px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
   clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 calc(100% - 14px), 0 14px); transition: background-color .2s, color .2s, transform .2s; }
 .menu-tag:hover { transform: translateY(-2px); }
-.menu-tag.is-on { background: var(--color-tiger); border-color: var(--color-tiger); color: #fff; }
+.menu-tag.is-on { background: var(--color-tiger); border-color: var(--color-tiger); color: var(--color-ink-deep); }
 .menu-tag:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
 .menu-tag-hole { width: 10px; height: 10px; border-radius: 50%; border: 2px solid currentColor; }
 .menu-soon { padding: clamp(22px, 3vw, 32px); background: #f6efe4; border: 2px solid var(--color-ink); box-shadow: 0 18px 40px rgb(44 41 37 / 0.2); }

@@ -18,7 +18,7 @@ const book = current?.booking
     ? { href: '#waitlist', label: 'Join the list', external: false }
     : { href: '#tables', label: 'Book a table', external: false };
 ---
-<p class="preview-flag">Website preview for Fatt Pundit · not the live site · prices and photos to be confirmed</p>
+{import.meta.env.PUBLIC_LAUNCH !== 'true' && <p class="preview-flag">Website preview for Fatt Pundit · not the live site · prices and photos to be confirmed</p>}
 <header class="bar">
   <div class="wrap bar-in">
     <a class="brand" href={home ? '#top' : '/'}>FATT PUNDIT</a>

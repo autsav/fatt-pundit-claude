@@ -254,7 +254,7 @@ function Back({ art }: { art: Art }) {
 
 /* ---------- The book ---------- */
 
-const TAB_COLORS = ['bg-tiger text-white', 'bg-gold text-ink', 'bg-sand text-ink', 'bg-slate text-white', 'bg-[#efe6d8] text-ink', 'bg-ink text-sand'];
+const TAB_COLORS = ['bg-tiger text-ink-deep', 'bg-gold text-ink', 'bg-sand text-ink', 'bg-slate text-ink-deep', 'bg-[#efe6d8] text-ink', 'bg-ink text-sand'];
 
 export default function MenuBook({ menus, art, next, places }: { menus: MenuLite[]; art: Art; next?: { href: string; label: string }; places?: MenuPlace[] }) {
   const [placeId, setPlaceId] = useState(places?.[0]?.id);

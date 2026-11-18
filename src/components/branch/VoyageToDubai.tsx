@@ -69,7 +69,7 @@ export default function VoyageToDubai({ art }: Props) {
   return (
     <section ref={sectionRef} aria-label="The voyage to Dubai" className={calm ? 'bg-sand py-16' : 'relative h-[260svh] bg-sand'}>
       <div className={calm ? '' : 'sticky top-[68px] flex h-[calc(100svh-68px)] flex-col items-center justify-center overflow-hidden px-4'}>
-        <p className="m-0 text-center font-note text-[20px] text-tiger">The voyage continues</p>
+        <p className="m-0 text-center font-note text-[20px] text-tiger-deep">The voyage continues</p>
         <h2 className="m-0 mt-1 text-center text-[clamp(26px,3.6vw,46px)] uppercase leading-none tracking-[0.06em] text-ink">London to Dubai</h2>
         <figure className="voyage-paper relative mx-auto mb-0 mt-6 w-full max-w-[min(1000px,calc((100svh-260px)*1.36))] border-2 border-ink bg-white">
           {/* The map itself never changes, so it sits on its own still layer;

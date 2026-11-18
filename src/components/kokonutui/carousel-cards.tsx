@@ -477,17 +477,17 @@ const StampCard = ({ item }: { item: RailItem }) => (
             <div className="absolute inset-0 flex flex-col bg-[#f6efe3] p-5">{item.slip}</div>
           )}
           {item.badge && (
-            <span className="absolute left-3 top-3 bg-tiger px-2 py-1 font-label text-[11px] font-bold uppercase tracking-[0.2em] text-white">{item.badge}</span>
+            <span className="absolute left-3 top-3 bg-tiger px-2 py-1 font-label text-[11px] font-bold uppercase tracking-[0.2em] text-ink-deep">{item.badge}</span>
           )}
         </div>
         <div className="px-1 pb-1 pt-4">
           <div className="flex items-baseline justify-between gap-3">
             <h3 className="m-0 text-[15px] font-bold uppercase leading-tight tracking-[0.08em]">{item.title}</h3>
-            {item.price && <span className="shrink-0 font-bold text-tiger">{item.price}</span>}
+            {item.price && <span className="shrink-0 font-bold text-tiger-deep">{item.price}</span>}
           </div>
           {item.note && <p className="fp-rail-details mt-1.5 text-[13.5px] leading-snug text-ink/80">{item.note}</p>}
           {item.tags && item.tags.length > 0 && (
-            <p className="mt-2 font-label text-[11.5px] font-bold uppercase tracking-[0.22em] text-gold">{item.tags.join(" · ")}</p>
+            <p className="mt-2 font-label text-[11.5px] font-bold uppercase tracking-[0.22em] text-gold-deep">{item.tags.join(" · ")}</p>
           )}
         </div>
       </article>

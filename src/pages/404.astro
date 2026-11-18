@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import { getBranches } from '../lib/site-data';
+const branches = await getBranches();
+---
+<Base title="Lost luggage · Fatt Pundit" description="This page has gone missing in transit." noindex>
+  <SiteHeader branches={branches} />
+  <main class="lost">
+    <div class="tag">
+      <p class="tag-head">Lost luggage</p>
+      <p class="tag-code">404</p>
+      <p class="tag-line">This page went missing somewhere between Canton and London.</p>
+      <ul class="tag-go">
+        <li><a class="btn btn-orange" href="/">Back to the start</a></li>
+        {branches.map((b) => <li><a class="btn btn-ink" href={`/${b.id}/`}>{b.shortName}</a></li>)}
+      </ul>
+      <p class="fortune" data-fortune hidden></p>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .lost { min-height: 80svh; display: grid; place-items: center; padding: 48px 16px; background: var(--color-ink); }
+  .tag { position: relative; max-width: 520px; background: var(--color-sand); color: var(--color-ink); padding: 48px 32px 32px; border: 2px solid var(--color-ink); box-shadow: 10px 10px 0 var(--color-tiger); transform: rotate(-1.5deg); text-align: center; }
+  .tag::before { content: ''; position: absolute; top: 16px; left: 50%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--color-ink); box-shadow: 0 0 0 5px var(--color-gold); }
+  .tag-head { margin: 18px 0 0; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-tiger-deep); }
+  .tag-code { margin: 4px 0; font-size: clamp(72px, 16vw, 128px); font-weight: 700; line-height: 1; }
+  .tag-line { margin: 0 0 24px; font-family: var(--font-note); font-style: italic; font-size: 21px; }
+  .tag-go { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .fortune { margin: 24px 0 0; font-family: var(--font-note); font-style: italic; }
+</style>

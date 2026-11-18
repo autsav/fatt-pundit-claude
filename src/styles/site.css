@@ -26,7 +26,7 @@ body { font-size: 17px; line-height: 1.55; }
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 26px; font-weight: 700; font-size: 19px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 2px solid transparent; cursor: pointer; font-family: inherit; transition: transform .15s ease, background-color .15s ease; }
 .btn:hover { transform: translateY(-2px); }
 .btn-sm { min-height: 44px; padding: 0 18px; }
-.btn-orange { background: var(--color-tiger); color: var(--color-ink); }
+.btn-orange { background: var(--color-tiger); color: var(--color-ink-deep); }
 .btn-ink { background: var(--color-ink); color: var(--color-sand); font-size: 17px; }
 .btn-line { border-color: var(--color-ink); color: var(--color-ink); font-size: 15px; font-weight: 400; letter-spacing: 0.06em; text-transform: none; }
 .btn-ghost-light { border-color: var(--color-sand); color: var(--color-sand); }

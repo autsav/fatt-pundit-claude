@@ -134,12 +134,25 @@ const menuPlaces = await Promise.all(
   })),
 );
 const menuArt = { frame: frameArt.src, stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
+// Search engines: the group, with each restaurant as its own entity.
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': new URL('/#org', Astro.site).href,
+  name: 'Fatt Pundit',
+  url: new URL('/', Astro.site).href,
+  logo: new URL('/icon-512.png', Astro.site).href,
+  description: "Indo-Chinese Hakka cooking from Tangra, Kolkata's Chinatown, in Soho, Covent Garden and Dubai.",
+  sameAs: ['https://www.instagram.com/fattpundit/', 'https://www.facebook.com/fattpundit/', 'https://x.com/FattPundit'],
+  subOrganization: branches.map((b) => ({ '@type': 'Restaurant', '@id': new URL(`/${b.id}/#restaurant`, Astro.site).href, name: b.name, url: new URL(`/${b.id}/`, Astro.site).href })),
+};
 ---
 <Base
   title="Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai"
   description="Indo-Chinese Hakka cooking from Tangra, Kolkata's Chinatown. Book a table at Fatt Pundit Soho or Covent Garden, London. Opening soon in Dubai."
-  noindex
+  og="home"
 >
+  <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
   <a class="skip" href="#tables">Skip to your table</a>
   <SiteHeader branches={branches} />
 

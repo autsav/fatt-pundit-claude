@@ -67,6 +67,8 @@ const heroPoster = heroImg ? (await getImage({ src: photo(p.hero!)!, width: 800,
 const gallery = p.gallery.map((k) => ({ key: k, src: photo(k)!, alt: ALTS[k] ?? '' })).filter((g) => g.src);
 
 const LEAD = { tiger: 'var(--color-tiger)', gold: 'var(--color-gold)', slate: 'var(--color-slate)' }[p.lead];
+// Small words in the branch colour on light paper use its text-safe partner.
+const LEAD_TEXT = { tiger: 'var(--color-tiger-deep)', gold: 'var(--color-gold-deep)', slate: 'var(--color-slate-deep)' }[p.lead];
 const markSrc = b.mark === 'tiger-indian' ? stampLeft : b.mark === 'tiger-chinese' ? stampRight : null;
 // Brand rule: on dark, the stamp is printed in colour (negative logo), so it is drawn as a mask.
 const mark = markSrc ? await stampSrc(markSrc, 240) : null;
@@ -107,8 +109,13 @@ const DAY_NAMES: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 
 const ld = {
   '@context': 'https://schema.org',
   '@type': 'Restaurant',
+  '@id': new URL(`/${b.id}/#restaurant`, Astro.site).href,
   name: b.name,
   url: new URL(`/${b.id}/`, Astro.site).href,
+  parentOrganization: { '@id': new URL('/#org', Astro.site).href },
+  ...(open ? { hasMenu: new URL(`/${b.id}/menu/`, Astro.site).href } : {}),
+  ...(b.geo ? { geo: { '@type': 'GeoCoordinates', latitude: b.geo.lat, longitude: b.geo.lng } } : {}),
+  ...(b.email ? { email: b.email } : {}),
   servesCuisine: ['Indo-Chinese', 'Hakka'],
   priceRange: '££',
   address: { '@type': 'PostalAddress', streetAddress: b.address.street, addressLocality: b.address.city, postalCode: b.address.postcode ?? undefined, addressCountry: b.address.country },
@@ -122,13 +129,13 @@ const ld = {
 const title = open ? `Fatt Pundit ${b.shortName} · Indo-Chinese Hakka restaurant · ${b.address.street}` : `Fatt Pundit ${b.shortName} · Opening soon at ${b.address.street}`;
 const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : 'Join the list for opening news.'}`;
 ---
-<Base title={title} description={description} noindex>
+<Base title={title} description={description} og={b.id}>
   {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="100vw" fetchpriority="high" />}
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   <a class="skip" href="#visit">Skip to opening hours and directions</a>
   <SiteHeader branches={branches} current={b} />
 
-  <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --second: ${p.second};`}>
+  <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
     <!-- 1 · Arrival: the guest facts work before any animation. -->
     <section class="arrival" style={`view-transition-name: branch-${b.id}`} aria-labelledby="branch-title">
       <!-- Phones: a photo band shown at its true sharpness, then the facts on solid ink.
@@ -347,7 +354,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 <style>
   .branch { overflow-x: clip; }
   .branch :global(p) { margin: 0; }
-  .lead-text { color: var(--lead); }
+  .lead-text { color: var(--lead-text); }
 
   /* Arrival. Phones: media band + facts on ink. 900px and up: media fills, text sits on a dark fade. */
   .arrival { position: relative; display: flex; flex-direction: column; color: var(--color-sand); background: var(--color-ink); overflow: hidden; }
@@ -396,7 +403,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
   /* The room */
   .room-lines { margin: 0; display: flex; flex-direction: column; gap: 0.2em; font-size: clamp(30px, 4.6vw, 62px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; }
-  .room-lines span:nth-child(2) { color: var(--lead); }
+  .room-lines span:nth-child(2) { color: var(--lead-text); }
   .room-lines span:nth-child(3) { font-family: var(--font-note); font-style: italic; text-transform: none; font-size: 0.62em; letter-spacing: 0; color: color-mix(in srgb, var(--color-ink) 75%, transparent); }
 
   .wall-intro { text-align: center; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 17px; }
@@ -414,12 +421,12 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .sig { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
   @media (max-width: 760px) { .sig { grid-template-columns: 1fr; } }
   .sig-ticket { position: relative; background: #fffdf8; padding: 26px 26px 34px; min-height: 300px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.6); border-top: 2px dashed rgb(44 41 37 / 0.4); rotate: -1.5deg; }
-  .sig-no { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-tiger); border-bottom: 2px dotted rgb(44 41 37 / 0.4); padding-bottom: 8px; }
+  .sig-no { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-tiger-deep); border-bottom: 2px dotted rgb(44 41 37 / 0.4); padding-bottom: 8px; }
   .sig-name { font-size: clamp(26px, 2.6vw, 34px); font-weight: 700; text-transform: uppercase; line-height: 1.05; letter-spacing: 0.03em; }
   .sig-price { font-weight: 700; font-size: 22px; color: var(--color-tiger); }
   .sig-stamp { position: absolute; right: -12px; bottom: -14px; width: 104px; rotate: -10deg; }
   .sig-desc { font-family: var(--font-note); font-style: italic; font-size: 21px; }
-  .tags { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.22em; color: var(--color-gold); }
+  .tags { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.22em; color: var(--color-gold-deep); }
   .teaser { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
   .small-ticket { min-height: 220px; }
   .small-ticket:nth-child(2) { rotate: 1deg; }
@@ -436,7 +443,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
   /* Good to know */
   .faq { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px 40px; }
-  .faq dt { font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--lead); }
+  .faq dt { font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--lead-text); }
   .faq dd { margin: 6px 0 0; }
 
   /* Waitlist */
@@ -451,5 +458,5 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .other-k { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-gold); }
   .other-name { font-size: 34px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
   .other-addr { font-family: var(--font-note); font-style: italic; }
-  .other-go { margin-top: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-tiger); }
+  .other-go { margin-top: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-tiger-bright); }
 </style>

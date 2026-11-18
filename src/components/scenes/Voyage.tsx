@@ -226,6 +226,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
 
   return (
     <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : '460vh' }} aria-label="The journey from Canton to Kolkata, London and Dubai">
+      <h2 className="sr-only">The voyage: Canton to Kolkata, London and Dubai</h2>
       <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[68px] h-[calc(100svh-68px)] overflow-hidden'}>
         {/* The chart: one image, moved only by transform. */}
         <img ref={seaRef} src={art.sea} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} decoding="async" />
@@ -277,7 +278,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
         {/* Ticket strip: one hole punched per port; each hole jumps there. */}
         <div className="absolute inset-x-0 top-3 z-10 flex justify-center px-3">
           <nav aria-label="Ports on the voyage" className="voyage-ticket flex items-center gap-1 bg-sand px-3 py-1.5 text-ink sm:gap-3 sm:px-5">
-            <span className="hidden font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger sm:inline">Admit one</span>
+            <span className="hidden font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger-deep sm:inline">Admit one</span>
             {PORTS.map((pt, i) => (
               <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex min-h-11 items-center gap-1.5 px-1 font-label text-[11px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i <= reached ? 'is-punched' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
                 <span className="voyage-punch" aria-hidden="true" />
@@ -324,7 +325,7 @@ function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; 
     <article className="voyage-postcard">
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <p className="m-0 font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger">Stop {i + 1} of 4</p>
+          <p className="m-0 font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger-deep">Stop {i + 1} of 4</p>
           <h3 className="voyage-title m-0">{['Canton', 'Kolkata', 'London', 'Dubai'][i]}</h3>
         </div>
         <span className="voyage-postmark" aria-hidden="true">
