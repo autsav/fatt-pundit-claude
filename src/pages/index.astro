@@ -4,6 +4,7 @@ import { getImage, Image } from 'astro:assets';
 import Arrival from '../components/scenes/Arrival.astro';
 import Doors from '../components/scenes/Doors.astro';
 import RainHero from '../components/scenes/RainHero.tsx';
+import Voyage from '../components/scenes/Voyage.tsx';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { formatPrice } from '../lib/format';
@@ -11,6 +12,15 @@ import { formatPrice } from '../lib/format';
 import stampLeft from '../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../assets/images/brand/logo-stamp-distressed-right.png';
 import map from '../assets/images/brand/map.webp';
+import worldLand from '../assets/images/brand/world-land.svg';
+import shipArt from '../assets/images/brand/ship.png';
+import compassArt from '../assets/images/brand/compass.png';
+import frameArt from '../assets/images/brand/frame.png';
+import stampGoldArt from '../assets/images/brand/stamp-gold.png';
+import stampOrangeArt from '../assets/images/brand/stamp-orange.png';
+import mountainAArt from '../assets/images/brand/mountain-a.png';
+import mountainsBArt from '../assets/images/brand/mountains-b.png';
+import mountainsCArt from '../assets/images/brand/mountains-c.png';
 import inside from '../assets/images/covent-garden/gallery-01.jpg';
 import momos from '../assets/images/journey/04-momos-chutney.jpg';
 import barSour from '../assets/images/journey/05-bar-guava-chilli-sour.jpg';
@@ -63,6 +73,20 @@ function hoursLines(hours: NonNullable<(typeof branches)[number]['hours']>) {
 }
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
+const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
+// Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
+const voyageArt = {
+  map: await img(map, 1295),
+  world: worldLand.src,
+  ship: await img(shipArt, 400),
+  compass: await img(compassArt, 240),
+  frame: frameArt.src,
+  stampGold: await img(stampGoldArt, 320),
+  stampOrange: await img(stampOrangeArt, 340),
+  mountainA: await img(mountainAArt, 300),
+  mountainsB: await img(mountainsBArt, 520),
+  mountainsC: await img(mountainsCArt, 260),
+};
 const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status }));
 ---
 <Base
@@ -95,29 +119,8 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <!-- 2 · The doors -->
     <Doors />
 
-    <!-- 3 · The journey -->
-    <section id="story" class="sec sand">
-      <div class="wrap split rev">
-        <figure class="map reveal" data-map>
-          <Image src={map} alt="Hand-drawn map from the Fatt Pundit menu: the route from the Canton region of China, around the coast and across the Bay of Bengal, to Kolkata" widths={[600, 1000, 1295]} sizes="(min-width: 900px) 560px, 92vw" />
-          <svg class="route" viewBox="0 0 1295 1320" aria-hidden="true">
-            <path pathLength="1" d="M1038 718 C1000 900 950 1170 820 1170 C700 1170 640 1060 605 960 C578 880 548 805 505 752" />
-            <circle class="pin pin-a" cx="1038" cy="718" r="16" />
-            <circle class="pin pin-b" cx="505" cy="752" r="16" />
-          </svg>
-        </figure>
-        <div class="stack reveal">
-          <p class="kicker">The journey</p>
-          <h2 class="h2">From Canton to Kolkata</h2>
-          <p>The Hakka people sailed from China's Canton province to India and brought their cooking with them. In Tangra, Kolkata's Chinatown, Chinese wok technique met Indian spice.</p>
-          <p>Indo-Chinese food was born there, new yet familiar. We cook it in London, and soon in Dubai.</p>
-          <div class="name-cards">
-            <div class="name-card"><p class="name-word">FATT</p><p>a common Chinese surname</p></div>
-            <div class="name-card"><p class="name-word">PUNDIT</p><p>the Indian word for a scholar</p></div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- 3 · The voyage -->
+    <Voyage client:visible art={voyageArt} />
 
     <!-- 4 · The kitchen -->
     <section id="kitchen" class="sec ink">
@@ -274,7 +277,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
     { threshold: 0.18 },
   );
-  document.querySelectorAll('.reveal, [data-map], .stamp-in').forEach((el) => (reduce ? el.classList.add('is-in') : io.observe(el)));
+  document.querySelectorAll('.reveal, .stamp-in').forEach((el) => (reduce ? el.classList.add('is-in') : io.observe(el)));
 
   // Demo waitlist: no backend yet, so say so honestly.
   document.querySelectorAll<HTMLFormElement>('[data-waitlist]').forEach((f) =>

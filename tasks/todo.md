@@ -39,6 +39,18 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 - [ ] Not checked: real phones and Safari (only headless Chrome here). Mid-range Android frame rate still to test.
 - Deviation: Status Island not used (built for task progress); a small CSS pill does the open-now job without 30 KB of Motion on first load.
 
+## Motion plan · Day 2: the voyage ✅ done 18 Nov
+- [x] Brand art cut from guidelines p.24: gold junk ship, compass, 3 mountain sets (gold pixels only), gold + orange stamps, menu frame band; static ship erased from map.webp
+- [x] scripts/build-world-map.mjs: Natural Earth 50m → engraved-coast world-land.svg in the menu-map style + world-route.json (sea lanes via Suez to London, Hormuz branch to Dubai)
+- [x] Voyage.tsx: 560vh scrubbed timeline. Canton→Kolkata on the menu map (Tangra circled), pull-back onto the world map (city points line up), Kolkata→London, stamps land at London, gold dotted branch to Dubai, FATT / PUNDIT boards
+- [x] Checked: desktop + 390 px frames, calm mode (finished map, ship docked at London), demo from sub-path (0 errors, 0 404s), astro check 0 errors
+- [x] JS: Voyage chunk 54 KB gz, lazy (client:visible), not in first load
+- [ ] Not checked: real phones, Safari
+- [ ] Ask client: is the guidelines map art cleared for web use at this size? (same source as the menus)
+
+## Motion plan · Day 3: kitchen + menu book (next)
+- [ ] Greaseproof tiger pattern (p.42), à la carte page visuals (p.25/28), page-flip menu
+
 ## Day 2: journey storyboard (next)
 - [ ] docs/journey-storyboard.md: 7 scenes, copy ≤ 25 words each, asset per scene, motion note, reduced-motion still
 - [ ] Client approves direction

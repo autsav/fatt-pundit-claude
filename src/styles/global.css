@@ -61,6 +61,19 @@
 }
 
 @keyframes fp-pill-in { from { transform: translateY(16px); opacity: 0; filter: blur(4px); } to { transform: none; opacity: 1; filter: none; } }
+.voyage-paper { background: radial-gradient(rgb(44 41 37 / 0.07) 1px, transparent 1.2px) 0 0 / 7px 7px, radial-gradient(120% 90% at 30% 40%, rgb(255 255 255 / 0.18), transparent 60%); }
+@keyframes fp-pulse { 50% { transform: scale(1.7); opacity: 0.45; } }
+.voyage-pulse { transform-box: fill-box; transform-origin: center; animation: fp-pulse 1.6s ease-in-out infinite; }
+.voyage-maps { --swap: 0; }
+/* Pull-back: the menu map shrinks onto its exact place on the wider map (Kolkata and Canton line up),
+   while the wider map arrives from the same zoom. Origin and scale are solved from the two maps' city points. */
+.voyage-layer { will-change: transform, opacity; transform-origin: 96% 58%; }
+.voyage-east { opacity: calc(1 - var(--swap)); transform: scale(calc(1 - var(--swap) * 0.59)); }
+.voyage-west { opacity: var(--swap); transform: scale(calc(2.44 - var(--swap) * 1.44)); }
+.voyage-place { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: 34px; fill: var(--color-ink); paint-order: stroke; stroke: #fff; stroke-width: 8px; }
+.voyage-stamp { opacity: 0; transform: scale(2.2) rotate(-10deg); transition: opacity .35s ease, transform .55s cubic-bezier(.2, 1.5, .4, 1); }
+.voyage-stamp.is-in { opacity: 1; transform: none; }
+.voyage-heading { animation: fp-pill-in .6s cubic-bezier(.23, 1, .32, 1) both; }
 .fp-pill-swap { display: inline-block; animation: fp-pill-in 0.35s cubic-bezier(0.23, 1, 0.32, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {

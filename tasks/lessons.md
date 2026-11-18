@@ -10,3 +10,6 @@ Review at the start of every session. Add a line after any correction.
 - CSS custom properties holding url() resolve against the stylesheet, not the page: put mask-image URLs directly in the inline style.
 - Demo export: Vite's preload helper prefixes "/"; scripts/export-demo.mjs rewrites it to page-relative. Host reserves "_" prefixes, so assets ship in assets/.
 - SplitFlapText: a full-drum spin reads as noise; cap trips with maxFlips and fire follow-ups from onSettled, not timers.
+- anime.js draw: set strokeDasharray as an SVG attribute, never inline style (inline style wins and the draw never shows).
+- Calm mode must show the END state of a scrubbed scene, including moving parts (ship parked at London), not the start.
+- A crossfade between two maps only reads as one camera move if transform-origin + scale are solved from shared city points.
