@@ -1,0 +1,997 @@
+[
+  {
+    "id": "momo-mix-vegetable",
+    "name": "Mix vegetable momo",
+    "section": "momos",
+    "description": "spinach, mushroom, courgette + tofu",
+    "price": {
+      "GBP": 7
+    },
+    "tags": [
+      "V",
+      "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "momo-chicken",
+    "name": "Chicken momo",
+    "section": "momos",
+    "description": "soy, garlic, spring onions",
+    "price": {
+      "GBP": 7.5
+    },
+    "tags": [
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "momo-beef",
+    "name": "Beef momo",
+    "section": "momos",
+    "description": "leeks, red chilli, coriander",
+    "price": {
+      "GBP": 8
+    },
+    "tags": [
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "momo-kid-goat",
+    "name": "Kid goat momo",
+    "section": "momos",
+    "description": "garam masala, cardamom, ginger + garlic",
+    "price": {
+      "GBP": 8.5
+    },
+    "signature": true,
+    "tags": [
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "crackling-spinach",
+    "name": "Crackling spinach",
+    "section": "veg",
+    "description": "sweet yoghurt, date + plum sauce, pomegranate",
+    "price": {
+      "GBP": 11
+    },
+    "signature": true,
+    "tags": [
+      "V",
+      "GF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "popcorn-cauliflower",
+    "name": "Popcorn cauliflower",
+    "section": "veg",
+    "description": "purple + white, smoked, soya garlic dip",
+    "price": {
+      "GBP": 11
+    },
+    "signature": true,
+    "tags": [
+      "V",
+      "VG",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "crispy-okra-salt-n-pepper",
+    "name": "Crispy okra salt ‘n’ pepper",
+    "section": "veg",
+    "description": "pink salt, chillies, burnt garlic",
+    "price": {
+      "GBP": 11
+    },
+    "tags": [
+      "V",
+      "VG",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "hakka-chilly-paneer-lettuce-cups",
+    "name": "Hakka chilly paneer lettuce cups",
+    "section": "veg",
+    "description": "cottage cheese, shallots, soy sauce, white + black pepper",
+    "price": {
+      "GBP": 13.75
+    },
+    "signature": true,
+    "tags": [
+      "V",
+      "GF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "sticky-sesame-vegetables",
+    "name": "Sticky sesame vegetables",
+    "section": "veg",
+    "description": "crispy veg fritters, sticky ginger glaze",
+    "price": {
+      "GBP": 11.5
+    },
+    "tags": [
+      "V",
+      "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "bombay-chilli-mock-chicken",
+    "name": "Bombay chilli mock chicken",
+    "section": "veg",
+    "description": "celery, Szechuan chilly, mixed peppers",
+    "price": {
+      "GBP": 13.75
+    },
+    "tags": [
+      "V",
+      "VG",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "veg-manchurian",
+    "name": "Veg Manchurian",
+    "section": "veg",
+    "description": "invented at the famous China Garden Restaurant in Mumbai; mix veg croquette with shallots, coriander + soya sauce",
+    "price": {
+      "GBP": 13.5
+    },
+    "tags": [
+      "V",
+      "VG"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "malabar-monkfish-curry",
+    "name": "Malabar monkfish curry",
+    "section": "seafood",
+    "description": "grilled, saffron butter, fresh coconut",
+    "price": {
+      "GBP": 18
+    },
+    "signature": true,
+    "tags": [
+      "GF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "bombay-chilly-prawns",
+    "name": "Bombay chilly prawns",
+    "section": "seafood",
+    "description": "celery, Szechuan chilly, mixed peppers",
+    "price": {
+      "GBP": 14.5
+    },
+    "signature": true,
+    "tags": [
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "crunchy-pepper-crab",
+    "name": "Crunchy pepper crab",
+    "section": "seafood",
+    "description": "soft shell crab, wok blistered sweet corn, charred scallion + Szechuan peppercorn",
+    "price": {
+      "GBP": 15.5
+    },
+    "tags": [
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "kolkata-chilli-duck",
+    "name": "Kolkata chilli duck",
+    "section": "meat",
+    "description": "lean strips, caramelised onion, slit green chilli",
+    "price": {
+      "GBP": 15.95
+    },
+    "tags": [
+      "GF",
+      "DF"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "lollypop-chicken",
+    "name": "Lollypop chicken",
+    "section": "meat",
+    "description": "spicy + crispy chicken wings served with Szechuan chutney",
+    "price": {
+      "GBP": 11.5
+    },
+    "tags": [
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "manchurian-chicken",
+    "name": "Manchurian chicken",
+    "section": "meat",
+    "description": "shallots, coriander, soy glaze",
+    "price": {
+      "GBP": 14
+    },
+    "tags": [
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "shredded-chilly-venison",
+    "name": "Shredded chilly venison",
+    "section": "meat",
+    "description": "“Made famous at the Leopold Café of Mumbai”; sweet chilli reduction, mantou bread",
+    "price": {
+      "GBP": 15.5
+    },
+    "tags": [
+      "GF",
+      "DF"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "lamb-chops-black-bean-dust",
+    "name": "Lamb chops, black bean dust",
+    "section": "meat",
+    "description": "stone flower masala rub, charred to perfection",
+    "price": {
+      "GBP": 26
+    },
+    "tags": [
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "rabbit-wontons",
+    "name": "Rabbit wontons",
+    "section": "meat",
+    "description": "burnt garlic, black bean, chilli oil",
+    "price": {
+      "GBP": 14.2
+    },
+    "tags": [
+      "DF"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "ribeye-dry-red-chilly",
+    "name": "Ribeye dry red chilly",
+    "section": "meat",
+    "description": "beef strips, Kashmiri red chillies, roasted cashews",
+    "price": {
+      "GBP": 22
+    },
+    "tags": [
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "szechuan-honey-duck",
+    "name": "Szechuan honey duck",
+    "section": "meat",
+    "description": "crispy duck strips, five spice + pancakes",
+    "tags": [],
+    "kind": "food"
+  },
+  {
+    "id": "kolkata-chilly-chicken",
+    "name": "Kolkata chilly chicken",
+    "section": "meat",
+    "description": "caramelised onion, slit green chillies, smoked dark soya",
+    "tags": [],
+    "kind": "food"
+  },
+  {
+    "id": "bing-bread",
+    "name": "Bing bread",
+    "section": "rice",
+    "description": "buttery, crisp + crunchy",
+    "price": {
+      "GBP": 5.9
+    },
+    "tags": [
+      "V",
+      "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "burnt-ginger-rice",
+    "name": "Burnt ginger rice",
+    "section": "rice",
+    "price": {
+      "GBP": 6.25
+    },
+    "tags": [
+      "V",
+      "VG",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "egg-szechuan-fried-rice",
+    "name": "Egg Szechuan fried rice",
+    "section": "rice",
+    "price": {
+      "GBP": 7.25
+    },
+    "tags": [
+      "V",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "veg-szechuan-fried-rice",
+    "name": "Veg Szechuan fried rice",
+    "section": "rice",
+    "price": {
+      "GBP": 7.25
+    },
+    "tags": [
+      "V",
+      "VG"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "vegetable-hakka-noodles",
+    "name": "Vegetable Hakka noodles",
+    "section": "rice",
+    "description": "bean sprouts, cabbage, green onion",
+    "price": {
+      "GBP": 12
+    },
+    "tags": [
+      "V",
+      "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "stir-fry-szechuan-noodles",
+    "name": "Stir fry Szechuan noodles",
+    "section": "rice",
+    "options": [
+      {
+        "label": "Veg",
+        "price": {
+          "GBP": 13
+        }
+      },
+      {
+        "label": "Chicken or beef",
+        "price": {
+          "GBP": 15
+        }
+      }
+    ],
+    "tagNote": "Vegan, vegetarian and dairy-free tags apply to the veg option only.",
+    "tags": [
+      "V",
+      "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "sweet-potato-fries",
+    "name": "Sweet potato fries",
+    "section": "sides",
+    "description": "smoked paprika, black pepper, Szechuan mayo dip",
+    "price": {
+      "GBP": 6.75
+    },
+    "tags": [
+      "V",
+      "VG",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "stir-fry-broccoli",
+    "name": "Stir fry broccoli",
+    "section": "sides",
+    "description": "with roasted almonds",
+    "price": {
+      "GBP": 6.75
+    },
+    "tags": [
+      "V",
+      "VG",
+      "GF",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "tamarind-glazed-potatoes",
+    "name": "Tamarind glazed potatoes",
+    "section": "sides",
+    "description": "baby potatoes, black salt",
+    "price": {
+      "GBP": 6.75
+    },
+    "source": "guidelines-pdf",
+    "tags": [
+      "V"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "snowflake-gelato-sizzling-brownie",
+    "name": "Snowflake Gelato sizzling brownie",
+    "section": "dessert",
+    "description": "our best-selling dessert, made with Soho neighbour Snowflake Gelato’s vanilla and chocolate-covered honeycomb",
+    "price": {
+      "GBP": 12.5
+    },
+    "tags": [
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "vegan-sizzling-brownie",
+    "name": "Vegan sizzling brownie",
+    "section": "dessert",
+    "description": "with Madagascan vanilla ice cream",
+    "price": {
+      "GBP": 12.5
+    },
+    "tags": [
+      "V",
+      "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "lady-kenny",
+    "name": "Lady Kenny",
+    "section": "dessert",
+    "description": "inspired by Ledikeni, the Bengali sweet named after Lady Charlotte Canning",
+    "price": {
+      "GBP": 7.5
+    },
+    "tags": [
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "guava-chilli-sour",
+    "name": "Guava chilli sour",
+    "section": "fruit-coolers",
+    "description": "Himalayan salt, red chilli, guava; spike it with tequila",
+    "options": [
+      {
+        "label": "Mocktail",
+        "price": {
+          "GBP": 8.5
+        }
+      },
+      {
+        "label": "Spike it",
+        "price": {
+          "GBP": 13.5
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "mango-szechuan-rush",
+    "name": "Mango Szechuan rush",
+    "section": "fruit-coolers",
+    "description": "Alphonso mango, Szechuan syrup; spike it with vodka",
+    "options": [
+      {
+        "label": "Mocktail",
+        "price": {
+          "GBP": 8.5
+        }
+      },
+      {
+        "label": "Spike it",
+        "price": {
+          "GBP": 13.5
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "hakka-garden",
+    "name": "Hakka Garden",
+    "section": "cocktails",
+    "description": "Venezuelan white rum, black raspberry, passion fruit",
+    "price": {
+      "GBP": 14
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "white-tiger",
+    "name": "White Tiger",
+    "section": "cocktails",
+    "description": "London dry gin, elderflower, lychee juice, Prosecco",
+    "price": {
+      "GBP": 13.5
+    },
+    "signature": true,
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "chin-chin-choo",
+    "name": "Chin Chin Choo",
+    "section": "cocktails",
+    "description": "Himalayan juniper gin, tamarind, plum",
+    "price": {
+      "GBP": 11
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "desi-dragon",
+    "name": "Desi Dragon",
+    "section": "cocktails",
+    "description": "rum, dragon fruit, Szechuan peppercorn, ginger reduction",
+    "price": {
+      "GBP": 13.5
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "fatt-pundit-negroni",
+    "name": "Fatt Pundit Negroni",
+    "section": "cocktails",
+    "description": "spiced gin, Campari, Cocchi Torino",
+    "price": {
+      "GBP": 13.5
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "unity-lager",
+    "name": "Unity Lager",
+    "section": "beers",
+    "description": "New Zealand, England, 4.5%",
+    "price": {
+      "GBP": 7.5
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "zen-pale-ale",
+    "name": "Zen Pale Ale",
+    "section": "beers",
+    "description": "blend of British ale + Japanese tea, 4.5%",
+    "price": {
+      "GBP": 7.5
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "mango-lassi",
+    "name": "Mango lassi",
+    "section": "soft-drinks",
+    "description": "Greek yoghurt, jaggery",
+    "price": {
+      "GBP": 6.25
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "masala-thums-up",
+    "name": "Masala Thums Up",
+    "section": "soft-drinks",
+    "price": {
+      "GBP": 8.5
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "thums-up",
+    "name": "Thums Up",
+    "section": "soft-drinks",
+    "price": {
+      "GBP": 6
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "la-cavea-prosecco",
+    "name": "La Cavea Prosecco NV",
+    "section": "sparkling",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 10.2
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 50
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "grande-reserve-devaux",
+    "name": "Grande Réserve Devaux Champagne NV",
+    "section": "sparkling",
+    "options": [
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 66
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "famille-perrin-luberon-rose",
+    "name": "Famille Perrin Luberon Rosé",
+    "section": "rose",
+    "description": "France",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 7.5
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 37.5
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "azevedo-vinho-verde",
+    "name": "Azevedo Vinho Verde, Loureiro Alvarinho",
+    "section": "white",
+    "description": "Portugal",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 7.5
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 37.5
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "planalto-douro-branco",
+    "name": "Planalto Douro Branco",
+    "section": "white",
+    "description": "Portugal",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 8
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 45
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "estripe-chardonnay",
+    "name": "Estripe Organic Fairtrade Chardonnay",
+    "section": "white",
+    "description": "Argentina",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 9.5
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 51.75
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "akluj-chardonnay-sauvignon",
+    "name": "Akluj Chardonnay + Sauvignon Blanc",
+    "section": "white",
+    "description": "India",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 9.5
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 51.75
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "tinpot-hut-sauvignon-blanc",
+    "name": "Tinpot Hut Marlborough Sauvignon Blanc",
+    "section": "white",
+    "description": "New Zealand",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 10.2
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 56.25
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "axel-pauly-riesling",
+    "name": "Bernkasteler Riesling Kabinett, Axel Pauly",
+    "section": "white",
+    "description": "Mosel, Germany",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 10.7
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 62
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "ponte-pietra",
+    "name": "Ponte Pietra Merlot + Corvina",
+    "section": "red",
+    "description": "Italy",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 7.5
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 37.5
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "kaiken-malbec",
+    "name": "Kaiken Clásico Malbec",
+    "section": "red",
+    "description": "Argentina",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 8
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 45
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "aconcagua-costa-pinot-noir",
+    "name": "Aconcagua Costa Pinot Noir",
+    "section": "red",
+    "description": "Chile",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 9
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 47.25
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "alpha-zeta-valpolicella",
+    "name": "Alpha Zeta Valpolicella",
+    "section": "red",
+    "description": "Italy",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 10.2
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 56.25
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "bodegas-lan-rioja-reserva",
+    "name": "Bodegas LAN Rioja Reserva",
+    "section": "red",
+    "description": "Spain",
+    "options": [
+      {
+        "label": "Glass",
+        "price": {
+          "GBP": 11.25
+        }
+      },
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 67.5
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "dominique-morel-beaujolais",
+    "name": "Beaujolais-Villages, Dominique Morel",
+    "section": "red",
+    "description": "France",
+    "options": [
+      {
+        "label": "Bottle",
+        "price": {
+          "GBP": 62
+        }
+      }
+    ],
+    "tags": [],
+    "kind": "drink"
+  }
+]

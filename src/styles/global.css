@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+
+/*
+ * Brand tokens — Fatt Pundit Branding Guidelines, B3 Designers, Aug 2026 (p.18, p.20–21).
+ * Do not add colours that are not in the guidelines.
+ *
+ * Contrast (WCAG 2.2):
+ *   ink on sand      8.8:1  any text
+ *   gold on ink      6.0:1  any text
+ *   ink on orange    4.4:1  large/bold text only (>= 19px bold)
+ *   orange on sand   2.0:1  decoration only, never text
+ *   slate on sand    2.3:1  decoration only, never text
+ *
+ * Open question: guidelines list gold as HEX #CBA052 but RGB 206,161,83 (#CEA153). Using HEX.
+ */
+@theme {
+  --color-ink: #2c2925;          /* Pantone Black C — main */
+  --color-tiger: #f15d3d;        /* Pantone 171 C   — main */
+  --color-gold: #cba052;         /* Pantone 7407 C  — main */
+  --color-sand: #dac7b5;         /* Pantone 482 C   — additional */
+  --color-slate: #758591;        /* Pantone 7544 C  — additional */
+
+  --font-display: var(--font-typewriter);
+  --font-body: var(--font-typewriter);
+  --font-label: var(--font-typewriter-condensed);
+  --font-note: var(--font-lora);
+
+  /* Guidelines tracking 100 / 50 (InDesign units = 1/1000 em) */
+  --tracking-title: 0.1em;
+  --tracking-copy: 0.05em;
+}
+
+@layer base {
+  html {
+    background: var(--color-sand);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    letter-spacing: var(--tracking-copy);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-title);
+    line-height: 1;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-tiger);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .note {
+    font-family: var(--font-note);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: var(--tracking-copy);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

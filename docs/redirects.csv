@@ -1,0 +1,10 @@
+old_url,new_url,status,note
+/,/,200,"splash page replaced by the journey (title was ""FATT PUNDIT | Best Asian Restaurants"")"
+/soho/,/soho/,200,kept (title was "Home - FATT PUNDIT")
+/covent-garden/,/covent-garden/,200,kept (title was "Home - FATT PUNDIT")
+/soho/reserve-a-table/,/book/?branch=soho,301,old page embeds OpenTable rid 171789
+/covent-garden/reserve-a-table/,/book/?branch=covent-garden,301,old page embeds SevenRooms venue fattpunditcoventgarden
+/soho/monetary-voucher/,/gift-vouchers/,301,old page shows no voucher provider link: ask client
+/soho/food-pickup/,/soho/click-and-collect/,301,old page links only Deliveroo/Uber Eats: ask client what pickup uses
+/soho,/soho/,301,already redirects today; keep
+/covent-garden,/covent-garden/,301,already redirects today; keep

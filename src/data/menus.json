@@ -1,0 +1,1051 @@
+[
+  {
+    "id": "a-la-carte",
+    "title": "À la carte",
+    "kind": "a-la-carte",
+    "order": 1,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Momos",
+        "items": [
+          {
+            "dish": "momo-mix-vegetable"
+          },
+          {
+            "dish": "momo-chicken"
+          },
+          {
+            "dish": "momo-beef"
+          },
+          {
+            "dish": "momo-kid-goat"
+          }
+        ],
+        "note": "All meals in Tangra start with these hearty, flavoursome steamed dumplings coming straight from the steel steamers, served with a spicy chutney, with influences from Bhutan, Nepal, Tibet and other parts of India."
+      },
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "popcorn-cauliflower"
+          },
+          {
+            "dish": "crispy-okra-salt-n-pepper"
+          },
+          {
+            "dish": "hakka-chilly-paneer-lettuce-cups"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          },
+          {
+            "dish": "bombay-chilli-mock-chicken"
+          }
+        ]
+      },
+      {
+        "title": "Seafood",
+        "items": [
+          {
+            "dish": "malabar-monkfish-curry"
+          },
+          {
+            "dish": "bombay-chilly-prawns"
+          },
+          {
+            "dish": "crunchy-pepper-crab"
+          }
+        ]
+      },
+      {
+        "title": "Meat, game + poultry",
+        "items": [
+          {
+            "dish": "kolkata-chilli-duck"
+          },
+          {
+            "dish": "lollypop-chicken"
+          },
+          {
+            "dish": "manchurian-chicken"
+          },
+          {
+            "dish": "shredded-chilly-venison"
+          },
+          {
+            "dish": "lamb-chops-black-bean-dust"
+          },
+          {
+            "dish": "rabbit-wontons"
+          },
+          {
+            "dish": "ribeye-dry-red-chilly"
+          }
+        ]
+      },
+      {
+        "title": "Bread, rice + noodles",
+        "items": [
+          {
+            "dish": "bing-bread"
+          },
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "egg-szechuan-fried-rice"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          },
+          {
+            "dish": "stir-fry-szechuan-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "sweet-potato-fries"
+          },
+          {
+            "dish": "stir-fry-broccoli"
+          }
+        ]
+      },
+      {
+        "title": "Desserts",
+        "items": [
+          {
+            "dish": "snowflake-gelato-sizzling-brownie"
+          },
+          {
+            "dish": "vegan-sizzling-brownie"
+          },
+          {
+            "dish": "lady-kenny"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "vegan",
+    "title": "Vegan",
+    "kind": "diet",
+    "order": 2,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Momos",
+        "items": [
+          {
+            "dish": "momo-mix-vegetable"
+          }
+        ],
+        "note": "All meals in Tangra start with these hearty, flavoursome steamed dumplings coming straight from the steel steamers, served with a spicy chutney, with influences from Bhutan, Nepal, Tibet and other parts of India."
+      },
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "popcorn-cauliflower"
+          },
+          {
+            "dish": "crispy-okra-salt-n-pepper"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          },
+          {
+            "dish": "bombay-chilli-mock-chicken"
+          },
+          {
+            "dish": "veg-manchurian"
+          }
+        ]
+      },
+      {
+        "title": "Bread, rice + noodles",
+        "items": [
+          {
+            "dish": "bing-bread"
+          },
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "veg-szechuan-fried-rice"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          },
+          {
+            "dish": "stir-fry-szechuan-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "sweet-potato-fries"
+          },
+          {
+            "dish": "stir-fry-broccoli"
+          }
+        ]
+      },
+      {
+        "title": "Desserts",
+        "items": [
+          {
+            "dish": "vegan-sizzling-brownie"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "diet": "vegan",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "halal",
+    "title": "Halal",
+    "kind": "diet",
+    "order": 3,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Momos",
+        "items": [
+          {
+            "dish": "momo-chicken"
+          },
+          {
+            "dish": "momo-kid-goat"
+          },
+          {
+            "dish": "momo-beef"
+          },
+          {
+            "dish": "momo-mix-vegetable"
+          }
+        ],
+        "note": "All meals in Tangra start with these hearty, flavoursome steamed dumplings coming straight from the steel steamers, served with a spicy chutney, with influences from Bhutan, Nepal, Tibet and other parts of India."
+      },
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "popcorn-cauliflower"
+          },
+          {
+            "dish": "crispy-okra-salt-n-pepper"
+          },
+          {
+            "dish": "hakka-chilly-paneer-lettuce-cups"
+          },
+          {
+            "dish": "bombay-chilli-mock-chicken"
+          },
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          }
+        ]
+      },
+      {
+        "title": "Seafood",
+        "items": [
+          {
+            "dish": "malabar-monkfish-curry"
+          },
+          {
+            "dish": "bombay-chilly-prawns"
+          },
+          {
+            "dish": "crunchy-pepper-crab"
+          }
+        ]
+      },
+      {
+        "title": "Meat, game + poultry",
+        "items": [
+          {
+            "dish": "lollypop-chicken"
+          },
+          {
+            "dish": "manchurian-chicken"
+          },
+          {
+            "dish": "lamb-chops-black-bean-dust"
+          },
+          {
+            "dish": "ribeye-dry-red-chilly"
+          }
+        ]
+      },
+      {
+        "title": "Bread, rice + noodles",
+        "items": [
+          {
+            "dish": "bing-bread"
+          },
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "egg-szechuan-fried-rice"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          },
+          {
+            "dish": "stir-fry-szechuan-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "sweet-potato-fries"
+          },
+          {
+            "dish": "stir-fry-broccoli"
+          }
+        ]
+      },
+      {
+        "title": "Desserts",
+        "items": [
+          {
+            "dish": "snowflake-gelato-sizzling-brownie"
+          },
+          {
+            "dish": "vegan-sizzling-brownie"
+          },
+          {
+            "dish": "lady-kenny"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "diet": "halal",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "gluten-free",
+    "title": "Gluten free",
+    "kind": "diet",
+    "order": 4,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "popcorn-cauliflower"
+          },
+          {
+            "dish": "crispy-okra-salt-n-pepper"
+          },
+          {
+            "dish": "hakka-chilly-paneer-lettuce-cups"
+          },
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "bombay-chilli-mock-chicken"
+          }
+        ]
+      },
+      {
+        "title": "Seafood",
+        "items": [
+          {
+            "dish": "malabar-monkfish-curry"
+          },
+          {
+            "dish": "bombay-chilly-prawns"
+          }
+        ]
+      },
+      {
+        "title": "Meat, game + poultry",
+        "items": [
+          {
+            "dish": "kolkata-chilli-duck"
+          },
+          {
+            "dish": "shredded-chilly-venison"
+          },
+          {
+            "dish": "lamb-chops-black-bean-dust"
+          },
+          {
+            "dish": "ribeye-dry-red-chilly"
+          }
+        ]
+      },
+      {
+        "title": "Bread, rice + noodles",
+        "items": [
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "egg-szechuan-fried-rice"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "sweet-potato-fries"
+          },
+          {
+            "dish": "stir-fry-broccoli"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "diet": "gluten-free",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "dairy-free",
+    "title": "Dairy free",
+    "kind": "diet",
+    "order": 5,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Momos",
+        "items": [
+          {
+            "dish": "momo-kid-goat"
+          },
+          {
+            "dish": "momo-mix-vegetable"
+          },
+          {
+            "dish": "momo-chicken"
+          },
+          {
+            "dish": "momo-beef"
+          }
+        ],
+        "note": "All meals in Tangra start with these hearty, flavoursome steamed dumplings coming straight from the steel steamers, served with a spicy chutney, with influences from Bhutan, Nepal, Tibet and other parts of India."
+      },
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "popcorn-cauliflower"
+          },
+          {
+            "dish": "crispy-okra-salt-n-pepper"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          },
+          {
+            "dish": "bombay-chilli-mock-chicken"
+          }
+        ]
+      },
+      {
+        "title": "Seafood",
+        "items": [
+          {
+            "dish": "bombay-chilly-prawns"
+          },
+          {
+            "dish": "crunchy-pepper-crab"
+          }
+        ]
+      },
+      {
+        "title": "Meat, game + poultry",
+        "items": [
+          {
+            "dish": "kolkata-chilli-duck"
+          },
+          {
+            "dish": "lollypop-chicken"
+          },
+          {
+            "dish": "manchurian-chicken"
+          },
+          {
+            "dish": "shredded-chilly-venison"
+          },
+          {
+            "dish": "lamb-chops-black-bean-dust"
+          },
+          {
+            "dish": "rabbit-wontons"
+          },
+          {
+            "dish": "ribeye-dry-red-chilly"
+          }
+        ]
+      },
+      {
+        "title": "Bread, rice + noodles",
+        "items": [
+          {
+            "dish": "bing-bread"
+          },
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "egg-szechuan-fried-rice"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          },
+          {
+            "dish": "stir-fry-szechuan-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "sweet-potato-fries"
+          },
+          {
+            "dish": "stir-fry-broccoli"
+          }
+        ]
+      },
+      {
+        "title": "Desserts",
+        "items": [
+          {
+            "dish": "vegan-sizzling-brownie"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "diet": "dairy-free",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "pescatarian",
+    "title": "Pescatarian",
+    "kind": "diet",
+    "order": 6,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Momos",
+        "items": [
+          {
+            "dish": "momo-mix-vegetable"
+          }
+        ],
+        "note": "All meals in Tangra start with these hearty, flavoursome steamed dumplings coming straight from the steel steamers, served with a spicy chutney, with influences from Bhutan, Nepal, Tibet and other parts of India."
+      },
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          },
+          {
+            "dish": "popcorn-cauliflower"
+          }
+        ]
+      },
+      {
+        "title": "Seafood",
+        "items": [
+          {
+            "dish": "malabar-monkfish-curry"
+          },
+          {
+            "dish": "bombay-chilly-prawns"
+          },
+          {
+            "dish": "crunchy-pepper-crab"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Desserts",
+        "items": [
+          {
+            "dish": "snowflake-gelato-sizzling-brownie"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "diet": "pescatarian",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "set-menu",
+    "title": "Set menu",
+    "kind": "set",
+    "order": 7,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": false,
+    "sections": [
+      {
+        "title": "Momos",
+        "items": [
+          {
+            "dish": "momo-mix-vegetable"
+          },
+          {
+            "dish": "momo-chicken"
+          }
+        ],
+        "note": "All meals in Tangra start with these hearty, flavoursome steamed dumplings coming straight from the steel steamers, served with a spicy chutney, with influences from Bhutan, Nepal, Tibet and other parts of India."
+      },
+      {
+        "title": "Veg",
+        "items": [
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          }
+        ]
+      },
+      {
+        "title": "Seafood",
+        "items": [
+          {
+            "dish": "malabar-monkfish-curry"
+          },
+          {
+            "dish": "bombay-chilly-prawns"
+          }
+        ]
+      },
+      {
+        "title": "Meat, game + poultry",
+        "items": [
+          {
+            "dish": "lollypop-chicken"
+          },
+          {
+            "dish": "shredded-chilly-venison"
+          }
+        ]
+      },
+      {
+        "title": "Sides",
+        "items": [
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Desserts",
+        "items": [
+          {
+            "dish": "snowflake-gelato-sizzling-brownie"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "pre-theatre",
+    "title": "Pre-theatre",
+    "kind": "pre-theatre",
+    "order": 8,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": false,
+    "sections": [
+      {
+        "title": "To start (choose one)",
+        "items": [
+          {
+            "dish": "momo-chicken"
+          },
+          {
+            "dish": "momo-kid-goat"
+          }
+        ]
+      },
+      {
+        "title": "To continue (choose one per person)",
+        "items": [
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          },
+          {
+            "dish": "bombay-chilly-prawns"
+          },
+          {
+            "dish": "lollypop-chicken"
+          }
+        ]
+      },
+      {
+        "title": "Mains (choose one per person)",
+        "items": [
+          {
+            "dish": "malabar-monkfish-curry"
+          },
+          {
+            "dish": "szechuan-honey-duck"
+          },
+          {
+            "dish": "kolkata-chilly-chicken"
+          },
+          {
+            "dish": "ribeye-dry-red-chilly"
+          }
+        ]
+      },
+      {
+        "title": "Sides (choose one per person)",
+        "items": [
+          {
+            "dish": "tamarind-glazed-potatoes"
+          },
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "egg-szechuan-fried-rice"
+          }
+        ]
+      },
+      {
+        "title": "Dessert",
+        "items": [
+          {
+            "dish": "lady-kenny"
+          },
+          {
+            "dish": "snowflake-gelato-sizzling-brownie"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "setPrice": [
+      {
+        "label": "2 courses",
+        "price": {
+          "GBP": 33.5
+        }
+      },
+      {
+        "label": "3 courses",
+        "price": {
+          "GBP": 37
+        }
+      }
+    ],
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "vegetarian-pre-theatre",
+    "title": "Vegetarian pre-theatre",
+    "kind": "pre-theatre",
+    "order": 9,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": false,
+    "sections": [
+      {
+        "title": "To start",
+        "items": [
+          {
+            "dish": "momo-mix-vegetable"
+          }
+        ]
+      },
+      {
+        "title": "To continue (choose one per person)",
+        "items": [
+          {
+            "dish": "crackling-spinach"
+          },
+          {
+            "dish": "sticky-sesame-vegetables"
+          },
+          {
+            "dish": "popcorn-cauliflower"
+          },
+          {
+            "dish": "crispy-okra-salt-n-pepper"
+          }
+        ]
+      },
+      {
+        "title": "Mains (choose one per person)",
+        "items": [
+          {
+            "dish": "hakka-chilly-paneer-lettuce-cups"
+          },
+          {
+            "dish": "bombay-chilli-mock-chicken"
+          },
+          {
+            "dish": "vegetable-hakka-noodles"
+          }
+        ]
+      },
+      {
+        "title": "Sides (choose one per person)",
+        "items": [
+          {
+            "dish": "tamarind-glazed-potatoes"
+          },
+          {
+            "dish": "burnt-ginger-rice"
+          },
+          {
+            "dish": "egg-szechuan-fried-rice"
+          }
+        ]
+      },
+      {
+        "title": "Dessert",
+        "items": [
+          {
+            "dish": "vegan-sizzling-brownie"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "diet": "vegetarian",
+    "setPrice": [
+      {
+        "label": "2 courses",
+        "price": {
+          "GBP": 33.5
+        }
+      },
+      {
+        "label": "3 courses",
+        "price": {
+          "GBP": 37
+        }
+      }
+    ],
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  },
+  {
+    "id": "drinks",
+    "title": "Drinks",
+    "kind": "drinks",
+    "order": 10,
+    "branches": [
+      "soho",
+      "covent-garden"
+    ],
+    "showPrices": true,
+    "sections": [
+      {
+        "title": "Fruit coolers",
+        "items": [
+          {
+            "dish": "guava-chilli-sour"
+          },
+          {
+            "dish": "mango-szechuan-rush"
+          }
+        ],
+        "note": "Inspired by the fruit vendors of India, who serve fresh cut fruit with a variety of spices and salts. Supercharge your cooler by spiking it with a paired spirit."
+      },
+      {
+        "title": "Cocktails",
+        "items": [
+          {
+            "dish": "hakka-garden"
+          },
+          {
+            "dish": "white-tiger"
+          },
+          {
+            "dish": "chin-chin-choo"
+          },
+          {
+            "dish": "desi-dragon"
+          },
+          {
+            "dish": "fatt-pundit-negroni"
+          }
+        ]
+      },
+      {
+        "title": "Beers",
+        "items": [
+          {
+            "dish": "unity-lager"
+          },
+          {
+            "dish": "zen-pale-ale"
+          }
+        ]
+      },
+      {
+        "title": "Soft drinks",
+        "items": [
+          {
+            "dish": "mango-lassi"
+          },
+          {
+            "dish": "masala-thums-up"
+          },
+          {
+            "dish": "thums-up"
+          }
+        ]
+      },
+      {
+        "title": "Sparkling + Champagne",
+        "items": [
+          {
+            "dish": "la-cavea-prosecco"
+          },
+          {
+            "dish": "grande-reserve-devaux"
+          }
+        ]
+      },
+      {
+        "title": "Rosé",
+        "items": [
+          {
+            "dish": "famille-perrin-luberon-rose"
+          }
+        ]
+      },
+      {
+        "title": "White wine",
+        "items": [
+          {
+            "dish": "azevedo-vinho-verde"
+          },
+          {
+            "dish": "planalto-douro-branco"
+          },
+          {
+            "dish": "estripe-chardonnay"
+          },
+          {
+            "dish": "akluj-chardonnay-sauvignon"
+          },
+          {
+            "dish": "tinpot-hut-sauvignon-blanc"
+          },
+          {
+            "dish": "axel-pauly-riesling"
+          }
+        ]
+      },
+      {
+        "title": "Red wine",
+        "items": [
+          {
+            "dish": "ponte-pietra"
+          },
+          {
+            "dish": "kaiken-malbec"
+          },
+          {
+            "dish": "aconcagua-costa-pinot-noir"
+          },
+          {
+            "dish": "alpha-zeta-valpolicella"
+          },
+          {
+            "dish": "bodegas-lan-rioja-reserva"
+          },
+          {
+            "dish": "dominique-morel-beaujolais"
+          }
+        ]
+      }
+    ],
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
+    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+  }
+]

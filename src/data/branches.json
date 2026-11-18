@@ -1,0 +1,232 @@
+[
+  {
+    "id": "soho",
+    "order": 1,
+    "name": "Fatt Pundit Soho",
+    "shortName": "Soho",
+    "status": "open",
+    "mark": "tiger-indian",
+    "address": {
+      "street": "77 Berwick Street",
+      "locality": "Soho",
+      "city": "London",
+      "postcode": "W1F 8TH",
+      "country": "GB"
+    },
+    "geo": null,
+    "timezone": "Europe/London",
+    "currency": "GBP",
+    "locale": "en-GB",
+    "phone": "+442072877900",
+    "email": "reservations@fattpundit.co.uk",
+    "booking": {
+      "provider": "opentable",
+      "url": "https://www.opentable.com/r/fatt-pundit-london",
+      "widgetId": "171789"
+    },
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ],
+      "sun": []
+    },
+    "delivery": [
+      {
+        "provider": "deliveroo",
+        "url": "https://deliveroo.co.uk/menu/london/soho/fatt-pundit"
+      },
+      {
+        "provider": "uber-eats",
+        "url": "https://www.ubereats.com/london/food-delivery/fatt-pundit/mirV7fF6QeOiVlUK8OSNPA"
+      }
+    ],
+    "clickAndCollectUrl": null,
+    "vouchersUrl": null,
+    "groupsNote": null,
+    "menus": [
+      "a-la-carte",
+      "vegan",
+      "halal",
+      "gluten-free",
+      "dairy-free",
+      "pescatarian",
+      "set-menu",
+      "pre-theatre",
+      "vegetarian-pre-theatre",
+      "drinks"
+    ]
+  },
+  {
+    "id": "covent-garden",
+    "order": 2,
+    "name": "Fatt Pundit Covent Garden",
+    "shortName": "Covent Garden",
+    "status": "open",
+    "mark": "tiger-chinese",
+    "address": {
+      "street": "6 Maiden Lane",
+      "locality": "Covent Garden",
+      "city": "London",
+      "postcode": "WC2E 7NA",
+      "country": "GB"
+    },
+    "geo": null,
+    "timezone": "Europe/London",
+    "currency": "GBP",
+    "locale": "en-GB",
+    "phone": "+442078368883",
+    "email": "reservations.coventgarden@fattpundit.co.uk",
+    "booking": {
+      "provider": "sevenrooms",
+      "url": "https://www.sevenrooms.com/reservations/fattpunditcoventgarden",
+      "widgetId": "fattpunditcoventgarden"
+    },
+    "hours": {
+      "mon": [],
+      "tue": [
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "14:30"
+        ],
+        [
+          "17:00",
+          "22:30"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ]
+    },
+    "delivery": [],
+    "clickAndCollectUrl": null,
+    "vouchersUrl": null,
+    "groupsNote": "Tables for more than 4 guests: please call the restaurant. Larger bookings need a deposit.",
+    "menus": [
+      "a-la-carte",
+      "vegan",
+      "gluten-free",
+      "halal",
+      "dairy-free",
+      "pre-theatre",
+      "vegetarian-pre-theatre",
+      "set-menu",
+      "drinks"
+    ]
+  },
+  {
+    "id": "dubai",
+    "order": 3,
+    "name": "Fatt Pundit Dubai",
+    "shortName": "Dubai",
+    "status": "opening-soon",
+    "mark": null,
+    "address": {
+      "street": "The Hangout, Mall of the Emirates",
+      "locality": "Al Barsha",
+      "city": "Dubai",
+      "postcode": null,
+      "country": "AE"
+    },
+    "geo": null,
+    "timezone": "Asia/Dubai",
+    "currency": "AED",
+    "locale": "en-AE",
+    "phone": null,
+    "email": null,
+    "booking": null,
+    "hours": null,
+    "delivery": [],
+    "clickAndCollectUrl": null,
+    "vouchersUrl": null,
+    "groupsNote": null,
+    "menus": []
+  }
+]
