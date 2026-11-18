@@ -78,9 +78,9 @@ export default function RainHero({ src, branches }: Props) {
     const el = titleRef.current;
     if (!ready || !el || isCalm()) return;
     let cancelled = false;
-    import('animejs').then(({ animate, stagger, text }) => {
+    import('animejs').then(({ animate, stagger, splitText }) => {
       if (cancelled) return;
-      const { chars } = text.split(el, { chars: { wrap: 'clip' } });
+      const { chars } = splitText(el, { chars: { wrap: 'clip' } });
       animate(chars, { y: ['110%', '0%'], rotate: { from: 8, to: 0 }, duration: 900, ease: 'outExpo', delay: stagger(45) });
     });
     return () => {

@@ -13,3 +13,6 @@ Review at the start of every session. Add a line after any correction.
 - anime.js draw: set strokeDasharray as an SVG attribute, never inline style (inline style wins and the draw never shows).
 - Calm mode must show the END state of a scrubbed scene, including moving parts (ship parked at London), not the start.
 - A crossfade between two maps only reads as one camera move if transform-origin + scale are solved from shared city points.
+- Headless screenshots of a WebGL canvas that is partly off screen can come back black or transparent. Check the real pixels with gl.readPixels before "fixing" the shader.
+- Paginating content into fixed pages: measure real block heights in a hidden copy (cqw units scale with width), don't guess from character counts.
+- Layers that must move together (a paper sheet and its wash) go in ONE element; a separate unrotated overlay leaves a wedge.

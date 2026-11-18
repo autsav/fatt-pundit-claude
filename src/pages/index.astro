@@ -5,6 +5,8 @@ import Arrival from '../components/scenes/Arrival.astro';
 import Doors from '../components/scenes/Doors.astro';
 import RainHero from '../components/scenes/RainHero.tsx';
 import Voyage from '../components/scenes/Voyage.tsx';
+import Kitchen, { type KitchenDish } from '../components/scenes/Kitchen.tsx';
+import MenuBook, { type MenuLite } from '../components/scenes/MenuBook.tsx';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { formatPrice } from '../lib/format';
@@ -21,8 +23,8 @@ import stampOrangeArt from '../assets/images/brand/stamp-orange.png';
 import mountainAArt from '../assets/images/brand/mountain-a.png';
 import mountainsBArt from '../assets/images/brand/mountains-b.png';
 import mountainsCArt from '../assets/images/brand/mountains-c.png';
+import greaseproofOrange from '../assets/images/brand/greaseproof-orange.png';
 import inside from '../assets/images/covent-garden/gallery-01.jpg';
-import momos from '../assets/images/journey/04-momos-chutney.jpg';
 import barSour from '../assets/images/journey/05-bar-guava-chilli-sour.jpg';
 import barCocktail from '../assets/images/journey/05-bar-cocktail.jpg';
 import imgSpinach from '../assets/images/dishes/crackling-spinach.jpg';
@@ -44,12 +46,6 @@ const dish = async (id: string) => {
   return d;
 };
 
-const featured = [
-  { d: await dish('momo-mix-vegetable'), img: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf' },
-  { d: await dish('crackling-spinach'), img: imgSpinach, alt: 'Crackling spinach topped with yoghurt and pomegranate in a steel bowl' },
-  { d: await dish('crispy-okra-salt-n-pepper'), img: imgOkra, alt: 'Crispy okra with chillies in a black and gold steamer pot, pink salt beside it' },
-  { d: await dish('snowflake-gelato-sizzling-brownie'), img: imgBrownie, alt: 'Sizzling brownie in a cast-iron skillet with vanilla ice cream and chocolate sauce', name: 'Sizzling brownie' },
-];
 const drinks = await Promise.all(['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'desi-dragon'].map(dish));
 const priceOf = (d: Awaited<ReturnType<typeof dish>>) =>
   d.price ? formatPrice(d.price, 'GBP') : d.options?.map((o) => `${o.label} ${formatPrice(o.price, 'GBP')}`).join(' · ');
@@ -87,6 +83,63 @@ const voyageArt = {
   mountainsB: await img(mountainsBArt, 520),
   mountainsC: await img(mountainsCArt, 260),
 };
+// Scene 4: signature dishes for the rail. Photos only where we have the real dish; the rest are order tickets.
+type Dish = Awaited<ReturnType<typeof dish>>;
+const SECTION_NAMES: Record<string, string> = { momos: 'Momos', veg: 'Veg', seafood: 'Seafood', meat: 'Meat, game + poultry', rice: 'Bread, rice + noodles', sides: 'Sides', desserts: 'Desserts' };
+const railDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string }): Promise<KitchenDish> => {
+  const d: Dish = await dish(id);
+  return {
+    id,
+    name: photo?.name ?? d.name,
+    note: d.description,
+    price: priceOf(d) ?? undefined,
+    tags: d.tags,
+    image: photo ? await img(photo.src, 640) : undefined,
+    imageAlt: photo?.alt,
+    section: SECTION_NAMES[d.section] ?? d.section,
+    signature: !!d.signature,
+  };
+};
+const kitchenDishes = await Promise.all([
+  railDish('momo-mix-vegetable', { src: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf' }),
+  railDish('momo-kid-goat'),
+  railDish('crackling-spinach', { src: imgSpinach, alt: 'Crackling spinach topped with yoghurt and pomegranate in a steel bowl' }),
+  railDish('popcorn-cauliflower'),
+  railDish('crispy-okra-salt-n-pepper', { src: imgOkra, alt: 'Crispy okra with chillies in a black and gold steamer pot, pink salt beside it' }),
+  railDish('hakka-chilly-paneer-lettuce-cups'),
+  railDish('malabar-monkfish-curry'),
+  railDish('bombay-chilly-prawns'),
+  railDish('snowflake-gelato-sizzling-brownie', { src: imgBrownie, alt: 'Sizzling brownie in a cast-iron skillet with vanilla ice cream and chocolate sauce', name: 'Sizzling brownie' }),
+]);
+const kitchenArt = { greaseproof: greaseproofOrange.src, stampGold: await img(stampGoldArt, 200) };
+
+// Scene 5: the menu book, straight from menus.json + dishes.json.
+const MENU_TABS: [string, string][] = [['a-la-carte', 'À la carte'], ['vegan', 'Vegan'], ['halal', 'Halal'], ['gluten-free', 'Gluten free'], ['dairy-free', 'Dairy free'], ['drinks', 'Drinks']];
+const menuBooks: MenuLite[] = await Promise.all(
+  MENU_TABS.map(async ([id, tab]) => {
+    const m = (await getEntry('menus', id))?.data;
+    if (!m) throw new Error(`menu ${id} missing from src/data/menus.json`);
+    return {
+      id,
+      tab,
+      title: m.kind === 'drinks' ? 'Drinks' : m.title,
+      allergyNote: m.allergyNote,
+      sections: await Promise.all(
+        m.sections.map(async (sec) => ({
+          title: sec.title,
+          note: sec.note,
+          items: await Promise.all(
+            sec.items.map(async ({ dish: did }) => {
+              const d = await dish(did);
+              return { name: d.name, desc: d.description, price: m.showPrices ? (priceOf(d) ?? undefined) : undefined, options: !!d.options, tags: d.tags };
+            }),
+          ),
+        })),
+      ),
+    };
+  }),
+);
+const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
 const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status }));
 ---
 <Base
@@ -101,7 +154,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <div class="wrap bar-in">
       <a class="brand" href="#top">FATT PUNDIT</a>
       <nav aria-label="Main" class="nav">
-        <a href="#kitchen">Menus</a>
+        <a href="#menu">Menus</a>
         <a href="#story">Our story</a>
         <a href="#tables">Locations</a>
         <a class="btn btn-orange btn-sm" href="#tables">Book a table</a>
@@ -123,37 +176,10 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <Voyage client:visible art={voyageArt} />
 
     <!-- 4 · The kitchen -->
-    <section id="kitchen" class="sec ink">
-      <div class="wrap stack-lg">
-        <div class="head-row reveal">
-          <div class="stack">
-            <p class="kicker gold">The kitchen</p>
-            <h2 class="h2">All meals in Tangra start with momos</h2>
-          </div>
-          <a class="btn btn-orange" href="#kitchen">Full menu</a>
-        </div>
-        <div class="steam-photo reveal">
-          <Image src={momos} alt="Steamed momos with a pot of red chutney, one held up on chopsticks" widths={[640, 1000, 1400]} sizes="(min-width: 1280px) 1200px, 94vw" />
-          <span class="steam s1" aria-hidden="true"></span><span class="steam s2" aria-hidden="true"></span><span class="steam s3" aria-hidden="true"></span>
-        </div>
-        <ul class="dishes">
-          {featured.map(({ d, img, alt, name }) => (
-            <li class="dish reveal">
-              <Image src={img} alt={alt} widths={[400, 700]} sizes="(min-width: 1100px) 290px, (min-width: 640px) 45vw, 92vw" class="dish-img" />
-              <div class="dish-body">
-                <div class="dish-top"><h3>{name ?? d.name}</h3><span class="price">{priceOf(d)}</span></div>
-                {d.description && <p class="dish-desc">{d.description}</p>}
-                {d.tags.length > 0 && <p class="tags">{d.tags.join(' · ')}</p>}
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div class="row chips reveal">
-          <span class="note gold">Menus for every table:</span>
-          {['Vegan', 'Halal', 'Gluten free', 'Dairy free', 'Pre-theatre'].map((m) => <a class="chip" href="#kitchen">{m}</a>)}
-        </div>
-      </div>
-    </section>
+    <Kitchen client:visible dishes={kitchenDishes} art={kitchenArt} />
+
+    <!-- 5 · The menu book -->
+    <MenuBook client:visible menus={menuBooks} art={menuArt} />
 
     <!-- 5 · The bar -->
     <section class="sec ink bar-sec">
@@ -259,7 +285,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
         ))}
       </div>
       <nav aria-label="Footer" class="foot-nav">
-        <a href="#kitchen">Menus</a><a href="#story">Our story</a><a href="#tables">Groups</a><a href="#tables">Gift vouchers</a>
+        <a href="#menu">Menus</a><a href="#story">Our story</a><a href="#tables">Groups</a><a href="#tables">Gift vouchers</a>
         <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">Instagram</a>
         <a href="https://www.facebook.com/fattpundit/" target="_blank" rel="noopener">Facebook</a>
         <a href="https://x.com/FattPundit" target="_blank" rel="noopener">X</a>
@@ -346,27 +372,8 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   .name-card { flex: 1 1 200px; border: 2px solid var(--color-ink); padding: 16px 18px; font-size: 15px; }
   .name-word { font-weight: 700; font-size: 26px; letter-spacing: 0.14em; }
 
-  /* Kitchen */
-  .head-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; }
-  .head-row .stack { max-width: 760px; }
-  .steam-photo { position: relative; overflow: hidden; aspect-ratio: 21 / 9; border: 2px solid var(--color-gold); }
-  .steam-photo :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .steam { position: absolute; bottom: 30%; width: 90px; height: 160px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.55), rgba(255,255,255,0)); filter: blur(10px); opacity: 0; animation: steam 5s ease-in infinite; }
-  .s1 { left: 60%; } .s2 { left: 68%; animation-delay: 1.6s; } .s3 { left: 76%; animation-delay: 3.2s; }
-  @keyframes steam { 0% { transform: translateY(40px) scale(.6); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-160px) scale(1.4); opacity: 0; } }
-  @media (max-width: 640px) { .steam-photo { aspect-ratio: 4 / 3; } }
-  .dishes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
-  .dish { display: flex; flex-direction: column; border: 1px solid var(--color-gold); }
-  .dish :global(.dish-img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
-  .dish-body { padding: 18px; display: flex; flex-direction: column; gap: 8px; }
-  .dish-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-  .dish h3, .drinks h3 { margin: 0; font-size: 17px; letter-spacing: 0.08em; }
-  .dish-desc { font-size: 15px; }
-  .tags { font-family: var(--font-label); font-weight: 700; color: var(--color-gold); font-size: 13px; letter-spacing: 0.2em; }
+  .drinks h3 { margin: 0; font-size: 17px; letter-spacing: 0.08em; }
   .price { font-weight: 700; white-space: nowrap; }
-  .chips { gap: 10px; }
-  .chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 2px solid var(--color-sand); color: var(--color-sand); text-decoration: none; font-size: 15px; text-transform: uppercase; letter-spacing: 0.12em; }
-  .chip:hover { background: var(--color-sand); color: var(--color-ink); }
 
   /* Bar */
   .bar-sec { padding-top: 0; }

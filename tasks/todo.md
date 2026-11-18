@@ -48,8 +48,20 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 - [ ] Not checked: real phones, Safari
 - [ ] Ask client: is the guidelines map art cleared for web use at this size? (same source as the menus)
 
-## Motion plan · Day 3: kitchen + menu book (next)
-- [ ] Greaseproof tiger pattern (p.42), à la carte page visuals (p.25/28), page-flip menu
+## Motion plan · Day 3: kitchen + menu book ✅ done 18 Nov
+- [x] Greaseproof tiger paper (guidelines p.42) rebuilt as a seamless tile from the brand tiger heads + typewriter "FATT PUNDIT" (orange + gold): src/assets/images/brand/greaseproof-*.png
+- [x] Ink Background (KokonutUI) restyled: "THE KITCHEN" in pale ink on the dark pass, wraps on phones, steam plumes rise by themselves and curl through the letters; stir with cursor/finger; still frame in calm mode
+- [x] Momentum Rail (KokonutUI) restyled: perforated postage-stamp cards on the greaseproof sheet; 4 real photos + 5 signature dishes as kitchen order tickets (no fake photos); fling/arrows/keys
+- [x] Page Flip (KokonutUI) restyled as the printed menu (p.26–27): ink cover + orange stamp, framed pages with gold/orange stamps, "NAME | £price", map back page; bookmarks: À la carte, Vegan, Halal, Gluten free, Dairy free, Drinks
+- [x] Pagination measured from real block heights (hidden 1000px page, cqw units), so pages fill correctly at any width
+- [x] Prices + tags come from dishes.json via menus.json (plan's done-test) — nothing typed in components
+- [x] Checked: desktop + 390 px (single-page book, two-line headline), calm mode, fling test (lands on card 3), demo from sub-path (0 errors, 0 404s, 0 broken images, no sideways scroll)
+- [x] JS: whole page 187 KB gz (budget 300); Kitchen 10 KB + MenuBook 13 KB load on scroll only
+- [ ] Not checked: real phones, Safari, mid-range Android frame rate with steam running
+- [ ] Ask client: photos of the signature dishes (kid goat momo, popcorn cauliflower, paneer cups, monkfish, prawns) to replace the order tickets
+
+## Motion plan · Day 4: bar + room (next)
+- [ ] Spotlight bar (cursor / auto-sweep on phones), contact sheet + lightbox; bill holder (p.38–39) + aprons (p.40–41)
 
 ## Day 2: journey storyboard (next)
 - [ ] docs/journey-storyboard.md: 7 scenes, copy ≤ 25 words each, asset per scene, motion note, reduced-motion still
