@@ -503,7 +503,9 @@ export default function RainGlassBackground({
       if (width < 2 || height < 2) {
         return;
       }
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      // Phones: 1x is plenty behind fogged glass and halves the fill work.
+      const coarse = window.matchMedia("(pointer: coarse)").matches;
+      const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1 : 1.5);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       pane.resize(canvas.width, canvas.height, width, height);
@@ -526,12 +528,24 @@ export default function RainGlassBackground({
       render();
     };
 
+    let slowAvg = 16;
+    let tick = 0;
+    let skip = false;
     const frame = (now: number) => {
       raf = 0;
       if (!visible) {
         return;
       }
       const dt = Math.min((now - (last || now - 16)) / 1000, 1 / 20);
+      // Weak phones: if frames keep running long, draw every other frame
+      // so scrolling the page stays smooth. Recovers when frames are quick.
+      const gap = tick ? Math.min(now - tick, 100) : 16;
+      tick = now;
+      slowAvg = slowAvg * 0.9 + gap * 0.1;
+      if (slowAvg > 26 && (skip = !skip)) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       last = now;
       // New drops land; now and then one lands on another and gets heavy.
       spawn += dt * (4 + rain * 22);
@@ -559,6 +573,7 @@ export default function RainGlassBackground({
       raf = requestAnimationFrame(frame);
     };
     const start = () => {
+      if (!woken) return;
       if (!raf && visible && !reduceMotion) {
         last = 0;
         raf = requestAnimationFrame(frame);
@@ -568,7 +583,19 @@ export default function RainGlassBackground({
     readFog();
     build();
     canvas.style.opacity = "1";
-    start();
+    // Let the page finish painting and hydrating before the rain starts
+    // running every frame; the first picture is already drawn by build().
+    let woken = false;
+    const wake = () => {
+      if (woken) return;
+      woken = true;
+      start();
+    };
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(wake, { timeout: 2500 });
+    } else {
+      window.setTimeout(wake, 1200);
+    }
 
     const image = new Image();
     image.crossOrigin = "anonymous";

@@ -101,3 +101,12 @@ writeFileSync(
   ) + '\n',
 );
 console.log(`world-land.svg ${(svg.length / 1024).toFixed(0)} KB · points`, points);
+
+// The site shows the sea as a picture (an SVG this detailed re-rasterises on
+// every camera zoom). Master PNG at 3200 px; Astro makes the AVIF from it.
+{
+  const { default: sharp } = await import('sharp');
+  const out = new URL('../src/assets/images/brand/voyage-sea.png', import.meta.url);
+  await sharp(Buffer.from(sea), { density: (72 * 3200) / SEA.w }).resize(3200).png({ compressionLevel: 9 }).toFile(out.pathname);
+  console.log('voyage-sea.png written');
+}

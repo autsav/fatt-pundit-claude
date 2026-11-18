@@ -10,7 +10,8 @@
     "check": "astro check",
     "validate:data": "node scripts/validate-data.mjs",
     "prebuild": "node scripts/validate-data.mjs && node scripts/test-hours.ts",
-    "test": "node scripts/test-hours.ts"
+    "test": "node scripts/test-hours.ts",
+    "perf:budget": "node scripts/perf-budget.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.9",

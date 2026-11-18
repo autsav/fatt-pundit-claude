@@ -25,5 +25,9 @@ const { src, poster, label, class: className } = Astro.props;
       else v.pause();
     }
   }, { threshold: 0.25 });
-  if (!calm) for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-loop]')) io.observe(v);
+  // Loops are garnish: start watching only once the page has loaded and the
+  // browser is idle, so they never compete with the first paint.
+  const watch = () => { for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-loop]')) io.observe(v); };
+  const later = () => ('requestIdleCallback' in window ? requestIdleCallback(watch, { timeout: 3000 }) : setTimeout(watch, 1500));
+  if (!calm) { if (document.readyState === 'complete') later(); else addEventListener('load', later, { once: true }); }
 </script>

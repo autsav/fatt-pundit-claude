@@ -7,6 +7,7 @@
  */
 import type { GetStaticPaths, ImageMetadata } from 'astro';
 import { getImage, Image } from 'astro:assets';
+import { stampSrc } from '../../lib/stamp';
 import Base from '../../layouts/Base.astro';
 import SiteHeader from '../../components/site/SiteHeader.astro';
 import SiteFooter from '../../components/site/SiteFooter.astro';
@@ -60,12 +61,15 @@ const ALTS: Record<string, string> = {
 };
 const heroImg = p.hero && photo(p.hero) ? await getImage({ src: photo(p.hero)!, width: 2000, format: 'webp', quality: 80 }) : null;
 const heroSet = heroImg ? (await Promise.all([800, 1200, 1600, 2400].map(async (w) => `${(await getImage({ src: photo(p.hero!)!, width: w, format: 'webp', quality: 80 })).src} ${w}w`))).join(', ') : undefined;
+// Video poster = the 800w hero, the same file a phone picks from the srcset,
+// so the poster never downloads a second, bigger copy of the photo.
+const heroPoster = heroImg ? (await getImage({ src: photo(p.hero!)!, width: 800, format: 'webp', quality: 80 })).src : undefined;
 const gallery = p.gallery.map((k) => ({ key: k, src: photo(k)!, alt: ALTS[k] ?? '' })).filter((g) => g.src);
 
 const LEAD = { tiger: 'var(--color-tiger)', gold: 'var(--color-gold)', slate: 'var(--color-slate)' }[p.lead];
 const markSrc = b.mark === 'tiger-indian' ? stampLeft : b.mark === 'tiger-chinese' ? stampRight : null;
 // Brand rule: on dark, the stamp is printed in colour (negative logo), so it is drawn as a mask.
-const mark = markSrc ? (await getImage({ src: markSrc, width: 240, format: 'png' })).src : null;
+const mark = markSrc ? await stampSrc(markSrc, 240) : null;
 const img = async (src: ImageMetadata, width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 
 // Beat 3: the dish this room is known for, or (Dubai) what is coming.
@@ -90,8 +94,8 @@ const wallOff = (await getImage({ src: lightsOffStill, width: 1280, format: 'web
 const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'webp', quality: 80 })).src;
 // Bulb positions (% of each photo), measured from the frames.
 const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 0.6 }, { x: 65.9, y: 13.3, size: 0.6 }];
-const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
-const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await img(stampGoldArt, 260), compass: await img(compassArt, 240) };
+const menuArt = { frame: frameArt.src, stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
+const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await stampSrc(stampGoldArt, 260), compass: await img(compassArt, 240) };
 
 const others = branches.filter((o) => o.id !== b.id);
 const words = open ? [b.shortName] : [b.shortName, 'The Hangout', 'Boarding soon'];
@@ -119,6 +123,7 @@ const title = open ? `Fatt Pundit ${b.shortName} · Indo-Chinese Hakka restauran
 const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : 'Join the list for opening news.'}`;
 ---
 <Base title={title} description={description} noindex>
+  {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="100vw" fetchpriority="high" />}
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   <a class="skip" href="#visit">Skip to opening hours and directions</a>
   <SiteHeader branches={branches} current={b} />
@@ -132,7 +137,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         {heroImg ? (
           <>
             <img class="arrival-bg" src={heroImg.src} srcset={heroSet} sizes="100vw" alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
-            {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroImg.src} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />}
+            {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroPoster!} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />}
           </>
         ) : b.id === 'soho' ? (
           <div class="arrival-bg art-soho" aria-hidden="true">
@@ -147,7 +152,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         {mark && <span class="mark-badge" aria-hidden="true"><span class="arrival-mark" style={`-webkit-mask-image: url(${mark}); mask-image: url(${mark});`}></span></span>}
         <h1 id="branch-title" class="sr-only">Fatt Pundit {b.shortName}</h1>
         <p class="arrival-brand" aria-hidden="true">Fatt Pundit</p>
-        <div aria-hidden="true" class="board-slot"><BranchArrival client:load words={words} branch={pill} /></div>
+        <div aria-hidden="true" class="board-slot"><BranchArrival client:idle words={words} branch={pill} /></div>
         <p class="arrival-addr">{fullAddress(b)}</p>
         <div class="row arrival-actions">
           {open && b.booking ? (
@@ -205,7 +210,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
               <p class="sig-no">{signature.label === 'only-here' ? 'Only here' : 'Born here'}</p>
               <p class="sig-name">{signature.d.name}</p>
               {priceOf(signature.d) && <p class="sig-price">{priceOf(signature.d)}</p>}
-              <img src={menuArt.stampGold} alt="" class="sig-stamp" />
+              <img src={menuArt.stampGold} alt="" class="sig-stamp" width="508" height="564" loading="lazy" decoding="async" />
             </div>
             <div class="stack">
               <p class="kicker lead-text">{signature.label === 'only-here' ? `Only at ${b.shortName}` : `Born at ${b.shortName}`}</p>

@@ -2,18 +2,21 @@
 // Scene 2: the doors. Pinned while you scroll: the two tiger doors swing
 // open on heavy hinges, the camera pushes through, and warm light floods in
 // until the screen turns to sand (the next scene's paper).
-import { getImage, Image } from 'astro:assets';
+import { Image } from 'astro:assets';
+import { stampSrc } from '../../lib/stamp';
 import tigerLeft from '../../assets/images/brand/tiger-head-left.png';
 import tigerRight from '../../assets/images/brand/tiger-head-right.png';
 import room from '../../assets/images/covent-garden/gallery-04.jpg';
 
-const tL = await getImage({ src: tigerLeft, width: 600, format: 'avif', quality: 60 });
-const tR = await getImage({ src: tigerRight, width: 600, format: 'avif', quality: 60 });
+// Used only as masks (alpha), so a palette PNG is all they need.
+const tL = { src: await stampSrc(tigerLeft, 480) };
+const tR = { src: await stampSrc(tigerRight, 480) };
 ---
 <section class="doors" data-doors aria-label="Step inside">
   <div class="stage">
     <div class="camera" data-camera>
       <Image src={room} alt="" class="room" widths={[800, 1400, 2000]} sizes="100vw" data-room />
+      <div class="dim" data-dim></div>
       <div class="glow" data-glow></div>
       <div class="frame">
         <div class="leaf left" data-leaf="l">
@@ -21,12 +24,14 @@ const tR = await getImage({ src: tigerRight, width: 600, format: 'avif', quality
             <span class="tiger" style={`-webkit-mask-image:url(${tL.src});mask-image:url(${tL.src})`}></span>
             <span class="handle"></span>
           </div>
+          <span class="shade" data-shade></span>
         </div>
         <div class="leaf right" data-leaf="r">
           <div class="panel">
             <span class="tiger" style={`-webkit-mask-image:url(${tR.src});mask-image:url(${tR.src})`}></span>
             <span class="handle"></span>
           </div>
+          <span class="shade" data-shade></span>
         </div>
       </div>
     </div>
@@ -37,29 +42,35 @@ const tR = await getImage({ src: tigerRight, width: 600, format: 'avif', quality
 
 <style>
   .doors { position: relative; height: 280vh; background: var(--color-ink); }
+  /* Soft drop shadow drawn once as a still gradient behind the frame (a 120px
+     blur box-shadow inside the scaling camera cost a repaint per frame). */
+  .stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(50% 45% at 50% 52%, rgb(0 0 0 / 0.45), transparent 75%); pointer-events: none; }
   .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; place-items: center; }
-  .camera { --p: 0; position: relative; width: min(92vw, calc(100svh * 0.86)); aspect-ratio: 5 / 6; transform: scale(calc(1 + var(--push, 0) * 1.6)); transform-origin: 50% 46%; will-change: transform; }
-  .room { position: absolute; inset: 4.5%; width: 91%; height: 91%; object-fit: cover; filter: brightness(var(--bright, 0.35)) saturate(1.1); }
-  .glow { position: absolute; inset: 4.5%; background: radial-gradient(60% 55% at 50% 50%, rgb(203 160 82 / 0.55), transparent 70%); opacity: var(--glow, 0); mix-blend-mode: screen; }
-  .frame { position: absolute; inset: 0; border: clamp(10px, 1.6vw, 18px) solid var(--color-gold); box-shadow: 0 40px 120px rgb(0 0 0 / 0.6), inset 0 0 0 3px var(--color-ink); perspective: 1600px; display: flex; padding: 3.2%; box-sizing: border-box; }
+  .camera { position: relative; width: min(92vw, calc(100svh * 0.86)); aspect-ratio: 5 / 6; transform-origin: 50% 46%; will-change: transform; }
+  .room { position: absolute; inset: 4.5%; width: 91%; height: 91%; object-fit: cover; }
+  /* Darkness is a layer that fades (opacity = compositor only); a brightness
+     filter here forced a full repaint of the photo every scroll frame. */
+  .dim { position: absolute; inset: 4.5%; background: #000; opacity: 0.65; will-change: opacity; }
+  .glow { position: absolute; inset: 4.5%; background: radial-gradient(60% 55% at 50% 50%, rgb(203 160 82 / 0.42), transparent 70%); opacity: 0; will-change: opacity; }
+  .frame { position: absolute; inset: 0; border: clamp(10px, 1.6vw, 18px) solid var(--color-gold); box-shadow: inset 0 0 0 3px var(--color-ink); perspective: 1600px; display: flex; padding: 3.2%; box-sizing: border-box; }
   .leaf { position: relative; flex: 1 1 50%; transform-style: preserve-3d; will-change: transform; }
-  .leaf.left { transform-origin: left center; transform: rotateY(calc(var(--open, 0) * -112deg)); }
-  .leaf.right { transform-origin: right center; transform: rotateY(calc(var(--open, 0) * 112deg)); }
+  .leaf.left { transform-origin: left center; }
+  .leaf.right { transform-origin: right center; }
   .panel { position: absolute; inset: 0; background: var(--color-sand); border: 3px solid var(--color-ink); box-shadow: inset 0 0 0 10px var(--color-sand), inset 0 0 0 12px rgb(44 41 37 / 0.35); display: grid; place-items: center; backface-visibility: hidden; }
   .tiger { width: 78%; aspect-ratio: 3 / 4; background: var(--color-ink); -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
   .handle { position: absolute; top: 55%; width: 10px; height: 54px; background: var(--color-gold); box-shadow: 0 2px 0 rgb(0 0 0 / 0.3); }
   .left .handle { right: 14px; } .right .handle { left: 14px; }
   /* Shade on the opening edge sells the weight of the door. */
-  .leaf::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 40%, rgb(0 0 0 / 0.55)); opacity: calc(var(--open, 0) * 1.4); }
-  .right::after { background: linear-gradient(270deg, transparent 40%, rgb(0 0 0 / 0.55)); }
-  .come-in { position: absolute; bottom: 7svh; margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: clamp(18px, 2vw, 24px); opacity: calc(1 - var(--open, 0) * 4); }
-  .flood { position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: var(--flood, 0); pointer-events: none; }
+  .shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 40%, rgb(0 0 0 / 0.55)); opacity: 0; will-change: opacity; }
+  .right .shade { background: linear-gradient(270deg, transparent 40%, rgb(0 0 0 / 0.55)); }
+  .come-in { position: absolute; bottom: 7svh; margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: clamp(18px, 2vw, 24px); will-change: opacity; }
+  .flood { position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: 0; pointer-events: none; will-change: opacity; }
 
   @media (max-width: 700px) { .doors { height: 220vh; } }
   @media (prefers-reduced-motion: reduce) {
     .doors { height: auto; }
     .stage { position: relative; height: 80svh; }
-    .camera { --open: 0.55; --bright: 1; }
+    .left { transform: rotateY(-62deg); } .right { transform: rotateY(62deg); } .dim { opacity: 0; }
   }
 </style>
 
@@ -76,17 +87,45 @@ const tR = await getImage({ src: tigerRight, width: 600, format: 'avif', quality
   // Heavy door: slow start, then swings, then settles.
   const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
+  // Decode the room photo before it is needed, so its first draw doesn't
+  // land in the middle of a scroll frame.
+  const room = section?.querySelector<HTMLImageElement>('[data-room]');
+  if (section && room) {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      room.loading = 'eager';
+      room.decode().catch(() => {});
+    }, { rootMargin: '150% 0px' });
+    io.observe(section);
+  }
+
   if (section && camera && stage && !calm) {
+    // Write transform/opacity straight onto each element. Custom properties on
+    // the camera made every child recalc style each frame.
+    const q = <T extends Element>(sel: string) => [...section.querySelectorAll<T>(sel)];
+    const [leafL, leafR] = q<HTMLElement>('[data-leaf]');
+    const shades = q<HTMLElement>('[data-shade]');
+    const dim = section.querySelector<HTMLElement>('[data-dim]')!;
+    const glow = section.querySelector<HTMLElement>('[data-glow]')!;
+    const comein = section.querySelector<HTMLElement>('[data-comein]')!;
+    const flood = section.querySelector<HTMLElement>('[data-flood]')!;
+    let last = -1;
     scroll(
       (p: number) => {
+        if (Math.abs(p - last) < 0.0005) return;
+        last = p;
         const open = ease(range(p, 0.04, 0.55));
         const push = ease(range(p, 0.3, 0.92));
-        camera.style.setProperty('--open', open.toFixed(4));
-        camera.style.setProperty('--push', push.toFixed(4));
-        camera.style.setProperty('--bright', (0.35 + range(p, 0.08, 0.6) * 0.65).toFixed(3));
-        camera.style.setProperty('--glow', range(p, 0.2, 0.7).toFixed(3));
-        stage.style.setProperty('--open', open.toFixed(4));
-        stage.style.setProperty('--flood', ease(range(p, 0.72, 0.98)).toFixed(3));
+        camera.style.transform = `scale(${(1 + push * 1.6).toFixed(4)})`;
+        leafL.style.transform = `rotateY(${(open * -112).toFixed(2)}deg)`;
+        leafR.style.transform = `rotateY(${(open * 112).toFixed(2)}deg)`;
+        const shade = Math.min(1, open * 1.4).toFixed(3);
+        for (const s of shades) s.style.opacity = shade;
+        dim.style.opacity = (0.65 * (1 - range(p, 0.08, 0.6))).toFixed(3);
+        glow.style.opacity = range(p, 0.2, 0.7).toFixed(3);
+        comein.style.opacity = Math.max(0, 1 - open * 4).toFixed(3);
+        flood.style.opacity = ease(range(p, 0.72, 0.98)).toFixed(3);
       },
       { target: section, offset: ['start start', 'end end'] },
     );

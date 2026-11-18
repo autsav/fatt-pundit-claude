@@ -144,13 +144,13 @@ const Allergy = ({ text }: { text: string }) => <p className="m-0 pt-[1cqw] text
 function MenuHeader({ menu, art }: { menu: MenuLite; art: Art }) {
   return (
     <header className="flex items-center justify-between gap-[2cqw] pb-[4cqw] text-center">
-      <img src={art.stampGold} alt="" className="aspect-[0.86] w-[15cqw] -rotate-6" draggable={false} />
+      <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw] -rotate-6" draggable={false} />
       <div>
         <p className="m-0 text-[6.6cqw] font-bold uppercase leading-none tracking-[0.1em]">Fatt Pundit</p>
         <p className="m-0 mt-[1.6cqw] font-note text-[4cqw] text-tiger">{menu.title}</p>
         <p className="m-0 mt-[1cqw] font-label text-[2.6cqw] font-bold uppercase tracking-[0.22em]">Soho · Covent Garden</p>
       </div>
-      <img src={art.stampOrange} alt="" className="aspect-[0.86] w-[15cqw] rotate-6" draggable={false} />
+      <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw] rotate-6" draggable={false} />
     </header>
   );
 }
@@ -225,7 +225,7 @@ function Cover({ menu, art, place }: { menu: MenuLite; art: Art; place?: MenuPla
   return (
     <div className="relative flex size-full flex-col items-center justify-center gap-[5cqw] bg-ink px-[10cqw] text-center text-sand">
       <div className="pointer-events-none absolute inset-[3cqw] border-[0.5cqw] border-gold/60" />
-      <img src={art.stampOrange} alt="" className="w-[46cqw]" draggable={false} />
+      <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[46cqw]" draggable={false} />
       <div>
         <p className="m-0 text-[8cqw] font-bold uppercase leading-none tracking-[0.12em]">Fatt Pundit</p>
         <p className="m-0 mt-[3cqw] font-note text-[5.4cqw] text-gold">{menu.title}</p>

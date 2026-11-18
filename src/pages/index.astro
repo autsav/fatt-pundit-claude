@@ -1,6 +1,7 @@
 ---
 // Homepage: the "Through the door" journey (plan: Creative concept, scenes 1–7).
 import { getImage, Image } from 'astro:assets';
+import { stampSrc } from '../lib/stamp';
 import Arrival from '../components/scenes/Arrival.astro';
 import Doors from '../components/scenes/Doors.astro';
 import GateBoard from '../components/scenes/GateBoard.astro';
@@ -20,7 +21,7 @@ import tigerHead from '../assets/images/brand/tiger-head-left.png';
 import stampLeft from '../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../assets/images/brand/logo-stamp-distressed-right.png';
 import map from '../assets/images/brand/map.webp';
-import voyageSea from '../assets/images/brand/voyage-sea.svg';
+import voyageSea from '../assets/images/brand/voyage-sea.png';
 import shipArt from '../assets/images/brand/ship.png';
 import frameArt from '../assets/images/brand/frame.png';
 import compassArt from '../assets/images/brand/compass.png';
@@ -58,7 +59,7 @@ const barPrints: [{ src: string; alt: string }, { src: string; alt: string }] = 
   { src: await webp(barCocktail, 700), alt: 'A deep red fruit cooler with mint and citrus' },
 ];
 const barDrinks = drinks.map((d, i) => ({ id: DRINK_IDS[i], name: d.name, description: d.description, price: priceOf(d) }));
-const barTiger = await webp(tigerHead, 500);
+const barTiger = await stampSrc(tigerHead, 400);
 // Scene 7: the room as a contact sheet. Thumbs for the sheet, large for the lightbox.
 const ROOM: [ImageMetadata, string][] = [
   [g5, 'A tiger in a turban painted on the brick wall above a dining table'],
@@ -77,11 +78,13 @@ const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) =>
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
   map: await img(map, 1295),
-  sea: voyageSea.src,
+  // A picture, not the SVG: the browser re-rasterised the vector chart (a
+  // 16-megapixel draw) whenever the camera zoomed, stalling scroll frames.
+  sea: (await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 })).src,
   ship: await img(shipArt, 400),
   compass: await img(compassArt, 240),
-  stampGold: await img(stampGoldArt, 320),
-  stampOrange: await img(stampOrangeArt, 340),
+  stampGold: await stampSrc(stampGoldArt, 280),
+  stampOrange: await stampSrc(stampOrangeArt, 280),
   mountainA: await img(mountainAArt, 300),
   mountainsB: await img(mountainsBArt, 520),
   mountainsC: await img(mountainsCArt, 260),
@@ -114,7 +117,7 @@ const kitchenDishes = await Promise.all([
   railDish('bombay-chilly-prawns'),
   railDish('snowflake-gelato-sizzling-brownie', { src: imgBrownie, alt: 'Sizzling brownie in a cast-iron skillet with vanilla ice cream and chocolate sauce', name: 'Sizzling brownie' }),
 ]);
-const kitchenArt = { greaseproof: greaseproofOrange.src, stampGold: await img(stampGoldArt, 200) };
+const kitchenArt = { greaseproof: greaseproofOrange.src, stampGold: await stampSrc(stampGoldArt, 160) };
 
 // Scene 5: the menu book, straight from menus.json + dishes.json.
 // Menu by location: every menu any branch serves, and each branch's own list.
@@ -130,7 +133,7 @@ const menuPlaces = await Promise.all(
     soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: `/${b.id}/#waitlist` },
   })),
 );
-const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
+const menuArt = { frame: frameArt.src, stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
 ---
 <Base
   title="Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai"
@@ -151,7 +154,7 @@ const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), 
     <Doors />
 
     <!-- 3 · The voyage -->
-    <Voyage client:visible art={voyageArt} />
+    <Voyage client:idle art={voyageArt} />
 
     <!-- 4 · The kitchen -->
     <Kitchen client:visible dishes={kitchenDishes} art={kitchenArt} />

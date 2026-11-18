@@ -201,3 +201,7 @@
 .menu-tag-hole { width: 10px; height: 10px; border-radius: 50%; border: 2px solid currentColor; }
 .menu-soon { padding: clamp(22px, 3vw, 32px); background: #f6efe4; border: 2px solid var(--color-ink); box-shadow: 0 18px 40px rgb(44 41 37 / 0.2); }
 @media (max-width: 480px) { .menu-tag { gap: 8px; padding: 0 12px 0 14px; font-size: 12.5px; letter-spacing: 0.1em; clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); } }
+
+/* Below-the-fold sections: the browser skips their layout and paint until
+   they come near the screen. `auto` remembers the real size once seen. */
+#room, #tables, footer.foot { content-visibility: auto; contain-intrinsic-size: auto 900px; }

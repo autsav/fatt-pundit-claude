@@ -22,13 +22,18 @@ export default function VoyageToDubai({ art }: Props) {
   const tlRef = useRef<{ seek: (t: number) => unknown } | null>(null);
   const [calm, setCalm] = useState(false);
   const [landed, setLanded] = useState(false);
+  const landedRef = useRef(false);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
 
   const apply = (p: number) => {
     // 0–0.08 hold at London, 0.08–0.86 sail, then the stamp.
     const t = Math.min(1, Math.max(0, (p - 0.08) / 0.78));
     tlRef.current?.seek(t * 1000);
-    setLanded(p > 0.88);
+    const isIn = p > 0.88;
+    if (isIn !== landedRef.current) {
+      landedRef.current = isIn;
+      setLanded(isIn);
+    }
   };
 
   useEffect(() => {
@@ -67,9 +72,13 @@ export default function VoyageToDubai({ art }: Props) {
         <p className="m-0 text-center font-note text-[20px] text-tiger">The voyage continues</p>
         <h2 className="m-0 mt-1 text-center text-[clamp(26px,3.6vw,46px)] uppercase leading-none tracking-[0.06em] text-ink">London to Dubai</h2>
         <figure className="voyage-paper relative mx-auto mb-0 mt-6 w-full max-w-[min(1000px,calc((100svh-260px)*1.36))] border-2 border-ink bg-white">
-          <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className="block w-full" role="img" aria-label="Map: the route from London by sea through the Mediterranean, Suez and the Red Sea to Dubai">
+          {/* The map itself never changes, so it sits on its own still layer;
+              only the thin route and the ship redraw while you scroll. */}
+          <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className="absolute inset-0 block h-full w-full [transform:translateZ(0)]" aria-hidden="true">
             <image href={art.world} x="0" y="0" width={world.w} height={world.h} />
             <image href={art.compass} x={VIEW.x + 18} y={VIEW.y + VIEW.h - 150} width="130" height="130" opacity="0.9" />
+          </svg>
+          <svg viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} className="relative block w-full" role="img" aria-label="Map: the route from London by sea through the Mediterranean, Suez and the Red Sea to Dubai">
             <path ref={pathRef} d={world.toDubai} fill="none" stroke="#cba052" strokeWidth="6" strokeLinecap="round" />
             {[['London', L, -18], ['Dubai', D, 46]].map(([label, at, dy]) => (
               <g key={label as string}>

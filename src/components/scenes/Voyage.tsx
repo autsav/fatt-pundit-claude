@@ -61,6 +61,10 @@ const SEGS: Seg[] = [
 ];
 /** Map units that fit the short side of the stage when the camera is in close. */
 const CLOSE = 360;
+// The sea picture is 3200 px wide. Lay it out no bigger than that in device
+// pixels; the camera's scale() makes up the rest (slightly soft at the
+// closest zoom, but drawn once instead of every frame).
+const seaScale = (k: number) => Math.min(k, 3200 / (SEA.w * (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1)));
 const SHIP_PX = 64;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -93,10 +97,11 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     const h = st.clientHeight;
     if (still) {
       const fit = Math.min(w, h);
-      layout.current = { w, h, fx: w / 2, fy: h / 2, fit, k: fit / CLOSE };
+      const k = seaScale(fit / CLOSE);
+      layout.current = { w, h, fx: w / 2, fy: h / 2, fit, k };
       if (seaRef.current) {
-        seaRef.current.style.width = `${SEA.w * (fit / CLOSE)}px`;
-        seaRef.current.style.height = `${SEA.h * (fit / CLOSE)}px`;
+        seaRef.current.style.width = `${SEA.w * k}px`;
+        seaRef.current.style.height = `${SEA.h * k}px`;
       }
       return;
     }
@@ -105,7 +110,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     const fx = desk ? card + (w - card) / 2 : w / 2;
     const fy = desk ? h * 0.56 : h * 0.33;
     const fit = desk ? Math.min(w - card, h) : Math.min(w, h * 0.56);
-    const k = fit / CLOSE;
+    const k = seaScale(fit / CLOSE);
     layout.current = { w, h, fx, fy, fit, k };
     if (seaRef.current) {
       seaRef.current.style.width = `${SEA.w * k}px`;
@@ -170,6 +175,11 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       el.style.strokeDasharray = `${f * lens.current[i]} ${lens.current[i] + 1}`;
     });
   };
+
+  useEffect(() => {
+    // Decode the chart early so the first close-up isn't a stalled frame.
+    seaRef.current?.decode?.().catch(() => {});
+  }, []);
 
   useEffect(() => {
     lens.current = legRefs.current.map((el) => el?.getTotalLength() ?? 0);

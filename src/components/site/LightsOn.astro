@@ -19,7 +19,7 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
 ---
 <figure class="lights" data-lights data-glow="off" style={`--ratio: ${ratio}; --dusk: 0;`}>
   <div class="frame">
-    <video class="shot" muted playsinline preload="metadata" poster={off} aria-label={label} disablepictureinpicture>
+    <video class="shot" muted playsinline preload="none" data-poster={off} aria-label={label} disablepictureinpicture>
       <source src={src} type="video/mp4" />
     </video>
     <img class="shot lit" src={lit} alt="" loading="lazy" decoding="async" />
@@ -41,6 +41,15 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
     const frame = fig.querySelector<HTMLElement>('.frame')!;
     const cue = fig.querySelector<HTMLElement>('.cue')!;
     const pull = fig.querySelector<HTMLButtonElement>('.pull')!;
+    // The poster (and the video's first bytes) load only as the guest nears
+    // the frame, so they never compete with the page's hero photo.
+    const near = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      near.disconnect();
+      video.poster = video.dataset.poster ?? '';
+      video.preload = 'metadata';
+    }, { rootMargin: '1200px 0px' });
+    near.observe(fig);
     let state: 'off' | 'on' | 'lit' = 'off';
     const set = (s: typeof state) => {
       state = s;

@@ -8,6 +8,9 @@ const at = './src/assets/fonts/american-typewriter';
 export default defineConfig({
   site: 'https://www.fattpundit.co.uk',
   trailingSlash: 'always',
+  // 'auto' (inline only tiny sheets): measured 18 Nov, inlining all 88 KB of CSS
+  // made first paint slower (1.2 s -> 2.2 s on home) than three cached files.
+  build: { inlineStylesheets: 'auto' },
   integrations: [react()],
   vite: { plugins: [tailwindcss()] },
   fonts: [

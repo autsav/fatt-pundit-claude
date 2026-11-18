@@ -37,3 +37,11 @@ Review at the start of every session. Add a line after any correction.
 
 - Links inside a React island break in the sub-path demo (the exporter only rewrites static HTML). Put link-heavy UI in an Astro component and slot it into the island; use document-level click delegation, since the island can re-mount slotted HTML (listeners on the old nodes are lost).
 - Astro's <astro-slot> wrapper is display:block inside islands: it shrinks to content in a flex parent. Size it from the parent ([&>*]:w-full).
+
+- Scroll stutter in headless came from raster, not JS: an SVG <img> under a zooming camera re-rasterises per zoom (1.4 s raster). Ship detailed vector art as a picture when it's scaled by transform; cap layer size in device px.
+- Animate opacity of a dark layer, never `filter: brightness`, inside scroll scenes. Write transform/opacity straight onto elements instead of custom properties on a parent (whole-subtree style recalc per frame).
+- An intro that starts at opacity 0 makes it the LCP element and drags LCP to the end of the intro. Paint it finished; animate a press, not an appearance.
+- Lighthouse simulated LCP counts high-priority JS before paint: `client:load` islands in the hero cost ~1 s of lab LCP; `client:idle` fixed it. Check `observedLargestContentfulPaint` before chasing lab LCP.
+- Inlining all CSS (88 KB) made FCP slower than three cached files. Measure before keeping a "best practice".
+- Distressed one-colour stamps: palette PNG (sharp png quality<100) is 3× smaller than WebP/AVIF; the noise is what costs bytes.
+- To find what janks: record scrollY of slow frames, then trace — `RasterTask` vs `FunctionCall` tells raster from script.

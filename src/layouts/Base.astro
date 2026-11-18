@@ -40,9 +40,17 @@ const icon = await getImage({ src: stamp, width: 64, format: 'png' });
       // Page-to-page morphs: when the browser skips one (fast double click, calm mode), stay quiet.
       for (const t of ['pageswap', 'pagereveal']) addEventListener(t, (e) => { const v = e.viewTransition; if (v) for (const k of ['ready', 'finished', 'updateCallbackDone']) v[k]?.catch(() => {}); });
     </script>
-    <Font cssVariable="--font-typewriter" preload />
+    <!-- Preload only the bold cut: it sets every title on the first screen. -->
+    <Font cssVariable="--font-typewriter" preload={[{ weight: 700 }]} />
     <Font cssVariable="--font-typewriter-condensed" />
     <Font cssVariable="--font-lora" />
+    <slot name="head" />
+    <!-- Instant page changes (Chrome/Edge): a branch page is rendered in the
+         background once the guest hovers its link (desktop) or it sits on
+         screen (phones). Other browsers ignore this and load normally. -->
+    <script type="speculationrules" is:inline>
+      {"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[target=_blank], [download], [href*='#'], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}
+    </script>
   </head>
   <body>
     <slot />

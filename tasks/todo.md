@@ -121,3 +121,35 @@ See plan doc.
 - [x] Departure-board chooser in the hero (W1 Soho / WC2 Covent Garden / DXB Dubai), each row links to the branch page, live status on the guest's clock, stamp on tap
 - [x] Replaces the cycling flip board, Book/See menus buttons and open pill; "Or see the menus first" link kept
 - [x] Verified phone/desktop/calm + exported demo sub-path: board on first screen, rows land on branch page at top. Published v1795018269-a46d
+
+## £10k upgrade (plan doc: "Fatt Pundit — £10k audit + upgrade plan") — started 18 Nov
+Baseline (mobile Lighthouse): home 47, CG 53, Soho 94, Dubai 99. Home scroll drops 14% frames (doors, kitchen).
+Decisions taken from the doc's "my pick" column (user said go without answering): deep-link to existing booking URLs, Google Sheet for specials (CSV URL env, falls back to JSON), Plausible (env domain, off until set), ideas = Tonight's board + Branch clocks + Dish passport, English only, Cloudflare Pages headers.
+
+### Phase A — Butter (gate: home + CG mobile Perf 90+, dropped frames <1%)
+- [x] A1 Doors: filter → fading dark layer
+- [x] A2 Kitchen: no moving drop-shadow filter; only in-view video plays
+- [x] A3 Rain hero: start after idle, dpr 1 on phones
+- [x] A4 First screen paints finished (no hidden LCP); CG hero preload + fetchpriority
+- [x] A5 Images at display size (stamps, logos), AVIF, sizes
+- [x] A6 CSS inline, fonts preload one, content-visibility on lower sections
+- [x] A7 Speculation rules for branch pages
+- [x] A8 Budget script (lighthouse + fps) — fails on breach (`npm run perf:budget`)
+- Result A: mobile Perf home 98, Soho 98, CG 99, Dubai 100; TBT ≤23 ms; CLS ≤0.031; dropped frames 1.7/0/0/0.2% (4× CPU). Observed LCP ~0.25 s. Kept external CSS (inlining all made FCP slower).
+### Phase B — Found and trusted (gate: 4 Lighthouse areas 95+ with noindex off in test)
+- [ ] B1 Contrast tokens gold-ink/tiger-ink, heading order, sized images
+- [ ] B2 Share cards (OG image per branch), canonical, sitemap, robots, favicon set
+- [ ] B3 Schema: Organization on home, Restaurant + Menu per branch
+- [ ] B4 404 "Lost luggage" + Privacy, Allergens, Accessibility, Booking terms pages
+### Phase C — Book and come back (gate: link → booked in 3 taps)
+- [ ] C1 Book drawer per branch (party/date → booking URL) + sticky Book bar on phones + home hero Book
+- [ ] C2 Menu list view: search, dietary + spice filters, allergen note, print, /[branch]/menu/
+- [ ] C3 Find us: directions links, nearest station, static map
+- [ ] C4 Private dining enquiry, gift card link, newsletter
+### Phase D — Signature and handover
+- [ ] D1 Tonight's board (Sheet CSV → split-flap)
+- [ ] D2 Branch clocks (local time → day/after-dark)
+- [ ] D3 Dish passport (stamp dishes → shortlist, share)
+- [ ] D4 Analytics (Plausible, env) + web-vitals RUM + _headers
+- [ ] D5 Handover guide (docs/HANDOVER.md)
+- [ ] D6 Final QA: Lighthouse 4 pages, fps, overflow, calm, demo publish, commit

@@ -39,7 +39,7 @@ export interface InkBackgroundProps {
 // the ink is drawn on a finer one.
 const SIM = 128;
 const DYE = 512;
-const PRESSURE_ITERATIONS = 20;
+const PRESSURE_ITERATIONS = 14;
 // How fast stirred ink fades away, and how fast velocity calms down.
 const DYE_FADE = 0.35;
 const VELOCITY_FADE = 1.2;
@@ -733,7 +733,9 @@ export default function InkBackground({
       if (width < 2 || height < 2) {
         return;
       }
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // The ink is solved on a 512 grid, so drawing it at more than 1x the
+      // CSS size only costs fill rate (and phone frames) for no extra detail.
+      const dpr = 1;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       fluid.resize(canvas.width, canvas.height);
@@ -770,12 +772,24 @@ export default function InkBackground({
       }
     };
 
+    let slowAvg = 16;
+    let tick = 0;
+    let skip = false;
     const frame = (now: number) => {
       raf = 0;
       if (!visible) {
         return;
       }
       const dt = Math.min((now - (last || now - 16)) / 1000, 1 / 30);
+      // Weak phones: if frames keep running long, draw every other frame
+      // so scrolling the page stays smooth. Recovers when frames are quick.
+      const gap = tick ? Math.min(now - tick, 100) : 16;
+      tick = now;
+      slowAvg = slowAvg * 0.9 + gap * 0.1;
+      if (slowAvg > 26 && (skip = !skip)) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       last = now;
       if (hand.down || hand.moved > now - 100) {
         active = now;
