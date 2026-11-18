@@ -21,3 +21,9 @@ Review at the start of every session. Add a line after any correction.
 - Sticky scenes under a sticky site header need top/height offset by the header, or their headings hide under it.
 - Astro scoped styles don't reach elements rendered inside a child component (a <video> from LoopVideo): style them with :global() from the page.
 - Check AI motion clips by numbers, not just eyes: diff each frame against the source photo (mean diff + % pixels changed), then look.
+- Scroll triggers ("at mid-screen") must fire where people actually stop: test at phone size; trigger when the element's middle passes ~65% down, not dead centre.
+- Light added on a bright photo is invisible: darken the scene first (multiply grade), then add the glow (screen blend) — contrast sells it.
+- A camera over a big detailed map: one pre-drawn image moved by transform only (will-change), plus a light SVG overlay whose viewBox follows the same camera. Draw the chart wider than the route so the camera never sees its edge.
+- Thin line art (the gold junk) disappears on a busy background: put it on a solid badge.
+- Test touch gestures with the target fully on screen and clear of the sticky header, or the test swipes the header.
+

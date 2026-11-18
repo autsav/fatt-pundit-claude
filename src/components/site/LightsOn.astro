@@ -1,0 +1,119 @@
+---
+/**
+ * "Lights on": the real plate-wall photo dims to dusk as it scrolls in; at mid-screen the
+ * lamp clip plays once (off → on), halos bloom on the bulbs, then the lit lamps breathe.
+ * The brass pull-switch replays it. Calm mode (prefers-reduced-motion): lit still, no motion.
+ */
+import LampHalos from './LampHalos.astro';
+
+interface Props {
+  src: string;
+  off: string;
+  lit: string;
+  label: string;
+  lamps: { x: number; y: number; size?: number }[];
+  ratio: number;
+  place: string;
+}
+const { src, off, lit, label, lamps, ratio, place } = Astro.props;
+---
+<figure class="lights" data-lights data-glow="off" style={`--ratio: ${ratio}; --dusk: 0;`}>
+  <div class="frame">
+    <video class="shot" muted playsinline preload="metadata" poster={off} aria-label={label} disablepictureinpicture>
+      <source src={src} type="video/mp4" />
+    </video>
+    <img class="shot lit" src={lit} alt="" loading="lazy" decoding="async" />
+    <div class="dusk" aria-hidden="true"></div>
+    <LampHalos lamps={lamps} ratio={ratio} />
+  </div>
+  <figcaption>
+    <button class="pull" type="button" aria-label="Turn the lights off and on again">
+      <span class="chain" aria-hidden="true"></span><span class="knob" aria-hidden="true"></span>
+    </button>
+    <span class="cue" aria-live="polite" data-cue-off="Scroll to turn the lights on" data-cue-on={`Good evening, ${place}`}>Scroll to turn the lights on</span>
+  </figcaption>
+</figure>
+
+<script>
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-lights]')) {
+    const video = fig.querySelector('video')!;
+    const frame = fig.querySelector<HTMLElement>('.frame')!;
+    const cue = fig.querySelector<HTMLElement>('.cue')!;
+    const pull = fig.querySelector<HTMLButtonElement>('.pull')!;
+    let state: 'off' | 'on' | 'lit' = 'off';
+    const set = (s: typeof state) => {
+      state = s;
+      fig.dataset.glow = s;
+      cue.textContent = s === 'off' ? cue.dataset.cueOff! : cue.dataset.cueOn!;
+    };
+
+    if (calm) {
+      fig.style.setProperty('--dusk', '1');
+      set('lit');
+      fig.dataset.still = 'true';
+      pull.hidden = true;
+      continue;
+    }
+
+    const on = () => {
+      set('on');
+      video.currentTime = 0;
+      // If the browser won't play (low-power mode), fade to the lit still instead.
+      video.play().catch(() => { fig.dataset.still = 'true'; window.setTimeout(() => set('lit'), 2800); });
+    };
+    video.addEventListener('ended', () => set('lit'));
+
+    // Dusk follows the scroll: 0 as the photo enters, 1 when its middle is 65% down the screen.
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = frame.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.35 + r.height * 0.5)));
+      fig.style.setProperty('--dusk', p.toFixed(3));
+      if (p >= 1 && state === 'off') on();
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { window.addEventListener('scroll', onScroll, { passive: true }); update(); }
+      else { window.removeEventListener('scroll', onScroll); if (state !== 'off') video.pause(); }
+    }).observe(fig);
+
+    pull.addEventListener('click', () => {
+      fig.dataset.pulled = 'true';
+      window.setTimeout(() => delete fig.dataset.pulled, 260);
+      video.pause();
+      delete fig.dataset.still;
+      set('off');
+      fig.style.setProperty('--dusk', '1');
+      window.setTimeout(on, 650);
+    });
+  }
+</script>
+
+<style>
+  .lights { margin: 0; display: flex; flex-direction: column; gap: 12px; max-width: 980px; width: 100%; margin-inline: auto; }
+  .frame { position: relative; aspect-ratio: var(--ratio); overflow: hidden; border: 2px solid var(--color-gold); background: #2c2925; }
+  .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lit { opacity: 0; transition: opacity 2.6s ease; }
+  [data-still] .lit { opacity: 1; }
+  /* Evening: a deep blue-ink multiply that grows with scroll, darker at the edges. */
+  .dusk { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: calc(var(--dusk) * 0.78);
+    background: radial-gradient(120% 90% at 40% 30%, #8a7f96, #3a3348 70%, #241f2c); }
+
+  figcaption { display: flex; align-items: center; gap: 14px; min-height: 64px; }
+  .cue { font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  [data-glow='on'] .cue, [data-glow='lit'] .cue { color: var(--color-tiger); }
+
+  /* Brass pull-switch: a bead chain and a knob. Pulling drops it a few pixels. */
+  .pull { position: relative; flex: none; width: 44px; height: 64px; border: 0; padding: 0; background: none; cursor: pointer; }
+  .pull:focus-visible { outline: 2px solid var(--color-tiger); outline-offset: 2px; }
+  .chain { position: absolute; left: 50%; top: 0; height: 40px; width: 3px; translate: -50% 0;
+    background: repeating-linear-gradient(180deg, var(--color-gold) 0 3px, transparent 3px 5px); transition: height 0.18s ease; }
+  .knob { position: absolute; left: 50%; top: 38px; width: 18px; height: 22px; translate: -50% 0; border-radius: 45% 45% 50% 50% / 35% 35% 65% 65%;
+    background: radial-gradient(circle at 35% 30%, #f3dca6, var(--color-gold) 45%, #8a6a2c); box-shadow: 0 2px 4px rgb(44 41 37 / 0.35); transition: top 0.18s ease; }
+  [data-pulled] .chain { height: 50px; }
+  [data-pulled] .knob { top: 48px; }
+  @media (prefers-reduced-motion: reduce) { .lit { transition: none; } }
+</style>

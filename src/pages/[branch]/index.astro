@@ -16,8 +16,11 @@ import WalkTheRoom from '../../components/branch/WalkTheRoom.tsx';
 import VoyageToDubai from '../../components/branch/VoyageToDubai.tsx';
 import MenuBook from '../../components/scenes/MenuBook.tsx';
 import LoopVideo from '../../components/site/LoopVideo.astro';
-import plateWallLoop from '../../assets/video/cg-plate-wall-lamps.mp4';
-import plateWallPoster from '../../assets/video/cg-plate-wall-lamps-poster.jpg';
+import LightsOn from '../../components/site/LightsOn.astro';
+import LampHalos from '../../components/site/LampHalos.astro';
+import lightsOnClip from '../../assets/video/cg-lights-on.mp4';
+import lightsOffStill from '../../assets/video/cg-lights-on-off.jpg';
+import lightsLitStill from '../../assets/video/cg-lights-on-lit.jpg';
 import boothsLoop from '../../assets/video/cg-booths-glow.mp4';
 import { BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, hoursLines, menuBooks, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
 import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
@@ -83,7 +86,11 @@ const sohoStops = [
 ];
 
 const books = open ? await menuBooks(b.menus) : [];
-const plateWallStill = (await getImage({ src: plateWallPoster, width: 1280, format: 'webp', quality: 80 })).src;
+const wallOff = (await getImage({ src: lightsOffStill, width: 1280, format: 'webp', quality: 80 })).src;
+const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'webp', quality: 80 })).src;
+// Bulb positions (% of each photo), measured from the frames.
+const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 1.5 }, { x: 65.9, y: 13.3, size: 1.5 }];
+const HERO_LAMPS = [{ x: 10, y: 20, size: 0.7 }, { x: 36.2, y: 23, size: 0.6 }, { x: 55.6, y: 24.7, size: 0.6 }];
 const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
 const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await img(stampGoldArt, 260), compass: await img(compassArt, 240) };
 
@@ -123,7 +130,13 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       {heroImg ? (
         <>
           <img class="arrival-bg" src={heroImg.src} alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
-          {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroImg.src} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />}
+          {b.id === 'covent-garden' && (
+            <>
+              <LoopVideo src={boothsLoop} poster={heroImg.src} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />
+              <div class="evening" aria-hidden="true"></div>
+              <div class="hero-glow" data-glow="off"><LampHalos lamps={HERO_LAMPS} ratio={1024 / 683} cover /></div>
+            </>
+          )}
         </>
       ) : b.id === 'soho' ? (
         <div class="arrival-bg art-soho" aria-hidden="true">
@@ -159,10 +172,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         </div>
         {b.id === 'covent-garden' && (
           <>
-            <figure class="real-wall">
-              <LoopVideo src={plateWallLoop} poster={plateWallStill} label={ALTS['gallery-02']} class="real-wall-video" />
-              <figcaption><span class="lead-text">The real wall</span>, on Maiden Lane. Our photo, with only the lamplight brought to life.</figcaption>
-            </figure>
+            <LightsOn src={lightsOnClip} off={wallOff} lit={wallLit} label={ALTS['gallery-02']} lamps={WALL_LAMPS} ratio={1760 / 1176} place="Maiden Lane" />
             <p class="wall-intro">Now turn the plates over: each one hides something from the kitchen.</p>
             <PlateWall client:visible dishes={plates} />
           </>
@@ -229,7 +239,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     </section>
 
     <!-- 4 · The menus here -->
-    {books.length > 0 && <MenuBook client:visible menus={books} art={menuArt} />}
+    {books.length > 0 && <MenuBook client:visible menus={books} art={menuArt} next={{ href: '#visit', label: 'Continue to visit' }} />}
 
     <!-- 5 · Visit -->
     <section id="visit" class="sec ink visit" aria-labelledby="visit-title">
@@ -329,6 +339,11 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       f.reset();
     });
   }
+  // Hero shelf lamps come on just after arrival, then breathe.
+  for (const g of document.querySelectorAll<HTMLElement>('.hero-glow')) {
+    window.setTimeout(() => { g.dataset.glow = 'on'; }, 500);
+    window.setTimeout(() => { g.dataset.glow = 'lit'; }, 4200);
+  }
 </script>
 
 <style>
@@ -371,10 +386,9 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .room-lines span:nth-child(2) { color: var(--lead); }
   .room-lines span:nth-child(3) { font-family: var(--font-note); font-style: italic; text-transform: none; font-size: 0.62em; letter-spacing: 0; color: color-mix(in srgb, var(--color-ink) 75%, transparent); }
 
-  /* The real plate wall (photo loop), above the drawn one */
-  .real-wall { margin: 0; display: flex; flex-direction: column; gap: 10px; max-width: 980px; width: 100%; margin-inline: auto; }
-  .real-wall :global(.real-wall-video) { display: block; width: 100%; height: auto; aspect-ratio: 1760 / 1176; object-fit: cover; border: 2px solid var(--color-gold); background: #e9e1d3; }
-  .real-wall figcaption { font-family: var(--font-note); font-style: italic; font-size: 17px; }
+  /* Covent Garden hero at evening: a blue-ink grade, then the shelf lamps glow. */
+  .evening { position: absolute; inset: 0; mix-blend-mode: multiply; background: radial-gradient(90% 80% at 35% 25%, #a99cb2, #4a4058 75%); opacity: 0.7; }
+  .hero-glow { position: absolute; inset: 0; overflow: hidden; }
   .wall-intro { text-align: center; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 17px; }
 
   /* Contact sheet of the room's photos */

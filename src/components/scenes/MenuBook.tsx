@@ -244,7 +244,7 @@ function Back({ art }: { art: Art }) {
 
 const TAB_COLORS = ['bg-tiger text-white', 'bg-gold text-ink', 'bg-sand text-ink', 'bg-slate text-white', 'bg-[#efe6d8] text-ink', 'bg-ink text-sand'];
 
-export default function MenuBook({ menus, art }: { menus: MenuLite[]; art: Art }) {
+export default function MenuBook({ menus, art, next }: { menus: MenuLite[]; art: Art; next?: { href: string; label: string } }) {
   const [active, setActive] = useState(menus[0]?.id);
   const [opened, setOpened] = useState(false);
   const menu = menus.find((m) => m.id === active) ?? menus[0];
@@ -268,7 +268,8 @@ export default function MenuBook({ menus, art }: { menus: MenuLite[]; art: Art }
         <h2 className="m-0 mt-2 text-center text-[clamp(30px,4.4vw,56px)] uppercase leading-none tracking-[0.06em]">Turn the pages</h2>
         <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">The menu you'll be handed at the table. Pick yours from the bookmarks.</p>
 
-        <div className="mt-7 w-full" style={{ maxWidth: 'min(1000px, calc((100svh - 340px) * 1.5))' }}>
+        {/* Phones show one page: capped near half the screen so there is room to scroll past. */}
+        <div className="mx-auto mt-7 w-full max-sm:!max-w-[40svh]" style={{ maxWidth: 'min(1000px, calc((100svh - 340px) * 1.5))' }}>
           {/* Bookmarks: paper tabs standing up from the top edge of the book. */}
           <div role="tablist" aria-label="Menus" className="relative z-10 flex flex-wrap items-end justify-center gap-[6px] px-4">
             {menus.map((m, i) => {
@@ -294,6 +295,12 @@ export default function MenuBook({ menus, art }: { menus: MenuLite[]; art: Art }
             <PageFlip key={menu.id} pages={pages} label={`${menu.title} menu`} start={opened ? 1 : 0} />
           </div>
         </div>
+        <p className="m-0 mt-5 text-center font-label text-[12.5px] font-bold uppercase tracking-[0.2em] text-ink/70 sm:hidden">Swipe sideways or tap a page edge to turn</p>
+        {next && (
+          <a href={next.href} className="mt-6 inline-flex min-h-11 items-center gap-2 border-b-2 border-ink pb-0.5 font-bold uppercase tracking-[0.1em] text-ink no-underline">
+            {next.label} <span aria-hidden="true">↓</span>
+          </a>
+        )}
       </div>
     </section>
   );

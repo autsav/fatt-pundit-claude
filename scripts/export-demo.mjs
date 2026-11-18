@@ -50,5 +50,5 @@ for (const f of walk(join(out, 'assets'))) {
     );
   }
 }
-const left = PAGES.flatMap((pg) => readFileSync(join(out, pg, 'index.html'), 'utf8').match(/_astro\//g) ?? []);
+const left = PAGES.flatMap((pg) => readFileSync(join(out, pg, 'index.html'), 'utf8').match(/(?<![\w./])\/?_astro\//g) ?? []); // full https://…/_astro/ URLs (JSON-LD) are fine
 console.log(`demo/ ready: ${PAGES.length} pages${left.length ? ` — WARNING: ${left.length} absolute /_astro/ paths left` : ''}`);

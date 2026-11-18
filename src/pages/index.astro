@@ -7,18 +7,21 @@ import RainHero from '../components/scenes/RainHero.tsx';
 import Voyage from '../components/scenes/Voyage.tsx';
 import Kitchen, { type KitchenDish } from '../components/scenes/Kitchen.tsx';
 import MenuBook, { type MenuLite } from '../components/scenes/MenuBook.tsx';
+import BarAfterDark from '../components/scenes/BarAfterDark.tsx';
+import RoomContactSheet from '../components/scenes/RoomContactSheet.tsx';
 import Base from '../layouts/Base.astro';
 import { getBranches, dish, priceOf, hoursLines, menuBooks, prettyPhone } from '../lib/site-data';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 
+import tigerHead from '../assets/images/brand/tiger-head-left.png';
 import stampLeft from '../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../assets/images/brand/logo-stamp-distressed-right.png';
 import map from '../assets/images/brand/map.webp';
-import worldLand from '../assets/images/brand/world-land.svg';
+import voyageSea from '../assets/images/brand/voyage-sea.svg';
 import shipArt from '../assets/images/brand/ship.png';
-import compassArt from '../assets/images/brand/compass.png';
 import frameArt from '../assets/images/brand/frame.png';
+import compassArt from '../assets/images/brand/compass.png';
 import stampGoldArt from '../assets/images/brand/stamp-gold.png';
 import stampOrangeArt from '../assets/images/brand/stamp-orange.png';
 import mountainAArt from '../assets/images/brand/mountain-a.png';
@@ -33,6 +36,7 @@ import imgSpinach from '../assets/images/dishes/crackling-spinach.jpg';
 import imgOkra from '../assets/images/dishes/crispy-okra-salt-n-pepper.jpg';
 import imgVegMomo from '../assets/images/dishes/momo-mix-vegetable.jpg';
 import imgBrownie from '../assets/images/dishes/sizzling-brownie.jpg';
+import g1 from '../assets/images/covent-garden/gallery-01.jpg';
 import g2 from '../assets/images/covent-garden/gallery-02.jpg';
 import g3 from '../assets/images/covent-garden/gallery-03.jpg';
 import g4 from '../assets/images/covent-garden/gallery-04.jpg';
@@ -42,17 +46,38 @@ import g7 from '../assets/images/covent-garden/gallery-07.jpg';
 import g8 from '../assets/images/covent-garden/gallery-08.jpg';
 
 const branches = await getBranches();
-const drinks = await Promise.all(['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'desi-dragon'].map(dish));
+const DRINK_IDS = ['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'desi-dragon'];
+const drinks = await Promise.all(DRINK_IDS.map(dish));
+// Scene 6: the bar after dark.
+const webp = async (src: ImageMetadata, width: number) => (await getImage({ src, width, format: 'webp', quality: 78 })).src;
+const barRoom = { src: await webp(g3, 1400), alt: 'The bar at Covent Garden: copper shelves of bottles, brass lamps and arched mirrors over the booths' };
+const barPrints: [{ src: string; alt: string }, { src: string; alt: string }] = [
+  { src: await webp(barSour, 800), alt: 'Guava chilli sour with a chilli-salt rim, fresh guavas beside it' },
+  { src: await webp(barCocktail, 700), alt: 'A deep red fruit cooler with mint and citrus' },
+];
+const barDrinks = drinks.map((d, i) => ({ id: DRINK_IDS[i], name: d.name, description: d.description, price: priceOf(d) }));
+const barTiger = await webp(tigerHead, 500);
+// Scene 7: the room as a contact sheet. Thumbs for the sheet, large for the lightbox.
+const ROOM: [ImageMetadata, string][] = [
+  [g5, 'A tiger in a turban painted on the brick wall above a dining table'],
+  [g3, 'The bar, lit by brass lamps, with tables leading to it'],
+  [g2, 'Blue-and-white plates arranged on a plaster wall above green banquettes'],
+  [g8, 'Hindi and Chinese lettering painted on the dining room wall'],
+  [g4, 'Arched mirrors and pendant lights over the dining room'],
+  [g7, 'The dining room with a red door and painted lettering'],
+  [g6, 'Pink leather banquette against a green painted wall'],
+  [g1, 'Pink booths and bentwood chairs under shelves of lamps and pots, against a green plaster wall'],
+];
+const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), full: await webp(src, 1600), alt })));
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
   map: await img(map, 1295),
-  world: worldLand.src,
+  sea: voyageSea.src,
   ship: await img(shipArt, 400),
   compass: await img(compassArt, 240),
-  frame: frameArt.src,
   stampGold: await img(stampGoldArt, 320),
   stampOrange: await img(stampOrangeArt, 340),
   mountainA: await img(mountainAArt, 300),
@@ -119,45 +144,20 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <Kitchen client:visible dishes={kitchenDishes} art={kitchenArt} />
 
     <!-- 5 · The menu book -->
-    <MenuBook client:visible menus={menuBooksHome} art={menuArt} />
+    <MenuBook client:visible menus={menuBooksHome} art={menuArt} next={{ href: '#bar', label: 'Continue to the bar' }} />
 
-    <!-- 5 · The bar -->
-    <section class="sec ink bar-sec">
-      <div class="wrap split">
-        <div class="stack reveal">
-          <p class="kicker gold">After dark</p>
-          <h2 class="h2">The bar</h2>
-          <p>Fruit coolers inspired by India's street fruit vendors, spiced and salted. Have one straight, or spike it with a paired spirit.</p>
-          <ul class="drinks">
-            {drinks.map((d) => (
-              <li><div><h3>{d.name}</h3>{d.description && <p>{d.description}</p>}</div><span class="price">{priceOf(d)}</span></li>
-            ))}
-          </ul>
-        </div>
-        <div class="bar-photos reveal">
-          <Image src={barSour} alt="Guava chilli sour with a chilli-salt rim, fresh guavas beside it" widths={[500, 900]} sizes="(min-width: 900px) 420px, 70vw" class="bp1" />
-          <Image src={barCocktail} alt="A deep red fruit cooler with mint and citrus" widths={[400, 700]} sizes="(min-width: 900px) 300px, 55vw" class="bp2" />
-        </div>
-      </div>
-    </section>
+    <!-- 6 · The bar after dark -->
+    <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />
 
-    <!-- 6 · The room -->
-    <section class="sec sand">
+    <!-- 7 · The room -->
+    <section id="room" class="sec room-halftone">
       <div class="wrap stack-lg">
         <div class="stack reveal narrow">
           <p class="kicker">The room</p>
           <h2 class="h2">Pull up a chair</h2>
           <p>Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
         </div>
-        <div class="gallery reveal">
-          <Image src={g5} alt="A tiger in a turban painted on the brick wall above a dining table" widths={[500, 900]} sizes="(min-width: 900px) 50vw, 92vw" class="ga" />
-          <Image src={g3} alt="The bar, lit by brass lamps, with tables leading to it" widths={[400, 700]} sizes="(min-width: 900px) 25vw, 46vw" class="gb" />
-          <Image src={g2} alt="Blue-and-white plates arranged on a plaster wall above green banquettes" widths={[400, 700]} sizes="(min-width: 900px) 25vw, 46vw" class="gc" />
-          <Image src={g8} alt="Hindi and Chinese lettering painted on the dining room wall" widths={[400, 700]} sizes="(min-width: 900px) 25vw, 46vw" class="gd" />
-          <Image src={g4} alt="Arched mirrors and pendant lights over the dining room" widths={[400, 700]} sizes="(min-width: 900px) 25vw, 46vw" class="ge" />
-          <Image src={g7} alt="The dining room with a red door and painted lettering" widths={[500, 900]} sizes="(min-width: 900px) 50vw, 92vw" class="gf" />
-          <Image src={g6} alt="Pink leather banquette against a green painted wall" widths={[500, 900]} sizes="(min-width: 900px) 50vw, 92vw" class="gg" />
-        </div>
+        <RoomContactSheet client:visible frames={sheet} picks={[0, 2]} />
         <div class="rating reveal">
           <span class="rating-n">4.6 / 5</span>
           <span>from more than 1,170 diners on OpenTable (Soho, November 2026)</span>
@@ -247,9 +247,6 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   p { margin: 0; }
 
   /* Journey */
-  .split { display: flex; flex-wrap: wrap; align-items: center; gap: 48px 72px; }
-  .split.rev { flex-wrap: wrap-reverse; }
-  .split > * { flex: 1 1 420px; min-width: 0; }
   .map { position: relative; margin: 0; background: var(--color-ink); padding: 12px; }
   .map :global(img) { display: block; width: 100%; height: auto; }
   .route { position: absolute; inset: 12px; width: calc(100% - 24px); height: calc(100% - 24px); }
@@ -263,26 +260,12 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   .name-card { flex: 1 1 200px; border: 2px solid var(--color-ink); padding: 16px 18px; font-size: 15px; }
   .name-word { font-weight: 700; font-size: 26px; letter-spacing: 0.14em; }
 
-  .drinks h3 { margin: 0; font-size: 17px; letter-spacing: 0.08em; }
   .price { font-weight: 700; white-space: nowrap; }
 
   /* Bar */
-  .bar-sec { padding-top: 0; }
-  .bar-sec .wrap { border-top: 2px solid var(--color-gold); padding-top: clamp(64px, 8vw, 110px); }
-  .drinks { list-style: none; margin: 6px 0 0; padding: 0; }
-  .drinks li { display: flex; justify-content: space-between; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--color-gold); }
-  .drinks p { font-size: 15px; }
-  .drinks .price { white-space: normal; text-align: right; max-width: 42%; }
   main { overflow-x: clip; }
-  .bar-photos { position: relative; min-height: 520px; }
-  .bar-photos :global(.bp1) { position: absolute; top: 0; right: 0; width: 78%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 2px solid var(--color-gold); }
-  .bar-photos :global(.bp2) { position: absolute; bottom: 0; left: 0; width: 56%; height: auto; aspect-ratio: 1; object-fit: cover; border: 8px solid var(--color-ink); outline: 2px solid var(--color-gold); }
 
   /* Room */
-  .gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(150px, 18vw, 240px); gap: 12px; }
-  .gallery :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .gallery :global(.ga) { grid-column: span 2; grid-row: span 2; }
-  .gallery :global(.gf), .gallery :global(.gg) { grid-column: span 2; }
   @media (max-width: 700px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery :global(.gf) { grid-column: span 2; } }
   .rating { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; border-block: 2px solid var(--color-ink); padding-block: 20px; }
   .rating-n { font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
@@ -314,7 +297,6 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
   .reveal.is-in { opacity: 1; transform: none; }
 
   @media (max-width: 640px) {
-    .bar-photos { min-height: 400px; }
   }
 
   @media (prefers-reduced-motion: reduce) {

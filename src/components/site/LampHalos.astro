@@ -1,0 +1,44 @@
+---
+/**
+ * Warm glow over the real bulbs in a photo. Positions are % of the photo.
+ * `cover` matches an object-fit: cover photo (centred), so the halos stay on the bulbs at any crop.
+ */
+interface Props {
+  lamps: { x: number; y: number; size?: number }[];
+  /** Photo width / height. */
+  ratio: number;
+  cover?: boolean;
+  class?: string;
+}
+const { lamps, ratio, cover = false, class: className } = Astro.props;
+---
+<div class:list={['lamp-halos', { cover }, className]} style={`--ratio: ${ratio};`} aria-hidden="true">
+  {lamps.map((l, i) => (
+    <span class="halo" style={`--x: ${l.x}%; --y: ${l.y}%; --s: ${l.size ?? 1}; --i: ${i};`}></span>
+  ))}
+</div>
+
+<style>
+  .lamp-halos { position: absolute; inset: 0; pointer-events: none; }
+  /* Cover-matched layer: as wide as the photo would be when it fills the box, centred. */
+  .lamp-halos.cover { inset: auto; left: 50%; top: 50%; translate: -50% -50%; aspect-ratio: var(--ratio); min-width: 100%; min-height: 100%; }
+  .halo {
+    position: absolute; left: var(--x); top: var(--y);
+    width: calc(36% * var(--s)); aspect-ratio: 1; translate: -50% -50%;
+    border-radius: 50%; mix-blend-mode: screen;
+    background: radial-gradient(circle, rgb(255 244 220) 0 3%, rgb(255 214 150 / 0.9) 8%, rgb(248 176 90 / 0.5) 20%, rgb(241 140 60 / 0.18) 38%, transparent 64%);
+    opacity: var(--glow, 0);
+    transition: opacity 2.6s cubic-bezier(0.3, 0, 0.2, 1) calc(0.2s + var(--i) * 0.25s);
+  }
+  /* A soft pool of light thrown down the wall under each lamp. */
+  .halo::after {
+    content: ''; position: absolute; left: 50%; top: 40%; width: 150%; height: 190%; translate: -50% 0;
+    background: radial-gradient(50% 50% at 50% 20%, rgb(255 190 110 / 0.55), rgb(255 170 90 / 0.18) 45%, transparent 75%);
+  }
+  :global([data-glow='on']) .halo { --glow: 1; }
+  :global([data-glow='lit']) .halo { --glow: 1; transition: none; animation: breathe 4.8s ease-in-out calc(var(--i) * -1.3s) infinite; }
+  @keyframes breathe { 0%, 100% { opacity: 1; scale: 1; } 50% { opacity: 0.82; scale: 0.96; } }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-glow]) .halo { --glow: 1; transition: none; animation: none; }
+  }
+</style>

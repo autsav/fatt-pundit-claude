@@ -1,35 +1,28 @@
 import { useMotionValueEvent, useScroll } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Mark, MarkerText } from '@/components/kokonutui/marker-text';
 import SplitFlapText from '@/components/kokonutui/split-flap-text';
-import TypewriterTitle from '@/components/kokonutui/type-writer';
 import world from '@/data/world-route.json';
 import { isCalm } from '@/lib/motion-tokens';
 
 /**
- * Scene 3: the voyage. Pinned while the guest scrolls. Built from the brand's own drawings
- * (guidelines p.24): the menu map, its gold junk, gold mountains, compass, border, and the two
- * stamps (gold and orange).
+ * Scene 3: the voyage, "follow the ship". Pinned while the guest scrolls.
  *
- * One driver (Motion's scroll progress) scrubs one anime.js timeline:
- *   leg 1 on the menu map: Canton → Kolkata ("Tangra" gets hand-marked);
- *   the map pulls back to a wider map drawn in the same engraved style;
- *   leg 2: Kolkata → Suez → London, where the two stamps land; then a gold branch to Dubai.
+ * A night chart (ink sea, gold engraved ripples, sand land; built by scripts/build-world-map.mjs)
+ * fills the screen. A camera follows the brand's gold junk from port to port, pulling back on the
+ * long leg. Four ports, about one screen each, each with a postcard (left on desktop, bottom on
+ * phones). A ticket strip at the top gets a hole punched per port; tap a hole to jump there.
+ *
+ * Speed: the chart is one image moved by the GPU (transform only). Route, ship and labels sit in a
+ * light SVG on top whose viewBox follows the same camera, so they stay sharp and screen-sized.
+ * Calm mode: no pinning; the whole route is drawn and the postcards sit in a grid.
  */
 
-const LEG1 = 'M1038 718 C1000 900 950 1170 820 1170 C700 1170 640 1060 605 960 C578 880 548 805 505 752';
-const W = world.w;
-const H = world.h;
-const T1 = 1000;
-const T2 = 2600;
-const T3 = 3000;
-
 export interface VoyageArt {
+  sea: string;
   map: string;
-  world: string;
   ship: string;
   compass: string;
-  frame: string;
   stampGold: string;
   stampOrange: string;
   mountainA: string;
@@ -37,225 +30,342 @@ export interface VoyageArt {
   mountainsC: string;
 }
 
-type Stop = { label: string; text: string; chapter: 'east' | 'west' };
-const STOPS: Stop[] = [
-  { label: 'Canton', chapter: 'east', text: 'Hakka families leave Canton, southern China, carrying their recipes.' },
-  { label: 'At sea', chapter: 'east', text: 'Across the South China Sea and the Bay of Bengal.' },
-  { label: 'Kolkata', chapter: 'east', text: 'They make a new home in Kolkata.' },
-  { label: 'Westward', chapter: 'west', text: 'The recipes travel on: the Arabian Sea, Suez, the Mediterranean.' },
-  { label: 'London', chapter: 'west', text: 'London. Soho in 2019, Covent Garden in 2021.' },
-  { label: 'Dubai', chapter: 'west', text: 'Next stop: Dubai, opening soon.' },
+type Pt = [number, number];
+const W = world.w;
+const H = world.h;
+/** The chart image runs past the route box on every side. */
+const SEA = world.sea;
+const PORTS: { id: string; name: string; at: Pt; dx: number; dy: number; anchor: 'start' | 'end' }[] = [
+  { id: 'canton', name: 'Canton', at: world.points.canton as Pt, dx: 14, dy: -14, anchor: 'end' },
+  { id: 'kolkata', name: 'Kolkata', at: world.points.kolkata as Pt, dx: 14, dy: -14, anchor: 'end' },
+  { id: 'london', name: 'London', at: world.points.london as Pt, dx: 14, dy: 30, anchor: 'start' },
+  { id: 'dubai', name: 'Dubai', at: world.points.dubai as Pt, dx: 14, dy: -14, anchor: 'end' },
+];
+const LEGS = [world.leg1, world.leg2, world.toDubai];
+const AT_SEA = [
+  'At sea: the South China Sea and the Bay of Bengal',
+  'Westward: the Arabian Sea, Suez, the Mediterranean',
+  'Onward: back through Suez to the Gulf',
 ];
 
+/** The scroll script: a hold at each port, sailing in between. `peak` = widest view on that leg. */
+type Seg = { a: number; b: number } & ({ hold: number } | { leg: number; peak: number });
+const SEGS: Seg[] = [
+  { a: 0, b: 0.1, hold: 0 },
+  { a: 0.1, b: 0.27, leg: 0, peak: 520 },
+  { a: 0.27, b: 0.41, hold: 1 },
+  { a: 0.41, b: 0.69, leg: 1, peak: 1180 },
+  { a: 0.69, b: 0.79, hold: 2 },
+  { a: 0.79, b: 0.92, leg: 2, peak: 860 },
+  { a: 0.92, b: 1.0001, hold: 3 },
+];
+/** Map units that fit the short side of the stage when the camera is in close. */
+const CLOSE = 360;
+const SHIP_PX = 64;
+
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
-const range = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
-
-/** Scroll progress → timeline time, with holds at Kolkata (Tangra) and during the pull-back. */
-function timeAt(p: number) {
-  if (p < 0.4) return range(p, 0.05, 0.4) * T1;
-  if (p < 0.56) return T1;
-  if (p < 0.82) return T1 + range(p, 0.56, 0.82) * (T2 - T1);
-  return T2 + range(p, 0.82, 0.88) * (T3 - T2);
-}
-
-function stopAt(p: number) {
-  const r1 = range(p, 0.05, 0.4);
-  if (p >= 0.86) return 5;
-  if (p >= 0.8) return 4;
-  if (p >= 0.58) return 3;
-  if (r1 >= 0.97) return 2;
-  if (r1 >= 0.42) return 1;
-  if (p >= 0.05) return 0;
-  return -1;
-}
-
-/** The brand's gold junk (from the menu map), centred on the route, bow to the west. */
-function Ship({ href, size }: { href: string; size: number }) {
-  return <image href={href} width={size} height={size} x={-size / 2} y={-size * 0.82} />;
-}
-
-/** Place name in the menu map's manner: italic, ink, small. */
-function Place({ at, label, dx = 18, dy = -14, anchor = 'start', show = true }: { at: number[]; label: string; dx?: number; dy?: number; anchor?: 'start' | 'end'; show?: boolean }) {
-  return (
-    <g style={{ opacity: show ? 1 : 0, transition: 'opacity .5s' }}>
-      <circle cx={at[0]} cy={at[1]} r="9" fill="none" stroke="#f15d3d" strokeWidth="4" />
-      <text x={at[0] + (anchor === 'end' ? -dx : dx)} y={at[1] + dy} textAnchor={anchor} className="voyage-place">
-        {label}
-      </text>
-    </g>
-  );
-}
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const smooth = (t: number) => t * t * (3 - 2 * t);
 
 export default function Voyage({ art }: { art: VoyageArt }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const figureRef = useRef<HTMLElement>(null);
-  const leg1Ref = useRef<SVGPathElement>(null);
-  const leg2Ref = useRef<SVGPathElement>(null);
-  const dubaiRef = useRef<SVGPathElement>(null);
-  const boat1Ref = useRef<SVGGElement>(null);
-  const boat2Ref = useRef<SVGGElement>(null);
-  const tlRef = useRef<{ seek: (t: number) => unknown } | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const seaRef = useRef<HTMLImageElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const shipRef = useRef<SVGGElement>(null);
+  const hullRef = useRef<SVGGElement>(null);
+  const legRefs = useRef<(SVGPathElement | null)[]>([]);
+  const lens = useRef<number[]>([]);
+  const layout = useRef({ w: 1, h: 1, fx: 0, fy: 0, fit: 1, k: 1 });
+  const facing = useRef(1);
   const [calm, setCalm] = useState(false);
-  const [stop, setStop] = useState(-1);
-  const [tangra, setTangra] = useState(false);
-  const [west, setWest] = useState(false);
-  const [named, setNamed] = useState(false);
+  const [port, setPort] = useState(0);
+  const [leg, setLeg] = useState(-1);
+  const [reached, setReached] = useState(0);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
 
+  /** Stage size → focal point (where the camera's centre lands) and the scale for the chart image. */
+  const measure = useCallback((still = false) => {
+    const st = stageRef.current;
+    if (!st) return;
+    const w = st.clientWidth;
+    const h = st.clientHeight;
+    if (still) {
+      const fit = Math.min(w, h);
+      layout.current = { w, h, fx: w / 2, fy: h / 2, fit, k: fit / CLOSE };
+      if (seaRef.current) {
+        seaRef.current.style.width = `${SEA.w * (fit / CLOSE)}px`;
+        seaRef.current.style.height = `${SEA.h * (fit / CLOSE)}px`;
+      }
+      return;
+    }
+    const desk = w >= 1024;
+    const card = desk ? Math.min(460, w * 0.36) : 0;
+    const fx = desk ? card + (w - card) / 2 : w / 2;
+    const fy = desk ? h * 0.56 : h * 0.33;
+    const fit = desk ? Math.min(w - card, h) : Math.min(w, h * 0.56);
+    const k = fit / CLOSE;
+    layout.current = { w, h, fx, fy, fit, k };
+    if (seaRef.current) {
+      seaRef.current.style.width = `${SEA.w * k}px`;
+      seaRef.current.style.height = `${SEA.h * k}px`;
+    }
+  }, []);
+
+  /** Point the camera at (cx, cy) showing `span` map units across the stage's short side. */
+  const camera = (cx: number, cy: number, span: number) => {
+    const { w, h, fx, fy, fit, k } = layout.current;
+    const ppu = fit / span;
+    if (seaRef.current) seaRef.current.style.transform = `translate3d(${fx - (cx - SEA.x) * ppu}px, ${fy - (cy - SEA.y) * ppu}px, 0) scale(${ppu / k})`;
+    const svg = svgRef.current;
+    if (svg) {
+      svg.setAttribute('viewBox', `${cx - fx / ppu} ${cy - fy / ppu} ${w / ppu} ${h / ppu}`);
+      svg.style.setProperty('--u', String(1 / ppu));
+    }
+  };
+
+  const placeShip = (x: number, y: number, dir: number) => {
+    if (dir && dir !== facing.current) {
+      facing.current = dir;
+      hullRef.current?.setAttribute('transform', `scale(${dir} 1)`);
+    }
+    shipRef.current?.setAttribute('transform', `translate(${x} ${y})`);
+  };
+
   const apply = (p: number) => {
-    tlRef.current?.seek(timeAt(p));
-    figureRef.current?.style.setProperty('--swap', range(p, 0.48, 0.56).toFixed(3));
-    setStop(stopAt(p));
-    setTangra(p > 0.43);
-    setWest(p > 0.52);
-    setNamed(p > 0.91);
+    const s = SEGS.find((g) => p < g.b) ?? SEGS[SEGS.length - 1];
+    const t = clamp((p - s.a) / (s.b - s.a));
+    let drawn = 0;
+    if ('hold' in s) {
+      const [x, y] = PORTS[s.hold].at;
+      camera(x, y, CLOSE * (1 - 0.05 * t));
+      placeShip(x, y, 0);
+      drawn = s.hold;
+      if (port !== s.hold) setPort(s.hold);
+      if (leg !== -1) setLeg(-1);
+      if (reached < s.hold) setReached(s.hold);
+    } else {
+      const path = legRefs.current[s.leg];
+      const len = lens.current[s.leg];
+      if (!path || !len) return;
+      const e = smooth(t);
+      const pt = path.getPointAtLength(e * len);
+      const ahead = path.getPointAtLength(Math.min(len, e * len + 4));
+      const a = PORTS[s.leg].at;
+      const b = PORTS[s.leg + 1].at;
+      const pull = Math.sin(Math.PI * e);
+      camera(lerp(pt.x, (a[0] + b[0]) / 2, pull), lerp(pt.y, (a[1] + b[1]) / 2, pull), lerp(CLOSE, s.peak, pull));
+      // The drawing faces west; mirror it when sailing east.
+      const dx = ahead.x - pt.x;
+      placeShip(pt.x, pt.y, Math.abs(dx) > 0.3 ? (dx > 0 ? -1 : 1) : 0);
+      drawn = s.leg + e;
+      if (port !== -1) setPort(-1);
+      if (leg !== s.leg) setLeg(s.leg);
+      if (reached < s.leg) setReached(s.leg);
+    }
+    legRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const f = clamp(drawn - i);
+      el.style.strokeDasharray = `${f * lens.current[i]} ${lens.current[i] + 1}`;
+    });
   };
 
   useEffect(() => {
+    lens.current = legRefs.current.map((el) => el?.getTotalLength() ?? 0);
     const c = isCalm();
     setCalm(c);
+    measure();
     if (c) {
-      figureRef.current?.style.setProperty('--swap', '1');
-      setStop(5);
-      setTangra(true);
-      setWest(true);
-      setNamed(true);
+      setReached(3);
+      legRefs.current.forEach((el) => el && (el.style.strokeDasharray = 'none'));
       return;
     }
-    let alive = true;
-    import('animejs').then(({ createTimeline, svg }) => {
-      if (!alive || !leg1Ref.current || !leg2Ref.current || !dubaiRef.current || !boat1Ref.current || !boat2Ref.current) return;
-      const m1 = svg.createMotionPath(leg1Ref.current);
-      const m2 = svg.createMotionPath(leg2Ref.current);
-      const tl = createTimeline({ autoplay: false, defaults: { ease: 'linear' } })
-        .add(svg.createDrawable(leg1Ref.current), { draw: ['0 0', '0 1'], duration: T1 }, 0)
-        // Translate only, so the ship keeps its drawn pose (bow west), never tilting upside down.
-        .add(boat1Ref.current, { translateX: m1.translateX, translateY: m1.translateY, duration: T1 }, 0)
-        .add(svg.createDrawable(leg2Ref.current), { draw: ['0 0', '0 1'], duration: T2 - T1 }, T1)
-        .add(boat2Ref.current, { translateX: m2.translateX, translateY: m2.translateY, duration: T2 - T1 }, T1)
-        .add(svg.createDrawable(dubaiRef.current), { draw: ['0 0', '0 1'], duration: T3 - T2 }, T2);
-      tlRef.current = tl;
+    apply(scrollYProgress.get());
+    const ro = new ResizeObserver(() => {
+      measure();
       apply(scrollYProgress.get());
     });
-    return () => {
-      alive = false;
-    };
+    if (stageRef.current) ro.observe(stageRef.current);
+    return () => ro.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollYProgress]);
+  }, []);
+
+  // Calm mode: one wide, still view of the whole route.
+  useEffect(() => {
+    if (!calm) return;
+    measure(true);
+    camera(660, 600, 1080);
+    placeShip(...PORTS[2].at, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calm]);
 
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
     if (!calm) apply(p);
   });
 
-  const visible = (i: number) => {
-    if (i > stop) return false;
-    if (STOPS[i].chapter !== (west ? 'west' : 'east')) return false;
-    if (named && i !== 5) return false;
-    return true;
+  /** Ticket holes jump to a port. */
+  const jump = (i: number) => {
+    const sec = sectionRef.current;
+    const hold = SEGS.find((g) => 'hold' in g && g.hold === i)!;
+    if (!sec) return;
+    const top = sec.getBoundingClientRect().top + window.scrollY;
+    const travel = sec.offsetHeight - window.innerHeight;
+    window.scrollTo({ top: top + travel * (hold.a + (hold.b - hold.a) * 0.3), behavior: 'smooth' });
   };
-  const labelStyle = 'font-label text-[13px] font-bold uppercase tracking-[0.24em] text-tiger';
-  const textStyle = 'text-[clamp(16px,1.5vw,19px)] leading-snug';
-  const L = world.points.london;
-  const M = world.mountains;
 
   return (
-    <section ref={sectionRef} id="story" className="voyage relative bg-sand text-ink" style={{ height: calm ? 'auto' : '560vh' }} aria-label="The journey from Canton to Kolkata, London and Dubai">
-      <div className={calm ? 'relative' : 'sticky top-0 h-[100svh] overflow-hidden'}>
-        <div className="voyage-paper absolute inset-0" aria-hidden="true" />
-        <div className="relative mx-auto flex h-full max-w-[1240px] flex-col gap-5 px-[clamp(16px,4vw,40px)] pb-6 pt-[86px] lg:flex-row lg:items-center lg:gap-16 lg:pb-10">
-          <figure
-            ref={figureRef}
-            className="voyage-maps relative m-0 max-h-[46svh] shrink-0 self-center overflow-hidden border-[10px] border-ink bg-white shadow-[0_30px_80px_rgb(44_41_37/0.35)] lg:max-h-none lg:self-auto"
-            style={{ width: 'min(100%, calc((100svh - 130px) * 0.98), 660px)', aspectRatio: `${W} / ${H}` }}
-          >
-            {/* East: the menu map itself. */}
-            <div className="voyage-layer voyage-east absolute inset-0">
-              <img src={art.map} alt="The hand-drawn map from the Fatt Pundit menu: southern China, the Bay of Bengal and India" className="block h-full w-full" width={W} height={H} />
-              <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
-                <path d={LEG1} fill="none" stroke="#2c2925" strokeOpacity="0.18" strokeWidth="6" strokeDasharray="4 14" strokeLinecap="round" />
-                <path ref={leg1Ref} d={LEG1} fill="none" stroke="#f15d3d" strokeWidth="11" strokeLinecap="round" strokeDasharray={calm ? undefined : '0 100000'} />
-                <circle cx="1038" cy="718" r="16" fill="#f15d3d" />
-                <circle cx="505" cy="752" r="18" fill={stop >= 2 ? '#f15d3d' : 'none'} stroke="#f15d3d" strokeWidth="5" className={stop === 2 && !calm ? 'voyage-pulse' : ''} />
-                <g ref={boat1Ref} style={{ transform: 'translate(1038px, 718px)' }}>
-                  <Ship href={art.ship} size={190} />
-                </g>
-              </svg>
-            </div>
+    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : '460vh' }} aria-label="The journey from Canton to Kolkata, London and Dubai">
+      <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[68px] h-[calc(100svh-68px)] overflow-hidden'}>
+        {/* The chart: one image, moved only by transform. */}
+        <img ref={seaRef} src={art.sea} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} decoding="async" />
+        <svg ref={svgRef} className="voyage-ink absolute inset-0 h-full w-full" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+          <image href={art.mountainsB} x={world.mountains.himalaya[0] - 150} y={world.mountains.himalaya[1] - 70} width="260" opacity="0.85" />
+          <image href={art.mountainA} x={world.mountains.alps[0] - 70} y={world.mountains.alps[1] - 40} width="150" opacity="0.85" />
+          <image href={art.mountainsC} x={world.mountains.caucasus[0] - 60} y={world.mountains.caucasus[1] - 34} width="130" opacity="0.85" />
+          <image href={art.compass} x={world.compass[0] - 70} y={world.compass[1] - 100} width="140" className="voyage-compass" />
+          {/* The course ahead: gold dots. */}
+          {LEGS.map((d, i) => (
+            <path key={`c${i}`} d={d} className="voyage-course" />
+          ))}
+          {/* The course sailed: drawn as the ship goes. Tiger for the story so far, gold for what's next. */}
+          {/* The Dubai leg goes underneath, so where it retraces the London leg the tiger line stays on top. */}
+          {[2, 0, 1].map((i) => (
+            <path
+              key={`l${i}`}
+              ref={(el) => {
+                legRefs.current[i] = el;
+              }}
+              d={LEGS[i]}
+              className={i === 2 ? 'voyage-sailed voyage-sailed-next' : 'voyage-sailed'}
+              style={{ strokeDasharray: '0 100000' }}
+            />
+          ))}
+          {PORTS.map((pt, i) => (
+            <g key={pt.id} transform={`translate(${pt.at[0]} ${pt.at[1]})`} className={`voyage-port ${i <= reached ? 'is-reached' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
+              <g className="voyage-mk">
+                <circle r="13" className="voyage-ring" />
+                <circle r="6" className="voyage-dot" />
+                <text x={pt.anchor === 'end' ? -pt.dx - 6 : pt.dx + 6} y={pt.dy} textAnchor={pt.anchor} className="voyage-name">
+                  {pt.name}
+                </text>
+              </g>
+            </g>
+          ))}
+          <g ref={shipRef} transform={`translate(${PORTS[0].at[0]} ${PORTS[0].at[1]})`}>
+            {/* The brand's junk on a tiger badge, so it reads against the busy chart. */}
+            <g className="voyage-mk">
+              <circle r={SHIP_PX / 2} className="voyage-badge" />
+              <g ref={hullRef}>
+                <image href={art.ship} width={SHIP_PX * 0.78} height={SHIP_PX * 0.78} x={-SHIP_PX * 0.39} y={-SHIP_PX * 0.43} className="voyage-hull" />
+              </g>
+            </g>
+          </g>
+        </svg>
+        <div className="voyage-vignette pointer-events-none absolute inset-0" aria-hidden="true" />
 
-            {/* West: the wider map, drawn in the menu map's engraved style, framed with its border. */}
-            <div className="voyage-layer voyage-west absolute inset-0">
-              <img src={art.world} alt="A map in the same engraved style from London to the South China Sea, with the route from Canton to Kolkata, on to London, and a branch to Dubai" className="block h-full w-full" width={W} height={H} loading="lazy" />
-              <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
-                <image href={art.mountainsB} x={M.himalaya[0] - 150} y={M.himalaya[1] - 70} width="260" />
-                <image href={art.mountainA} x={M.alps[0] - 70} y={M.alps[1] - 40} width="150" />
-                <image href={art.mountainsC} x={M.caucasus[0] - 60} y={M.caucasus[1] - 34} width="130" />
-                <image href={art.compass} x={world.compass[0] - 60} y={world.compass[1] - 90} width="120" />
-                <path d={world.leg1} fill="none" stroke="#f15d3d" strokeWidth="7" strokeLinecap="round" />
-                <path d={world.leg2} fill="none" stroke="#2c2925" strokeOpacity="0.2" strokeWidth="4" strokeDasharray="3 10" strokeLinecap="round" />
-                <path ref={leg2Ref} d={world.leg2} fill="none" stroke="#f15d3d" strokeWidth="8" strokeLinecap="round" strokeDasharray={calm ? undefined : '0 100000'} />
-                <path ref={dubaiRef} d={world.dubai} fill="none" stroke="#cba052" strokeWidth="7" strokeLinecap="round" strokeDasharray={calm ? '2 12' : '0 100000'} />
-                <Place at={world.points.canton} label="Canton" anchor="end" dx={14} dy={-18} />
-                <Place at={world.points.kolkata} label="Kolkata" anchor="end" dx={14} dy={40} />
-                <Place at={world.points.dubai} label="Dubai" anchor="end" dx={16} dy={-16} show={stop >= 5} />
-                {/* London: the two restaurant stamps land on the city, gold for Soho, orange for Covent Garden. */}
-                <g className={`voyage-stamp ${stop >= 4 ? 'is-in' : ''}`} style={{ transformOrigin: `${L[0]}px ${L[1]}px` }}>
-                  <image href={art.stampGold} x={L[0] + 6} y={L[1] - 250} width="150" transform={`rotate(-8 ${L[0] + 80} ${L[1] - 120})`} />
-                  <image href={art.stampOrange} x={L[0] + 120} y={L[1] - 210} width="160" transform={`rotate(7 ${L[0] + 200} ${L[1] - 90})`} />
-                </g>
-                <Place at={L} label="London" dx={16} dy={44} show={stop >= 4} />
-                <g ref={boat2Ref} style={{ transform: `translate(${(calm ? L : world.points.kolkata)[0]}px, ${(calm ? L : world.points.kolkata)[1]}px)` }}>
-                  <Ship href={art.ship} size={160} />
-                </g>
-              </svg>
-              <div className="pointer-events-none absolute inset-0" style={{ borderStyle: 'solid', borderWidth: '28px', borderImage: `url(${art.frame}) 60 stretch` }} />
-            </div>
-          </figure>
-
-          <div className="flex min-w-0 flex-1 flex-col gap-3 lg:min-w-[420px] lg:gap-5">
-            <p className="note m-0 hidden text-[20px] lg:block">The journey</p>
-            <h2 key={west ? 'w' : 'e'} className="voyage-heading m-0 text-[clamp(26px,4vw,54px)]">
-              {west ? 'From Kolkata to London' : 'From Canton to Kolkata'}
-            </h2>
-
-            <ol className="m-0 flex list-none flex-col gap-3 p-0" aria-live="off">
-              {STOPS.map((st, i) =>
-                visible(i) ? (
-                  <li key={st.label} className={`${i === stop ? 'grid' : 'hidden lg:grid'} grid-cols-[auto_1fr] items-baseline gap-x-4 transition-opacity duration-500`} style={{ opacity: i === stop ? 1 : 0.55 }}>
-                    <span className={labelStyle}>{st.label}</span>
-                    {i === stop && !calm ? (
-                      <TypewriterTitle as="p" key={`t-${i}`} autoLoop={false} naturalVariance sequences={[{ text: st.text, deleteAfter: false }]} startDelay={80} textClassName={`whitespace-pre-wrap ${textStyle} @lg:text-[clamp(16px,1.5vw,19px)] @2xl:text-[clamp(16px,1.5vw,19px)] tracking-[0.04em]`} typingSpeed={22} className="m-0 justify-start font-body text-ink tracking-normal" />
-                    ) : (
-                      <p className={`m-0 ${textStyle}`}>{st.text}</p>
-                    )}
-                  </li>
-                ) : null,
-              )}
-            </ol>
-
-            {!west && (
-              <MarkerText as="p" className={`m-0 ${textStyle} ${stop === 2 ? '' : 'hidden lg:block'}`} show={tangra}>
-                <span style={{ opacity: tangra ? 1 : 0, transition: 'opacity .5s' }}>
-                  In <Mark type="circle">Tangra</Mark>, Kolkata's Chinatown, the wok meets Indian spice. Indo-Chinese food is born: <Mark type="underline">new, yet familiar</Mark>.
-                </span>
-              </MarkerText>
-            )}
-
-            {named && (
-              <div className="mt-1 flex flex-wrap gap-x-8 gap-y-4">
-                <div className="flex flex-col gap-2">
-                  <SplitFlapText className="text-[clamp(22px,2.6vw,34px)]" length={4} maxFlips={8} text="FATT" tileClassName="w-[0.86em] bg-ink text-sand" />
-                  <span className="text-[14px]">a common Chinese surname</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <SplitFlapText className="text-[clamp(22px,2.6vw,34px)]" length={6} maxFlips={8} text="PUNDIT" tileClassName="w-[0.86em] bg-ink text-sand" />
-                  <span className="text-[14px]">the Indian word for a scholar</span>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Ticket strip: one hole punched per port; each hole jumps there. */}
+        <div className="absolute inset-x-0 top-3 z-10 flex justify-center px-3">
+          <nav aria-label="Ports on the voyage" className="voyage-ticket flex items-center gap-1 bg-sand px-3 py-1.5 text-ink sm:gap-3 sm:px-5">
+            <span className="hidden font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger sm:inline">Admit one</span>
+            {PORTS.map((pt, i) => (
+              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex min-h-11 items-center gap-1.5 px-1 font-label text-[11px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i <= reached ? 'is-punched' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
+                <span className="voyage-punch" aria-hidden="true" />
+                <span>{pt.name}</span>
+              </button>
+            ))}
+          </nav>
         </div>
+        {!calm && (
+          <p key={leg} className={`voyage-sea-note absolute inset-x-0 top-[72px] z-10 m-0 text-center font-note text-[clamp(15px,1.6vw,19px)] italic text-sand ${leg >= 0 ? 'is-on' : ''}`} aria-hidden={leg < 0}>
+            {leg >= 0 ? AT_SEA[leg] : ''}
+          </p>
+        )}
+
+        {/* Postcards, one per port. All stay in the page for screen readers; only the current one shows. */}
+        {!calm && (
+          <ol className="m-0 list-none p-0">
+            {PORTS.map((pt, i) => (
+              <li key={pt.id} className={`voyage-card ${port === i ? 'is-on' : ''}`}>
+                <Postcard i={i} art={art} live={port === i} />
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
+
+      {calm && (
+        <ol className="mx-auto grid max-w-[1240px] list-none gap-6 px-[clamp(16px,4vw,40px)] py-10 md:grid-cols-2">
+          {PORTS.map((pt, i) => (
+            <li key={pt.id} className="voyage-card is-on is-static">
+              <Postcard i={i} art={art} live={false} still />
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
+  );
+}
+
+/** A postcard from each port: kicker, place in Lora italic, a line or two, and its picture. */
+function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; live: boolean; still?: boolean }) {
+  const text = 'm-0 text-[clamp(15px,1.4vw,18px)] leading-snug';
+  return (
+    <article className="voyage-postcard">
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <p className="m-0 font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger">Stop {i + 1} of 4</p>
+          <h3 className="voyage-title m-0">{['Canton', 'Kolkata', 'London', 'Dubai'][i]}</h3>
+        </div>
+        <span className="voyage-postmark" aria-hidden="true">
+          <span>{['China', 'Tangra', 'W1 · WC2', 'UAE'][i]}</span>
+        </span>
+      </header>
+
+      {i === 0 && <p className={text}>Hakka families leave Canton, southern China, carrying their recipes across the sea.</p>}
+
+      {i === 1 && (
+        <>
+          <img src={art.map} alt="The hand-drawn map from the Fatt Pundit menu: southern China, the Bay of Bengal and India" className="voyage-pic" width={1295} height={1320} loading="lazy" />
+          <MarkerText as="p" className={text} show={live || still}>
+            They make a new home in Kolkata. In <Mark type="circle">Tangra</Mark>, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, <Mark type="underline">new, yet familiar</Mark>.
+          </MarkerText>
+        </>
+      )}
+
+      {i === 2 && (
+        <>
+          <div className="flex items-end justify-center gap-6">
+            <figure className="m-0 flex flex-col items-center gap-1">
+              <img src={art.stampGold} alt="" className="w-[clamp(64px,8vw,96px)] -rotate-6" loading="lazy" />
+              <figcaption className="font-label text-[11px] font-bold uppercase tracking-[0.2em]">Soho · 2019</figcaption>
+            </figure>
+            <figure className="m-0 flex flex-col items-center gap-1">
+              <img src={art.stampOrange} alt="" className="w-[clamp(68px,8.5vw,102px)] rotate-6" loading="lazy" />
+              <figcaption className="font-label text-[11px] font-bold uppercase tracking-[0.2em]">Covent Garden · 2021</figcaption>
+            </figure>
+          </div>
+          <p className={text}>The recipes reach London: Soho in 2019, Covent Garden in 2021.</p>
+        </>
+      )}
+
+      {i === 3 && (
+        <>
+          <p className={text}>
+            Next stop: Dubai, opening soon. <span className="voyage-boarding">Boarding soon</span>
+          </p>
+          <div className="flex flex-wrap gap-x-6 gap-y-3 border-t border-ink/20 pt-3">
+            <div className="flex flex-col gap-1">
+              {live ? <SplitFlapText className="text-[clamp(18px,2vw,26px)]" length={4} maxFlips={8} text="FATT" tileClassName="w-[0.86em] bg-ink text-sand" /> : <span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">FATT</span>}
+              <span className="text-[13px]">a common Chinese surname</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              {live ? <SplitFlapText className="text-[clamp(18px,2vw,26px)]" length={6} maxFlips={8} text="PUNDIT" tileClassName="w-[0.86em] bg-ink text-sand" /> : <span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">PUNDIT</span>}
+              <span className="text-[13px]">the Indian word for a scholar</span>
+            </div>
+          </div>
+        </>
+      )}
+    </article>
   );
 }

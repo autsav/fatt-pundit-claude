@@ -2,9 +2,10 @@
 // Run once (or when routes change): node scripts/build-world-map.mjs
 // Outputs:
 //   src/assets/images/brand/world-land.svg  — coastlines drawn in brand ink on paper (Natural Earth 1:50m, public domain)
+//   src/assets/images/brand/voyage-sea.svg  — the same coast as a night chart (ink sea, gold engraved ripples, sand land)
 //   src/data/world-route.json               — projected route paths + city points, same pixel box as the menu map
 import { readFileSync, writeFileSync } from 'node:fs';
-import { geoMercator, geoPath } from 'd3-geo';
+import { geoGraticule, geoMercator, geoPath } from 'd3-geo';
 import { line, curveCatmullRom } from 'd3-shape';
 import { feature } from 'topojson-client';
 
@@ -57,6 +58,28 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" wid
 </svg>
 `;
 writeFileSync(new URL('../src/assets/images/brand/world-land.svg', import.meta.url), svg);
+
+// Night chart for the home voyage: ink sea, gold graticule, gold ripple lines echoing the
+// coast (the menu map's engraving, inverted), sand land with an ink coastline.
+// The chart reaches past the route box on every side, so the camera never sees its edge.
+const SEA = { x: -420, y: -160, w: W + 840, h: H + 320 };
+projection.clipExtent([[SEA.x, SEA.y], [SEA.x + SEA.w, SEA.y + SEA.h]]);
+const seaLand = geoPath(projection).digits(0)(land);
+const grat = geoPath(projection).digits(0)(geoGraticule().step([10, 10])());
+projection.clipExtent([[0, 0], [W, H]]);
+const ripples = [40, 26, 14]
+  .map((w, i) => `<use href="#l" fill="none" stroke="#cba052" stroke-opacity="${(0.34 - i * 0.07).toFixed(2)}" stroke-width="${w}"/>\n<use href="#l" fill="none" stroke="#2c2925" stroke-width="${w - 2}"/>`)
+  .join('\n');
+const sea = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${SEA.x} ${SEA.y} ${SEA.w} ${SEA.h}" width="${SEA.w}" height="${SEA.h}">
+<defs><path id="l" d="${seaLand}" stroke-linejoin="round"/></defs>
+<rect x="${SEA.x}" y="${SEA.y}" width="${SEA.w}" height="${SEA.h}" fill="#2c2925"/>
+<path d="${grat}" fill="none" stroke="#cba052" stroke-opacity="0.16" stroke-width="1.2" stroke-dasharray="2 6"/>
+${ripples}
+<use href="#l" fill="#dac7b5" stroke="#cba052" stroke-width="7"/>
+<use href="#l" fill="#dac7b5" stroke="#2c2925" stroke-width="2.4"/>
+</svg>
+`;
+writeFileSync(new URL('../src/assets/images/brand/voyage-sea.svg', import.meta.url), sea);
 writeFileSync(
   new URL('../src/data/world-route.json', import.meta.url),
   JSON.stringify(
@@ -67,6 +90,7 @@ writeFileSync(
       // Where the brand's gold mountain drawings sit on this map.
       mountains: { himalaya: P(84, 31), alps: P(9, 46.5), caucasus: P(45, 41.5) },
       compass: P(-4, 2),
+      sea: SEA,
       leg1: route(leg1),
       leg2: route(leg2),
       dubai: route(dubai),

@@ -60,8 +60,16 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 - [ ] Not checked: real phones, Safari, mid-range Android frame rate with steam running
 - [ ] Ask client: photos of the signature dishes (kid goat momo, popcorn cauliflower, paneer cups, monkfish, prawns) to replace the order tickets
 
-## Motion plan · Day 4: bar + room (next)
-- [ ] Spotlight bar (cursor / auto-sweep on phones), contact sheet + lightbox; bill holder (p.38–39) + aprons (p.40–41)
+## Fixes + Day 4 (plan doc: "Fatt Pundit Fixes + Day 4 Plan") ✅ done 18 Nov
+- [x] Phone menu book: vertical swipe scrolls the page, sideways swipe / outer-third tap turns; book capped on phones; "Continue to …" link. Touch-tested 3 pages.
+- [x] Lights on (Covent Garden): wall dims to dusk on scroll, clip plays once off→on, halos + light pools, brass pull-switch replays; hero evening grade + 3 shelf-lamp halos. Calm: lit still.
+- [x] Voyage rebuilt "follow the ship": night chart, camera follows ship, pull-back on long leg, 4 postcards, ticket holes punch + jump. Calm: whole route + postcard grid.
+- [x] Day 4 bar after dark: apron weave, embroidered title, spotlight (cursor / auto-sweep + tap), leather apron drinks card from data. Calm: lit.
+- [x] Day 4 room: contact sheet on halftone, 2 grease-pencil picks, <dialog> lightbox (arrows, swipe, Esc, focus return).
+- [x] Verified desk/phone/calm, no page errors, JS home 161 KB gz / branch 113 KB; demo sub-path test clean; published v1794993077-db07.
+
+## Motion plan · Day 5: boarding pass + goodbye (next)
+- [ ] Boarding pass, tear-to-book, receipt goodbye, bill holder (guidelines p.38–39)
 
 ## Day 2: journey storyboard (next)
 - [ ] docs/journey-storyboard.md: 7 scenes, copy ≤ 25 words each, asset per scene, motion note, reduced-motion still

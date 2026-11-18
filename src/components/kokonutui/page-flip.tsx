@@ -234,6 +234,9 @@ export default function PageFlip({
     start: Pt;
     dragging: boolean;
     back?: boolean;
+    /** Finger or pen: decided by gesture, so vertical swipes keep scrolling the page. */
+    touch?: boolean;
+    done?: boolean;
   } | null>(null);
   const animRef = useRef<ReturnType<typeof animate> | null>(null);
   const playingRef = useRef(false);
@@ -360,6 +363,12 @@ export default function PageFlip({
       return;
     }
     const p = local(event);
+    // Touch (Fatt Pundit change): the browser keeps vertical scrolling (touch-action: pan-y).
+    // A sideways swipe turns the page; a tap turns it only on a page's outer third.
+    if (event.pointerType !== "mouse") {
+      pressRef.current = { start: p, dragging: false, touch: true };
+      return;
+    }
     // On one page, its left edge goes back and the rest turns forward.
     const backZone = single && p.x < size.w * 1.3;
     const dir: 1 | -1 = p.x >= size.w && !backZone ? 1 : -1;
@@ -416,6 +425,22 @@ export default function PageFlip({
     const p = local(event);
     const press = pressRef.current;
     const current = turnRef.current;
+    if (press?.touch) {
+      if (press.done) return;
+      const dx = p.x - press.start.x;
+      const dy = p.y - press.start.y;
+      if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
+        // Scrolling the site: let it go.
+        press.done = true;
+        return;
+      }
+      if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        press.done = true;
+        const dir: 1 | -1 = dx < 0 ? 1 : -1;
+        if (canTurn(dir)) go(dir);
+      }
+      return;
+    }
     if (press?.back) {
       press.dragging ||= len(sub(p, press.start)) >= DRAG_SLOP;
       return;
@@ -433,10 +458,22 @@ export default function PageFlip({
     }
   };
 
-  const onPointerUp = () => {
+  const onPointerUp = (event?: PointerEvent<HTMLDivElement>) => {
     const press = pressRef.current;
     const current = turnRef.current;
     pressRef.current = null;
+    if (press?.touch) {
+      if (press.done || !event || len(sub(local(event), press.start)) >= DRAG_SLOP) return;
+      // A tap: outer third of a page turns it, the middle does nothing.
+      const x = local(event).x;
+      const pageX = single ? x - size.w : x;
+      const third = size.w / 3;
+      const dir: 1 | -1 | 0 = single
+        ? pageX < third ? -1 : pageX > size.w - third ? 1 : 0
+        : x < third ? -1 : x > 2 * size.w - third ? 1 : 0;
+      if (dir && canTurn(dir)) go(dir);
+      return;
+    }
     if (press?.back) {
       if (!press.dragging) {
         go(-1);
@@ -505,8 +542,11 @@ export default function PageFlip({
         style={{ transform: `translateX(${single ? -50 : shift * 100}%)` }}
       >
         <div
-          className="relative aspect-[3/2] w-full touch-none select-none"
-          onPointerCancel={onPointerUp}
+          className="relative aspect-[3/2] w-full touch-pan-y select-none"
+          onPointerCancel={() => {
+            if (pressRef.current?.touch) pressRef.current = null;
+            else onPointerUp();
+          }}
           onPointerDown={onPointerDown}
           onPointerLeave={onPointerLeave}
           onPointerMove={onPointerMove}
