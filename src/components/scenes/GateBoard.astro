@@ -1,0 +1,111 @@
+---
+/**
+ * The first choice on the home page: a departure board with one row per restaurant.
+ * Each row is a real link into that branch's page; live open/closed status fills in on the guest's clock.
+ * Rendered as static HTML (slotted into the rain hero) so the demo exporter can rewrite its links.
+ */
+import { type Branch } from '@/lib/site-data';
+
+interface Props {
+  branches: Branch[];
+}
+const { branches } = Astro.props;
+const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', dubai: 'DXB' };
+---
+<nav class="gates" aria-labelledby="gates-title">
+  <p id="gates-title" class="gates-title">Choose your restaurant</p>
+  <ul class="gates-list">
+    {branches.map((b) => (
+      <li>
+        <a class="gate" href={`/${b.id}/`} data-gate>
+          <span class="gate-code" aria-hidden="true">{CODES[b.id] ?? ''}</span>
+          <span class="gate-main">
+            <span class="gate-name">{b.shortName}</span>
+            <span
+              class="gate-status"
+              data-gate-status
+              data-hours={b.status === 'open' && b.hours ? JSON.stringify(b.hours) : undefined}
+              data-tz={b.timezone}
+              data-soon={b.status !== 'open' ? 'true' : undefined}
+            >
+              {b.status === 'open' ? b.address.street : 'Opening soon'}
+            </span>
+          </span>
+          <span class="gate-go" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" /></svg>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  import { openStatus, statusLine, type Hours } from '@/lib/hours';
+
+  // Fill each row's status on the guest's own clock, in the branch's time zone.
+  // The hero re-mounts its content once the rain starts, so this re-runs whenever the rows change.
+  const fill = () => {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-gate-status]')) {
+      if (el.dataset.soon) continue;
+      if (!el.dataset.hours || !el.dataset.tz) continue;
+      const s = openStatus(JSON.parse(el.dataset.hours) as Hours, el.dataset.tz);
+      const text = statusLine('', s).replace(/^\s*·\s*/, '');
+      if (el.textContent !== text) el.textContent = text;
+      el.dataset.open = s.open ? 'true' : 'false';
+    }
+  };
+  fill();
+  setInterval(fill, 60_000);
+  let queued = false;
+  new MutationObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      fill();
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+
+  // Choosing a row: the row stamps, then the branch page opens (cross-page morph).
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[data-gate]');
+    if (!a || calm || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    a.classList.add('is-chosen');
+    window.setTimeout(() => (location.href = a.href), 260);
+  });
+</script>
+
+<style>
+  .gates { width: 100%; max-width: 640px; margin-inline: auto; pointer-events: auto; text-align: left; }
+  .gates-title { margin: 0 0 10px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 19px; color: var(--color-sand); }
+  .gates-list { margin: 0; padding: 0; list-style: none; border: 2px solid var(--color-gold); background: rgb(28 25 22 / 0.88); box-shadow: 0 20px 50px rgb(0 0 0 / 0.45); }
+  .gates-list li + li { border-top: 1px solid rgb(203 160 82 / 0.35); }
+  .gate { display: grid; grid-template-columns: 64px 1fr 44px; align-items: center; gap: 12px; min-height: 72px; padding: 10px 14px; color: var(--color-sand); text-decoration: none; transition: background-color .18s ease; }
+  .gate:hover { background: rgb(241 93 61 / 0.16); }
+  .gate:focus-visible { outline: 3px solid var(--color-tiger); outline-offset: -3px; }
+  /* The gate code reads like a flap on a departure board. */
+  .gate-code { display: grid; place-items: center; height: 40px; background: var(--color-ink); border: 1px solid rgb(203 160 82 / 0.5); color: var(--color-gold); font-family: var(--font-display); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; }
+  .gate-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .gate-name { font-family: var(--font-display); font-size: clamp(20px, 2.6vw, 26px); font-weight: 700; line-height: 1.1; letter-spacing: 0.06em; text-transform: uppercase; }
+  .gate-status { font-family: var(--font-note); font-style: italic; font-size: 16px; color: rgb(218 199 181 / 0.85); }
+  .gate-status[data-open='true']::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: #6fbf73; vertical-align: 1px; }
+  .gate-go { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-tiger); transition: transform .18s ease; }
+  .gate:hover .gate-go { transform: translateX(4px); }
+  .gate.is-chosen { background: rgb(241 93 61 / 0.28); }
+  .gate.is-chosen .gate-code { animation: gate-stamp .26s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes gate-stamp { 0% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  @media (min-width: 900px) {
+    .gates { max-width: 680px; }
+    .gate { grid-template-columns: 76px 1fr 48px; min-height: 84px; padding: 12px 18px; gap: 16px; }
+    .gate-code { height: 46px; font-size: 19px; }
+    .gate-status { font-size: 17px; }
+  }
+  @media (max-width: 420px) {
+    .gate { grid-template-columns: 52px 1fr 36px; gap: 10px; padding: 10px 10px; }
+    .gate-code { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gate, .gate-go { transition: none; } }
+</style>

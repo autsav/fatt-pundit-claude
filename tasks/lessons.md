@@ -35,3 +35,5 @@ Review at the start of every session. Add a line after any correction.
 - CSS @container units measure the content box (inside padding/border) — set thresholds and formulas against that, not the outer shape.
 - An overflow checker must skip deliberately hidden things (skip links, off-screen tracks, clipped book pages) and treat zero-size boxes carefully, or the noise hides the real issues.
 
+- Links inside a React island break in the sub-path demo (the exporter only rewrites static HTML). Put link-heavy UI in an Astro component and slot it into the island; use document-level click delegation, since the island can re-mount slotted HTML (listeners on the old nodes are lost).
+- Astro's <astro-slot> wrapper is display:block inside islands: it shrinks to content in a flex parent. Size it from the parent ([&>*]:w-full).

@@ -3,6 +3,7 @@
 import { getImage, Image } from 'astro:assets';
 import Arrival from '../components/scenes/Arrival.astro';
 import Doors from '../components/scenes/Doors.astro';
+import GateBoard from '../components/scenes/GateBoard.astro';
 import RainHero from '../components/scenes/RainHero.tsx';
 import Voyage from '../components/scenes/Voyage.tsx';
 import Kitchen, { type KitchenDish } from '../components/scenes/Kitchen.tsx';
@@ -130,7 +131,6 @@ const menuPlaces = await Promise.all(
   })),
 );
 const menuArt = { frame: frameArt.src, stampGold: await img(stampGoldArt, 220), stampOrange: await img(stampOrangeArt, 420), map: await img(map, 1000) };
-const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status }));
 ---
 <Base
   title="Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai"
@@ -145,7 +145,7 @@ const branchesLite = branches.map((b) => ({ shortName: b.shortName, timezone: b.
     <Arrival />
     <!-- 1 · Rain on the window -->
     <section id="top" class="rain" aria-label="Fatt Pundit">
-      <RainHero client:load src={rainSrc} branches={branchesLite} />
+      <RainHero client:load src={rainSrc}><GateBoard branches={branches} /></RainHero>
     </section>
     <!-- 2 · The doors -->
     <Doors />

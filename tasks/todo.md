@@ -116,3 +116,8 @@ See plan doc.
 - [x] 5 Menu by location on home: branch tags, ?at= deep link, Dubai card, remembered choice
 - [x] 6 QA at 360/390/768/1440, calm, budget, demo test, publish, commit, lessons
 - Verified: overflow script (incl. text in round shapes) at 360/390/768/1440 on 4 pages clean except intentional off-screen (book back page, Soho pan); 3-mode sweep no errors/overflow; JS home 163 KB, branches ≤117 KB; pages land at top even when forced to bottom; menu-at flows (tag, arrows, reload, ?at=, pass link). 15/16 upscales kept, gallery-08 original (upscaler invented Chinese glyphs). Published v1795007885-3104.
+
+## Home: choose your restaurant at the top ✅ done 18 Nov
+- [x] Departure-board chooser in the hero (W1 Soho / WC2 Covent Garden / DXB Dubai), each row links to the branch page, live status on the guest's clock, stamp on tap
+- [x] Replaces the cycling flip board, Book/See menus buttons and open pill; "Or see the menus first" link kept
+- [x] Verified phone/desktop/calm + exported demo sub-path: board on first screen, rows land on branch page at top. Published v1795018269-a46d
