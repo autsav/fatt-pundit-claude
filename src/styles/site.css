@@ -59,7 +59,7 @@ body { font-size: 17px; line-height: 1.55; }
 .foot { background: var(--color-ink); color: var(--color-sand); padding-block: 64px 40px; }
 .foot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; }
 .foot-h { font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-gold); }
-.foot-nav { display: flex; flex-wrap: wrap; gap: 10px 26px; border-top: 1px solid var(--color-gold); padding-top: 22px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.12em; }
+.foot-nav { display: flex; flex-wrap: wrap; gap: 10px 26px; border-top: 1px solid var(--color-gold); padding-top: 22px; font-size: 15px; }
 .foot-nav a { color: var(--color-sand); }
 .foot-nav a:hover { color: var(--color-gold); }
 
@@ -73,7 +73,7 @@ body { font-size: 17px; line-height: 1.55; }
   .nav a:not(.btn) { display: none; }
   .brand { font-size: 17px; letter-spacing: 0.14em; }
   .bar-in { flex-wrap: nowrap; }
-  .nav .btn-sm { padding: 0 16px; }
+  .nav .btn-sm { padding: 0 14px; font-size: 14px; letter-spacing: 0.06em; white-space: nowrap; }
   .nav .lbl-long { display: none; }
   .nav .lbl-short { display: inline; }
 }

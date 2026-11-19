@@ -69,7 +69,6 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     </script>
     <!-- Preload only the bold cut: it sets every title on the first screen. -->
     <Font cssVariable="--font-typewriter" preload={[{ weight: 700 }]} />
-    <Font cssVariable="--font-typewriter-condensed" />
     <!-- Lora italic sets the hero line and every board status: load it with
          the first paint so lines don't re-wrap (layout shift) when it lands. -->
     <Font cssVariable="--font-lora" preload />

@@ -52,8 +52,10 @@ export function openStatus(hours: Hours, timeZone: string, now: Date = new Date(
 
 /** One short line for the hero pill. */
 export function statusLine(name: string, s: OpenStatus): string {
-  if (s.open) return `${name} · Open now · until ${s.until}`;
-  if (!s.opens) return `${name} · Closed`;
+  // Plain sentences: "Soho is open until 10.30pm", "Opens tomorrow 12pm" (name left out when the page says it).
+  const who = name ? `${name} is ` : '';
+  if (s.open) return name ? `${who}open until ${s.until}` : `Open until ${s.until}`;
+  if (!s.opens) return name ? `${who}closed` : 'Closed';
   const when = s.opensDay === 'today' ? '' : s.opensDay === 'tomorrow' ? ' tomorrow' : ` ${s.opensDay![0].toUpperCase()}${s.opensDay!.slice(1)}`;
-  return `${name} · Opens${when} ${s.opens}`;
+  return name ? `${name} opens${when} ${s.opens}` : `Opens${when} ${s.opens}`;
 }

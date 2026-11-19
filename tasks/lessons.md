@@ -54,3 +54,6 @@ Review at the start of every session. Add a line after any correction.
 - Python str.replace with an empty 'old' inserts at every character: always assert the slice/old text is non-empty and found exactly once before replacing (a bad index() blew a page up to 695k lines).
 - A focus ring in a brand accent fails 3:1 on the brand's own paper: colour the ring by the surface (custom property set on surfaces, never on the control itself, since the ring sits outside the control).
 - "Empty" screens in a headless sweep can be capture timing (letter-by-letter titles, receipts printing): re-check one screen with a longer wait before redesigning it.
+- Removing `white-space: nowrap` from a line next to a late-loading font brings layout shift back (CLS 0 → 0.215): keep single-line slots single-line, change the layout instead.
+- Split-flap boards that step alphabetically can spell words mid-flight: animate through digits/signs, never letters.
+- Compare perf against the previous build in interleaved runs on the same machine before calling something a regression (a git worktree on another port does it).

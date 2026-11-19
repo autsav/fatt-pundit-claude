@@ -183,7 +183,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     <section class="sec room" aria-labelledby="room-title">
       <div class="wrap stack-lg">
         <div class="stack">
-          <p class="kicker lead-text">{p.opened ? `The room · since ${p.opened}` : 'The room · coming soon'}</p>
+          <p class="kicker lead-text">{p.opened ? `The room, since ${p.opened}` : 'The room, coming soon'}</p>
           <h2 id="room-title" class="room-lines">{p.lines.map((l) => <span>{l}</span>)}</h2>
         </div>
         {b.id === 'covent-garden' && (
@@ -256,7 +256,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
     <!-- 4 · The menus here -->
     {books.length > 0 && <MenuBook client:visible menus={books} art={menuArt} next={{ href: '#visit', label: 'Continue to visit' }} />}
-    {open && <p class="menu-list-link"><a href={`/${b.id}/menu/`}>Read every {b.shortName} menu as a list</a> · search, diet filters, print</p>}
+    {open && <p class="menu-list-link"><a href={`/${b.id}/menu/`}>Read every {b.shortName} menu as a list</a>, with search, diet filters and printing.</p>}
 
     <!-- 5 · Visit -->
     <section id="visit" class="sec ink visit" aria-labelledby="visit-title">
@@ -346,7 +346,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
               <span class="other-k">{o.status === 'open' ? 'Next stop' : 'Boarding soon'}</span>
               <span class="other-name">{o.shortName}</span>
               <span class="other-addr">{o.address.street}</span>
-              <span class="other-go">Step inside →</span>
+              <span class="other-go">Step inside</span>
             </a>
           ))}
         </div>
@@ -357,7 +357,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   <!-- Phones: Book, Menu and Directions stay one thumb away once the hero has scrolled by. -->
   <nav class="dock" data-dock aria-label={`${b.shortName} quick actions`}>
     {b.booking
-      ? <a class="dock-book" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener" aria-label={`Book a table at ${b.shortName}`}>Book</a>
+      ? <a class="dock-book" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener" aria-label={`Book a table at ${b.shortName}`}>Book a table</a>
       : <a class="dock-book" href="#waitlist">Join the list</a>}
     <a href={open ? `/${b.id}/menu/` : '#menu'}>Menu</a>
     <a href={directionsUrl(b)} target="_blank" rel="noopener">Directions</a>
@@ -376,7 +376,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: el.dataset.tz!, hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
       document.documentElement.dataset.daypart = part;
       document.documentElement.dataset.hour = String(hour);
-      el.innerHTML = `${ICON[part]}<span>${clockIn(el.dataset.tz!)} in ${el.dataset.name} · ${WORD[part]}</span>`;
+      el.innerHTML = `${ICON[part]}<span>${clockIn(el.dataset.tz!)} in ${el.dataset.name}, ${WORD[part]}</span>`;
     };
     tick();
     setInterval(tick, 60_000);
@@ -482,10 +482,10 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .sig { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
   @media (max-width: 760px) { .sig { grid-template-columns: 1fr; } }
   .sig-ticket { position: relative; background: var(--color-paper-light); padding: 26px 26px 34px; min-height: 300px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.6); border-top: 2px dashed rgb(44 41 37 / 0.4); rotate: -1.5deg; }
-  .sig-no { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-tiger-deep); border-bottom: 2px dotted rgb(44 41 37 / 0.4); padding-bottom: 8px; }
+  .sig-no { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 19px; color: var(--color-tiger-deep); border-bottom: 2px dotted rgb(44 41 37 / 0.4); padding-bottom: 8px; }
   .sig-name { font-size: clamp(26px, 2.6vw, 34px); font-weight: 700; text-transform: uppercase; line-height: 1.05; letter-spacing: 0.03em; }
   .sig-price { font-weight: 700; font-size: 22px; color: var(--color-tiger); }
-  .sig-stamp { position: absolute; right: -12px; bottom: -14px; width: 104px; rotate: -10deg; }
+  .sig-stamp { position: absolute; right: -12px; bottom: -14px; width: 104px; }
   .sig-desc { font-family: var(--font-note); font-style: italic; font-size: 21px; }
   .tags { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.22em; color: var(--color-gold-deep); }
   .teaser { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
@@ -500,7 +500,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .hours-lg { font-size: 17px; gap: 0; display: block; }
   .hours-lg > div { display: grid; grid-template-columns: 9em 1fr; padding: 8px 10px; border-bottom: 1px solid rgb(203 160 82 / 0.35); }
   .hours-lg > div.today { background: rgb(203 160 82 / 0.16); }
-  .hours-lg > div.today dt::after { content: ' · today'; color: var(--color-gold); font-weight: 400; }
+  .hours-lg > div.today dt::after { content: ' (today)'; color: var(--color-gold); font-weight: 400; }
 
   /* Good to know */
   .faq { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 28px; }
@@ -522,13 +522,13 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .other-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; max-width: 900px; margin-inline: auto; width: 100%; }
   .other { display: flex; flex-direction: column; gap: 6px; padding: 28px; background: var(--color-ink); color: var(--color-sand); text-decoration: none; outline: 3px dashed var(--color-ink); outline-offset: 7px; transition: transform .2s cubic-bezier(.2, 1.4, .4, 1); }
   .other:hover { transform: translateY(-4px) rotate(-0.6deg); }
-  .other-k { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-gold); }
+  .other-k { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 18px; color: var(--color-gold); }
   .other-name { font-size: 34px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
   .other-addr { font-family: var(--font-note); font-style: italic; }
   .other-go { margin-top: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-tiger-bright); }
-  .dock { position: fixed; z-index: 40; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); display: none; grid-template-columns: 1.4fr 1fr 1fr; gap: 6px; padding: 6px; background: var(--color-ink); border: 2px solid var(--color-gold); box-shadow: 0 10px 30px rgb(0 0 0 / 0.35); transform: translateY(140%); transition: transform .25s ease; }
+  .dock { position: fixed; z-index: 40; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); display: none; grid-template-columns: 1.6fr 1fr 1.2fr; gap: 6px; padding: 6px; background: var(--color-ink); border: 2px solid var(--color-gold); box-shadow: 0 10px 30px rgb(0 0 0 / 0.35); transform: translateY(140%); transition: transform .25s ease; }
   .dock.is-on { transform: none; }
-  .dock a { display: grid; place-items: center; min-height: 48px; padding: 0 8px; color: var(--color-sand); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; text-align: center; border: 1px solid rgb(218 199 181 / 0.35); }
+  .dock a { display: grid; place-items: center; min-height: 48px; padding: 0 6px; color: var(--color-sand); font-weight: 700; font-size: 13px; letter-spacing: 0.04em; white-space: nowrap; text-transform: uppercase; text-decoration: none; text-align: center; border: 1px solid rgb(218 199 181 / 0.35); }
   .dock .dock-book { background: var(--color-tiger); color: var(--color-ink-deep); border-color: var(--color-tiger); }
   @media (max-width: 760px) { .dock { display: grid; } }
   @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }

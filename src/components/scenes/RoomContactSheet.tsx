@@ -115,7 +115,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
             <figcaption className="flex w-full max-w-[1100px] items-center justify-between gap-4 px-2 text-sand">
               <span className="font-note text-[16px] italic">{cur.alt}</span>
               <span className="shrink-0 font-label text-[12px] font-bold uppercase tracking-[0.24em] text-gold">
-                Frame {FIRST + open} · {open + 1} / {frames.length}
+                Frame {FIRST + open}, {open + 1} of {frames.length}
               </span>
             </figcaption>
           </figure>

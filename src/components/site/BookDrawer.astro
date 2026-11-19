@@ -188,7 +188,7 @@ const data = branches.map((b) => ({
       $<HTMLElement>('[data-book-group]').hidden = !tooMany;
       $<HTMLElement>('[data-book-group-n]').textContent = String(b.maxOnline + 1);
       for (const a of dlg.querySelectorAll<HTMLAnchorElement>('[data-book-tel],[data-book-tel2]')) { a.href = `tel:${b.phone}`; a.textContent = b.phonePretty; }
-      $<HTMLElement>('[data-book-name]').textContent = b.name;
+      $<HTMLElement>('[data-book-name]').textContent = `at ${b.name}`;
       $<HTMLElement>('[data-book-provider]').textContent = PROVIDER[b.provider] ?? 'the booking page';
       sizeOut.value = String(size);
       dlg.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = size <= 1;

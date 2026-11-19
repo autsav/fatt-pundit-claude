@@ -18,8 +18,8 @@ export default function OpenNowPill({ branches, nameless = false }: { branches: 
     const compute = () =>
       setLines(
         branches.map((b) => {
-          const drop = (t: string) => (nameless ? t.replace(`${b.shortName} · `, '') : t);
-          if (b.status === 'opening-soon' || !b.hours) return { text: drop(`${b.shortName} · Opening soon`), open: false };
+          const drop = (t: string) => (nameless ? t.replace(`${b.shortName} is `, '').replace(`${b.shortName} `, '').replace(/^./, (c) => c.toUpperCase()) : t);
+          if (b.status === 'opening-soon' || !b.hours) return { text: drop(`${b.shortName} is opening soon`), open: false };
           const s = openStatus(b.hours, b.timezone);
           return { text: drop(statusLine(b.shortName, s)), open: s.open };
         }),

@@ -35,19 +35,6 @@ export default defineConfig({
       },
     },
     {
-      provider: fontProviders.local(),
-      name: 'American Typewriter Condensed',
-      cssVariable: '--font-typewriter-condensed',
-      fallbacks: ['Courier New', 'monospace'],
-      options: {
-        variants: [
-          { src: [`${at}/american-typewriter-condensed-light.woff2`], weight: 300, style: 'normal' },
-          { src: [`${at}/american-typewriter-condensed.woff2`], weight: 400, style: 'normal' },
-          { src: [`${at}/american-typewriter-condensed-bold.woff2`], weight: 700, style: 'normal' },
-        ],
-      },
-    },
-    {
       // Brand guidelines: notes/captions in Lora Medium Italic (OFL, free).
       provider: fontProviders.local(),
       name: 'Lora',

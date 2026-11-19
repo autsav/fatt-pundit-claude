@@ -201,3 +201,16 @@ Gate for every item: before/after screenshots 390 + 1440, contrast 4.5:1, `npm r
   - E6: 3 button kinds with one size. The focus ring colour follows the surface via --fp-ring: 0 failures over 553 controls. Two paper tokens.
   - E7: stamp press on buttons, tabs and gate rows; boarding passes lift on hover; all off in reduced motion. The dock already hides at the foot.
   - QA: perf budget met (90/98/98/99, observed LCP ≤0.21 s, CLS 0.001, TBT ≤2 ms, home 1074 KB). Lighthouse a11y 100 except one flaky run (the arrival kicker caught mid-fade). No overflow on 9 pages at 360/768/1024/1440, 0 JS errors, calm mode ok.
+
+## Brand guidelines check + audit fixes 1–6 (19 Nov, midday)
+- [x] Read B3 guidelines (47 pp). Rules that matter for the web: never rotate or reshape the logo, nor put it on a busy photo; the 5 colours only; AT Bold/Semi Bold/Regular + Lora Medium Italic only
+- [x] Logo: removed rotation from 9 stamp uses (arrival + its press animation, passes, voyage, menu book, kitchen, Dubai, signature card). Branch hero mark checked: full shape, on solid ink, approved colour
+- [x] Fonts: dropped AT Condensed (labels now AT; one fewer font family to load). `font-synthesis: none` keeps Lora true Medium Italic wherever 600/700 was asked for
+- [x] Colours: Soho teal and CG green branch accents → slate / tiger; film-edge ambers → gold/sand; #a87f33 → gold-deep; white → paper. Kept: the Westminster street sign and the blue-and-white plates (real objects)
+- [x] 1 Split-flap: flips through digits/signs only, then lands. Verified 26 frames, no foreign letters
+- [x] 2 Calm mode: opening line shows over the open doors
+- [x] 3 Capital labels 97 → 71 distinct: label-above-heading habits became Lora notes; kept ticket/pass/receipt/menu tabs/diet codes/nav
+- [x] 4 Dot strings → sentences (hours line now "Soho is open until 10.30pm"; test-hours updated + 2 new cases). Diet code lists keep dots
+- [x] 5 Arrows only on scroll cues
+- [x] 6 One booking vocabulary: "Book a table", "Book at <branch>", "Join the list"; "tear the stub" is the hint, not the label
+- QA: no overflow on 9 pages × 4 widths; focus ring 0/553 + 0/526 failures; a11y 100 (home 97 = the arrival overlay sampled mid-fade, same artefact as before); Soho label-in-name fixed. Perf: home 89–91, CLS 0. Dropped frames 2.0–2.2% vs 1.5–1.8% for the previous build (interleaved runs); the heavier swiftshader test shows 7% for both, kitchen worst in both. At the 2% line: worth a kitchen pass.

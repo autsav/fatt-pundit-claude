@@ -130,7 +130,7 @@ const menuPlaces = await Promise.all(
     name: b.shortName,
     street: b.address.street,
     menus: b.menus,
-    book: b.status === 'open' && b.booking ? { href: b.booking.url, label: `Book ${b.shortName}` } : undefined,
+    book: b.status === 'open' && b.booking ? { href: b.booking.url, label: `Book at ${b.shortName}` } : undefined,
     soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: `/${b.id}/#waitlist` },
   })),
 );
@@ -180,7 +180,7 @@ const orgLd = {
 
     <!-- 5 · The menu book -->
     <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} next={{ href: '#bar', label: 'Continue to the bar' }} />
-    <p class="menu-list-link">Menus as a list: {branches.filter((b) => b.status === 'open').map((b, i) => <>{i > 0 && ' · '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}</p>
+    <p class="menu-list-link">Read the menus as a list for {branches.filter((b) => b.status === 'open').map((b, i) => <>{i > 0 && ' or '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}</p>
 
     <!-- 6 · The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />

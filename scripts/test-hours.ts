@@ -16,19 +16,22 @@ assert.equal(prettyTime('12:00'), '12pm');
 // Winter (GMT): Wed 18 Nov 2026 13:00 London = 13:00 UTC → Soho open until 2.30pm
 assert.deepEqual(openStatus(soho.hours, 'Europe/London', at('2026-11-18T13:00:00Z')), { open: true, until: '2.30pm' });
 // Between lunch and dinner → opens today 5pm
-assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-18T15:00:00Z'))), 'Soho · Opens 5pm');
+assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-18T15:00:00Z'))), 'Soho opens 5pm');
 // Saturday late → Soho closed Sunday → opens Monday 12pm
-assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-21T23:00:00Z'))), 'Soho · Opens Mon 12pm');
+assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-21T23:00:00Z'))), 'Soho opens Mon 12pm');
 // Covent Garden Sunday 20:30 → open until 9pm
 assert.deepEqual(openStatus(cg.hours, 'Europe/London', at('2026-11-22T20:30:00Z')), { open: true, until: '9pm' });
 // Covent Garden Sunday 22:00 → Monday closed → opens Tuesday 5pm
-assert.equal(statusLine('Covent Garden', openStatus(cg.hours, 'Europe/London', at('2026-11-22T22:00:00Z'))), 'Covent Garden · Opens Tue 5pm');
+assert.equal(statusLine('Covent Garden', openStatus(cg.hours, 'Europe/London', at('2026-11-22T22:00:00Z'))), 'Covent Garden opens Tue 5pm');
 
 // Summer (BST = UTC+1): Wed 15 Jul 2026 16:45 UTC = 17:45 London → open until 10.30pm
 assert.deepEqual(openStatus(soho.hours, 'Europe/London', at('2026-07-15T16:45:00Z')), { open: true, until: '10.30pm' });
 // 16:45 UTC in winter = 16:45 London → closed, opens 5pm (proves the clock change is handled)
-assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-18T16:45:00Z'))), 'Soho · Opens 5pm');
+assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-18T16:45:00Z'))), 'Soho opens 5pm');
 // Tue 22:45 (after close) → opens tomorrow (Wed) noon
-assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-17T22:45:00Z'))), 'Soho · Opens tomorrow 12pm');
+assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-17T22:45:00Z'))), 'Soho opens tomorrow 12pm');
 
 console.log('hours: all tests passed');
+// Plain sentences, no dot-joined fragments; the gate board passes no name.
+assert.equal(statusLine('', openStatus(soho.hours, 'Europe/London', at('2026-11-18T15:00:00Z'))), 'Opens 5pm');
+assert.match(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-18T13:00:00Z'))), /^Soho is open until /);

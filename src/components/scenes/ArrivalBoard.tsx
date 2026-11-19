@@ -6,12 +6,10 @@ import SplitFlapText from '@/components/kokonutui/split-flap-text';
  * Announces `fp:board-done` on window when the flaps have settled,
  * so the Astro arrival script can thud the stamp down.
  */
-// Same drum order as SplitFlapText. Each tile starts a few flaps before its letter,
-// so the board clatters briefly instead of spinning the whole drum (fast on slow phones too).
-const CHARSET = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.-/&!?';
+// The board starts on numbers and signs and clatters through more of them before each letter lands
+// (maxFlips), so it never spells anything but the name, and settles fast on slow phones too.
 const TARGET = 'FATT PUNDIT';
-const LEAD = [7, 5, 9, 6, 0, 8, 6, 10, 5, 7, 9];
-const START = [...TARGET].map((c, i) => (c === ' ' ? ' ' : CHARSET[(CHARSET.indexOf(c) - LEAD[i] + CHARSET.length) % CHARSET.length])).join('');
+const START = [...TARGET].map((c, i) => (c === ' ' ? ' ' : '7&2:9-4/38'[i % 10])).join('');
 
 export default function ArrivalBoard() {
   const [text, setText] = useState(START);
@@ -30,6 +28,7 @@ export default function ArrivalBoard() {
     <SplitFlapText
       className="font-display text-[clamp(30px,7.4vw,92px)] tracking-normal"
       length={11}
+      maxFlips={6}
       onSettled={settled}
       text={text}
       tileClassName="bg-[#3a3631] text-sand shadow-[inset_0_0_0_1px_rgb(203_160_82/0.35),0_6px_14px_rgb(0_0_0/0.45)]"

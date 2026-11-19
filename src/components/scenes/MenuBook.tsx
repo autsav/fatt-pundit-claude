@@ -106,7 +106,7 @@ function paginate(menu: MenuLite, z: Sizes): PageData[] {
 
 function Frame({ art, children }: { art: Art; children: ReactNode }) {
   return (
-    <div className="relative size-full bg-white">
+    <div className="relative size-full bg-paper-light">
       <div aria-hidden="true" className="pointer-events-none absolute inset-[2.6cqw]" style={{ borderStyle: 'solid', borderWidth: '3.6cqw', borderImage: `url(${art.frame}) 60 stretch` }} />
       <div className="absolute inset-[9cqw] flex flex-col">{children}</div>
     </div>
@@ -144,13 +144,13 @@ const Allergy = ({ text }: { text: string }) => <p className="m-0 pt-[1cqw] text
 function MenuHeader({ menu, art }: { menu: MenuLite; art: Art }) {
   return (
     <header className="flex items-center justify-between gap-[2cqw] pb-[4cqw] text-center">
-      <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw] -rotate-6" draggable={false} />
+      <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
       <div>
         <p className="m-0 text-[6.6cqw] font-bold uppercase leading-none tracking-[0.1em]">Fatt Pundit</p>
         <p className="m-0 mt-[1.6cqw] font-note text-[4cqw] text-tiger">{menu.title}</p>
-        <p className="m-0 mt-[1cqw] font-label text-[2.6cqw] font-bold uppercase tracking-[0.22em]">Soho · Covent Garden</p>
+        <p className="m-0 mt-[1cqw] font-label text-[2.6cqw] font-bold uppercase tracking-[0.22em]">Soho and Covent Garden</p>
       </div>
-      <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw] rotate-6" draggable={false} />
+      <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
     </header>
   );
 }
@@ -229,9 +229,9 @@ function Cover({ menu, art, place }: { menu: MenuLite; art: Art; place?: MenuPla
       <div>
         <p className="m-0 text-[8cqw] font-bold uppercase leading-none tracking-[0.12em]">Fatt Pundit</p>
         <p className="m-0 mt-[3cqw] font-note text-[5.4cqw] text-gold">{menu.title}</p>
-        {place && <p className="m-0 mt-[4cqw] font-label text-[3.2cqw] font-bold uppercase tracking-[0.22em] text-sand/85">{place.name} · {place.street}</p>}
+        {place && <p className="m-0 mt-[4cqw] font-label text-[3.2cqw] font-bold uppercase tracking-[0.22em] text-sand/85">{place.name}, {place.street}</p>}
       </div>
-      <p className="absolute bottom-[9cqw] m-0 font-label text-[max(12px,2.8cqw)] font-bold uppercase tracking-[0.26em] text-sand/70">Turn the corner →</p>
+      <p className="absolute bottom-[9cqw] m-0 font-note font-medium normal-case italic tracking-normal text-[max(14px,3.4cqw)] text-sand/80">Turn the corner</p>
     </div>
   );
 }

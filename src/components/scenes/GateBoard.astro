@@ -62,7 +62,7 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
       if (el.dataset.soon) continue;
       if (!el.dataset.hours || !el.dataset.tz) continue;
       const s = openStatus(JSON.parse(el.dataset.hours) as Hours, el.dataset.tz);
-      const text = statusLine('', s).replace(/^\s*·\s*/, '');
+      const text = statusLine('', s);
       if (el.textContent !== text) el.textContent = text;
       el.dataset.open = s.open ? 'true' : 'false';
     }
@@ -109,7 +109,7 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
   .gate-code { display: grid; place-items: center; height: 40px; background: var(--color-ink); border: 1px solid rgb(203 160 82 / 0.5); color: var(--color-gold); font-family: var(--font-display); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; }
   .gate-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .gate-name { font-family: var(--font-display); font-size: clamp(20px, 2.6vw, 26px); font-weight: 700; line-height: 1.1; letter-spacing: 0.06em; text-transform: uppercase; }
-  .gate-status { font-family: var(--font-note); font-style: italic; font-size: 16px; color: rgb(218 199 181 / 0.85);  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gate-status { font-family: var(--font-note); font-style: italic; font-size: 16px; color: rgb(218 199 181 / 0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* one line: a re-wrap when Lora lands would shift the board */ }
   .gate-status[data-open='true']::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: #6fbf73; vertical-align: 1px; }
   .gate-go { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-tiger); transition: transform .18s ease; }
   .gate:hover .gate-go { transform: translateX(4px); }
@@ -124,6 +124,14 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
   }
   @media (max-width: 420px) {
     .gate { grid-template-columns: 52px 1fr auto 22px; gap: 10px; padding: 10px 10px; }
+  }
+  /* Small phones: the clock drops under the status, so the hours read on one line. */
+  @media (max-width: 420px) {
+    .gate { grid-template-columns: 52px 1fr 22px; row-gap: 2px; }
+    .gate-code { grid-column: 1; grid-row: 1 / span 2; }
+    .gate-main { grid-column: 2; grid-row: 1; }
+    .gate-clock { grid-column: 2; grid-row: 2; margin-left: 0; min-width: 0; justify-content: flex-start; padding-right: 0; }
+    .gate-go { grid-column: 3; grid-row: 1 / span 2; }
     .gate-code { font-size: 15px; }
   }
   @media (prefers-reduced-motion: reduce) { .gate, .gate-go { transition: none; } }

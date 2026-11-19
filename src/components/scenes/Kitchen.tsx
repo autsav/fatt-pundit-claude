@@ -39,7 +39,7 @@ function Ticket({ no, name, section, stamp }: { no: number; name: string; sectio
       <p className="m-0 font-display text-[21px] font-bold uppercase leading-[1.1] tracking-[0.03em] text-ink [overflow-wrap:anywhere] @3xl/rail:text-[24px]">{name}</p>
       <div className="flex items-end justify-between gap-2">
         <p className="m-0 font-note text-[16px] leading-snug text-ink/80">from the {section.toLowerCase()} section</p>
-        <img src={stamp} alt="" width={70} height={81} className="-mb-1 -mr-1 w-[70px] shrink-0 rotate-[-10deg]" draggable={false} />
+        <img src={stamp} alt="" width={70} height={81} className="-mb-1 -mr-1 w-[70px] shrink-0" draggable={false} />
       </div>
     </div>
   );
@@ -95,7 +95,7 @@ export default function Kitchen({ dishes, art }: Props) {
           <p ref={lineRef} className="m-0 font-note text-[clamp(20px,2.2vw,26px)] leading-snug text-sand">
             All meals in Tangra start with momos, straight from the steel steamers.
           </p>
-          <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.26em] text-gold">
+          <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[18px] text-gold">
             <span className="hidden motion-safe:[@media(pointer:fine)]:inline">Move through the steam</span>
             <span className="hidden motion-safe:inline motion-safe:[@media(pointer:fine)]:hidden">Touch the steam</span>
           </p>
@@ -121,7 +121,7 @@ export default function Kitchen({ dishes, art }: Props) {
           }
         />
         <p className="relative mx-auto mt-2 max-w-[1200px] px-5 font-label text-[12px] font-bold uppercase tracking-[0.22em] text-ink/70">
-          Drag or flick · V vegetarian · VG vegan · GF gluten free · DF dairy free · H halal
+          Drag or flick to browse. V vegetarian, VG vegan, GF gluten free, DF dairy free, H halal.
         </p>
       </div>
     </section>

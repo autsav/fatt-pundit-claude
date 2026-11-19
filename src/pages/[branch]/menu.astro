@@ -115,7 +115,7 @@ const ld = {
   ))}
   <DishPassport branch={b.id} name={b.shortName} />
   <p class="menu-empty" data-menu-empty hidden>No dishes match. Clear a filter or try another word.</p>
-  <p class="menu-foot"><a href={`/${b.id}/`}>Back to {b.shortName}</a> · <a href={b.booking?.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a> · <button type="button" class="linkish" onclick="print()">Print this menu</button></p>
+  <p class="menu-foot"><a href={`/${b.id}/`}>Back to {b.shortName}</a><a href={b.booking?.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a><button type="button" class="linkish" onclick="print()">Print this menu</button></p>
   </div>
   </div>
 </InfoShell>
@@ -150,7 +150,7 @@ const ld = {
   .menu-allergy { margin-top: 16px !important; font-size: 14px; }
   .menu-passport-tip { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 15px; }
   .menu-empty { font-family: var(--font-note); font-style: italic; }
-  .menu-foot { margin-top: 32px !important; }
+  .menu-foot { display: flex; flex-wrap: wrap; gap: 8px 24px;  margin-top: 32px !important; }
   .linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--color-tiger-deep); font-weight: 700; text-decoration: underline; cursor: pointer; }
   [hidden] { display: none !important; }
   /* Desktop: the tools become a sticky index on the left, the menu reads down the right. */

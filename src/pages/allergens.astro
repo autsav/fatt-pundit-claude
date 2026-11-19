@@ -9,12 +9,12 @@ const open = (await getBranches()).filter((b) => b.status === 'open');
   <p>Our team can tell you which of the 14 major allergens are in every dish: celery, cereals containing gluten, crustaceans, eggs, fish, lupin, milk, molluscs, mustard, tree nuts, peanuts, sesame, soya and sulphites.</p>
   <h2>Marks on our menus</h2>
   <ul>
-    <li><strong>V</strong> vegetarian · <strong>VG</strong> vegan · <strong>GF</strong> gluten free · <strong>DF</strong> dairy free · <strong>H</strong> halal</li>
+    <li><strong>V</strong> vegetarian, <strong>VG</strong> vegan, <strong>GF</strong> gluten free, <strong>DF</strong> dairy free, <strong>H</strong> halal.</li>
   </ul>
   <p>Our kitchens are busy and share woks, fryers and steamers, so we can't promise any dish is completely free of traces of an allergen.</p>
   <h2>Ask before you book</h2>
   <ul>
-    {open.map((b) => <li>{b.shortName}: <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a>{b.email && <> · <a href={`mailto:${b.email}`}>{b.email}</a></>}</li>)}
+    {open.map((b) => <li>{b.shortName}: <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a>{b.email && <>, <a href={`mailto:${b.email}`}>{b.email}</a></>}</li>)}
   </ul>
   <p class="todo">Draft wording, to be confirmed by Fatt Pundit's kitchen team before launch.</p>
 </InfoPage>

@@ -28,7 +28,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   <div class="center">
     <p class="kicker">Now arriving</p>
     <div class="board"><ArrivalBoard client:load /></div>
-    <p class="route">Canton · Kolkata · London · Dubai</p>
+    <p class="route">Canton, Kolkata, London, Dubai</p>
     <img class="stamp" data-stamp src={stampImg.src} alt="" width="329" height="430" fetchpriority="high" decoding="sync" />
   </div>
   <button class="skip-arrival" type="button" data-skip>Skip</button>
@@ -44,7 +44,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   .kicker { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; color: var(--color-gold); font-size: 13px; }
   .route { margin: 0; font-family: var(--font-note); font-style: italic; color: rgb(218 199 181 / 0.88); font-size: 17px; letter-spacing: 0.04em; }
   /* Below the board, never over its letters. */
-  .stamp { width: clamp(84px, 10vw, 130px); height: auto; margin-top: -4px; opacity: 0.92; transform: rotate(-8deg); pointer-events: none; }
+  .stamp { width: clamp(84px, 10vw, 130px); height: auto; margin-top: -4px; opacity: 0.92; pointer-events: none; }
   .skip-arrival { position: absolute; right: 20px; bottom: 20px; min-height: 44px; padding: 0 18px; background: transparent; border: 1px solid rgb(218 199 181 / 0.4); color: var(--color-sand); font: inherit; font-size: 14px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; }
   .skip-arrival:hover { border-color: var(--color-gold); color: var(--color-gold); }
 </style>
@@ -76,7 +76,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
         // The stamp thuds onto the board…
         // Painted from the first frame (so the page's main picture is not held back
         // by the intro); the thud is a press, not an appearance.
-        tl.add('[data-stamp]', { scale: [1, 1.14, 1], rotate: [-8, -11, -8], duration: 380, ease: 'inOutQuad' })
+        tl.add('[data-stamp]', { scale: [1, 1.14, 1], duration: 380, ease: 'inOutQuad' })
           // …the whole board jolts from the impact…
           .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, '-=40')
           // …a breath, then it splits open like a station shutter.

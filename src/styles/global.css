@@ -34,7 +34,8 @@
 
   --font-display: var(--font-typewriter);
   --font-body: var(--font-typewriter);
-  --font-label: var(--font-typewriter-condensed);
+  /* Guidelines p.20: American Typewriter (Bold, Semi Bold, Regular) + Lora Medium Italic only. No condensed cut. */
+  --font-label: var(--font-typewriter);
   --font-note: var(--font-lora);
 
   /* Guidelines tracking 100 / 50 (InDesign units = 1/1000 em) */
@@ -43,6 +44,8 @@
 }
 
 @layer base {
+  /* Never fake a weight or slant the guidelines don't list: Lora stays Medium Italic even where 600/700 is asked for. */
+  html { font-synthesis: none; }
   html {
     background: var(--color-sand);
     color: var(--color-ink);
@@ -104,7 +107,7 @@
 .voyage-port.is-here .voyage-ring { transform-box: fill-box; transform-origin: center; animation: voyage-ping 1.8s ease-out infinite; }
 @keyframes voyage-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
 .voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 600; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
-.voyage-port.is-reached .voyage-name { fill: #fff; }
+.voyage-port.is-reached .voyage-name { fill: var(--color-paper-light); }
 .voyage-compass { opacity: 0.9; }
 .voyage-badge { fill: var(--color-tiger); stroke: var(--color-sand); stroke-width: 3; filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.5)); }
 .voyage-hull { filter: brightness(0) invert(1); }
@@ -192,8 +195,8 @@
     radial-gradient(circle at center, #f2e9dc 0 3.2px, transparent 3.6px) 0 6px / 16px 14px repeat-x,
     radial-gradient(circle at center, #f2e9dc 0 3.2px, transparent 3.6px) 0 calc(100% - 6px) / 16px 14px repeat-x; }
 .room-frame:nth-child(odd) { rotate: -0.3deg; }
-.room-edge { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: #e0973a; line-height: 1; }
-.room-edge-n { color: #f0b55c; }
+.room-edge { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--color-gold); line-height: 1; }
+.room-edge-n { color: var(--color-sand); }
 .room-shot { display: block; padding: 0; border: 0; background: #000; cursor: zoom-in; aspect-ratio: 3 / 2; overflow: hidden; }
 .room-shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2, 1, .3, 1); }
 .room-shot:hover img, .room-shot:focus-visible img { transform: scale(1.04); }

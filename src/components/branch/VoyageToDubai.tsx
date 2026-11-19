@@ -92,8 +92,8 @@ export default function VoyageToDubai({ art }: Props) {
             </g>
           </svg>
           <div className={`voyage-stamp pointer-events-none absolute flex flex-col items-center ${landed ? 'is-in' : ''}`} style={{ left: `${((D[0] - VIEW.x) / VIEW.w) * 100}%`, top: `${((D[1] - VIEW.y) / VIEW.h) * 100}%`, translate: '-30% -105%' }}>
-            <img src={art.stampGold} alt="" className="w-[clamp(64px,9vw,110px)] -rotate-6" />
-            <span className="-mt-1 rotate-[-6deg] border-2 border-tiger bg-white/90 px-2 py-0.5 font-label text-[clamp(11px,1.2vw,15px)] font-bold uppercase tracking-[0.22em] text-tiger">Boarding soon</span>
+            <img src={art.stampGold} alt="" className="w-[clamp(64px,9vw,110px)]" />
+            <span className="-mt-1 rotate-[-6deg] border-2 border-tiger bg-paper-light/90 px-2 py-0.5 font-label text-[clamp(11px,1.2vw,15px)] font-bold uppercase tracking-[0.22em] text-tiger">Boarding soon</span>
           </div>
         </figure>
       </div>

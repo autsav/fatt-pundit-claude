@@ -463,7 +463,7 @@ function CardLoop({ src, poster, alt }: { src: string; poster: string; alt: stri
 const StampCard = ({ item }: { item: RailItem }) => (
   <li className="fp-rail-card w-(--rail-card) flex-none snap-center">
     <div className="fp-rail-tilt relative drop-shadow-[0_12px_14px_rgb(44_41_37/0.32)]">
-      <article className="relative bg-white p-[16px] text-ink" style={PERF}>
+      <article className="relative bg-paper-light p-[16px] text-ink" style={PERF}>
         <div className="relative aspect-[4/5] overflow-hidden bg-ink">
           {item.image ? (
             <div className="fp-rail-layer absolute inset-[-5%] [--rail-depth:4%]">

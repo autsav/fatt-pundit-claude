@@ -41,7 +41,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
           <p>{b.address.street}{b.address.postcode ? `, ${b.address.postcode}` : ''}</p>
           {b.phone ? <a class="foot-tel" href={`tel:${b.phone.replace(/\s/g, '')}`}>{prettyPhone(b.phone)}</a> : <p>Opening soon</p>}
           {b.status === 'open' && b.booking
-            ? <a class="foot-cta" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book {b.shortName}</a>
+            ? <a class="foot-cta" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}</a>
             : <a class="foot-cta" href={`/${b.id}/#waitlist`}>Join the list</a>}
         </div>
       ))}

@@ -89,7 +89,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
     <section id="bar" className="bar-dark relative overflow-hidden text-sand" aria-labelledby="bar-title">
       <div className="relative mx-auto flex max-w-[1240px] flex-col gap-[clamp(28px,4vw,48px)] px-[clamp(16px,4vw,40px)] py-[clamp(64px,8vw,110px)]">
         <header className="flex flex-col items-center gap-3 text-center">
-          <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.3em] text-gold">After dark</p>
+          <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[20px] text-gold">After dark</p>
           <h2 id="bar-title" className="m-0 w-full max-w-[760px]">
             <span className="sr-only">The bar</span>
             <svg viewBox="0 0 760 150" className="block h-auto w-full" aria-hidden="true">
@@ -127,7 +127,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
           {/* The menu on a leather apron. */}
           <div className="bar-apron relative">
             <span className="bar-deboss" aria-hidden="true" style={{ WebkitMaskImage: `url(${tiger})`, maskImage: `url(${tiger})` }} />
-            <h3 className="relative m-0 mb-2 font-label text-[13px] font-bold uppercase tracking-[0.3em] text-gold">From the bar</h3>
+            <h3 className="relative m-0 mb-2 font-note text-[20px] font-medium normal-case italic tracking-normal text-gold">From the bar</h3>
             <ul className="relative m-0 list-none p-0">
               {drinks.map((d) => (
                 <li key={d.id} className="flex items-baseline justify-between gap-4 border-b border-dashed border-sand/35 py-3.5 last:border-b-0">

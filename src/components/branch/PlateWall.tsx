@@ -176,7 +176,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
         {last !== null && dishes[last] ? (
           <>
             <span className="font-bold">{dishes[last].name}</span>
-            {dishes[last].price && <span className="text-tiger-deep"> · {dishes[last].price}</span>}
+            {dishes[last].price && <span className="text-tiger-deep">, {dishes[last].price}</span>}
           </>
         ) : (
           <span className="font-note italic text-ink/75">{calm ? 'Tap a plate to turn it over.' : 'Hover or tap a plate to turn it over.'}</span>

@@ -20,7 +20,7 @@ export async function dish(id: string) {
 export type Dish = Awaited<ReturnType<typeof dish>>;
 
 export const priceOf = (d: Dish) =>
-  d.price ? formatPrice(d.price, 'GBP') : (d.options?.map((o) => `${o.label} ${formatPrice(o.price, 'GBP')}`).join(' · ') ?? null);
+  d.price ? formatPrice(d.price, 'GBP') : (d.options?.map((o) => `${o.label} ${formatPrice(o.price, 'GBP')}`).join(', ') ?? null);
 
 const DAYS = [['mon', 'Mon'], ['tue', 'Tue'], ['wed', 'Wed'], ['thu', 'Thu'], ['fri', 'Fri'], ['sat', 'Sat'], ['sun', 'Sun']] as const;
 const t = (s: string) => {

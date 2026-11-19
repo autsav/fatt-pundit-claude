@@ -50,7 +50,7 @@ export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; acce
         <RoomPlan zone={s.zone} accent={accent} />
       )}
       <figcaption className="relative">
-        <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.24em]" style={{ color: accent }}>
+        <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[17px] text-gold">
           Stop {i + 1} of {stops.length}
         </p>
         <p className="m-0 mt-2 text-[clamp(24px,3.2vw,40px)] font-bold uppercase leading-none tracking-[0.05em] text-sand">{s.title}</p>
@@ -70,7 +70,7 @@ export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; acce
   return (
     <section ref={sectionRef} aria-label="Walk the room" className="relative h-[320svh] bg-ink max-sm:h-[240svh]">
       <div className="sticky top-[68px] flex h-[calc(100svh-68px)] flex-col justify-center overflow-hidden">
-        <p className="m-0 px-[6vw] pb-6 font-label text-[13px] font-bold uppercase tracking-[0.26em] text-gold">Walk the room · door to pass</p>
+        <p className="m-0 px-[6vw] pb-6 font-note font-medium normal-case italic tracking-normal text-[20px] text-gold">Walk the room, from the door to the pass</p>
         <div ref={trackRef} className="flex gap-6 px-[6vw] will-change-transform">
           {frames}
         </div>

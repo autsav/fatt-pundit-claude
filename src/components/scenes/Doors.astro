@@ -84,7 +84,9 @@ const tR = { src: await stampSrc(tigerRight, 480) };
   @media (prefers-reduced-motion: reduce) {
     .doors { height: auto; }
     .stage { position: relative; height: 80svh; }
-    .flood { display: none; }
+    /* No swing in calm mode: the light past the doors (and the opening of the story) is simply there. */
+    .flood { opacity: 1; }
+    .o-cue { display: none; }
     .left { transform: rotateY(-62deg); } .right { transform: rotateY(62deg); } .dim { opacity: 0; }
   }
 </style>

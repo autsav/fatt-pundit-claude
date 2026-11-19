@@ -23,6 +23,9 @@ import { cn } from "@/lib/utils";
 
 /** The order the flaps are printed in. A tile can only flip forward. */
 const CHARSET = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.-/&!?";
+/** Fatt Pundit: with `maxFlips`, tiles clatter through these only, then land on their letter,
+ * so no real word can show up mid-flight (the T of FATT used to pass R and S). */
+const NOISE = "0123456789:-/&?";
 /** One flap falling, in ms. Quick, so long trips round the drum still feel brisk. */
 const FLIP = 56;
 /** Tiles start a beat apart, left to right. */
@@ -127,25 +130,32 @@ function Tile({
     }
     let timer: ReturnType<typeof setTimeout>;
     let id = 0;
-    if (maxFlips !== undefined) {
-      const n = CHARSET.length;
-      const trip = (CHARSET.indexOf(target) - CHARSET.indexOf(shownRef.current) + n) % n;
-      if (trip > maxFlips) {
-        // Jump unseen to a few flaps before the letter; the board then clatters into place.
-        const start = CHARSET[(CHARSET.indexOf(target) - maxFlips + n) % n];
-        shownRef.current = start;
-        setShown(start);
+    // The flaps still to fall, in order, ending on the target.
+    const path: string[] = [];
+    if (shownRef.current !== target) {
+      if (maxFlips !== undefined) {
+        const k = Math.max(2, Math.min(maxFlips, 8));
+        const seed = CHARSET.indexOf(target) + Math.round(delay / STAGGER);
+        for (let i = 0; i < k; i++) path.push(NOISE[(seed * 5 + i * 3) % NOISE.length]);
+        if (target === " ") path.length = 1;
+      } else {
+        // Step through the drum one flap at a time until the target is up.
+        let c = shownRef.current;
+        while (c !== target) {
+          c = CHARSET[(CHARSET.indexOf(c) + 1) % CHARSET.length];
+          path.push(c);
+        }
       }
+      if (path[path.length - 1] !== target) path.push(target);
     }
-    // Step through the drum one flap at a time until the target is up.
     const step = () => {
       const from = shownRef.current;
-      if (from === target) {
+      const to = path.shift();
+      if (to === undefined) {
         setFlip(null);
         settleRef.current?.(target);
         return;
       }
-      const to = CHARSET[(CHARSET.indexOf(from) + 1) % CHARSET.length];
       id += 1;
       setFlip({ id, from, to });
       timer = setTimeout(() => {
