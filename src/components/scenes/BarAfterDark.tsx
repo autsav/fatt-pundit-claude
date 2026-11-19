@@ -114,9 +114,9 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
         <div className="grid items-center gap-[clamp(24px,4vw,56px)] lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
           <figure className="m-0 flex flex-col gap-3">
             <div ref={stageRef} className={`bar-stage relative aspect-[4/5] w-full overflow-hidden sm:aspect-[3/2] ${calm ? 'is-lit' : ''}`}>
-              <img src={room.src} alt={room.alt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
-              <img src={prints[0].src} alt={prints[0].alt} className="bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
-              <img src={prints[1].src} alt={prints[1].alt} className="bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
+              <img src={room.src} alt={room.alt} className="fp-photo absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+              <img src={prints[0].src} alt={prints[0].alt} className="fp-photo bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
+              <img src={prints[1].src} alt={prints[1].alt} className="fp-photo bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
               <div className="bar-dark-veil pointer-events-none absolute inset-0" aria-hidden="true" />
             </div>
             <figcaption className="font-note text-[16px] italic text-sand/80">
@@ -135,7 +135,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
                     <p className="m-0 text-[17px] font-bold uppercase tracking-[0.08em]">{d.name}</p>
                     {d.description && <p className="m-0 mt-1 font-note text-[15px] italic leading-snug text-sand/80">{d.description}</p>}
                   </div>
-                  {d.price && <span className="max-w-[42%] shrink-0 text-right font-bold text-tiger">{d.price}</span>}
+                  {d.price && <span className="max-w-[42%] shrink-0 text-right font-bold text-tiger-bright">{d.price}</span>}
                 </li>
               ))}
             </ul>

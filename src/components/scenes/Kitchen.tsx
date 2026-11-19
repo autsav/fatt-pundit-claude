@@ -32,9 +32,9 @@ interface Props {
 function Ticket({ no, name, section, stamp }: { no: number; name: string; section: string; stamp: string }) {
   return (
     <div className="relative flex h-full w-full flex-col justify-between text-left">
-      <div className="flex w-full justify-between border-b-2 border-dotted border-ink/40 pb-2 font-label text-[11px] font-bold uppercase tracking-[0.24em]">
+      <div className="flex w-full justify-between border-b-2 border-dotted border-ink/40 pb-2 font-label text-[12px] font-bold uppercase tracking-[0.24em]">
         <span className="text-ink/70">No. {String(no).padStart(2, '0')}</span>
-        <span className="text-tiger">Signature</span>
+        <span className="text-tiger-deep">Signature</span>
       </div>
       <p className="m-0 font-display text-[21px] font-bold uppercase leading-[1.1] tracking-[0.03em] text-ink [overflow-wrap:anywhere] @3xl/rail:text-[24px]">{name}</p>
       <div className="flex items-end justify-between gap-2">
@@ -106,7 +106,7 @@ export default function Kitchen({ dishes, art }: Props) {
       <div className="relative -mt-10 pb-16 pt-14 text-ink">
         <div
           aria-hidden="true"
-          className="absolute inset-x-[-4%] top-0 bottom-[-40px] origin-left -rotate-[0.8deg] bg-[#faf6ef] shadow-[0_-18px_40px_-20px_rgb(0_0_0/0.8)]"
+          className="absolute inset-x-[-4%] top-0 bottom-[-40px] origin-left -rotate-[0.8deg] bg-paper-light shadow-[0_-18px_40px_-20px_rgb(0_0_0/0.8)]"
           style={{ backgroundImage: `linear-gradient(rgb(250 246 239 / 0.5), rgb(250 246 239 / 0.5)), url(${art.greaseproof})`, backgroundSize: 'auto, 300px 300px' }}
         />
         <CarouselCards
@@ -115,8 +115,8 @@ export default function Kitchen({ dishes, art }: Props) {
           title="Signature dishes"
           head={
             <div className="min-w-0 flex-1">
-              <p className="m-0 font-note text-[19px] text-tiger">On the pass</p>
-              <h2 className="m-0 mt-1 text-balance text-[clamp(24px,3.4vw,40px)] uppercase leading-[1.05] tracking-[0.04em]">Signature dishes</h2>
+              <p className="m-0 font-note text-[19px] text-tiger-deep">On the pass</p>
+              <h2 className="m-0 mt-1 text-balance text-[clamp(32px,4.6vw,64px)] uppercase leading-[0.98] tracking-[0.04em]">Signature dishes</h2>
             </div>
           }
         />

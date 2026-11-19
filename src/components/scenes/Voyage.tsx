@@ -278,9 +278,9 @@ export default function Voyage({ art }: { art: VoyageArt }) {
         {/* Ticket strip: one hole punched per port; each hole jumps there. */}
         <div className="absolute inset-x-0 top-3 z-10 flex justify-center px-3">
           <nav aria-label="Ports on the voyage" className="voyage-ticket flex items-center gap-1 bg-sand px-3 py-1.5 text-ink sm:gap-3 sm:px-5">
-            <span className="hidden font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger-deep sm:inline">Admit one</span>
+            <span className="hidden font-label text-[12px] font-bold uppercase tracking-[0.24em] text-tiger-deep sm:inline">Admit one</span>
             {PORTS.map((pt, i) => (
-              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex min-h-11 items-center gap-1.5 px-1 font-label text-[11px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i <= reached ? 'is-punched' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
+              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex min-h-11 items-center gap-1.5 px-1 font-label text-[12px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i <= reached ? 'is-punched' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
                 <span className="voyage-punch" aria-hidden="true" />
                 <span>{pt.name}</span>
               </button>
@@ -325,7 +325,7 @@ function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; 
     <article className="voyage-postcard">
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <p className="m-0 font-label text-[11px] font-bold uppercase tracking-[0.24em] text-tiger-deep">Stop {i + 1} of 4</p>
+          <p className="m-0 font-label text-[12px] font-bold uppercase tracking-[0.24em] text-tiger-deep">Stop {i + 1} of 4</p>
           <h3 className="voyage-title m-0">{['Canton', 'Kolkata', 'London', 'Dubai'][i]}</h3>
         </div>
         <span className="voyage-postmark" aria-hidden="true">
@@ -349,11 +349,11 @@ function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; 
           <div className="flex items-end justify-center gap-6">
             <figure className="m-0 flex flex-col items-center gap-1">
               <img src={art.stampGold} alt="" className="w-[clamp(64px,8vw,96px)] -rotate-6" loading="lazy" />
-              <figcaption className="font-label text-[11px] font-bold uppercase tracking-[0.2em]">Soho · 2019</figcaption>
+              <figcaption className="font-label text-[12px] font-bold uppercase tracking-[0.2em]">Soho · 2019</figcaption>
             </figure>
             <figure className="m-0 flex flex-col items-center gap-1">
               <img src={art.stampOrange} alt="" className="w-[clamp(68px,8.5vw,102px)] rotate-6" loading="lazy" />
-              <figcaption className="font-label text-[11px] font-bold uppercase tracking-[0.2em]">Covent Garden · 2021</figcaption>
+              <figcaption className="font-label text-[12px] font-bold uppercase tracking-[0.2em]">Covent Garden · 2021</figcaption>
             </figure>
           </div>
           <p className={text}>The recipes reach London: Soho in 2019, Covent Garden in 2021.</p>

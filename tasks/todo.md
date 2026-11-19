@@ -159,3 +159,45 @@ Decisions taken from the doc's "my pick" column (user said go without answering)
 - Result D: Tonight's board (Sheet CSV, live re-read, sample rows until set); branch clocks (local time + sun/moon from NOAA sunrise/sunset, on gate board + branch hero, greeting follows local hour); dish passport on list menus (stamp → shortlist → share/copy); Plausible + web-vitals + Book/Passport events behind PUBLIC_PLAUSIBLE_DOMAIN; _headers.
 - [x] D6 Final QA: Lighthouse 4 pages, fps, overflow, calm, demo publish, commit
 - Final (18 Nov): budget met on all pages — perf 90/98/96/98, observed LCP ~0.2 s, CLS 0.001, TBT ≤13 ms, dropped frames ≤1.3%. Overflow clean at 360/390/768/1440 on 12 pages (only intentional off-screen items). 3-mode sweep: 0 errors. Demo (11 pages) under sub-path: 0 broken links. Published v1795042638-f4d6.
+
+## Design upgrade plan (19 Nov) — /ui-ux-pro-max
+Audit: screenshots of home, Soho, Covent Garden, Dubai, Soho menu at 390 and 1440 (/tmp/shots).
+Brand stays (ink/tiger/gold/sand, typewriter + Lora). The skill's generic palette and fonts were rejected; its "scroll storytelling + chapter progress" pattern was kept.
+Gate for every item: before/after screenshots 390 + 1440, contrast 4.5:1, `npm run perf:budget` still passes, calm mode ok.
+
+### E1 Fill the empty screens (biggest win)
+- [x] Home hero: a blank band between tagline and gate board (desktop + phone). Big stamp + display headline + one hero dish/room photo
+- [x] Voyage intro: a whole viewport of plain gold glow. Add the opening line ("Canton → Kolkata, 1778") + the ship
+- [x] Goodbye door: 2 blank black panels. Put the room photo / painted mural inside the doors
+- [x] Soho: hero has sign only, room cards say "photo to come". Interim brand line drawings that swap to photos automatically
+### E2 Type scale + hierarchy
+- [x] One modular scale (1.333) for desktop; headlines bigger at 1440 (TURN THE PAGES, PULL UP A CHAIR look small)
+- [x] Fewer tiny tracked caps labels (eyebrows ~9px); min 12px, keep only where they carry info (stop 1 of 5)
+- [x] Nav 11px → 13px; footer text up
+### E3 Desktop layouts (now = phone layout centred, wide empty sides)
+- [x] List menu: sticky section index left + menu right
+- [x] Good to know: bigger, card per topic with icon
+- [x] Footer: hours, socials, newsletter, gift cards, 3 branch stamps
+- [x] Content width 1200 grid; full-bleed photos break the grid on purpose
+### E4 Photos + art direction
+- [x] One photo grade (warm, light grain) for all photos; Covent Garden set is the reference
+- [x] Dish photos on signature cards that lack them; shot list for client (Soho room, 12 dishes, bar)
+### E5 Story spine
+- [x] Slim chapter progress on home: Canton · Kolkata · London · Dubai (lights up as you scroll, tap to jump)
+### E6 Vintage finish + consistency
+- [x] Button system: 3 kinds only (tiger solid, outline, text link) + one focus ring style
+- [x] Paper grain, perforation, stamp edges used the same way everywhere
+- [x] One icon set (line, 1.5 stroke)
+### E7 Feel
+- [x] Hover/press: ticket lift, stamp press on Book, menu card tilt; 150–300 ms; reduced-motion = none
+- [x] Phone dock: check it never covers last lines (bottom padding)
+
+- Result E (19 Nov):
+  - E1: the rain hero has a fogged still under the glass (it shows at once, and stays if WebGL can't run). The arrival stamp sits under the board, not over its letters. The doors' gold light now carries the opening line ("From Canton to Kolkata"). The receipt prints faster. Soho "Walk the room" shows a floor plan per stop, until the photos arrive.
+  - E2: h2 scale 34→72px (1.333). No label under 12px except the decorative plate backs, which are repeated in the 17px caption. Fixed 5 tiger-on-paper text spots that failed contrast.
+  - E3: list menu with a sticky index and scroll-spy at 1024+. Good to know as 3 cards with icons and links. Footer: tagline, socials, phone and Book link per branch.
+  - E4: `.fp-photo` house grade on static photos only (measured: a spread of warm 21–58). Grain was skipped because the textures already carry it. docs/SHOT-LIST.md written.
+  - E5: chapter rail (1100px+) and an orange reading line under the header. The voyage keeps its own port ticket, so the rail is per chapter of the visit.
+  - E6: 3 button kinds with one size. The focus ring colour follows the surface via --fp-ring: 0 failures over 553 controls. Two paper tokens.
+  - E7: stamp press on buttons, tabs and gate rows; boarding passes lift on hover; all off in reduced motion. The dock already hides at the foot.
+  - QA: perf budget met (90/98/98/99, observed LCP ≤0.21 s, CLS 0.001, TBT ≤2 ms, home 1074 KB). Lighthouse a11y 100 except one flaky run (the arrival kicker caught mid-fade). No overflow on 9 pages at 360/768/1024/1440, 0 JS errors, calm mode ok.

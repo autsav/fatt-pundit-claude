@@ -1,10 +1,12 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
-import RainGlassBackground from '@/components/kokonutui/rain-glass-background';
+import RainGlassBackground, { FoggedStill } from '@/components/kokonutui/rain-glass-background';
 import { isCalm } from '@/lib/motion-tokens';
 
 interface Props {
   /** The dining room behind the rainy window (same-origin URL). */
   src: string;
+  /** Small soft still of the same room, painted at once and kept if WebGL can't run. */
+  poster: string;
   /** The restaurant chooser (GateBoard), rendered by Astro as static HTML so its links stay plain links. */
   children?: ReactNode;
 }
@@ -14,7 +16,7 @@ interface Props {
  * guests can wipe the glass to look inside. The title rises letter by letter
  * once the arrival board has opened (or straight away for returning guests).
  */
-export default function RainHero({ src, children }: Props) {
+export default function RainHero({ src, poster, children }: Props) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -64,10 +66,10 @@ export default function RainHero({ src, children }: Props) {
 
   // The WebGL rain starts only after the arrival board opens, so the two never fight for the CPU.
   if (!ready) {
-    return <div className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-ink px-6 py-16 text-center text-sand">{content}</div>;
+    return <div className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-ink px-6 py-16 text-center text-sand"><FoggedStill src={poster} /><div className="relative w-full flex justify-center">{content}</div></div>;
   }
   return (
-    <RainGlassBackground className="min-h-[100svh]" rain={0.55} src={src}>
+    <RainGlassBackground className="min-h-[100svh]" rain={0.55} src={src} poster={poster}>
       {content}
     </RainGlassBackground>
   );

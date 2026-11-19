@@ -37,7 +37,7 @@ const { branch, name } = Astro.props;
   @media (prefers-reduced-motion: reduce) { .pp-open.is-bump { animation: none; } }
   .pp-dlg { margin: auto; border: 0; padding: 0; max-width: min(520px, calc(100vw - 24px)); width: 100%; background: transparent; }
   .pp-dlg::backdrop { background: rgb(26 23 20 / 0.6); }
-  .pp-sheet { background: #faf6ef; color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-tiger); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
+  .pp-sheet { background: var(--color-paper-light); color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-tiger); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
   .pp-kicker { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-tiger-deep); }
   .pp-title { margin: 2px 0 14px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 26px; }
   .pp-list { margin: 0 0 12px; padding-left: 1.4em; display: grid; gap: 6px; font-weight: 700; }
@@ -50,7 +50,7 @@ const { branch, name } = Astro.props;
   :global(.pp-stamp svg) { width: 30px; height: 30px; transition: transform .2s ease, color .2s ease; }
   :global(.pp-stamp[aria-pressed='true']) { color: var(--color-tiger-deep); }
   :global(.pp-stamp[aria-pressed='true'] svg) { transform: rotate(-12deg) scale(1.08); }
-  :global(.pp-stamp:focus-visible) { outline: 3px solid var(--color-tiger); outline-offset: 0; }
+  :global(.pp-stamp:focus-visible) { outline: 3px solid var(--fp-ring); outline-offset: 0; }
 </style>
 
 <script>

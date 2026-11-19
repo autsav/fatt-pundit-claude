@@ -97,10 +97,10 @@ const data = branches.map((b) => ({
   .book-choices, .book-times { display: flex; flex-wrap: wrap; gap: 8px; }
   .book-chip { position: relative; }
   .book-chip input { position: absolute; opacity: 0; pointer-events: none; }
-  .book-chip span, .book :global(.book-time), .book :global(.book-day) { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 2px solid var(--color-ink); background: #faf6ef; font: inherit; font-weight: 700; color: var(--color-ink); cursor: pointer; }
+  .book-chip span, .book :global(.book-time), .book :global(.book-day) { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-paper-light); font: inherit; font-weight: 700; color: var(--color-ink); cursor: pointer; }
   .book-chip input:checked + span, .book :global(.book-time[aria-checked='true']), .book :global(.book-day[aria-checked='true']) { background: var(--color-ink); color: var(--color-sand); }
-  .book-chip input:focus-visible + span, .book :global(.book-time:focus-visible), .book :global(.book-day:focus-visible), .book-pm:focus-visible { outline: 3px solid var(--color-tiger); outline-offset: 2px; }
-  .book-step { display: inline-flex; align-items: center; border: 2px solid var(--color-ink); background: #faf6ef; }
+  .book-chip input:focus-visible + span, .book :global(.book-time:focus-visible), .book :global(.book-day:focus-visible), .book-pm:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
+  .book-step { display: inline-flex; align-items: center; border: 2px solid var(--color-ink); background: var(--color-paper-light); }
   .book-pm { width: 52px; height: 48px; font-size: 26px; background: none; border: 0; color: var(--color-ink); cursor: pointer; }
   .book-pm:disabled { opacity: 0.35; cursor: default; }
   .book-step output { min-width: 56px; text-align: center; font-size: 24px; font-weight: 700; }

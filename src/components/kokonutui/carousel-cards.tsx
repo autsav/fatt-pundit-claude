@@ -440,7 +440,7 @@ function useMomentumRail(
 // `aria-disabled` rather than `disabled` at the ends, so focus stays put.
 
 const ARROW =
-  "grid size-11 cursor-pointer place-items-center border-2 border-current transition-[background-color,color,opacity] duration-150 ease-out hover:bg-sand hover:text-ink focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2 aria-disabled:cursor-default aria-disabled:opacity-35 aria-disabled:hover:bg-transparent aria-disabled:hover:text-current";
+  "grid size-11 cursor-pointer place-items-center border-2 border-current transition-[background-color,color,opacity] duration-150 ease-out hover:bg-sand hover:text-ink focus-visible:outline-2 focus-visible:outline-[var(--fp-ring)] focus-visible:outline-offset-2 aria-disabled:cursor-default aria-disabled:opacity-35 aria-disabled:hover:bg-transparent aria-disabled:hover:text-current";
 
 /** Perforated stamp edge: a row of punched holes all round the paper. */
 const PERF: CSSProperties = {
@@ -470,14 +470,14 @@ const StampCard = ({ item }: { item: RailItem }) => (
               {item.video ? (
                 <CardLoop alt={item.imageAlt ?? ""} poster={item.image} src={item.video} />
               ) : (
-                <img alt={item.imageAlt ?? ""} className="h-full w-full object-cover" decoding="async" draggable={false} height={500} loading="lazy" src={item.image} width={400} />
+                <img alt={item.imageAlt ?? ""} className="fp-photo h-full w-full object-cover" decoding="async" draggable={false} height={500} loading="lazy" src={item.image} width={400} />
               )}
             </div>
           ) : (
-            <div className="absolute inset-0 flex flex-col bg-[#f6efe3] p-5">{item.slip}</div>
+            <div className="absolute inset-0 flex flex-col bg-paper p-5">{item.slip}</div>
           )}
           {item.badge && (
-            <span className="absolute left-3 top-3 bg-tiger px-2 py-1 font-label text-[11px] font-bold uppercase tracking-[0.2em] text-ink-deep">{item.badge}</span>
+            <span className="absolute left-3 top-3 bg-tiger px-2 py-1 font-label text-[12px] font-bold uppercase tracking-[0.2em] text-ink-deep">{item.badge}</span>
           )}
         </div>
         <div className="px-1 pb-1 pt-4">
@@ -487,7 +487,7 @@ const StampCard = ({ item }: { item: RailItem }) => (
           </div>
           {item.note && <p className="fp-rail-details mt-1.5 text-[13.5px] leading-snug text-ink/80">{item.note}</p>}
           {item.tags && item.tags.length > 0 && (
-            <p className="mt-2 font-label text-[11.5px] font-bold uppercase tracking-[0.22em] text-gold-deep">{item.tags.join(" · ")}</p>
+            <p className="mt-2 font-label text-[12px] font-bold uppercase tracking-[0.22em] text-gold-deep">{item.tags.join(" · ")}</p>
           )}
         </div>
       </article>

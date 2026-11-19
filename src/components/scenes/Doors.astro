@@ -36,7 +36,15 @@ const tR = { src: await stampSrc(tigerRight, 480) };
       </div>
     </div>
     <p class="come-in" data-comein>Come in.</p>
-    <div class="flood" data-flood></div>
+    <div class="flood" data-flood>
+      <!-- The light past the doors is where the story starts: the voyage picks it up next. -->
+      <div class="opening">
+        <p class="o-kicker">Our story starts at sea</p>
+        <p class="o-line">From Canton<br />to Kolkata</p>
+        <p class="o-sub">Hakka families sailed from southern China with their recipes, and met the spices of India in Tangra, Kolkata's Chinatown.</p>
+        <p class="o-cue" aria-hidden="true">Keep scrolling to follow the ship</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -64,12 +72,19 @@ const tR = { src: await stampSrc(tigerRight, 480) };
   .shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 40%, rgb(0 0 0 / 0.55)); opacity: 0; will-change: opacity; }
   .right .shade { background: linear-gradient(270deg, transparent 40%, rgb(0 0 0 / 0.55)); }
   .come-in { position: absolute; bottom: 7svh; margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: clamp(18px, 2vw, 24px); will-change: opacity; }
-  .flood { position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: 0; pointer-events: none; will-change: opacity; }
+  .flood { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: 0; pointer-events: none; will-change: opacity; }
+  .opening { display: grid; justify-items: center; gap: clamp(14px, 2vw, 22px); max-width: min(100%, 1000px); text-align: center; color: var(--color-ink); }
+  .opening p { margin: 0; }
+  .o-kicker { font-family: var(--font-note); font-style: italic; font-size: clamp(18px, 1.8vw, 22px); color: var(--color-tiger-deep); }
+  .o-line { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(40px, 6.4vw, 92px); line-height: 0.95; }
+  .o-sub { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.5; max-width: 44ch; }
+  .o-cue { font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
 
   @media (max-width: 700px) { .doors { height: 220vh; } }
   @media (prefers-reduced-motion: reduce) {
     .doors { height: auto; }
     .stage { position: relative; height: 80svh; }
+    .flood { display: none; }
     .left { transform: rotateY(-62deg); } .right { transform: rotateY(62deg); } .dim { opacity: 0; }
   }
 </style>

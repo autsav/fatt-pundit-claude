@@ -74,6 +74,7 @@ const ROOM: [ImageMetadata, string][] = [
 const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), full: await webp(src, 1600), alt })));
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
+const rainPoster = (await getImage({ src: inside, width: 640, format: 'webp', quality: 60 })).src;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
@@ -161,7 +162,7 @@ const orgLd = {
     <Arrival />
     <!-- 1 · Rain on the window -->
     <section id="top" class="rain" aria-label="Fatt Pundit">
-      <RainHero client:load src={rainSrc}>
+      <RainHero client:load src={rainSrc} poster={rainPoster}>
         <div class="hero-choose">
           <GateBoard branches={branches} />
           <a class="btn btn-orange hero-book" href="#tables" data-book="">Book a table</a>
@@ -214,6 +215,14 @@ const orgLd = {
     </section>
   </main>
 
+  <!-- Story rail: where you are in the visit. Lights up as you scroll, tap a stop to jump. Wide screens only;
+       phones get the thin progress line under the header instead. -->
+  <nav class="rail" aria-label="Chapters" data-rail hidden>
+    {[['top', 'The window'], ['story', 'The voyage'], ['kitchen', 'The kitchen'], ['menu', 'The menu'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']].map(([id, label]) => (
+      <a href={`#${id}`} data-ch={id}><span class="rail-dot" aria-hidden="true"></span><span class="rail-lbl">{label}</span></a>
+    ))}
+  </nav>
+
   <SiteFooter branches={branches} home />
 </Base>
 
@@ -226,6 +235,40 @@ const orgLd = {
       f.querySelector<HTMLElement>('.wl-msg')?.removeAttribute('hidden');
     }),
   );
+  // Story rail + reading line. Only transform/opacity change per frame.
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  const bar = document.querySelector<HTMLElement>('.bar');
+  if (rail && bar) {
+    rail.hidden = false;
+    const line = document.createElement('div');
+    line.className = 'read-line';
+    line.setAttribute('aria-hidden', 'true');
+    bar.append(line);
+    const links = new Map([...rail.querySelectorAll<HTMLAnchorElement>('[data-ch]')].map((a) => [a.dataset.ch!, a]));
+    const order = [...links.keys()];
+    const targets = order.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      // Read everything first, then write (no forced layout between writes).
+      const max = document.documentElement.scrollHeight - innerHeight;
+      // The current chapter: the last one whose top has passed the middle of the screen.
+      let cur = 0;
+      targets.forEach((el, i) => { if (el.getBoundingClientRect().top <= innerHeight * 0.5) cur = i; });
+      line.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max).toFixed(4) : 0})`;
+      rail.classList.toggle('is-on', scrollY > innerHeight * 0.8);
+      order.forEach((id, i) => {
+        const a = links.get(id)!;
+        a.classList.toggle('is-past', i < cur);
+        a.classList.toggle('is-here', i === cur);
+        if (i === cur) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current');
+      });
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+    addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(tick); });
+    tick();
+  }
+
   // Reveal sections.
   const io = new IntersectionObserver(
     (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
@@ -275,6 +318,22 @@ const orgLd = {
     .reveal { opacity: 1; transform: none; }
     .steam { display: none; }
   }
+  /* Story rail */
+  .rail { position: fixed; z-index: 30; right: 18px; top: 50%; translate: 0 -50%; display: none; flex-direction: column; gap: 2px; padding: 10px 8px;
+    background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+  @media (min-width: 1100px) { .rail { display: flex; } }
+  .rail.is-on { opacity: 1; pointer-events: auto; }
+  .rail a { position: relative; display: grid; place-items: center; width: 28px; height: 28px; text-decoration: none; }
+  .rail a::before { content: ''; position: absolute; left: 50%; top: -7px; height: 12px; border-left: 1px dashed rgb(203 160 82 / 0.5); }
+  .rail a:first-child::before { display: none; }
+  .rail-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--color-gold); transition: background-color .25s, transform .25s cubic-bezier(.2, 1.6, .4, 1); }
+  .rail a.is-past .rail-dot { background: var(--color-gold); border-style: solid; }
+  .rail a.is-here .rail-dot { background: var(--color-tiger); border: 1.5px solid var(--color-tiger); transform: scale(1.3); }
+  .rail-lbl { position: absolute; right: calc(100% + 14px); white-space: nowrap; padding: 4px 10px; background: var(--color-ink); border: 1px solid rgb(203 160 82 / 0.45); color: var(--color-sand);
+    font-family: var(--font-note); font-style: italic; font-size: 15px; opacity: 0; translate: 6px 0; transition: opacity .2s, translate .2s; pointer-events: none; }
+  .rail a:hover .rail-lbl, .rail a:focus-visible .rail-lbl { opacity: 1; translate: 0 0; }
+  .rail a:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 1px; }
+  :global(.read-line) { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
   .hero-choose { display: grid; gap: 12px; justify-items: center; }
   .hero-book { min-width: min(280px, 100%); }
   .menu-list-link { margin: 0; padding: 18px 16px 8px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; background: var(--color-sand); }

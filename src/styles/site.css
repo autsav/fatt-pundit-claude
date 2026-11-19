@@ -14,8 +14,9 @@
 .ink { background: var(--color-ink); color: var(--color-sand); }
 .gold-bg { background: var(--color-gold); color: var(--color-ink); }
 .gold { color: var(--color-gold); }
-.kicker, .note { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 20px; letter-spacing: 0.02em; }
-.h2 { margin: 0; font-size: clamp(34px, 4.4vw, 58px); }
+.kicker, .note { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(19px, 1.5vw, 22px); letter-spacing: 0.02em; }
+/* Type scale (1.333): 17 body · 20 note · 23 · 30 · 40 · 54 · 72. Headlines climb to 72px on wide screens. */
+.h2 { margin: 0; font-size: clamp(34px, 5vw, 72px); line-height: 0.98; }
 body { font-size: 17px; line-height: 1.55; }
 
 .preview-flag .pf-short { display: none; }
@@ -24,14 +25,24 @@ body { font-size: 17px; line-height: 1.55; }
 .skip { position: absolute; left: -999px; top: 8px; z-index: 50; background: var(--color-tiger); color: var(--color-ink); padding: 10px 16px; font-weight: 700; }
 .skip:focus { left: 8px; }
 
-/* Buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 26px; font-weight: 700; font-size: 19px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 2px solid transparent; cursor: pointer; font-family: inherit; transition: transform .15s ease, background-color .15s ease; }
-.btn:hover { transform: translateY(-2px); }
-.btn-sm { min-height: 44px; padding: 0 18px; }
+/* Buttons: three kinds only.
+   1. Solid: .btn-orange (the action), .btn-ink (the action on gold/tiger paper).
+   2. Outline: .btn-ghost-light on dark, .btn-line on light.
+   3. Text link: underlined tiger-deep (or tiger-bright on dark), no box.
+   Same size, weight and press everywhere; .btn-sm only for rows of secondary links. */
+.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 26px; font-weight: 700; font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border: 2px solid transparent; cursor: pointer; font-family: inherit;
+  transition: transform .18s cubic-bezier(.2, 1.4, .4, 1), box-shadow .18s ease, background-color .15s ease, color .15s ease; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 0 rgb(26 23 20 / 0.35); }
+/* Press like a rubber stamp: down, flat, no shadow. */
+.btn:active { transform: translateY(1px) scale(0.98); box-shadow: none; transition-duration: .06s; }
+.btn-sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
 .btn-orange { background: var(--color-tiger); color: var(--color-ink-deep); }
-.btn-ink { background: var(--color-ink); color: var(--color-sand); font-size: 17px; }
-.btn-line { border-color: var(--color-ink); color: var(--color-ink); font-size: 15px; font-weight: 400; letter-spacing: 0.06em; text-transform: none; }
+.btn-ink { background: var(--color-ink); color: var(--color-sand); }
+.btn-line { border-color: var(--color-ink); color: var(--color-ink); }
+.btn-line:hover { background: var(--color-ink); color: var(--color-sand); }
 .btn-ghost-light { border-color: var(--color-sand); color: var(--color-sand); }
+.btn-ghost-light:hover { background: var(--color-sand); color: var(--color-ink); box-shadow: 0 4px 0 rgb(0 0 0 / 0.4); }
+@media (prefers-reduced-motion: reduce) { .btn:hover, .btn:active { transform: none; } }
 
 /* Header */
 .bar { position: sticky; top: 0; z-index: 40; background: var(--color-ink); color: var(--color-sand); border-bottom: 2px solid var(--color-gold); }
@@ -54,6 +65,7 @@ body { font-size: 17px; line-height: 1.55; }
 
 
 .nav a[aria-current='page'] { color: var(--color-gold); }
+.nav .btn-sm { font-size: 16px; }
 .brand { white-space: nowrap; }
 .nav .lbl-short { display: none; }
 
@@ -61,7 +73,7 @@ body { font-size: 17px; line-height: 1.55; }
   .nav a:not(.btn) { display: none; }
   .brand { font-size: 17px; letter-spacing: 0.14em; }
   .bar-in { flex-wrap: nowrap; }
-  .nav .btn-sm { font-size: 15px; padding: 0 16px; }
+  .nav .btn-sm { padding: 0 16px; }
   .nav .lbl-long { display: none; }
   .nav .lbl-short { display: inline; }
 }

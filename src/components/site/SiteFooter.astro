@@ -28,20 +28,26 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
     <div class="foot-grid">
       <div class="stack-sm">
         <p class="brand">FATT PUNDIT</p>
+        <p class="note foot-tag">Hakka cooking from Kolkata's Chinatown, since 2019.</p>
+        <div class="social">
+          <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener" aria-label="Fatt Pundit on Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="4" /><path d="M17.2 6.8v.01" /></svg></a>
+          <a href="https://www.facebook.com/fattpundit/" target="_blank" rel="noopener" aria-label="Fatt Pundit on Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 21v-8h3l.5-3.5h-3.5V7.3c0-1 .4-1.8 1.9-1.8H18V2.4c-.4 0-1.6-.2-2.9-.2-2.7 0-4.6 1.7-4.6 4.7v2.6H7.5V13h3v8" /></svg></a>
+          <a href="https://x.com/FattPundit" target="_blank" rel="noopener" aria-label="Fatt Pundit on X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4 4 20" /></svg></a>
+        </div>
       </div>
       {branches.map((b) => (
-        <div class="stack-sm small">
+        <div class="stack-sm small foot-branch">
           <a class="foot-h" href={`/${b.id}/`}>{b.shortName}</a>
           <p>{b.address.street}{b.address.postcode ? `, ${b.address.postcode}` : ''}</p>
-          <p>{b.phone ? prettyPhone(b.phone) : 'Opening soon'}</p>
+          {b.phone ? <a class="foot-tel" href={`tel:${b.phone.replace(/\s/g, '')}`}>{prettyPhone(b.phone)}</a> : <p>Opening soon</p>}
+          {b.status === 'open' && b.booking
+            ? <a class="foot-cta" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book {b.shortName}</a>
+            : <a class="foot-cta" href={`/${b.id}/#waitlist`}>Join the list</a>}
         </div>
       ))}
     </div>
     <nav aria-label="Footer" class="foot-nav">
       <a href={h('#menu')}>Menus</a><a href={h('#story')}>Our story</a><a href="/private-dining/">Groups and private dining</a><a href={vouchers}>Gift vouchers</a>
-      <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.facebook.com/fattpundit/" target="_blank" rel="noopener">Facebook</a>
-      <a href="https://x.com/FattPundit" target="_blank" rel="noopener">X</a>
     </nav>
     {newsletter && (
       <form class="news" action={newsletter} method="post" target="_blank">
@@ -65,6 +71,16 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
   .news-row { display: flex; gap: 8px; }
   .news input { flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; font: inherit; border: 2px solid var(--color-sand); background: transparent; color: var(--color-sand); }
   .foot-nav-small { font-size: 14px; opacity: 0.85; }
-  .foot-h { text-decoration: none; }
+  .foot-h { text-decoration: none; font-size: 16px; }
+  .foot-tag { font-size: 17px; color: rgb(218 199 181 / 0.85); max-width: 26ch; }
+  .social { display: flex; gap: 10px; margin-top: 10px; }
+  .social a { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid rgb(218 199 181 / 0.45); color: var(--color-sand); transition: border-color .2s, color .2s, transform .2s; }
+  .social a:hover { border-color: var(--color-gold); color: var(--color-gold); transform: translateY(-2px); }
+  .social svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .foot-branch { font-size: 16px; line-height: 1.5; }
+  .foot-tel { color: var(--color-sand); text-decoration: none; }
+  .foot-tel:hover { color: var(--color-gold); }
+  .foot-cta { width: fit-content; margin-top: 8px; padding-bottom: 2px; color: var(--color-tiger-bright); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; text-decoration: none; border-bottom: 1.5px solid currentColor; }
+  .foot-cta:hover { color: var(--color-gold); }
   .foot-h:hover { text-decoration: underline; }
 </style>

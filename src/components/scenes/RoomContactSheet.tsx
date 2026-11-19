@@ -80,7 +80,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
                 FATT PUNDIT 400 <span className="room-edge-n">▸{FIRST + i}</span>
               </span>
               <button type="button" className="room-shot" onClick={(e) => show(i, e.currentTarget)} aria-label={`Open photo ${i + 1} of ${frames.length}: ${f.alt}`}>
-                <img src={f.thumb} alt="" loading="lazy" decoding="async" />
+                <img className="fp-photo" src={f.thumb} alt="" loading="lazy" decoding="async" />
               </button>
               <span className="room-edge" aria-hidden="true">
                 <span className="room-edge-n">{FIRST + i}A</span> ◂
@@ -111,7 +111,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
       >
         {cur && open !== null && (
           <figure className="m-0 flex h-full flex-col items-center justify-center gap-4">
-            <img key={cur.full} src={cur.full} alt={cur.alt} className="room-lightbox-img" />
+            <img key={cur.full} src={cur.full} alt={cur.alt} className="fp-photo room-lightbox-img" />
             <figcaption className="flex w-full max-w-[1100px] items-center justify-between gap-4 px-2 text-sand">
               <span className="font-note text-[16px] italic">{cur.alt}</span>
               <span className="shrink-0 font-label text-[12px] font-bold uppercase tracking-[0.24em] text-gold">

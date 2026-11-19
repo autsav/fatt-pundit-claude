@@ -14,15 +14,17 @@ interface Props {
   kicker: string;
   heading: string;
   noindex?: boolean;
+  /** A wider sheet for long lists (the menus) with their own layout. */
+  wide?: boolean;
 }
-const { title, description, kicker, heading, noindex } = Astro.props;
+const { title, description, kicker, heading, noindex, wide } = Astro.props;
 const branches = await getBranches();
 ---
 <Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex}>
   <a class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} />
   <main id="content" class="info">
-    <article class="sheet wrap narrow">
+    <article class:list={["sheet wrap", wide ? "wide" : "narrow"]}>
       <p class="kicker info-kicker">{kicker}</p>
       <h1 class="h2 info-title">{heading}</h1>
       <div class="info-body"><slot /></div>
@@ -33,7 +35,9 @@ const branches = await getBranches();
 
 <style>
   .info { background: var(--color-sand); padding-block: clamp(56px, 8vw, 112px); }
-  .sheet { background: #faf6ef; border: 2px solid var(--color-ink); padding: clamp(28px, 5vw, 64px); box-shadow: 8px 8px 0 var(--color-ink); }
+  .sheet { background: var(--color-paper-light); border: 2px solid var(--color-ink); padding: clamp(28px, 5vw, 64px); box-shadow: 8px 8px 0 var(--color-ink); }
+  .sheet.wide { max-width: 1180px; }
+  .wide .info-body { max-width: none; }
   .info-kicker { margin: 0; color: var(--color-tiger-deep); }
   .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
   .info-body { font-size: 18px; line-height: 1.65; max-width: 64ch; overflow-wrap: anywhere; }

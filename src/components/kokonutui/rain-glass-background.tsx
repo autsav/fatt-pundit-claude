@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 export interface RainGlassBackgroundProps {
   /** The view behind the window. Served with CORS so WebGL can read it. */
   src?: string;
+  /** Fatt Pundit: a small still of the same view, shown fogged until (or if never) the glass starts. */
+  poster?: string;
   title?: string;
   /** Content under the headline. */
   children?: ReactNode;
@@ -435,6 +437,7 @@ function paintWater(
 export default function RainGlassBackground({
   src = DEFAULT_SRC,
   title,
+  poster,
   children,
   rain = 0.6,
   interactive = true,
@@ -714,6 +717,7 @@ export default function RainGlassBackground({
         className="hidden text-[#2c2925]"
         ref={fogRef}
       />
+      {poster && <FoggedStill src={poster} />}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <canvas
           className="h-full w-full opacity-0 transition-opacity duration-700 ease-out"
@@ -734,3 +738,14 @@ export default function RainGlassBackground({
   );
 }
 
+
+/** Fatt Pundit: the room behind fogged glass as a plain picture. A small image
+ * stretched full screen is naturally soft, so no blur filter is needed. */
+export function FoggedStill({ src }: { src: string }) {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      <img src={src} alt="" className="size-full scale-105 object-cover" decoding="async" />
+      <div className="absolute inset-0 bg-ink/60" />
+    </div>
+  );
+}

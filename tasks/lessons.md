@@ -51,3 +51,6 @@ Review at the start of every session. Add a line after any correction.
 - Lab LCP for text adds preloaded fonts; judge real paint by `observedLargestContentfulPaint` and keep CLS fixes.
 - Scoped Astro CSS doesn't reach elements made in JS; use `.parent :global(.child)`.
 - Detached `requestIdleCallback` throws "Illegal invocation"; call it on `window`.
+- Python str.replace with an empty 'old' inserts at every character: always assert the slice/old text is non-empty and found exactly once before replacing (a bad index() blew a page up to 695k lines).
+- A focus ring in a brand accent fails 3:1 on the brand's own paper: colour the ring by the surface (custom property set on surfaces, never on the control itself, since the ring sits outside the control).
+- "Empty" screens in a headless sweep can be capture timing (letter-by-letter titles, receipts printing): re-check one screen with a longer wait before redesigning it.

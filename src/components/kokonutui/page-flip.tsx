@@ -667,7 +667,7 @@ function NavButton({
       // so the arrow keys keep working.
       aria-disabled={disabled || undefined}
       aria-label={label}
-      className="flex size-11 items-center justify-center border-2 border-ink text-ink transition-colors duration-150 ease-out hover:bg-ink hover:text-sand focus-visible:outline-2 focus-visible:outline-tiger focus-visible:outline-offset-2 aria-disabled:cursor-default aria-disabled:opacity-30 aria-disabled:hover:bg-transparent aria-disabled:hover:text-ink"
+      className="flex size-11 items-center justify-center border-2 border-ink text-ink transition-colors duration-150 ease-out hover:bg-ink hover:text-sand focus-visible:outline-2 focus-visible:outline-[var(--fp-ring)] focus-visible:outline-offset-2 aria-disabled:cursor-default aria-disabled:opacity-30 aria-disabled:hover:bg-transparent aria-disabled:hover:text-ink"
       onClick={disabled ? undefined : onClick}
       onKeyDown={onKeyDown}
       type="button"

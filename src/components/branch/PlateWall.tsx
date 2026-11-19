@@ -136,7 +136,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
               type="button"
               aria-pressed={on}
               aria-label={`${d.name}${d.price ? `, ${d.price}` : ''}`}
-              className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full [perspective:800px] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-tiger"
+              className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full [perspective:800px] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--fp-ring)]"
               style={{ left: `${x}%`, top: `${y}%`, width: `${size}%`, aspectRatio: '1' }}
               onClick={() => {
                 set(i, !on);
@@ -176,7 +176,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
         {last !== null && dishes[last] ? (
           <>
             <span className="font-bold">{dishes[last].name}</span>
-            {dishes[last].price && <span className="text-tiger"> · {dishes[last].price}</span>}
+            {dishes[last].price && <span className="text-tiger-deep"> · {dishes[last].price}</span>}
           </>
         ) : (
           <span className="font-note italic text-ink/75">{calm ? 'Tap a plate to turn it over.' : 'Hover or tap a plate to turn it over.'}</span>

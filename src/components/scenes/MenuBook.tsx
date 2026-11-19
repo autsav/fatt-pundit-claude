@@ -231,7 +231,7 @@ function Cover({ menu, art, place }: { menu: MenuLite; art: Art; place?: MenuPla
         <p className="m-0 mt-[3cqw] font-note text-[5.4cqw] text-gold">{menu.title}</p>
         {place && <p className="m-0 mt-[4cqw] font-label text-[3.2cqw] font-bold uppercase tracking-[0.22em] text-sand/85">{place.name} · {place.street}</p>}
       </div>
-      <p className="absolute bottom-[9cqw] m-0 font-label text-[2.8cqw] font-bold uppercase tracking-[0.26em] text-sand/70">Turn the corner →</p>
+      <p className="absolute bottom-[9cqw] m-0 font-label text-[max(12px,2.8cqw)] font-bold uppercase tracking-[0.26em] text-sand/70">Turn the corner →</p>
     </div>
   );
 }
@@ -322,8 +322,8 @@ export default function MenuBook({ menus, art, next, places }: { menus: MenuLite
       <div className="voyage-paper pointer-events-none absolute inset-0" aria-hidden="true" />
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="relative mx-auto flex max-w-[1200px] flex-col items-center px-5">
-        <p className="m-0 font-note text-[22px] text-tiger">The menu</p>
-        <h2 className="m-0 mt-2 text-center text-[clamp(30px,4.4vw,56px)] uppercase leading-none tracking-[0.06em]">Turn the pages</h2>
+        <p className="m-0 font-note text-[22px] text-tiger-deep">The menu</p>
+        <h2 className="m-0 mt-2 text-center text-[clamp(34px,5vw,72px)] uppercase leading-[0.98] tracking-[0.06em]">Turn the pages</h2>
         <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">{places ? 'Pick a restaurant, then a menu from the bookmarks.' : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
 
         {places && (
@@ -354,7 +354,7 @@ export default function MenuBook({ menus, art, next, places }: { menus: MenuLite
 
         {place?.soon ? (
           <div className="menu-soon mt-8 w-full max-w-[560px]">
-            <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.24em] text-tiger">Opening soon</p>
+            <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.24em] text-tiger-deep">Opening soon</p>
             <h3 className="m-0 mt-2 font-note text-[clamp(26px,3vw,34px)] font-medium normal-case italic leading-tight tracking-normal">{place.name}, {place.street}</h3>
             <p className="m-0 mt-3 text-[16px] leading-snug">The menu is being written. These are coming with us:</p>
             <ul className="m-0 mt-3 list-none p-0">
