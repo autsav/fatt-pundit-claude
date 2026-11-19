@@ -225,7 +225,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   };
 
   return (
-    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : '460vh' }} aria-label="The journey from Canton to Kolkata, London and Dubai">
+    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : '340vh' }} aria-label="The journey from Canton to Kolkata, London and Dubai">
       <h2 className="sr-only">The voyage: Canton to Kolkata, London and Dubai</h2>
       <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[68px] h-[calc(100svh-68px)] overflow-hidden'}>
         {/* The chart: one image, moved only by transform. */}

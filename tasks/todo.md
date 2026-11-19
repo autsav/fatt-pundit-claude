@@ -214,3 +214,10 @@ Gate for every item: before/after screenshots 390 + 1440, contrast 4.5:1, `npm r
 - [x] 5 Arrows only on scroll cues
 - [x] 6 One booking vocabulary: "Book a table", "Book at <branch>", "Join the list"; "tear the stub" is the hint, not the label
 - QA: no overflow on 9 pages × 4 widths; focus ring 0/553 + 0/526 failures; a11y 100 (home 97 = the arrival overlay sampled mid-fade, same artefact as before); Soho label-in-name fixed. Perf: home 89–91, CLS 0. Dropped frames 2.0–2.2% vs 1.5–1.8% for the previous build (interleaved runs); the heavier swiftshader test shows 7% for both, kitchen worst in both. At the 2% line: worth a kitchen pass.
+
+## Audit 7–9 (19 Nov, afternoon)
+- [x] 7 Home: kitchen scene removed; its signature dishes are now page 2 of the à la carte menu book ("From the pass": 4 photos + the rest named). Doors 280→190vh (phone 220→165vh), voyage 460→340vh. Home 16.3→12.7 screens on phone, 16.8→12.9 on desktop. Story rail lost its kitchen stop. Kitchen.tsx, carousel-cards.tsx, ink-background.tsx deleted (unused)
+- [x] 8 Dubai: waitlist straight after the hero; VoyageToDubai removed (the home voyage already sails to Dubai); packing list is a compact strip on phones. 8.8→5.6 screens on phone; 303→221 KB
+- [x] 9 Kept American Typewriter for copy: guidelines p.20–21 say titles AND copy, so "typewriter only for headlines" would break them. Licence backup instead: FONT_BACKUP=1 swaps to Kameron (OFL), checked 360–1440 with no overflow; buying steps in HANDOVER
+- [x] Arrival overlay goes aria-hidden + inert the moment the shutter starts (Lighthouse kept sampling the fade)
+- QA: no overflow 9 pages × 4 widths; focus ring 0/549, 0/523; a11y 100 on all 4 (home 100 ×2); budget met twice: home 88–92, dropped frames 0.8–1.5% (was 2.0–2.2), 970 KB; Dubai 100

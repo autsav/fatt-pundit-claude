@@ -26,6 +26,8 @@ After a JSON change: `npm run build`. `scripts/validate-data.mjs` runs first and
 ## Launch checklist
 
 - [ ] Licensed American Typewriter web fonts in `src/assets/fonts/american-typewriter/` (same file names)
+  - Buy: ITC American Typewriter web licence (Regular + Bold) from Monotype / MyFonts, convert to woff2 with the same file names. Semi Bold (guidelines p.20) if the client wants subtitles exactly to spec.
+  - Not bought by launch day? Build with `FONT_BACKUP=1` (set it in the host's build settings). The whole site switches to Kameron (SIL Open Font Licence, free for web) in one go; layout checked at 360–1440 px with no overflow. Remove the variable once the licensed files are in.
 - [ ] Client confirms the draft wording marked in italics on Allergens, Privacy, Booking terms, Accessibility
 - [ ] Test one real booking hand-off each: OpenTable (Soho) and SevenRooms (Covent Garden) open with party, date and time filled in
 - [ ] Real photos replace upscaled ones; Soho photos added

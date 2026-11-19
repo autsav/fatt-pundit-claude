@@ -57,3 +57,4 @@ Review at the start of every session. Add a line after any correction.
 - Removing `white-space: nowrap` from a line next to a late-loading font brings layout shift back (CLS 0 → 0.215): keep single-line slots single-line, change the layout instead.
 - Split-flap boards that step alphabetically can spell words mid-flight: animate through digits/signs, never letters.
 - Compare perf against the previous build in interleaved runs on the same machine before calling something a regression (a git worktree on another port does it).
+- `npm i` prunes hand-made symlinks in node_modules (playwright): re-link before perf:budget, or the budget silently can't run.

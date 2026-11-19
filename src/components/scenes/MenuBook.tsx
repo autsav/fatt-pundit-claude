@@ -34,6 +34,13 @@ export interface MenuPlace {
   soon?: { dishes: string[]; href: string };
 }
 const PLACE_KEY = 'fp-menu-at';
+/** A dish for the signature page that opens the à la carte menu (home page). */
+export interface SignatureDish {
+  name: string;
+  price?: string;
+  image?: string;
+  alt?: string;
+}
 
 interface Art {
   frame: string;
@@ -236,6 +243,35 @@ function Cover({ menu, art, place }: { menu: MenuLite; art: Art; place?: MenuPla
   );
 }
 
+/**
+ * The signature dishes, as the first page of the à la carte menu: the photographed ones in a
+ * grid, the rest named underneath. Replaces the separate kitchen scene on the home page.
+ */
+function Signatures({ dishes, art }: { dishes: SignatureDish[]; art: Art }) {
+  const pics = dishes.filter((d) => d.image).slice(0, 4);
+  const rest = dishes.filter((d) => !pics.includes(d));
+  return (
+    <Frame art={art}>
+      <p className="m-0 text-center text-[5.6cqw] font-bold uppercase leading-none tracking-[0.1em]">From the pass</p>
+      <p className="m-0 mt-[1.2cqw] text-center font-note text-[3.6cqw] font-medium italic text-tiger-deep">Our signature dishes</p>
+      <div className="mt-[3cqw] grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-[3cqw]">
+        {pics.map((d) => (
+          <figure key={d.name} className="m-0 flex min-h-0 flex-col">
+            <img src={d.image} alt={d.alt ?? ''} className="fp-photo min-h-0 w-full flex-1 object-cover" loading="lazy" decoding="async" draggable={false} />
+            <figcaption className="mt-[1.2cqw] text-[2.8cqw] font-bold uppercase leading-tight tracking-[0.05em]">
+              {d.name}
+              {d.price && <span className="font-normal"> | {d.price}</span>}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      {rest.length > 0 && (
+        <p className="m-0 mt-[2.4cqw] text-center font-note text-[3.1cqw] font-medium italic leading-[1.35]">Also from the pass: {rest.map((d) => d.name).join(', ')}.</p>
+      )}
+    </Frame>
+  );
+}
+
 /** The back of the real menu: the story and the map (guidelines p.27). */
 function Back({ art }: { art: Art }) {
   return (
@@ -256,7 +292,20 @@ function Back({ art }: { art: Art }) {
 
 const TAB_COLORS = ['bg-tiger text-ink-deep', 'bg-gold text-ink', 'bg-sand text-ink', 'bg-slate text-ink-deep', 'bg-[#efe6d8] text-ink', 'bg-ink text-sand'];
 
-export default function MenuBook({ menus, art, next, places }: { menus: MenuLite[]; art: Art; next?: { href: string; label: string }; places?: MenuPlace[] }) {
+export default function MenuBook({
+  menus,
+  art,
+  next,
+  places,
+  signatures,
+}: {
+  menus: MenuLite[];
+  art: Art;
+  next?: { href: string; label: string };
+  places?: MenuPlace[];
+  /** Home page: the à la carte menu opens on the signature dishes. */
+  signatures?: SignatureDish[];
+}) {
   const [placeId, setPlaceId] = useState(places?.[0]?.id);
   const place = places?.find((p) => p.id === placeId);
   // The menus this branch serves, in the book's order. No places = every menu given.
@@ -312,10 +361,11 @@ export default function MenuBook({ menus, art, next, places }: { menus: MenuLite
 
   const pages = useMemo(() => {
     const out: ReactNode[] = [<Cover key="cover" menu={menu} art={art} place={place} />];
+    if (signatures?.length && menu.id === 'a-la-carte') out.push(<Signatures key="sig" dishes={signatures} art={art} />);
     paginate(menu, z).forEach((p, i) => out.push(<MenuPage key={`p${i}`} menu={menu} data={p} n={i + 1} art={art} />));
     out.push(<Back key="back" art={art} />);
     return out;
-  }, [menu, art, z, place]);
+  }, [menu, art, z, place, signatures]);
 
   return (
     <section id="menu" className="relative overflow-hidden bg-sand py-[clamp(56px,6vw,88px)] text-ink" aria-label="The menus">
@@ -324,7 +374,7 @@ export default function MenuBook({ menus, art, next, places }: { menus: MenuLite
       <div className="relative mx-auto flex max-w-[1200px] flex-col items-center px-5">
         <p className="m-0 font-note text-[22px] text-tiger-deep">The menu</p>
         <h2 className="m-0 mt-2 text-center text-[clamp(34px,5vw,72px)] uppercase leading-[0.98] tracking-[0.06em]">Turn the pages</h2>
-        <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">{places ? 'Pick a restaurant, then a menu from the bookmarks.' : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
+        <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">{places ? (signatures?.length ? 'Our signature dishes open the book. Pick a restaurant, then a menu from the bookmarks.' : 'Pick a restaurant, then a menu from the bookmarks.') : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
 
         {places && (
           <div role="radiogroup" aria-label="Restaurant" className="mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">

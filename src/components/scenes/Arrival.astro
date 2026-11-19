@@ -69,6 +69,10 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     const open = (fast = false) => {
       if (started) return;
       started = true;
+      // The board is leaving: take it out of the accessibility tree and the tab order now,
+      // not when the last frame lands (a fading label is not content).
+      root.setAttribute('aria-hidden', 'true');
+      root.inert = true;
       const tl = createTimeline({
         onComplete: () => { document.body.style.overflow = ''; finish(); },
       });

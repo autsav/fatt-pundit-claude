@@ -7,7 +7,6 @@ import Doors from '../components/scenes/Doors.astro';
 import GateBoard from '../components/scenes/GateBoard.astro';
 import RainHero from '../components/scenes/RainHero.tsx';
 import Voyage from '../components/scenes/Voyage.tsx';
-import Kitchen, { type KitchenDish } from '../components/scenes/Kitchen.tsx';
 import MenuBook, { type MenuLite } from '../components/scenes/MenuBook.tsx';
 import BarAfterDark from '../components/scenes/BarAfterDark.tsx';
 import RoomContactSheet from '../components/scenes/RoomContactSheet.tsx';
@@ -30,8 +29,6 @@ import stampOrangeArt from '../assets/images/brand/stamp-orange.png';
 import mountainAArt from '../assets/images/brand/mountain-a.png';
 import mountainsBArt from '../assets/images/brand/mountains-b.png';
 import mountainsCArt from '../assets/images/brand/mountains-c.png';
-import greaseproofOrange from '../assets/images/brand/greaseproof-orange.png';
-import momoSteam from '../assets/video/momo-steam.mp4';
 import inside from '../assets/images/covent-garden/gallery-01.jpg';
 import barSour from '../assets/images/journey/05-bar-guava-chilli-sour.jpg';
 import barCocktail from '../assets/images/journey/05-bar-cocktail.jpg';
@@ -90,35 +87,22 @@ const voyageArt = {
   mountainsB: await img(mountainsBArt, 520),
   mountainsC: await img(mountainsCArt, 260),
 };
-// Scene 4: signature dishes for the rail. Photos only where we have the real dish; the rest are order tickets.
-const SECTION_NAMES: Record<string, string> = { momos: 'Momos', veg: 'Veg', seafood: 'Seafood', meat: 'Meat, game + poultry', rice: 'Bread, rice + noodles', sides: 'Sides', desserts: 'Desserts' };
-const railDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string; video?: string }): Promise<KitchenDish> => {
+// The menu book opens on the signature dishes. Photos only where we have the real dish; the rest are named.
+const sigDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string }) => {
   const d = await dish(id);
-  return {
-    id,
-    name: photo?.name ?? d.name,
-    note: d.description,
-    price: priceOf(d) ?? undefined,
-    tags: d.tags,
-    image: photo ? await img(photo.src, 640) : undefined,
-    video: photo?.video,
-    imageAlt: photo?.alt,
-    section: SECTION_NAMES[d.section] ?? d.section,
-    signature: !!d.signature,
-  };
+  return { name: photo?.name ?? d.name, price: priceOf(d) ?? undefined, image: photo ? await img(photo.src, 520) : undefined, alt: photo?.alt };
 };
-const kitchenDishes = await Promise.all([
-  railDish('momo-mix-vegetable', { src: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf', video: momoSteam }),
-  railDish('momo-kid-goat'),
-  railDish('crackling-spinach', { src: imgSpinach, alt: 'Crackling spinach topped with yoghurt and pomegranate in a steel bowl' }),
-  railDish('popcorn-cauliflower'),
-  railDish('crispy-okra-salt-n-pepper', { src: imgOkra, alt: 'Crispy okra with chillies in a black and gold steamer pot, pink salt beside it' }),
-  railDish('hakka-chilly-paneer-lettuce-cups'),
-  railDish('malabar-monkfish-curry'),
-  railDish('bombay-chilly-prawns'),
-  railDish('snowflake-gelato-sizzling-brownie', { src: imgBrownie, alt: 'Sizzling brownie in a cast-iron skillet with vanilla ice cream and chocolate sauce', name: 'Sizzling brownie' }),
+const signatureDishes = await Promise.all([
+  sigDish('momo-mix-vegetable', { src: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf' }),
+  sigDish('momo-kid-goat'),
+  sigDish('crackling-spinach', { src: imgSpinach, alt: 'Crackling spinach topped with yoghurt and pomegranate in a steel bowl' }),
+  sigDish('popcorn-cauliflower'),
+  sigDish('crispy-okra-salt-n-pepper', { src: imgOkra, alt: 'Crispy okra with chillies in a black and gold steamer pot, pink salt beside it' }),
+  sigDish('hakka-chilly-paneer-lettuce-cups'),
+  sigDish('malabar-monkfish-curry'),
+  sigDish('bombay-chilly-prawns'),
+  sigDish('snowflake-gelato-sizzling-brownie', { src: imgBrownie, alt: 'Sizzling brownie in a cast-iron skillet with vanilla ice cream and chocolate sauce', name: 'Sizzling brownie' }),
 ]);
-const kitchenArt = { greaseproof: greaseproofOrange.src, stampGold: await stampSrc(stampGoldArt, 160) };
 
 // Scene 5: the menu book, straight from menus.json + dishes.json.
 // Menu by location: every menu any branch serves, and each branch's own list.
@@ -175,11 +159,9 @@ const orgLd = {
     <!-- 3 · The voyage -->
     <Voyage client:idle art={voyageArt} />
 
-    <!-- 4 · The kitchen -->
-    <Kitchen client:visible dishes={kitchenDishes} art={kitchenArt} />
 
     <!-- 5 · The menu book -->
-    <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} next={{ href: '#bar', label: 'Continue to the bar' }} />
+    <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} next={{ href: '#bar', label: 'Continue to the bar' }} />
     <p class="menu-list-link">Read the menus as a list for {branches.filter((b) => b.status === 'open').map((b, i) => <>{i > 0 && ' or '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}</p>
 
     <!-- 6 · The bar after dark -->
@@ -218,7 +200,7 @@ const orgLd = {
   <!-- Story rail: where you are in the visit. Lights up as you scroll, tap a stop to jump. Wide screens only;
        phones get the thin progress line under the header instead. -->
   <nav class="rail" aria-label="Chapters" data-rail hidden>
-    {[['top', 'The window'], ['story', 'The voyage'], ['kitchen', 'The kitchen'], ['menu', 'The menu'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']].map(([id, label]) => (
+    {[['top', 'The window'], ['story', 'The voyage'], ['menu', 'The menu'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']].map(([id, label]) => (
       <a href={`#${id}`} data-ch={id}><span class="rail-dot" aria-hidden="true"></span><span class="rail-lbl">{label}</span></a>
     ))}
   </nav>

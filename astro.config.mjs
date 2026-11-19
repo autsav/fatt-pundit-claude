@@ -4,6 +4,21 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 
 const at = './src/assets/fonts/american-typewriter';
+// Licence backup (tasks/todo.md "Launch blockers"): build with FONT_BACKUP=1 to swap the unlicensed
+// American Typewriter files for Kameron (SIL Open Font Licence), the closest free proportional slab
+// with a real bold. Same CSS variable, so nothing else changes. Default stays the guideline font.
+const backup = process.env.FONT_BACKUP === '1';
+const kam = '@fontsource/kameron/files/kameron-latin';
+const typewriter = backup
+  ? [
+      { src: [`${kam}-400-normal.woff2`], weight: 400, style: 'normal' },
+      { src: [`${kam}-700-normal.woff2`], weight: 700, style: 'normal' },
+    ]
+  : [
+      { src: [`${at}/american-typewriter-light.woff2`], weight: 300, style: 'normal' },
+      { src: [`${at}/american-typewriter-regular.woff2`], weight: 400, style: 'normal' },
+      { src: [`${at}/american-typewriter-bold.woff2`], weight: 700, style: 'normal' },
+    ];
 
 export default defineConfig({
   site: 'https://www.fattpundit.co.uk',
@@ -23,16 +38,10 @@ export default defineConfig({
       // Replace with licensed ITC American Typewriter web fonts before launch
       // (same filenames = no code change). See tasks/todo.md "Launch blockers".
       provider: fontProviders.local(),
-      name: 'American Typewriter',
+      name: backup ? 'Kameron' : 'American Typewriter',
       cssVariable: '--font-typewriter',
       fallbacks: ['Courier New', 'monospace'],
-      options: {
-        variants: [
-          { src: [`${at}/american-typewriter-light.woff2`], weight: 300, style: 'normal' },
-          { src: [`${at}/american-typewriter-regular.woff2`], weight: 400, style: 'normal' },
-          { src: [`${at}/american-typewriter-bold.woff2`], weight: 700, style: 'normal' },
-        ],
-      },
+      options: { variants: typewriter },
     },
     {
       // Brand guidelines: notes/captions in Lora Medium Italic (OFL, free).

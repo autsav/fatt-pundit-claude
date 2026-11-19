@@ -14,7 +14,6 @@ import SiteFooter from '../../components/site/SiteFooter.astro';
 import BranchArrival from '../../components/branch/BranchArrival.tsx';
 import PlateWall from '../../components/branch/PlateWall.tsx';
 import WalkTheRoom from '../../components/branch/WalkTheRoom.tsx';
-import VoyageToDubai from '../../components/branch/VoyageToDubai.tsx';
 import TonightBoard from '../../components/branch/TonightBoard.tsx';
 import { loadSpecials } from '../../lib/specials';
 import MenuBook from '../../components/scenes/MenuBook.tsx';
@@ -31,9 +30,6 @@ import stampGoldArt from '../../assets/images/brand/stamp-gold.png';
 import stampOrangeArt from '../../assets/images/brand/stamp-orange.png';
 import frameArt from '../../assets/images/brand/frame.png';
 import map from '../../assets/images/brand/map.webp';
-import worldLand from '../../assets/images/brand/world-land.svg';
-import shipArt from '../../assets/images/brand/ship.png';
-import compassArt from '../../assets/images/brand/compass.png';
 
 export const getStaticPaths = (async () => {
   const branches = await getBranches();
@@ -99,7 +95,6 @@ const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'web
 // Bulb positions (% of each photo), measured from the frames.
 const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 0.6 }, { x: 65.9, y: 13.3, size: 0.6 }];
 const menuArt = { frame: frameArt.src, stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
-const dubaiArt = { world: worldLand.src, ship: await img(shipArt, 300), stampGold: await stampSrc(stampGoldArt, 260), compass: await img(compassArt, 240) };
 
 // Tonight's board: every row for this branch goes to the page; the board picks today's.
 const specials = open ? (await loadSpecials()).filter((r) => r.branch === b.id || r.branch === 'all') : [];
@@ -178,6 +173,23 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       </div>
     </section>
 
+    <!-- Opening soon: the list comes first, it's the one thing a guest can do yet. -->
+    {!open && (
+      <section id="waitlist" class="sec gold-bg" aria-labelledby="wl-title">
+        <div class="wrap narrow stack center">
+          <h2 id="wl-title" class="h2">Be first through the door</h2>
+          <p>Leave your email and we'll tell you when bookings open at The Hangout.</p>
+          <form class="wl-form row" data-waitlist>
+            <label for="wl-email" class="sr-only">Email address</label>
+            <input id="wl-email" type="email" required placeholder="you@example.com" autocomplete="email" />
+            <button class="btn btn-ink" type="submit">Join the list</button>
+          </form>
+          <p class="small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
+          <p class="wl-msg" role="status" hidden>Thanks. (Demo only: nothing was sent.)</p>
+        </div>
+      </section>
+    )}
+
     <!-- 2 · The room -->
     {specials.length > 0 && <TonightBoard client:visible branch={b.id} name={b.shortName} tz={b.timezone} rows={specials} csvUrl={import.meta.env.PUBLIC_SPECIALS_CSV_URL} />}
     <section class="sec room" aria-labelledby="room-title">
@@ -196,7 +208,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       </div>
     </section>
     {b.id === 'soho' && <WalkTheRoom client:visible stops={sohoStops} accent={p.second} />}
-    {b.id === 'dubai' && <VoyageToDubai client:visible art={dubaiArt} />}
     {gallery.length > 0 && (
       <section class="gallery-sec" aria-label={`Photos of ${b.shortName}`}>
         <div class="wrap">
@@ -320,21 +331,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       </section>
     )}
 
-    {!open && (
-      <section id="waitlist" class="sec gold-bg" aria-labelledby="wl-title">
-        <div class="wrap narrow stack center">
-          <h2 id="wl-title" class="h2">Be first through the door</h2>
-          <p>Leave your email and we'll tell you when bookings open at The Hangout.</p>
-          <form class="wl-form row" data-waitlist>
-            <label for="wl-email" class="sr-only">Email address</label>
-            <input id="wl-email" type="email" required placeholder="you@example.com" autocomplete="email" />
-            <button class="btn btn-ink" type="submit">Join the list</button>
-          </form>
-          <p class="small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
-          <p class="wl-msg" role="status" hidden>Thanks. (Demo only: nothing was sent.)</p>
-        </div>
-      </section>
-    )}
 
     <!-- 7 · The other rooms -->
     <section class="sec sand others" aria-labelledby="others-title">
@@ -492,6 +488,15 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .small-ticket { min-height: 220px; }
   .small-ticket:nth-child(2) { rotate: 1deg; }
   .teaser-desc { font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  /* Phones: the three dishes as one short ticket strip, not three tall cards. */
+  @media (max-width: 700px) {
+    .teaser { gap: 0; background: var(--color-paper-light); box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.6); }
+    .teaser .small-ticket { min-height: 0; padding: 16px 20px; gap: 4px; box-shadow: none; rotate: none; border-top: 0; }
+    .teaser .small-ticket + .small-ticket { border-top: 2px dotted rgb(44 41 37 / 0.3); }
+    .teaser .sig-no { display: none; }
+    .teaser .sig-name { font-size: 20px; }
+    .teaser-desc { font-size: 16px; margin: 0; }
+  }
 
   /* Visit */
   .visit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px 72px; }

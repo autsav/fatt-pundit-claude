@@ -49,7 +49,7 @@ const tR = { src: await stampSrc(tigerRight, 480) };
 </section>
 
 <style>
-  .doors { position: relative; height: 280vh; background: var(--color-ink); }
+  .doors { position: relative; height: 190vh; background: var(--color-ink); }
   /* Soft drop shadow drawn once as a still gradient behind the frame (a 120px
      blur box-shadow inside the scaling camera cost a repaint per frame). */
   .stage::before { content: ""; position: absolute; inset: 0; background: radial-gradient(50% 45% at 50% 52%, rgb(0 0 0 / 0.45), transparent 75%); pointer-events: none; }
@@ -80,7 +80,7 @@ const tR = { src: await stampSrc(tigerRight, 480) };
   .o-sub { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.5; max-width: 44ch; }
   .o-cue { font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
 
-  @media (max-width: 700px) { .doors { height: 220vh; } }
+  @media (max-width: 700px) { .doors { height: 165vh; } }
   @media (prefers-reduced-motion: reduce) {
     .doors { height: auto; }
     .stage { position: relative; height: 80svh; }
