@@ -38,7 +38,7 @@ Postage-stamp perforation, airmail-striped postcards, split-flap boards (digits/
 
 ---
 
-# Phase 1 proposal (awaiting approval)
+# Phase 1 additions (approved 19 Nov 2026; tokens live in global.css since slice 2.1)
 
 All of this is additive. The colours and fonts above stay as they are.
 

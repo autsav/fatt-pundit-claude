@@ -4,8 +4,8 @@
 | --- | --- | --- | --- |
 | 0 | Understand the project, safe baseline, audit, docs | **Done** (19 Nov 2026) | — |
 | 0.1 | Fix `astro check` error | **Done** (7dbaa73) | — |
-| 1 | Design direction + design-system proposal + mock frames | **Done, awaiting approval** | Approval of `design-direction.md` |
-| 2 | Implementation slices below | Not started | Each slice has its own gate |
+| 1 | Design direction + design-system proposal + mock frames | **Approved** 19 Nov 2026 | — |
+| 2 | Implementation slices below | In progress: 2.1 done | Each slice has its own gate |
 
 ## Rollback
 - Baseline: `git checkout baseline-pre-redesign` (tag on `main` @ 0ead5a8)
@@ -17,7 +17,7 @@ Gate for every slice: before/after screenshots at 390/768/1440 + calm mode; no h
 
 | # | Slice | Files (expected) | Why |
 | --- | --- | --- | --- |
-| 2.1 | Foundation tokens: spacing, grid (`.desk`), type steps, surfaces, lift | `src/styles/global.css`, `site.css` | Everything else builds on it; additive, no visual change by itself |
+| 2.1 ✅ | Foundation tokens: spacing, grid (`.desk`), type steps, surfaces, lift | `src/styles/global.css` | Done 19 Nov: additive, HTML identical, +453 B gz (qa-report.md) |
 | 2.2 | Quick a11y fixes: 404 `<h1>`; Tonight's board fit-to-width | `src/pages/404.astro`, `components/branch/TonightBoard.tsx` | Audit 4.5, 4.1 |
 | 2.3 | Branch arrival: photo + object spread (CG), typographic hero (Soho), Dubai check | `src/pages/[branch]/index.astro`, `components/branch/BranchArrival.tsx` | Audit 4.1, the biggest desktop gap |
 | 2.4 | Boarding-card strip under the branch hero (reuses `lib/hours.ts`, `BookDrawer` triggers) | new `components/branch/VisitStrip.astro` | Audit 4.2, essentials before story |

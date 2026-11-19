@@ -70,6 +70,30 @@
     outline: 3px solid var(--fp-ring);
     outline-offset: 3px;
   }
+
+  /* Layout foundation (docs/redesign/design-system.md, Phase 1). Plain custom properties, not @theme,
+     so they don't spawn Tailwind utilities or collide with its --spacing / --text-* namespaces. */
+  :root {
+    /* Spacing, 4px base */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+    --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px; --space-10: 128px;
+    --section-pad: var(--space-8);
+    /* Grid: 4 / 8 / 12 columns at <640 / 640–1023 / >=1024 (set on .desk) */
+    --grid-max: 1320px;
+    --grid-margin: clamp(20px, 5vw, 80px);
+    --grid-gutter: clamp(16px, 2vw, 24px);
+    /* Type steps, fluid between 390 and 1440 px */
+    --step-h2: clamp(34px, 1.4rem + 5.3vw, 96px);
+    --step-h3: clamp(22px, 1rem + 1vw, 32px);
+    --step-spoken: clamp(20px, 0.9rem + 1vw, 30px);
+    --step-body: clamp(17px, 1rem + 0.2vw, 19px);
+    --step-label: clamp(12px, 0.7rem + 0.1vw, 13px);
+    --step-fine: 14px;
+    /* Elevation: print-like hard offsets only. No blurred shadows (they repaint in scroll scenes). */
+    --lift-1: 3px 3px 0 rgb(26 23 20 / 0.35);
+    --lift-2: 6px 6px 0 rgb(26 23 20 / 0.35);
+  }
+  @media (min-width: 1024px) { :root { --section-pad: var(--space-10); } }
 }
 
 @layer components {
@@ -83,6 +107,32 @@
     font-weight: 500;
     letter-spacing: var(--tracking-copy);
   }
+
+  /* Desk grid: 4 / 8 / 12 columns. Children place themselves with grid-column.
+     .desk-bleed-start / -end let a photo run past the margin to the screen edge. */
+  .desk {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    padding-inline: var(--grid-margin);
+    max-width: calc(var(--grid-max) + 2 * var(--grid-margin));
+    margin-inline: auto;
+  }
+  @media (min-width: 640px) { .desk { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .desk { grid-template-columns: repeat(12, minmax(0, 1fr)); } }
+  .desk > * { grid-column: 1 / -1; }
+  .desk-bleed-start { margin-inline-start: calc(-1 * var(--grid-margin)); }
+  .desk-bleed-end { margin-inline-end: calc(-1 * var(--grid-margin)); }
+
+  /* Surfaces: night (ink), day (sand), paper. Each sets its own focus-ring colour (lesson 55). */
+  .surface-night { --fp-ring: var(--color-gold); background: var(--color-ink); color: var(--color-sand); }
+  .surface-day { --fp-ring: var(--color-ink); background: var(--color-sand); color: var(--color-ink); }
+  .surface-paper { --fp-ring: var(--color-ink); background: var(--color-paper); color: var(--color-ink); }
+  .surface-night .accent-text { color: var(--color-tiger-bright); }
+  :is(.surface-day, .surface-paper) .accent-text { color: var(--color-tiger-deep); }
+
+  .lift-1 { box-shadow: var(--lift-1); }
+  .lift-2 { box-shadow: var(--lift-2); }
 }
 
 @keyframes fp-pill-in { from { transform: translateY(16px); opacity: 0; filter: blur(4px); } to { transform: none; opacity: 1; filter: none; } }

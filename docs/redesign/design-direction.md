@@ -1,6 +1,6 @@
 # Design direction — Phase 1 proposal
 
-**Status: proposal, awaiting approval.** Nothing in `src/` changes until it is approved.
+**Status: approved 19 Nov 2026.** Implemented in slices; see implementation-roadmap.md.
 Evidence: `website-audit.md` (§4) and the baseline frames in `baseline/frames/`. Mock frames: `mocks/` (see §8).
 
 ## 1. Concept: "The traveller's desk"

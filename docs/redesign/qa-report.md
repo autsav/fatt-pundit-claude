@@ -64,6 +64,12 @@ These are single runs, so expect ±5 on Perf. For comparison, todo.md [T] record
 - `npm run check`: exit 0, **0 errors**, 0 warnings, 5 hints (measured)
 - `npm run build`: exit 0 (default fonts, American Typewriter files referenced in the built CSS) and exit 0 with `FONT_BACKUP=1` (Kameron referenced) (measured)
 
+### Slice 2.1: foundation tokens (19 Nov 2026)
+- Change: `src/styles/global.css` only. Spacing, grid, type-step and lift custom properties in a plain `:root` (not `@theme`); `.desk` grid (4/8/12 columns), `.desk-bleed-start/-end`, `.surface-night/-day/-paper` (each sets `--fp-ring`), `.accent-text`, `.lift-1/-2`.
+- `npm run check`: 0 errors, 0 warnings, 5 hints. `npm run build`: exit 0 (measured)
+- No-visual-change proof (measured): built before and after from the same tree (stash of this one file). **All 16 HTML pages identical** apart from asset hashes. Global CSS: **0 rules removed, 15 added**, and no page uses the new classes yet. Global CSS 12,517 → 12,970 bytes gzip (+453 B).
+- Not re-run: Lighthouse and the screenshot sweep. Unnecessary when the HTML is identical and the CSS only adds rules nothing uses. They run again in slice 2.2+, where the visuals change.
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 
