@@ -129,7 +129,7 @@ const title = open ? `Fatt Pundit ${b.shortName} · Indo-Chinese Hakka restauran
 const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : 'Join the list for opening news.'}`;
 ---
 <Base title={title} description={description} og={b.id}>
-  {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="100vw" fetchpriority="high" />}
+  {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="(min-width: 1024px) 62vw, 100vw" fetchpriority="high" />}
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   <a class="skip" href="#visit">Skip to opening hours and directions</a>
   <SiteHeader branches={branches} current={b} />
@@ -142,7 +142,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <div class={`arrival-media ${heroImg ? 'is-photo' : 'is-art'}`}>
         {heroImg ? (
           <>
-            <img class="arrival-bg" src={heroImg.src} srcset={heroSet} sizes="100vw" alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
+            <img class="arrival-bg" src={heroImg.src} srcset={heroSet} sizes="(min-width: 1024px) 62vw, 100vw" alt={ALTS[p.hero!] ?? ''} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
             {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroPoster!} label={ALTS[p.hero!] ?? ''} class="arrival-bg" />}
           </>
         ) : b.id === 'soho' ? (
@@ -426,7 +426,8 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .arrival-mark { display: block; width: 56%; aspect-ratio: 0.764; background: var(--lead); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
   .arrival-in:not(:has(.mark-badge)) { padding-top: 32px; }
   .arrival-brand { margin: 0; font-family: var(--font-label); font-size: 14px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: var(--color-sand); }
-  .board-slot { min-height: 1.2em; }
+  /* Full column width so the name board can size itself to it (container units). */
+  .board-slot { min-height: 1.2em; align-self: stretch; container-type: inline-size; }
   .arrival-addr { font-family: var(--font-note); font-style: italic; font-size: 19px; line-height: 1.4; }
   .arrival-actions { margin-top: 4px; }
   @media (min-width: 900px) {
@@ -439,6 +440,42 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     .arrival-in:not(:has(.mark-badge)) { padding-top: 64px; }
   }
   .arrival-media.is-art + .arrival-shade { background: linear-gradient(90deg, rgb(44 41 37 / 0.85), transparent 60%); }
+
+  /* 1024px and up: a desk spread on the 12-column grid (design-direction.md §3) instead of text over a faded photo.
+     Tracks: page edge | 12 content columns | page edge. Line 2 = content start, line 14 = content end.
+     Photo hero: the photo bleeds off the left edge (to the end of col 7); the name card overlaps it (cols 7–12).
+     Art hero (no photo yet): words on the left (cols 1–5), the art bleeds off the right edge (col 6 on). */
+  @media (min-width: 1024px) {
+    .arrival {
+      grid-template-columns: minmax(var(--grid-margin), 1fr) repeat(12, minmax(0, calc((var(--grid-max) - 11 * var(--grid-gutter)) / 12))) minmax(var(--grid-margin), 1fr);
+      column-gap: var(--grid-gutter);
+      align-items: center;
+      min-height: 0;
+      padding-block: var(--space-8);
+    }
+    .arrival-shade { display: none; }
+    .arrival-media, .arrival-media.is-photo, .arrival-media.is-art { position: relative; inset: auto; grid-row: 1; height: min(76svh, 720px); min-height: 520px; }
+    .arrival-media.is-photo { grid-column: 1 / 9; }
+    .arrival-media.is-art { grid-column: 7 / -1; }
+    .arrival-in { grid-row: 1; max-width: none; margin: 0; padding: 0; z-index: 1; }
+    .arrival-in > * { max-width: none; }
+    .arrival-media.is-photo ~ .arrival-in {
+      grid-column: 8 / 14;
+      padding: var(--space-8) var(--space-7);
+      background: var(--color-ink);
+      border: 1px solid var(--color-gold);
+    }
+    .arrival-media.is-art ~ .arrival-in { grid-column: 2 / 7; }
+    .arrival-in:not(:has(.mark-badge)) { padding-top: 0; }
+    .arrival-media.is-photo ~ .arrival-in:not(:has(.mark-badge)) { padding-top: var(--space-8); }
+  }
+  /* Small laptops: the card takes one more column and less padding so the actions stay above the fold. */
+  @media (min-width: 1024px) and (max-width: 1439px) {
+    .arrival-media.is-photo { grid-column: 1 / 8; }
+    .arrival-media.is-photo ~ .arrival-in { grid-column: 7 / 14; padding: var(--space-6) var(--space-5); gap: 12px; }
+    .arrival-media.is-photo ~ .arrival-in:not(:has(.mark-badge)) { padding-top: var(--space-6); }
+    .mark-badge { width: 88px; }
+  }
 
   /* Soho without photos: a Westminster street sign on a dark brick wall. */
   .art-soho { background:
@@ -457,6 +494,14 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .art-gate { background: radial-gradient(70% 60% at 70% 30%, rgb(203 160 82 / 0.28), transparent 70%), linear-gradient(160deg, #5f6e79, #2c2925 75%); display: grid; place-items: center end; padding-right: 6vw; }
   @media (max-width: 899px) { .art-gate { place-items: center; padding: 0 0 10%; } }
   .gate-code { font-size: clamp(110px, 22vw, 320px); font-weight: 700; letter-spacing: 0.06em; color: transparent; -webkit-text-stroke: 2px rgb(203 160 82 / 0.7); line-height: 1; }
+  /* Desk spread (1024px+): the art now has its own column, so centre it there and let the sign grow. */
+  @media (min-width: 1024px) {
+    .art-soho, .art-gate { place-items: center; padding: 0 var(--grid-margin) 0 var(--space-7); }
+    .sign-name, .sign-code { font-size: clamp(32px, 3.8vw, 60px); }
+    .sign-city { font-size: clamp(11px, 1vw, 15px); }
+    .street-sign { max-width: 100%; }
+    .gate-code { font-size: clamp(160px, 17vw, 260px); }
+  }
 
   /* The room */
   .room-lines { margin: 0; display: flex; flex-direction: column; gap: 0.2em; font-size: clamp(30px, 4.6vw, 62px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; }

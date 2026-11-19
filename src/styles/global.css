@@ -292,3 +292,5 @@
    board, capped at 32px. Unlayered, so it beats SplitFlapText's built-in text-3xl / sm:text-5xl
    (at 48px a 22-letter line overflowed the 760px board and was clipped). */
 .tonight-flap { font-size: min(32px, calc(100cqw / (var(--n, 24) * 0.8))); }
+/* Branch hero name board: the intended size, but never wider than its column (container = .board-slot). */
+.arrival-flap { font-size: min(clamp(22px, 4.6vw, 56px), calc(100cqw / (var(--n, 13) * 0.8))); }

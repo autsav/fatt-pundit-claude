@@ -79,6 +79,14 @@ These are single runs, so expect ±5 on Perf. For comparison, todo.md [T] record
 - Lighthouse mobile (measured): /soho/ P95 A100 BP100, CLS 0. /covent-garden/ P94 on the first run (TBT 192 ms), then **P97, P97 (TBT 1 / 4 ms)** on reruns, matching the baseline 97. /404.html A100 BP100. (Lighthouse refuses to audit a URL that returns HTTP 404, so the file was audited directly.)
 - `npm run check` 0 errors; `npm run build` exit 0.
 
+### Slice 2.3: branch arrival as a desk spread (19 Nov 2026)
+- Change (≥1024 px only; phones and 900–1023 unchanged): the hero becomes a 14-track grid (edge | 12 columns | edge). Photo hero (Covent Garden): the photo bleeds left to the end of col 7 and the name card (ink, gold rule) overlaps it at cols 7–12. Art hero (Soho sign, Dubai gate): words in cols 1–5, art bleeds right from col 6. The dark fade over the photo is gone, so no text sits on the photo. 1024–1439: the card widens to cols 6–12 with tighter padding. Hero image `sizes` = `(min-width:1024px) 62vw, 100vw` (preload matches).
+- Hero name board: same fix as Tonight's board. `sm:text-5xl` no longer wins; `.arrival-flap` = intended `clamp(22px, 4.6vw, 56px)` but never wider than its column. Phone size unchanged (22 px). At 768 the name is now 35 px (it was 48 px by accident).
+- Measured (headless Edge), 3 branches × 390/768/1024/1280/1440/1920 + calm @390/1440: no horizontal overflow, no JS errors, name board ≤ column width everywhere. All hero actions (Book/Call/Directions or Join/Directions) above the fold at 1024×768, 1280×720, 1366×768 and 1440×900.
+- Screenshots: `slices/2.3/` (390, 1024, 1440, calm 1440, CG 1280×720). Before = `baseline/frames/*_frames.webp`.
+- Lighthouse mobile: Soho P95, CG P97, Dubai P99. A11y 100 and BP 100 on all three. CLS 0.000. Desktop preset: P100 / A100 on all three. CG mobile weight 936 → 1005 KB = `cg-lights-on.mp4` (Lights-on scene further down) fully loaded in this run and aborted at baseline (0 KB). Hero requests unchanged on mobile.
+- **New finding (existing before this slice, confirmed by A/B with the slice stashed):** at 768 px (non-touch), the site header's nav wraps to a second line after the typewriter font loads. It shifts the page 44 px: **CLS 0.229 on /soho/, 0.224 on /dubai/**, identical without slice 2.3. Covent Garden does not shift (its longer Book label already wraps in the fallback font). Fix belongs to `SiteHeader.astro` (reserve the line or collapse the nav earlier). Added to the roadmap.
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 
