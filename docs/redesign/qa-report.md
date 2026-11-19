@@ -59,6 +59,11 @@ These are single runs, so expect ±5 on Perf. For comparison, todo.md [T] record
 | Unknown URL | HTTP 404, "Lost luggage" page. **No heading element on the page** |
 | Home branch chooser | links to all 3 branch pages present |
 
+### Fix after baseline: astro check (19 Nov 2026)
+- `astro.config.mjs`: font variants are now written inline in `fonts[0].options` so Astro's `[Variant, ...Variant[]]` type applies. Same files, same weights, same `FONT_BACKUP` switch.
+- `npm run check`: exit 0, **0 errors**, 0 warnings, 5 hints (measured)
+- `npm run build`: exit 0 (default fonts, American Typewriter files referenced in the built CSS) and exit 0 with `FONT_BACKUP=1` (Kameron referenced) (measured)
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 

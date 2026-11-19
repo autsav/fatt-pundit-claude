@@ -11,7 +11,7 @@
 - All redesign work happens on the `redesign/world-class` branch. Nothing is pushed without approval.
 
 ## Candidate work items from the audit (not yet prioritised or approved)
-- Fix the `astro check` error (`astro.config.mjs:44`)
+- ~~Fix the `astro check` error (`astro.config.mjs:44`)~~ Done 19 Nov (qa-report.md)
 - Give `/404` a real heading
 - Rework desktop compositions (Soho hero, doors, menu book, goodbye)
 - Shorten branch pages / bring hours and address closer to the top

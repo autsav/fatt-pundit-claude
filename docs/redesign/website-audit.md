@@ -129,7 +129,7 @@ Severity: **H** = blocks launch or quality, **M** = clear improvement, **L** = p
 - No secrets in the repo (`.env` is gitignored) [C].
 
 ### 4.11 Maintainability and tooling [C][M]
-- **M: `astro check` fails** (1 type error in `astro.config.mjs`, from the last commit).
+- ~~**M: `astro check` fails** (1 type error in `astro.config.mjs`, from the last commit).~~ Fixed 19 Nov after the baseline; check now 0 errors.
 - **M: Builds are blocked on this Windows PC.** Windows Application Control blocks satteri's native binary (`@bruits/satteri-win32-x64-msvc`). Workaround used here: install `@bruits/satteri-wasm32-wasi@0.11.7` with `--no-save --force` and set `NAPI_RS_FORCE_WASI=1`. **Running `npm install` again removes it.** Neither `package.json` nor the system policy was changed.
 - **L:** `perf-budget.mjs` defaults to a Linux Chrome path and needs Playwright + Lighthouse on PATH. On this machine, use Edge via `CHROME_PATH`.
 - **L:** Mixed approach: Tailwind utilities in markup + scoped `<style>` + global classes. It is consistent with itself, but `src/pages/[branch]/index.astro` is 37 KB and `index.astro` is 19 KB, which makes them heavy to change.
