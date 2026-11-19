@@ -4,7 +4,7 @@
  * the build; if the sheet's public CSV link is set, the board re-reads it in the
  * browser so today's lines show without waiting for a rebuild.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import SplitFlapText from '@/components/kokonutui/split-flap-text';
 import { parseCsv, pick, todayIn, type Special } from '@/lib/specials';
 
@@ -43,10 +43,11 @@ export default function TonightBoard({ branch, name, tz, rows, csvUrl }: Props) 
           <span id="tonight-h">Tonight at {name}</span>
           {lines.some((l) => l.demo) && <span className="tonight-demo">sample lines</span>}
         </p>
-        <ul className="tonight-rows">
+        {/* --n = tiles per row; .tonight-flap sizes them so the longest line fits the board (global.css). */}
+        <ul className="tonight-rows" style={{ '--n': length } as CSSProperties}>
           {lines.map((l, i) => (
             <li key={`${i}-${l.line}`}>
-              <SplitFlapText align="start" className="text-[clamp(13px,3.6vw,26px)]" length={length} maxFlips={10} text={clean(l.line)} tileClassName="bg-ink text-sand" />
+              <SplitFlapText align="start" className="tonight-flap" length={length} maxFlips={10} text={clean(l.line)} tileClassName="bg-ink text-sand" />
             </li>
           ))}
         </ul>

@@ -70,6 +70,15 @@ These are single runs, so expect ±5 on Perf. For comparison, todo.md [T] record
 - No-visual-change proof (measured): built before and after from the same tree (stash of this one file). **All 16 HTML pages identical** apart from asset hashes. Global CSS: **0 rules removed, 15 added**, and no page uses the new classes yet. Global CSS 12,517 → 12,970 bytes gzip (+453 B).
 - Not re-run: Lighthouse and the screenshot sweep. Unnecessary when the HTML is identical and the CSS only adds rules nothing uses. They run again in slice 2.2+, where the visuals change.
 
+### Slice 2.2: 404 heading + Tonight's board fit (19 Nov 2026)
+- **Cause of the clipped board (audit 4.1):** `SplitFlapText` carries `text-3xl sm:text-5xl`. Our `text-[clamp(…)]` only replaced the base size (tailwind-merge keeps the `sm:` variant), so from 640 px the tiles were 48 px: 22 tiles × 0.8em × 48 px ≈ 845 px in a ~700 px board, clipped.
+- **Fix:** `.tonight-rows` is now a size container. `.tonight-flap { font-size: min(32px, 100cqw / (--n × 0.8)) }`, where `--n` is the longest line's tile count, set by `TonightBoard.tsx`. Unlayered CSS, so it beats the component's utilities.
+- **404:** "Lost luggage" `<p>` → `<h1>` (`font-size/line-height: inherit` keeps the look: 17 px computed).
+- Measured (headless Edge, `/soho/` and `/covent-garden/` at 360/390/768/1024/1440): every row ≤ board width, no page overflow. Tile size 16.8 px @360, 18.5 px @390 (was ~13–14 px), 32 px @768+. All lines readable in full (screenshot check at 390 and 1440).
+- CLS: one capture gave 0.257 on /soho/ @768. Three repeat runs with a shift trace gave **0.000**, so it is not reproducible and no shift source was found. All other widths ≤ 0.002.
+- Lighthouse mobile (measured): /soho/ P95 A100 BP100, CLS 0. /covent-garden/ P94 on the first run (TBT 192 ms), then **P97, P97 (TBT 1 / 4 ms)** on reruns, matching the baseline 97. /404.html A100 BP100. (Lighthouse refuses to audit a URL that returns HTTP 404, so the file was audited directly.)
+- `npm run check` 0 errors; `npm run build` exit 0.
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 
