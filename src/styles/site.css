@@ -69,6 +69,24 @@ body { font-size: 17px; line-height: 1.55; }
 .brand { white-space: nowrap; }
 .nav .lbl-short { display: none; }
 
+/* The bar is ONE line at every width. Wrapping depended on the font: the fallback fit, the typewriter
+   font didn't, so the nav jumped to a second line after the font loaded and pushed the whole page down
+   (CLS 0.23 at 768px). Measured with the brand font: home/info nav (5 links) needs 965px of content
+   at full size, branch nav (3 links) 751–866px. Between phone and desktop: smaller nav, short Book
+   label, and the text links step aside where even that can't fit (the phone dock and page links remain). */
+.bar-in, .nav { flex-wrap: nowrap; }
+.nav { white-space: nowrap; }
+@media (min-width: 641px) and (max-width: 1099px) {
+  .brand { font-size: 18px; letter-spacing: 0.14em; }
+  .nav { gap: 8px 16px; font-size: 13px; }
+  .nav .btn-sm { font-size: 14px; padding: 0 14px; }
+  .nav .lbl-long { display: none; }
+  .nav .lbl-short { display: inline; }
+}
+@media (min-width: 641px) and (max-width: 719px) { .nav a:not(.btn) { display: none; } }
+/* 5 links + Book = 6 anchors (home, info pages). */
+@media (min-width: 720px) and (max-width: 919px) { .nav:has(> a:nth-child(6)) a:not(.btn) { display: none; } }
+
 @media (max-width: 640px) {
   .nav a:not(.btn) { display: none; }
   .brand { font-size: 17px; letter-spacing: 0.14em; }
@@ -76,4 +94,10 @@ body { font-size: 17px; line-height: 1.55; }
   .nav .btn-sm { padding: 0 14px; font-size: 14px; letter-spacing: 0.06em; white-space: nowrap; }
   .nav .lbl-long { display: none; }
   .nav .lbl-short { display: inline; }
+}
+/* Small phones (320–380px): brand + Book didn't fit (page scrolled 28px sideways at 320). */
+@media (max-width: 380px) {
+  .bar-in { gap: 10px 12px; }
+  .brand { font-size: 15px; letter-spacing: 0.1em; }
+  .nav .btn-sm { padding: 0 10px; letter-spacing: 0.04em; }
 }

@@ -87,6 +87,14 @@ These are single runs, so expect ±5 on Perf. For comparison, todo.md [T] record
 - Lighthouse mobile: Soho P95, CG P97, Dubai P99. A11y 100 and BP 100 on all three. CLS 0.000. Desktop preset: P100 / A100 on all three. CG mobile weight 936 → 1005 KB = `cg-lights-on.mp4` (Lights-on scene further down) fully loaded in this run and aborted at baseline (0 KB). Hero requests unchanged on mobile.
 - **New finding (existing before this slice, confirmed by A/B with the slice stashed):** at 768 px (non-touch), the site header's nav wraps to a second line after the typewriter font loads. It shifts the page 44 px: **CLS 0.229 on /soho/, 0.224 on /dubai/**, identical without slice 2.3. Covent Garden does not shift (its longer Book label already wraps in the fallback font). Fix belongs to `SiteHeader.astro` (reserve the line or collapse the nav earlier). Added to the roadmap.
 
+### Slice 2.3a: header on one line at every width (19 Nov 2026)
+- **Cause:** `.bar-in` and `.nav` were allowed to wrap. The header fit on one line in the fallback font, but the typewriter font is wider, so after it loaded the nav dropped to a second (or third) line and pushed the page down. Measured with the brand font: the home/info nav needs 965 px of content, branch navs 751–866 px.
+- **Fix (`src/styles/site.css` only):** no wrapping. From 641 to 1099 px: brand 18 px, nav 13 px, short "Book a table" label. Text links hidden at 641–719 px, and at 720–919 px when the nav has 5 links (home, info pages), as on phones. Below 381 px: tighter brand and button so the bar fits at 320 px.
+- **Header sweep** (5 page types × every 8 px from 320 to 1600, brand font loaded): **0 failures** (one line, inside the bar, no page overflow). Before: 210 failures (2–3 line header, up to 143 px tall, roughly 641–1060 px; plus 28 px sideways scroll at 320 px, which also existed before).
+- **CLS** (5 pages × 320/390/768/768 touch/1024/1280/1440): home and branches all ≤ 0.004. **Soho @768: 0.229 → 0.0012; Dubai @768: 0.224 → 0.0012.**
+- **New finding, not the header:** `/allergens/` (0.245 @768 → 0.055 @1440) and `/privacy/` (0.116 @768) shift on desktop sizes because the body text reflows when the typewriter font replaces Courier New (paragraphs lose a line, content moves up ~30 px). The nav doesn't move. Phones (touch emulation): 0. Moved to slice 2.7 (info pages): needs a metric-matched fallback (`size-adjust`) or `font-display` handling for the body font.
+- **Lighthouse mobile:** Soho P99 A100 BP100. Home P86 A100 BP100 CLS 0.000. Home A/B with this slice stashed vs applied, 2 runs each: 86/87 vs 86/88, observed LCP ~0.30 s in both, so no effect from this slice. Home's lab score ranges 86–88 between runs (the baseline 88 was a single run).
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 
