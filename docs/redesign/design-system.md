@@ -36,7 +36,41 @@ The focus ring colour follows the surface via `--fp-ring`, which is set on surfa
 ## Recurring motifs
 Postage-stamp perforation, airmail-striped postcards, split-flap boards (digits/signs only while flipping), boarding passes with a tear-off stub, film-strip contact sheet, receipt, greaseproof tiger paper, gold line art (junk ship, mountains, compass).
 
-## Gaps noted (for Phase 1, no decision yet)
+---
+
+# Phase 1 proposal (awaiting approval)
+
+All of this is additive. The colours and fonts above stay as they are.
+
+## Spacing scale (new tokens)
+`--space-1` 4 · `--space-2` 8 · `--space-3` 12 · `--space-4` 16 · `--space-5` 24 · `--space-6` 32 · `--space-7` 48 · `--space-8` 64 · `--space-9` 96 · `--space-10` 128 (px).
+Section padding: `--space-8` on phone, `--space-10` at 1024+.
+
+## Layout tokens
+`--grid-max: 1320px` · `--grid-margin: clamp(20px, 5vw, 80px)` · `--grid-gutter: clamp(16px, 2vw, 24px)` · columns 4 / 8 / 12 at <640 / 640–1023 / ≥1024. A `.desk` utility sets up the 12-column grid with named lines `photo-start / text-start / text-end`.
+
+## Type tokens
+`--step-display`, `--step-h2` (34 → 96), `--step-h3` (22 → 32), `--step-spoken` (20 → 30), `--step-body` (17 → 19), `--step-label` (12 → 13), `--step-fine` (14). Sizes follow design-direction.md §4 and are written as `clamp()` between 390 and 1440.
+
+## Surfaces
+`--surface-night` (ink), `--surface-day` (sand), `--surface-paper` (paper). Each one sets `--fp-ring`, the text colour and the accent text colour, so contrast and focus rings stay right automatically (this extends lesson 55).
+
+## Elevation
+Print-like only: `--lift-1: 3px 3px 0 rgb(26 23 20 / .35)` and `--lift-2: 6px 6px 0 rgb(26 23 20 / .35)`. **No blurred shadows** (they slow scroll scenes and look digital).
+
+## Ephemera components (replace generic cards)
+| Object | Use | Built from |
+| --- | --- | --- |
+| Ticket | Boarding-card strip, passes | Existing BoardingPasses styles (perforation, stub) |
+| Luggage tag | Good to know, 404 | New: paper tag, punched hole, string line in gold |
+| Postcard | Other rooms, voyage stops | Existing airmail edge from the voyage postcards |
+| Board | Tonight's board, departure chooser | Existing split-flap; adds a fit-to-width rule |
+| Receipt | Goodbye | Existing |
+| Print | Photos on sand | `.fp-photo` + paper border + `--lift-1` |
+
+Rule: every object has one tap target ≥ 44 × 44 px and a visible focus ring from its surface.
+
+## Gaps noted at baseline
 - No documented spacing scale or layout grid tokens (a 1200 content width is mentioned in todo E3, not as a token).
 - Semi Bold weight not available until fonts are licensed.
 - No written component inventory beyond this page and `/styleguide/`.

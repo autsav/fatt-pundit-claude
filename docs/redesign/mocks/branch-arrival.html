@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Branch arrival mock</title>
+<!-- PHASE 1 DESIGN MOCK. Static HTML, not production code. Copy and hours from src/data/branches.json. -->
+<style>
+  @font-face { font-family: AT; font-weight: 300; src: url(../../../src/assets/fonts/american-typewriter/american-typewriter-light.woff2); }
+  @font-face { font-family: AT; font-weight: 400; src: url(../../../src/assets/fonts/american-typewriter/american-typewriter-regular.woff2); }
+  @font-face { font-family: AT; font-weight: 700; src: url(../../../src/assets/fonts/american-typewriter/american-typewriter-bold.woff2); }
+  @font-face { font-family: Lora; font-weight: 500; font-style: italic; src: url(../../../node_modules/@fontsource/lora/files/lora-latin-500-italic.woff2); }
+  :root {
+    --color-ink: #2c2925; --color-tiger: #f15d3d; --color-gold: #cba052; --color-sand: #dac7b5; --color-slate: #758591;
+    --color-tiger-deep: #93321b; --color-gold-deep: #6b4c18; --color-ink-deep: #1a1714; --color-paper: #f6efe4; --color-paper-light: #faf6ef;
+    --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px; --space-10: 128px;
+    --grid-max: 1320px; --grid-margin: clamp(20px, 5vw, 80px); --grid-gutter: clamp(16px, 2vw, 24px);
+    --step-h2: clamp(34px, 1.4rem + 5.3vw, 96px); --step-h3: clamp(22px, 1rem + 1vw, 32px);
+    --step-spoken: clamp(20px, 0.9rem + 1vw, 30px); --step-body: clamp(17px, 1rem + .2vw, 19px);
+    --lift-1: 3px 3px 0 rgb(26 23 20 / .35); --lift-2: 6px 6px 0 rgb(26 23 20 / .35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: AT, 'Courier New', monospace; font-size: var(--step-body); line-height: 1.5; color: var(--color-ink); background: var(--color-sand); font-synthesis: none; }
+  .note { font-family: Lora, Georgia, serif; font-style: italic; font-weight: 500; }
+  .mock-label { font: 700 12px/1 AT; letter-spacing: .2em; text-transform: uppercase; background: var(--color-ink-deep); color: var(--color-gold); padding: 10px var(--grid-margin); margin: 0; }
+  header.site { display: flex; justify-content: space-between; align-items: center; padding: 14px var(--grid-margin); background: var(--color-ink); color: var(--color-sand); border-bottom: 1px solid var(--color-gold); font-weight: 700; letter-spacing: .2em; text-transform: uppercase; font-size: 13px; }
+  header.site nav { display: flex; gap: 20px; align-items: center; } header.site nav span:not(.btn) { display: none; }
+  @media (min-width: 1024px) { header.site nav span:not(.btn) { display: inline; } }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 26px; font: 700 17px AT; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; border: 2px solid transparent; }
+  .btn-sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
+  .btn-orange { background: var(--color-tiger); color: var(--color-ink-deep); }
+  .btn-ghost-light { border-color: var(--color-sand); color: var(--color-sand); }
+  .btn-line { border-color: var(--color-ink); color: var(--color-ink); }
+
+  /* Desk grid */
+  .desk { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: var(--grid-gutter); padding-inline: var(--grid-margin); max-width: calc(var(--grid-max) + 2 * var(--grid-margin)); margin-inline: auto; }
+  @media (min-width: 640px) { .desk { grid-template-columns: repeat(8, 1fr); } }
+  @media (min-width: 1024px) { .desk { grid-template-columns: repeat(12, 1fr); } }
+
+  /* ---------- Frame A: Covent Garden arrival, photo + object ---------- */
+  .arrive { background: var(--color-ink); color: var(--color-sand); position: relative; overflow: hidden; }
+  .arrive .desk { padding-block: 0 var(--space-8); }
+  .arrive-photo { grid-column: 1 / -1; margin-inline: calc(-1 * var(--grid-margin)); aspect-ratio: 4/3; overflow: hidden; }
+  .arrive-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.14) saturate(.93) contrast(1.03); }
+  .arrive-card { grid-column: 1 / -1; margin-top: calc(-1 * var(--space-8)); position: relative; background: var(--color-ink); border: 1px solid var(--color-gold); padding: var(--space-6) var(--space-5); box-shadow: var(--lift-2); }
+  @media (min-width: 1024px) {
+    .arrive .desk { padding-block: var(--space-9); align-items: center; }
+    .arrive-photo { grid-column: 1 / 8; grid-row: 1; margin-inline: calc(-1 * var(--grid-margin)) 0; aspect-ratio: 5/4; }
+    .arrive-card { grid-column: 7 / 13; grid-row: 1; margin-top: 0; padding: var(--space-8) var(--space-7); }
+  }
+  .stamp { width: 64px; height: 64px; border-radius: 50%; background: var(--color-ink-deep); display: grid; place-items: center; border: 1px solid var(--color-gold); }
+  .stamp img { width: 44px; }
+  .eyebrow { margin: var(--space-4) 0 0; font-weight: 700; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--color-gold); }
+  .arrive h1 { margin: 6px 0 0; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; line-height: .95; font-size: clamp(44px, 2rem + 4.2vw, 104px); color: var(--color-gold); }
+  .arrive .spoken { margin: var(--space-4) 0 0; font-size: var(--step-spoken); color: var(--color-sand); }
+  .open { display: inline-flex; gap: 8px; align-items: center; margin-top: var(--space-5); padding: 6px 14px; border: 1px solid rgb(218 199 181 / .4); border-radius: 999px; font-size: 14px; }
+  .open::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #6fbf73; }
+
+  /* ---------- Boarding-card strip (essentials) ---------- */
+  .strip-wrap { background: var(--color-sand); padding-block: var(--space-7); }
+  .strip { grid-column: 1 / -1; display: grid; background: var(--color-paper); box-shadow: var(--lift-2); border-top: 10px solid var(--color-tiger); position: relative; }
+  .strip > * { padding: var(--space-5); }
+  .strip .lab { display: block; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--color-tiger-deep); margin-bottom: 6px; }
+  .strip .big { font-weight: 700; font-size: 20px; line-height: 1.25; text-transform: uppercase; letter-spacing: .03em; }
+  .strip .sub { font-size: 15px; }
+  .strip .stub { background: var(--color-paper-light); border-top: 2px dashed rgb(44 41 37 / .45); display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+  @media (min-width: 1024px) {
+    .strip { grid-template-columns: 1.1fr 1.3fr 1fr auto; }
+    .strip > *:not(:first-child):not(.stub) { border-left: 1px solid rgb(44 41 37 / .18); }
+    .strip .stub { border-top: 0; border-left: 2px dashed rgb(44 41 37 / .45); flex-direction: column; align-items: stretch; justify-content: center; }
+  }
+
+  /* ---------- Frame B: Soho typographic hero (no photo yet) ---------- */
+  .soho { background: var(--color-ink); color: var(--color-sand); overflow: hidden; }
+  .soho .desk { padding-block: var(--space-8); row-gap: var(--space-6); align-items: center; }
+  .sign { grid-column: 1 / -1; background: var(--color-paper-light); color: var(--color-ink); border: 6px solid var(--color-paper-light); outline: 3px solid var(--color-ink); outline-offset: -12px; padding: var(--space-6) var(--space-6) var(--space-5); box-shadow: var(--lift-2); }
+  .sign-main { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); font-family: Arial, Helvetica, sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(30px, 1rem + 5vw, 92px); line-height: 1; letter-spacing: -.01em; }
+  .sign-main b { color: #c8102e; } /* Westminster sign red: real object, kept as in production */
+  .sign-sub { margin-top: 10px; font-family: Arial, Helvetica, sans-serif; font-size: clamp(11px, .5rem + .6vw, 18px); letter-spacing: .25em; text-transform: uppercase; }
+  .soho-text { grid-column: 1 / -1; }
+  .soho h1 { margin: 0; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; line-height: .95; font-size: clamp(44px, 2rem + 4.2vw, 104px); color: var(--color-gold); }
+  .soho .lines { margin: var(--space-4) 0 0; font-size: var(--step-spoken); }
+  @media (min-width: 1024px) {
+    .soho .desk { padding-block: var(--space-10); }
+    .soho-text { grid-column: 1 / 6; grid-row: 1; }
+    .sign { grid-column: 6 / 13; grid-row: 1; margin-right: calc(-1 * var(--space-6)); }
+  }
+  .tiger-wall { grid-column: 1 / -1; display: flex; gap: var(--space-5); align-items: center; opacity: .9; }
+  .tiger-wall img { height: 72px; }
+  .tiger-wall p { margin: 0; font-size: 15px; color: rgb(218 199 181 / .8); }
+
+  /* ---------- Frame C: Good to know = luggage tags; Other rooms = postcards ---------- */
+  .know { background: var(--color-sand); padding-block: var(--space-8); }
+  .know h2 { grid-column: 1 / -1; margin: 0 0 var(--space-7); font-size: var(--step-h2); line-height: 1; text-transform: uppercase; letter-spacing: .03em; }
+  .tags { grid-column: 1 / -1; display: grid; gap: var(--space-6); }
+  @media (min-width: 640px) { .tags { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .tags { grid-template-columns: repeat(3, 1fr); } .tag:nth-child(2) { margin-top: var(--space-7); } .tag:nth-child(3) { margin-top: var(--space-4); } }
+  .tag { position: relative; background: var(--color-paper); padding: var(--space-8) var(--space-5) var(--space-5); box-shadow: var(--lift-1);
+         clip-path: polygon(14% 0, 86% 0, 100% 9%, 100% 100%, 0 100%, 0 9%); }
+  .tag::before { content: ''; position: absolute; top: 18px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--color-sand); box-shadow: inset 0 0 0 3px var(--color-gold); }
+  .tag h3 { margin: 0; font-size: var(--step-h3); line-height: 1.1; text-transform: uppercase; letter-spacing: .04em; }
+  .tag .note { margin: 6px 0 var(--space-4); font-size: 18px; color: var(--color-tiger-deep); }
+  .tag p { margin: 0 0 var(--space-4); font-size: 16px; }
+  .tag a { font-weight: 700; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-ink); text-underline-offset: 4px; }
+
+  .rooms { background: var(--color-sand); padding-block: 0 var(--space-9); }
+  .postcard { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; background: var(--color-paper-light); box-shadow: var(--lift-2); margin-bottom: var(--space-6); text-decoration: none; color: inherit;
+              border: 10px solid transparent; border-image: repeating-linear-gradient(45deg, var(--color-tiger) 0 12px, var(--color-paper-light) 12px 20px, var(--color-slate) 20px 32px, var(--color-paper-light) 32px 40px) 10; }
+  .postcard img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; filter: sepia(.14) saturate(.93) contrast(1.03); }
+  .postcard .pc-text { padding: var(--space-5); }
+  .postcard .pc-text p { margin: 0; }
+  .postcard h3 { margin: 4px 0; font-size: var(--step-h3); text-transform: uppercase; letter-spacing: .04em; }
+  .pc-plan { aspect-ratio: 3/2; background: var(--color-ink); display: grid; place-items: center; color: var(--color-gold); }
+  @media (min-width: 1024px) {
+    .postcard { grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .postcard:first-child { grid-column: 1 / 7; }
+    .postcard:last-child { grid-column: 7 / 13; margin-top: var(--space-8); }
+  }
+</style>
+</head>
+<body>
+
+<p class="mock-label">Frame A: Covent Garden arrival, photo + object spread, then the boarding-card strip</p>
+<header class="site"><span>Fatt Pundit</span><nav><span>Soho</span><span>Covent Garden</span><span>Dubai</span><span class="btn btn-sm btn-orange">Book at Covent Garden</span></nav></header>
+<section class="arrive">
+  <div class="desk">
+    <div class="arrive-photo"><img src="../../../src/assets/images/covent-garden/gallery-01.jpg" alt="The Covent Garden dining room: red banquettes, green walls, brass lamps"></div>
+    <div class="arrive-card">
+      <div class="stamp"><img src="../../../src/assets/images/brand/logo-stamp-tiger.png" alt=""></div>
+      <p class="eyebrow">Fatt Pundit</p>
+      <h1>Covent Garden</h1>
+      <p class="spoken note">Colonial Kolkata on Maiden Lane. Two bars, two floors.</p>
+      <span class="open">Open until 2.30pm</span>
+    </div>
+  </div>
+</section>
+<section class="strip-wrap">
+  <div class="desk">
+    <div class="strip" role="group" aria-label="Plan your visit">
+      <div><span class="lab">Today · Thu</span><span class="big">12–2.30pm<br>5–10.30pm</span></div>
+      <div><span class="lab">Gate</span><span class="big">6 Maiden Lane</span><br><span class="sub">Covent Garden, WC2E 7NA · Covent Garden, Charing Cross</span></div>
+      <div><span class="lab">Call</span><span class="big">020 7836 8883</span><br><span class="sub">Tables for more than 4: please call</span></div>
+      <div class="stub"><a class="btn btn-orange" href="#">Book a table</a><a class="btn btn-sm btn-line" href="#">Directions</a></div>
+    </div>
+  </div>
+</section>
+
+<p class="mock-label">Frame B: Soho, no photo yet: typographic street-sign hero at full width</p>
+<section class="soho">
+  <div class="desk">
+    <div class="soho-text">
+      <div class="stamp"><img src="../../../src/assets/images/brand/logo-stamp-tiger.png" alt=""></div>
+      <p class="eyebrow">Fatt Pundit</p>
+      <h1>Soho</h1>
+      <p class="lines note">The first Fatt Pundit. A slip of a room on Berwick Street.</p>
+    </div>
+    <div class="sign" aria-hidden="true">
+      <div class="sign-main"><span>Berwick Street</span><b>W1</b></div>
+      <div class="sign-sub">City of Westminster</div>
+    </div>
+  </div>
+</section>
+<section class="strip-wrap">
+  <div class="desk">
+    <div class="strip" role="group" aria-label="Plan your visit">
+      <div><span class="lab">Today · Thu</span><span class="big">12–2.30pm<br>5–10.30pm</span></div>
+      <div><span class="lab">Gate</span><span class="big">77 Berwick Street</span><br><span class="sub">Soho, W1F 8TH · Tottenham Court Road, Oxford Circus, Piccadilly Circus</span></div>
+      <div><span class="lab">Call</span><span class="big">020 7287 7900</span><br><span class="sub">Delivery: Deliveroo, Uber Eats</span></div>
+      <div class="stub"><a class="btn btn-orange" href="#">Book a table</a><a class="btn btn-sm btn-line" href="#">Directions</a></div>
+    </div>
+  </div>
+</section>
+
+<p class="mock-label">Frame C: Good to know as luggage tags; Other rooms as postcards across the width</p>
+<section class="know">
+  <div class="desk">
+    <h2>Good to know</h2>
+    <div class="tags">
+      <article class="tag"><h3>Dietary menus</h3><p class="note">A menu for every table</p><p>Vegan, Halal, Gluten free, Dairy free, Pescatarian, Set menu, Pre-theatre.</p><a href="#">See every menu as a list</a></article>
+      <article class="tag"><h3>Allergies</h3><p class="note">Tell us when you book</p><p>We work hard to avoid cross-contamination but can't promise a dish is allergen-free.</p><a href="#">Allergens and dietary needs</a></article>
+      <article class="tag"><h3>Groups</h3><p class="note">More than four?</p><p>Tables for more than 4 guests: please call the restaurant. Larger bookings need a deposit.</p><a href="#">Private dining and big tables</a></article>
+    </div>
+  </div>
+</section>
+<section class="rooms">
+  <div class="desk">
+    <a class="postcard" href="#"><div class="pc-plan" aria-hidden="true">W1 · photo to come</div><div class="pc-text"><p class="note">Next stop</p><h3>Soho</h3><p>77 Berwick Street</p></div></a>
+    <a class="postcard" href="#"><div class="pc-plan" aria-hidden="true" style="background:var(--color-slate-deep,#465460)">DXB</div><div class="pc-text"><p class="note">Boarding soon</p><h3>Dubai</h3><p>The Hangout, Mall of the Emirates</p></div></a>
+  </div>
+</section>
+</body>
+</html>
