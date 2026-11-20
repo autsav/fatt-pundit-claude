@@ -34,13 +34,11 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 ### Menus and prices (details in `docs/content-discrepancies.md`)
 | # | Need | Why / where it's used | Pri |
 | --- | --- | --- | --- |
-| 13 | Tick the right price for each dish and drink: live site vs brand guidelines PDF (17 food rows, 10 drink rows) | Every menu | L |
 | 14 | Are Covent Garden's menus and prices the same as Soho's? (Soho has a pescatarian menu; does Covent Garden?) | Covent Garden menus page | L |
 | 15 | Bing bread: "buttery", yet on the vegan and dairy-free menus. Which is right? | Diet tags | L |
 | 16 | Stir-fry Szechuan noodles on the vegan menu: veg option only, or all? | Diet tags | L |
-| 17 | Spelling: "Lollypop" or "Lollipop"; "chilly" or "chilli" | All menus | M |
-| 18 | Add "Anti-foaming agent E900" to every menu's allergen line? | Allergen notes | M |
-| 19 | Is The Scholar and the Priest still on the drinks list? | The bar scene names it | M |
+| 17 | Spelling "chilly" or "chilli" (the printed menu mixes both; "Lollipop" settled by the printed menu) | All menus | M |
+| 18 | Add "Anti-foaming agent E900" to the dietary, set and pre-theatre menus too? (now on à la carte, as printed) | Allergen notes | M |
 | 20 | Spice level per dish | A spice filter on the menu pages | N |
 | 21 | Tonight's specials: the Google Sheet link (CSV) | Tonight's board shows sample rows until set; must not launch with samples | L |
 
@@ -85,3 +83,5 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 20 Nov 2026 | Guangdong (not Canton) and Calcutta (not Kolkata) everywhere a guest reads; closes #23 | All copy, map labels, alt text, meta, share images |
 | 20 Nov 2026 | Phase 4 UX decisions D1–D5 approved | `docs/redesign/phase4/ux-structure.md` |
 | 20 Nov 2026 | Home page wording approved: chapter names "01 Our story · 02 The menus · 03 The bar · 04 The room · 05 Your table"; menus labels "Open the book for" / "Or read them as a list"; closes #44 | Home (Phase 5) |
+| 20 Nov 2026 | Printed menus (photos in `docs/reference/menu-2026-11/`): every à la carte price matches the site; drinks list updated to match (Scholar and the Priest, Birds Eye Margarita, Lunch Box, Gavi, saffron masala tea added; Desi Dragon and Akluj removed; Chin Chin Choo £13.50 rum recipe; Negroni £14; Hakka Garden Cuban rum). Closes #13 and #19 | `dishes.json`, `menus.json`, home bar card |
+| 20 Nov 2026 | "Lollipop chicken" spelling; E900 on the à la carte allergen line (both as printed) | `dishes.json`, `menus.json` |

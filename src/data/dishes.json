@@ -233,7 +233,7 @@
   },
   {
     "id": "lollypop-chicken",
-    "name": "Lollypop chicken",
+    "name": "Lollipop chicken",
     "section": "meat",
     "description": "spicy + crispy chicken wings served with Szechuan chutney",
     "price": {
@@ -573,7 +573,7 @@
     "id": "hakka-garden",
     "name": "Hakka Garden",
     "section": "cocktails",
-    "description": "Venezuelan white rum, black raspberry, passion fruit",
+    "description": "Cuban white rum, black raspberry, passion fruit",
     "price": {
       "GBP": 14
     },
@@ -593,23 +593,34 @@
     "kind": "drink"
   },
   {
-    "id": "chin-chin-choo",
-    "name": "Chin Chin Choo",
+    "id": "the-scholar-and-the-priest",
+    "name": "The Scholar and the Priest",
     "section": "cocktails",
-    "description": "Himalayan juniper gin, tamarind, plum",
+    "description": "bourbon, Kashmiri saffron, almond liqueur, clay barrel aged",
     "price": {
-      "GBP": 11
+      "GBP": 13.5
     },
     "tags": [],
     "kind": "drink"
   },
   {
-    "id": "desi-dragon",
-    "name": "Desi Dragon",
+    "id": "chin-chin-choo",
+    "name": "Chin Chin Choo",
     "section": "cocktails",
-    "description": "rum, dragon fruit, Szechuan peppercorn, ginger reduction",
+    "description": "bell pepper infused rum, passion fruit, mustard salt",
     "price": {
       "GBP": 13.5
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "birds-eye-margarita",
+    "name": "Birds Eye Margarita",
+    "section": "cocktails",
+    "description": "reposado tequila, green chilli, coriander",
+    "price": {
+      "GBP": 14
     },
     "tags": [],
     "kind": "drink"
@@ -619,6 +630,17 @@
     "name": "Fatt Pundit Negroni",
     "section": "cocktails",
     "description": "spiced gin, Campari, Cocchi Torino",
+    "price": {
+      "GBP": 14
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "lunch-box",
+    "name": "Lunch Box",
+    "section": "cocktails",
+    "description": "aged rum, ginger reduction, coconut honey foam",
     "price": {
       "GBP": 13.5
     },
@@ -674,6 +696,16 @@
     "section": "soft-drinks",
     "price": {
       "GBP": 6
+    },
+    "tags": [],
+    "kind": "drink"
+  },
+  {
+    "id": "saffron-masala-tea",
+    "name": "Saffron masala tea",
+    "section": "hot-drinks",
+    "price": {
+      "GBP": 5
     },
     "tags": [],
     "kind": "drink"
@@ -803,21 +835,21 @@
     "kind": "drink"
   },
   {
-    "id": "akluj-chardonnay-sauvignon",
-    "name": "Akluj Chardonnay + Sauvignon Blanc",
+    "id": "la-giustiniana-gavi",
+    "name": "La Giustiniana Montessoro Gavi",
     "section": "white",
-    "description": "India",
+    "description": "Italy",
     "options": [
       {
         "label": "Glass",
         "price": {
-          "GBP": 9.5
+          "GBP": 10.25
         }
       },
       {
         "label": "Bottle",
         "price": {
-          "GBP": 51.75
+          "GBP": 56.5
         }
       }
     ],

@@ -137,8 +137,8 @@
         ]
       }
     ],
-    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
-    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+    "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya). Anti-foaming agent E900.",
+    "source": "printed menu, photographed 20 Nov 2026 (docs/reference/menu-2026-11/)"
   },
   {
     "id": "vegan",
@@ -944,13 +944,19 @@
             "dish": "white-tiger"
           },
           {
+            "dish": "the-scholar-and-the-priest"
+          },
+          {
             "dish": "chin-chin-choo"
           },
           {
-            "dish": "desi-dragon"
+            "dish": "birds-eye-margarita"
           },
           {
             "dish": "fatt-pundit-negroni"
+          },
+          {
+            "dish": "lunch-box"
           }
         ]
       },
@@ -976,6 +982,14 @@
           },
           {
             "dish": "thums-up"
+          }
+        ]
+      },
+      {
+        "title": "Hot drinks",
+        "items": [
+          {
+            "dish": "saffron-masala-tea"
           }
         ]
       },
@@ -1011,7 +1025,7 @@
             "dish": "estripe-chardonnay"
           },
           {
-            "dish": "akluj-chardonnay-sauvignon"
+            "dish": "la-giustiniana-gavi"
           },
           {
             "dish": "tinpot-hut-sauvignon-blanc"
@@ -1046,6 +1060,6 @@
       }
     ],
     "allergyNote": "We make every effort to avoid cross-contamination, but sadly cannot guarantee dishes and drinks are allergen-free. If you have any food or dietary requirements, please let us know. We use soya bean oil (produced from genetically modified soya).",
-    "source": "fattpundit.co.uk/soho (live site, 18 Nov 2026)"
+    "source": "printed menu, photographed 20 Nov 2026 (docs/reference/menu-2026-11/)"
   }
 ]

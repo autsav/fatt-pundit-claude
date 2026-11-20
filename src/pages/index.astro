@@ -45,7 +45,7 @@ import g7 from '../assets/images/covent-garden/gallery-07.jpg';
 import g8 from '../assets/images/covent-garden/gallery-08.jpg';
 
 const branches = await getBranches();
-const DRINK_IDS = ['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'desi-dragon'];
+const DRINK_IDS = ['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'the-scholar-and-the-priest'];
 const drinks = await Promise.all(DRINK_IDS.map(dish));
 // Scene 6: the bar after dark.
 const webp = async (src: ImageMetadata, width: number) => (await getImage({ src, width, format: 'webp', quality: 78 })).src;

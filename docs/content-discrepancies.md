@@ -1,5 +1,14 @@
 # Content discrepancies: please confirm with the client
 
+> **Resolved 20 Nov 2026 for the à la carte and drinks menus** by photos of the printed menus
+> (`docs/reference/menu-2026-11/food-a-la-carte.jpg`, `drinks.jpg`). Every à la carte price on the photo matches
+> the live-site column, so the site's food prices stand. The drinks list now follows the printed one: Chin Chin Choo
+> £13.50 (bell pepper infused rum, passion fruit, mustard salt), Negroni £14, Hakka Garden with Cuban white rum; added
+> The Scholar and the Priest £13.50, Birds Eye Margarita £14, Lunch Box £13.50, La Giustiniana Montessoro Gavi
+> £10.25 / £56.50, saffron masala tea £5; removed Desi Dragon and the Akluj Chardonnay (not on the printed list).
+> Wine prices already matched. Still open below: dietary-menu price variants, bing bread on the vegan menu (the print
+> still says "buttery"), Covent Garden vs Soho menus (the photos don't say which room), chilly/chilli.
+
 The site data (`src/data/*.json`) currently uses the **live website menus** (fattpundit.co.uk/soho/, read 18 Nov 2026),
 because that is what guests see today. The brand guidelines PDF (B3 Designers, Aug 2026) shows different prices
 and some different dishes and drinks. One of the two is out of date. **Client: tick the correct column for each row.**
