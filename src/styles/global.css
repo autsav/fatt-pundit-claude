@@ -191,7 +191,22 @@
   @view-transition { navigation: none; }
 }
 
+/* Home chapters (Phase 5). Each chapter after the hero opens the same way: a numbered label on a rule
+   (01 Our story … 05 Your table) and a light headline, the system's .fp-section-head. What follows the
+   head differs by chapter (book, bar, contact sheet, passes), so the page keeps one rhythm without one
+   repeated layout. Same padding everywhere (--section-pad). */
+.chapter { padding-block: var(--section-pad); }
+.chapter-head { row-gap: var(--space-4); margin-bottom: var(--section-gap); }
+.chapter-intro { margin: 0; max-width: 38em; font-size: var(--step-body); line-height: var(--lh-body); text-wrap: pretty; }
+/* A headline that is an object (the bar's embroidery) still sits on the rule, like .fp-h2. */
+@media (min-width: 1024px) { .chapter-head > h2:not(.fp-h2) { padding-top: var(--space-2); border-top: var(--border-rule) solid var(--fp-rule-strong); } }
+/* The menus toolbar: which room's book is open, or the list pages. Two groups side by side when there's room. */
+.menu-toolbar { display: flex; flex-wrap: wrap; gap: var(--space-5) var(--space-8); margin-top: var(--space-2); }
+.menu-toolbar-group { display: grid; gap: var(--space-3); align-content: start; }
+.menu-toolbar-label { margin: 0; font-size: var(--step-small); line-height: var(--lh-small); }
+
 /* Scene 6 · The bar after dark. Black apron weave, embroidered title, a spotlight in the dark. */
+.bar-title svg { max-width: 760px; overflow: visible; }
 .bar-dark { background-color: #171513;
   background-image:
     repeating-linear-gradient(0deg, rgb(255 255 255 / 0.028) 0 1px, transparent 1px 3px),

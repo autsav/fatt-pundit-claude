@@ -383,48 +383,57 @@ export default function MenuBook({
   }, [menu, art, z, place, signatures]);
 
   return (
-    <section id="menu" className="relative overflow-hidden bg-sand py-[clamp(56px,6vw,88px)] text-ink" aria-label="The menus">
+    <section id="menu" className="relative overflow-hidden bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
       <Measure menu={menu} art={art} onSizes={onSizes} />
-      <div className="relative mx-auto flex max-w-[1200px] flex-col items-center px-5">
-        <p className="m-0 font-note text-[22px] text-tiger-deep">The menu</p>
-        <h2 className="fp-h2 m-0 mt-2 text-center"><span className="sr-only">The menus: </span>Turn the pages</h2>
-        <p className="m-0 mt-3 max-w-xl text-center text-[17px] leading-snug">{places ? 'Choose a restaurant and a menu.' : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
-        {lists && lists.length > 0 && (
-          <p className="m-0 mt-2 flex flex-wrap items-center justify-center gap-x-5 text-[16px]">
-            <span>Or read them as a list, with search and diet filters:</span>
-            {lists.map((l) => <a key={l.href} className="inline-flex min-h-11 items-center font-bold text-tiger-deep underline underline-offset-4" href={l.href}>{l.label}</a>)}
-          </p>
-        )}
-
-        {places && (
-          <div role="radiogroup" aria-label="Restaurant" className="mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">
-            {places.map((p, i) => {
-              const on = p.id === place?.id;
-              return (
-                <button
-                  key={p.id}
-                  ref={(el) => {
-                    tagRefs.current[i] = el;
-                  }}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  tabIndex={on ? 0 : -1}
-                  onClick={() => choose(p.id)}
-                  onKeyDown={(e) => onTagKey(e, i)}
-                  className={`menu-tag ${on ? 'is-on' : ''}`}
-                >
-                  {p.name}
-                </button>
-              );
-            })}
+      <div className="wrap relative flex flex-col items-center">
+        {/* Chapter head (the home page's numbered chapters), then one toolbar: which room's book, or the list. */}
+        <header className="fp-section-head chapter-head w-full">
+          <p className="fp-section-label"><span className="fp-section-no">02</span> The menus</p>
+          <h2 className="fp-h2"><span className="sr-only">The menus: </span>Turn the pages</h2>
+          <div className="menu-toolbar">
+            {places && (
+              <div className="menu-toolbar-group">
+                <p className="menu-toolbar-label" id="menu-where">Open the book for</p>
+                <div role="radiogroup" aria-labelledby="menu-where" className="flex flex-wrap gap-2 sm:gap-3">
+                  {places.map((p, i) => {
+                    const on = p.id === place?.id;
+                    return (
+                      <button
+                        key={p.id}
+                        ref={(el) => {
+                          tagRefs.current[i] = el;
+                        }}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        tabIndex={on ? 0 : -1}
+                        onClick={() => choose(p.id)}
+                        onKeyDown={(e) => onTagKey(e, i)}
+                        className={`menu-tag ${on ? 'is-on' : ''}`}
+                      >
+                        {p.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                {soon.map((p) => (
+                  <p key={p.id} className="m-0 text-[16px]">
+                    {p.name}: the menu comes with the opening. <a className="fp-link" href={p.soon!.href}>Join the list</a>
+                  </p>
+                ))}
+              </div>
+            )}
+            {lists && lists.length > 0 && (
+              <div className="menu-toolbar-group">
+                <p className="menu-toolbar-label">Or read them as a list, with search and diet filters</p>
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  {lists.map((l) => <a key={l.href} className="fp-btn fp-btn--sm" href={l.href}>{l.label}</a>)}
+                </div>
+              </div>
+            )}
+            {!places && <p className="m-0 fp-body">The menu you'll be handed at the table. Pick yours from the bookmarks.</p>}
           </div>
-        )}
-        {soon.map((p) => (
-          <p key={p.id} className="m-0 mt-3 text-center text-[16px]">
-            {p.name}: the menu comes with the opening. <a className="font-bold text-tiger-deep underline underline-offset-4" href={p.soon!.href}>Join the list</a>
-          </p>
-        ))}
+        </header>
 
         {place?.soon ? (
           <div className="menu-soon mt-8 w-full max-w-[560px]">

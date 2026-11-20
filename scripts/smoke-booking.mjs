@@ -49,8 +49,9 @@ for (const [view, viewport] of VIEWS) {
     try {
       await pg.goto(BASE + path, { waitUntil: 'load' });
       await pg.waitForTimeout(800);
-      // Phones book from the dock; wider screens from the header.
-      await pg.locator(view === 'phone' ? '[data-dock] [data-book]' : 'header [data-book]').first().click();
+      // Phones book from the dock; wider screens from the Book in view (the header's, or on home the
+      // hero's: home hides the header's Book while the hero's is on screen).
+      await pg.locator(view === 'phone' ? '[data-dock] [data-book]' : '[data-book]:visible').first().click();
       const dlg = pg.locator('[data-book-drawer]');
       await dlg.waitFor({ state: 'visible', timeout: 3000 });
       if (branch) await dlg.locator(`label:has(input[name="where"][value="${branch}"])`).click();

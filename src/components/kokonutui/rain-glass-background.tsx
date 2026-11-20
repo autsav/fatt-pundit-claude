@@ -27,6 +27,17 @@ export interface RainGlassBackgroundProps {
   /** Set false for a window you can't wipe. */
   interactive?: boolean;
   className?: string;
+  /** Fatt Pundit: how much the fog hides the view, 0 to 1. */
+  fog?: number;
+  /** Fatt Pundit: how soft the view looks through the fog (texture mip level; 5 is very soft). */
+  soft?: number;
+  /** Fatt Pundit: the dark pool behind centred words. Off when no words sit on the glass. */
+  scrim?: boolean;
+  /** Fatt Pundit: a hand wipes one streak through the fog when the rain starts (calm mode: already wiped),
+   * so guests see the glass can be wiped. */
+  streak?: boolean;
+  /** Fatt Pundit: seconds a wiped patch takes to fog over again. */
+  fogBack?: number;
 }
 
 const DEFAULT_SRC =
@@ -45,6 +56,8 @@ const FOG_STEP = 0.25;
 // How much the fog hides the view, 0 to 1.
 const FOG = 0.6;
 const WIPE_WIDTH = 64;
+// Fatt Pundit: the opening hand-wipe is a broad palm, edge to edge, so it shows beside the words.
+const STREAK_WIDTH = 104;
 
 const VERTEX = `#version 300 es
 in vec2 aPos;
@@ -65,6 +78,7 @@ uniform vec4 uCover;
 uniform vec2 uRes;
 uniform vec3 uFog;
 uniform float uFogAmount;
+uniform float uSoft;
 
 vec2 hash(vec2 p) {
   p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
@@ -104,7 +118,7 @@ void main() {
   float clear = texture(uClear, uv).r;
 
   // Fogged glass: the view goes soft and pale. Wiped glass is clear.
-  vec3 soft = mix(scene(uv, 5.0), uFog, uFogAmount);
+  vec3 soft = mix(scene(uv, uSoft), uFog, uFogAmount);
   vec3 glass = mix(soft, scene(uv, 0.6), clear);
 
   // A drop is a tiny lens: it shows the view sharp and upside down.
@@ -196,7 +210,7 @@ interface Pane {
   resize: (w: number, h: number, cssW: number, cssH: number) => void;
   setScene: (image: HTMLImageElement, cssW: number, cssH: number) => void;
   setCover: (cssW: number, cssH: number) => void;
-  setFog: (rgb: number[], amount: number) => void;
+  setFog: (rgb: number[], amount: number, soft: number) => void;
   upload: (water: HTMLCanvasElement, clear: HTMLCanvasElement) => void;
   draw: () => void;
   destroy: () => void;
@@ -297,9 +311,10 @@ function createPane(gl: WebGL2RenderingContext): Pane | null {
       setCover(cssW, cssH);
     },
     setCover,
-    setFog: (rgb, amount) => {
+    setFog: (rgb, amount, soft) => {
       gl.uniform3f(at("uFog"), rgb[0], rgb[1], rgb[2]);
       gl.uniform1f(at("uFogAmount"), amount);
+      gl.uniform1f(at("uSoft"), soft);
     },
     upload: (water, clear) => {
       gl.activeTexture(gl.TEXTURE1);
@@ -442,6 +457,11 @@ export default function RainGlassBackground({
   rain = 0.6,
   interactive = true,
   className,
+  fog = FOG,
+  soft = 5,
+  scrim = true,
+  streak = false,
+  fogBack = FOG_BACK,
 }: RainGlassBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -487,9 +507,41 @@ export default function RainGlassBackground({
         return false;
       }
       colorKey = color;
-      pane.setFog(toRgb(color, probe), FOG);
+      pane.setFog(toRgb(color, probe), fog, soft);
       return true;
     };
+
+    // Fatt Pundit: the hand-wiped streak. Two passes, left to right then back a little lower, the way a
+    // hand clears a window. p runs 0 to 1 along the whole stroke.
+    const GHOST = 1.3;
+    const streakPoint = (p: number) => {
+      const back = p >= 0.5;
+      const t = back ? (p - 0.5) * 2 : p * 2;
+      const x = back ? 0.96 - 0.92 * t : 0.04 + 0.92 * t;
+      const y = (back ? 0.42 : 0.31) + Math.sin(t * Math.PI) * 0.03;
+      return { x: x * width, y: y * height };
+    };
+    const drawStreak = (from: number, to: number) => {
+      const steps = Math.max(2, Math.ceil((to - from) * 80));
+      clear.strokeStyle = "white";
+      clear.lineCap = "round";
+      clear.lineJoin = "round";
+      clear.lineWidth = STREAK_WIDTH * FOG_SCALE;
+      clear.filter = "blur(3px)";
+      clear.beginPath();
+      for (let i = 0; i <= steps; i++) {
+        const pt = streakPoint(from + ((to - from) * i) / steps);
+        if (i === 0) clear.moveTo(pt.x * FOG_SCALE, pt.y * FOG_SCALE);
+        else clear.lineTo(pt.x * FOG_SCALE, pt.y * FOG_SCALE);
+        for (const d of drops) {
+          if (Math.hypot(d.x - pt.x, d.y - pt.y) < STREAK_WIDTH / 2 + d.r * 0.5) d.r = 0;
+        }
+      }
+      clear.stroke();
+      clear.filter = "none";
+    };
+    // Seconds into the hand's wipe; starts after a short look at the fogged glass. null = no wipe to play.
+    let ghost: number | null = streak && !reduceMotion ? -0.8 : null;
 
     const render = () => {
       paintWater(water, drops, sprite, width, height);
@@ -528,6 +580,8 @@ export default function RainGlassBackground({
           drops.push(d);
         }
       }
+      // Calm mode: the streak is simply there (no hand moving across the glass).
+      if (streak && reduceMotion) drawStreak(0, 1);
       render();
     };
 
@@ -561,13 +615,19 @@ export default function RainGlassBackground({
           d.r = Math.min(14, d.r + 1.2);
         }
       }
+      if (ghost !== null) {
+        const from = Math.max(0, ghost / GHOST);
+        ghost += dt;
+        if (ghost > 0) drawStreak(from, Math.min(1, ghost / GHOST));
+        if (ghost >= GHOST) ghost = null;
+      }
       const fresh = stepDrops(drops, dt, height, clear);
       drops = drops.filter((d) => d.r > 0.6).concat(fresh);
       // Wiped glass fogs over again, slowly. In steps, so the 8-bit fog
       // map keeps fading instead of getting stuck at a faint grey.
       fogClock += dt;
       if (fogClock > FOG_STEP) {
-        clear.fillStyle = `rgba(0, 0, 0, ${(fogClock / FOG_BACK) * 2.4})`;
+        clear.fillStyle = `rgba(0, 0, 0, ${(fogClock / fogBack) * 2.4})`;
         clear.fillRect(0, 0, clearCanvas.width, clearCanvas.height);
         clear.fillStyle = "white";
         fogClock = 0;
@@ -711,7 +771,7 @@ export default function RainGlassBackground({
       window.removeEventListener("pointercancel", onUp);
       pane.destroy();
     };
-  }, [src, rain, interactive]);
+  }, [src, rain, interactive, fog, soft, streak, fogBack]);
 
   return (
     <div
@@ -726,7 +786,7 @@ export default function RainGlassBackground({
         className="hidden text-[#2c2925]"
         ref={fogRef}
       />
-      {poster && <FoggedStill src={poster} />}
+      {poster && <FoggedStill src={poster} shade={scrim ? 0.6 : 0.4} />}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <canvas
           className="h-full w-full opacity-0 transition-opacity duration-700 ease-out"
@@ -734,15 +794,19 @@ export default function RainGlassBackground({
         />
       </div>
       {/* Fatt Pundit: a soft dark pool behind the words, for 4.5:1 contrast over the glass. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(ellipse 60% 55% at 50% 50%, rgb(28 25 22 / 0.78) 0%, rgb(28 25 22 / 0.55) 45%, transparent 80%)" }}
-      />
-      <div className="relative flex min-h-[inherit] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
-        {title && <h2 className="max-w-3xl text-balance text-5xl sm:text-7xl">{title}</h2>}
-        {children}
-      </div>
+      {scrim && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(ellipse 60% 55% at 50% 50%, rgb(28 25 22 / 0.78) 0%, rgb(28 25 22 / 0.55) 45%, transparent 80%)" }}
+        />
+      )}
+      {(title || children) && (
+        <div className="relative flex min-h-[inherit] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+          {title && <h2 className="max-w-3xl text-balance text-5xl sm:text-7xl">{title}</h2>}
+          {children}
+        </div>
+      )}
     </div>
   );
 }
@@ -750,11 +814,12 @@ export default function RainGlassBackground({
 
 /** Fatt Pundit: the room behind fogged glass as a plain picture. A small image
  * stretched full screen is naturally soft, so no blur filter is needed. */
-export function FoggedStill({ src }: { src: string }) {
+export function FoggedStill({ src, shade = 0.6, priority = false }: { src: string; shade?: number; priority?: boolean }) {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      <img src={src} alt="" className="size-full scale-105 object-cover" decoding="async" />
-      <div className="absolute inset-0 bg-ink/60" />
+      {/* Fatt Pundit: as a full-screen hero this still is the largest thing painted, so it loads first. */}
+      <img src={src} alt="" className="size-full scale-105 object-cover" decoding={priority ? "sync" : "async"} fetchPriority={priority ? "high" : "auto"} />
+      <div className="absolute inset-0 bg-ink" style={{ opacity: shade }} />
     </div>
   );
 }

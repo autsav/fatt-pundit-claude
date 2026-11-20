@@ -1,18 +1,17 @@
-﻿---
-// Homepage: the "Through the door" journey (plan: Creative concept, scenes 1â€“7).
-import { getImage, Image } from 'astro:assets';
+---
+// Homepage: the "Through the door" journey (plan: Creative concept, scenes 1–7).
+import { getImage } from 'astro:assets';
 import { stampSrc } from '../lib/stamp';
 import Arrival from '../components/scenes/Arrival.astro';
 import Doors from '../components/scenes/Doors.astro';
-import GateBoard from '../components/scenes/GateBoard.astro';
-import RainHero from '../components/scenes/RainHero.tsx';
+import HomeHero from '../components/scenes/HomeHero.astro';
 import Voyage from '../components/scenes/Voyage.tsx';
-import MenuBook, { type MenuLite } from '../components/scenes/MenuBook.tsx';
+import MenuBook from '../components/scenes/MenuBook.tsx';
 import BarAfterDark from '../components/scenes/BarAfterDark.tsx';
 import RoomContactSheet from '../components/scenes/RoomContactSheet.tsx';
 import BoardingPasses from '../components/scenes/BoardingPasses.astro';
 import Base from '../layouts/Base.astro';
-import { getBranches, dish, priceOf, hoursLines, menuBooks, prettyPhone, groupRules, onlineSummary } from '../lib/site-data';
+import { getBranches, dish, priceOf, menuBooks, groupRules, onlineSummary } from '../lib/site-data';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 
@@ -133,7 +132,7 @@ const orgLd = {
 };
 ---
 <Base
-  title="Fatt Pundit Â· Chinese-Indian Hakka restaurant Â· Soho, Covent Garden, Dubai"
+  title="Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai"
   description="Indo-Chinese Hakka cooking from Tangra, Calcutta's Chinatown. Book a table at Fatt Pundit Soho or Covent Garden, London. Opening soon in Dubai."
   og="home"
 >
@@ -142,56 +141,51 @@ const orgLd = {
   <SiteHeader branches={branches} />
 
   <main>
-    <!-- 0 Â· Arrival -->
+    <!-- 0 · Arrival -->
     <Arrival />
-    <!-- 1 Â· Rain on the window -->
-    <section id="top" class="rain" aria-label="Fatt Pundit">
-      <RainHero client:load src={rainSrc} poster={rainPoster}>
-        <div class="hero-choose">
-          <GateBoard branches={branches} />
-          <a class="btn btn-orange hero-book" href="#tables" data-book="">Book a table</a>
-        </div>
-      </RainHero>
-    </section>
-    <!-- 2 Â· The doors -->
+    <!-- 1 · The window: name, restaurant board, Book; the room behind rainy glass -->
+    <HomeHero branches={branches} rainSrc={rainSrc} rainPoster={rainPoster} />
+    <!-- 2 · The doors -->
     <Doors />
 
-    <!-- 3 Â· The voyage -->
+    <!-- 3 · The voyage -->
     <Voyage client:idle art={voyageArt} />
 
 
-    <!-- 5 Â· The menu book -->
+    <!-- 5 · The menu book -->
     <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} lists={branches.filter((b) => b.status === 'open').map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` }))} next={{ href: '#bar', label: 'Continue to the bar' }} />
 
-    <!-- 6 Â· The bar after dark -->
+    <!-- 6 · The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />
 
-    <!-- 7 Â· The room -->
-    <section id="room" class="sec room-halftone">
+    <!-- 7 · The room -->
+    <section id="room" class="chapter room-halftone" aria-labelledby="room-title">
       <div class="wrap stack-lg">
-        <div class="stack reveal narrow">
-          <p class="kicker">The room</p>
-          <h2 class="fp-h2"><span class="sr-only">The room: </span>Pull up a chair</h2>
-          <p>Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
+        <div class="room-words">
+          <header class="room-head reveal">
+            <p class="fp-section-label"><span class="fp-section-no">04</span> The room</p>
+            <h2 id="room-title" class="fp-h2"><span class="sr-only">The room: </span>Pull up a chair</h2>
+            <p class="chapter-intro">Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
+          </header>
+          <p class="rating reveal">
+            <span class="rating-n fp-num">4.8<span class="rating-of"> / 5</span></span>
+            <span class="rating-src">on Google at both restaurants: 20,030 reviews for Covent Garden and 16,000+ for Soho (November 2026)</span>
+          </p>
         </div>
         <RoomContactSheet client:visible frames={sheet} picks={[0, 2]} />
-        <div class="rating reveal">
-          <span class="rating-n">4.8 / 5</span>
-          <span>on Google at both restaurants: 20,030 reviews for Covent Garden and 16,000+ for Soho (November 2026)</span>
-        </div>
       </div>
     </section>
 
-    <!-- 8 Â· Your boarding pass -->
-    <section id="tables" class="sec gold-bg" aria-labelledby="tables-title">
-      <div class="wrap stack-lg">
-        <div class="stack center reveal">
-          <p class="kicker">Your table</p>
+    <!-- 8 · Your boarding pass -->
+    <section id="tables" class="chapter gold-bg" aria-labelledby="tables-title">
+      <div class="wrap">
+        <header class="fp-section-head chapter-head reveal">
+          <p class="fp-section-label"><span class="fp-section-no">05</span> Your table</p>
           <h2 id="tables-title" class="fp-h2"><span class="sr-only">Your table: </span>Choose your gate</h2>
-          <p>Three passes, one for each room. Tear off a stub to book.</p>
-        </div>
+          <p class="chapter-intro">Three passes, one for each room. Tear off a stub to book.</p>
+        </header>
         <BoardingPasses branches={branches} stamps={stamps} />
-        <p class="center small reveal">{onlineSummary(branches)}. {groupRules(branches[0])?.depositShort} {groupRules(branches[0])?.setMenu} <a href="/private-dining/">Plan a group</a>.</p>
+        <p class="tables-note reveal">{onlineSummary(branches)}. {groupRules(branches[0])?.depositShort} {groupRules(branches[0])?.setMenu} <a href="/private-dining/">Plan a group</a>.</p>
       </div>
     </section>
   </main>
@@ -199,7 +193,7 @@ const orgLd = {
   <!-- Story rail: where you are in the visit. Lights up as you scroll, tap a stop to jump. Wide screens only;
        phones get the thin progress line under the header instead. -->
   <nav class="rail" aria-label="Chapters" data-rail hidden>
-    {[['top', 'The window'], ['story', 'The voyage'], ['menu', 'The menu'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']].map(([id, label]) => (
+    {[['top', 'The window'], ['story', 'Our story'], ['menu', 'The menus'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']].map(([id, label]) => (
       <a href={`#${id}`} data-ch={id}><span class="rail-dot" aria-hidden="true"></span><span class="rail-lbl">{label}</span></a>
     ))}
   </nav>
@@ -224,16 +218,34 @@ const orgLd = {
     const links = new Map([...rail.querySelectorAll<HTMLAnchorElement>('[data-ch]')].map((a) => [a.dataset.ch!, a]));
     const order = [...links.keys()];
     const targets = order.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+    // Positions are measured only when the page changes size (a ResizeObserver runs after layout, so
+    // measuring there is free). The scroll tick reads scrollY and nothing else: measuring sections on
+    // every frame, after the voyage had moved its map, forced a full style and layout pass per frame
+    // (about 1 s of forced layout across the voyage at 4x CPU).
+    let tops: number[] = [];
+    let max = 0;
+    let vh = innerHeight;
+    const measure = () => {
+      vh = innerHeight;
+      tops = targets.map((el) => el.getBoundingClientRect().top + window.scrollY);
+      max = document.documentElement.scrollHeight - vh;
+    };
     let raf = 0;
+    let cur = -1;
+    let on: boolean | null = null;
+    // scrollY is read in the scroll event (before any frame callback writes), not inside the frame,
+    // where reading it after another scene's writes would also force layout.
+    let y = scrollY;
     const tick = () => {
       raf = 0;
-      // Read everything first, then write (no forced layout between writes).
-      const max = document.documentElement.scrollHeight - innerHeight;
       // The current chapter: the last one whose top has passed the middle of the screen.
-      let cur = 0;
-      targets.forEach((el, i) => { if (el.getBoundingClientRect().top <= innerHeight * 0.5) cur = i; });
-      line.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max).toFixed(4) : 0})`;
-      rail.classList.toggle('is-on', scrollY > innerHeight * 0.8);
+      let now = 0;
+      tops.forEach((t, i) => { if (t - y <= vh * 0.5) now = i; });
+      line.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
+      const show = y > vh * 0.8;
+      if (show !== on) { on = show; rail.classList.toggle('is-on', show); }
+      if (now === cur) return;
+      cur = now;
       order.forEach((id, i) => {
         const a = links.get(id)!;
         a.classList.toggle('is-past', i < cur);
@@ -241,8 +253,11 @@ const orgLd = {
         if (i === cur) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current');
       });
     };
-    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
-    addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(tick); });
+    const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    new ResizeObserver(() => { y = scrollY; measure(); queue(); }).observe(document.body);
+    addEventListener('scroll', () => { y = scrollY; queue(); }, { passive: true });
+    addEventListener('resize', () => { measure(); queue(); });
+    measure();
     tick();
   }
 
@@ -258,55 +273,38 @@ const orgLd = {
 <style>
   p { margin: 0; }
 
-  /* Journey */
-  .map { position: relative; margin: 0; background: var(--color-ink); padding: 12px; }
-  .map :global(img) { display: block; width: 100%; height: auto; }
-  .route { position: absolute; inset: 12px; width: calc(100% - 24px); height: calc(100% - 24px); }
-  .route path { fill: none; stroke: var(--color-tiger); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2.6s cubic-bezier(.6,0,.2,1) .3s; }
-  .route .pin { fill: var(--color-tiger); opacity: 0; transition: opacity .4s; }
-  .map.is-in .route path { stroke-dashoffset: 0; }
-  .map.is-in .pin-a { opacity: 1; transition-delay: .2s; }
-  .map.is-in .pin-b { opacity: 1; transition-delay: 2.8s; animation: pulse 1.6s ease-in-out 3s infinite; transform-box: fill-box; transform-origin: center; }
-  @keyframes pulse { 50% { transform: scale(1.6); opacity: .5; } }
-  .name-cards { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
-  .name-card { flex: 1 1 200px; border: 2px solid var(--color-ink); padding: 16px 18px; font-size: 15px; }
-  .name-word { font-weight: 700; font-size: 26px; letter-spacing: 0.14em; }
-
-  .price { font-weight: 700; white-space: nowrap; }
-
   /* Bar */
   main { overflow-x: clip; }
 
-  /* Room */
-  @media (max-width: 700px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery :global(.gf) { grid-column: span 2; } }
-  /* Wide screens: the words sit beside the contact sheet, not above a wide empty field. */
+  /* Room. Wide screens: the words (head, then the rating) beside the contact sheet, both from the top rule. */
+  .room-words { display: grid; gap: var(--space-7); align-content: start; }
+  .room-head { display: grid; gap: var(--space-4); }
   @media (min-width: 1100px) {
     #room > .wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: clamp(32px, 4vw, 64px); align-items: start; }
-    #room > .wrap > .stack { grid-column: 1; grid-row: 1; }
-    #room > .wrap > .rating { grid-column: 1; grid-row: 2; }
-    /* Centred against the taller text column (top-aligned, it left one empty block under the sheet). */
-    #room > .wrap :global(.room-sheet) { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+    #room > .wrap > .room-words { grid-column: 1; }
+    #room > .wrap :global(.room-sheet) { grid-column: 2; grid-row: 1; }
   }
-  .rating { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; border-block: 2px solid var(--color-ink); padding-block: 20px; }
-  .rating-n { font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
-
-  /* Tables */
+  /* The rating as a ledger fact: the figure in the headline face, its source right under it. */
+  .rating { display: grid; gap: var(--space-2); margin: 0; padding-block: var(--space-4); border-block: var(--border-rule) solid var(--fp-rule-strong); max-width: 30em; }
+  .rating-n { font-weight: 300; font-size: clamp(44px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.02em; }
+  .rating-of { font-size: 0.45em; letter-spacing: 0; }
+  .rating-src { font-size: var(--step-small); line-height: var(--lh-small); }
+  .tables-note { margin: var(--space-7) 0 0; max-width: 46em; font-size: var(--step-small); line-height: var(--lh-small); }
 
   /* Reveal */
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
   .reveal.is-in { opacity: 1; transform: none; }
 
-  @media (max-width: 640px) {
-  }
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; }
-    .steam { display: none; }
   }
   /* Story rail */
   .rail { position: fixed; z-index: 30; right: 18px; top: 50%; translate: 0 -50%; display: none; flex-direction: column; gap: 2px; padding: 10px 8px;
     background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
-  @media (min-width: 1100px) { .rail { display: flex; } }
+  /* Only where the margin beside the 1240 column can hold it: from 1100px it sat on the content
+     (the bar's prices, the passes) until about 1310px. */
+  @media (min-width: 1320px) { .rail { display: flex; } }
   .rail.is-on { opacity: 1; pointer-events: auto; }
   /* 44px targets (were 28px); the dashed line joins one dot to the next. */
   .rail a { position: relative; display: grid; place-items: center; width: 44px; height: 44px; text-decoration: none; }
@@ -323,9 +321,4 @@ const orgLd = {
   .rail { padding: 6px; }
   .rail a:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 1px; }
   :global(.read-line) { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
-  .hero-choose { display: grid; gap: 12px; justify-items: center; }
-  .hero-book { min-width: min(280px, 100%); }
-  .menu-list-link { margin: 0; padding: 18px 16px 8px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; background: var(--color-sand); }
-  .menu-list-link { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 14px; }
-  .menu-list-link > span { flex-basis: 100%; }
 </style>

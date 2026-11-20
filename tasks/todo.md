@@ -265,3 +265,22 @@ Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors,
 - [x] QA: perf budget (LCP, dropped frames), CLS, axe settled, calm end states, screenshots 1280×560 / 1440×900 / 1920×1080 / 768 / 390
 - Result (20 Nov): doors fit below the header with Calcutta/Guangdong plaques, "Come in." + skip link on ink (gold 6:1 vs 1.6:1), edge strips gone (room/dim/glow inset matched to the panels), scroll 190→140vh. Book: neutral bookmarks in two groups, Soho/Covent Garden chips (ink when chosen), Dubai as a line, opens on the first spread at ≥1024 (signature dishes beside page 1), list links under the instruction, sentence case outside the book, plain sand. Rail 28→44px targets, current chapter named ≥1600. Room sheet centred. Pass stubs were already not tiger. axe 0 once settled, CLS ≤0.005, nav 12/12, menus 20/20, smoke 8/8. Frames at 4x CPU (noisy, same method on live vs local): desktop menu book 4.2–4.7% long frames vs 1.1–2.2% live (bigger open spread) — watch item; other scenes within the live range.
 - Naming (client, 20 Nov): Guangdong for Canton and Calcutta for Kolkata in all copy, labels, alt text, meta and share images (36 places). Map labels re-placed (Calcutta below its point) so the longer name does not collide at 390 calm. Dish names "Kolkata chilli duck" / "Kolkata chilly chicken" left as on the menu (CLIENT-INPUTS #42). make-og.mjs fixed for Windows paths; share images regenerated.
+
+## Phase 5: homepage design (docs/redesign/phase5/homepage.md), 20 Nov. Waiting for visual approval before other pages
+- [x] Hero: split shopfront (words + board + Book on ink; the room behind rainy glass in a gold frame, bleeding right). Words are static HTML painted finished; only the glass is an island (client:idle). Rise on first visit only. Phones: window band, dock carries Book/Menus, all 3 rooms above the dock at 390×844
+- [x] Chapters 01–05: numbered label on a rule + light headline (.fp-section-head) on story, menus, bar, room, passes; --section-pad everywhere; one 1240 column with the header
+- [x] Menus toolbar: "Open the book for" chips + list pages as secondary buttons (UX F8)
+- [x] Room: words + rating in one column, rating as a ledger fact; sheet top-aligned
+- [x] Fixes found on the way: page title encoding (Â·), chapter rail covering content at 1100–1310px (now ≥1320), gate open dot green → system success colour, dead styles and unused imports in index.astro
+- [x] QA: astro check 0/0; prebuild gates; no overflow 7 routes × 7 widths + calm; axe settled clean 320–1440; CLS ≤0.002; scripted interactions 21/22 (the miss was the test counting the off-screen skip link); smoke 8/8; perf 92, LCP 170 ms, 1,022 KB
+- Not met: dropped frames 3.2% (> 2%), same range as the old build in interleaved runs. Real devices, Safari, Firefox, screen readers not tested
+- [x] After review (client): first screen back to the immersive full-screen rain hero; kept static words, sentence-case Book, no hero Book on phones, header Book hidden while the hero's is in view, opening hand-wipe streak. QA: overflow none 320–1920, axe settled clean, CLS 0.002, scripted 21/22 (known astro-preview transition message)
+
+### Phase 5 close-out (approved 20 Nov: everything below the hero as recommended)
+- [x] T1 tokens.css comments: fix the encoding slip (â€“ → –)
+- [x] T2 Scroll smoothness pass: find the long frames on the home scroll (voyage, menu book), fix, re-measure against the old build
+- [x] T3 Refresh docs/redesign/phase5/shots: before/after with the immersive hero, full-page tours, chapters
+- [x] T4 Rewrite docs/redesign/phase5/homepage.md §2 for the final design
+- [x] T5 Full QA: astro check, build gates, overflow, axe settled, CLS, scripted checks, smoke, budget
+- [x] T6 Commit on branch phase5-homepage and push to GitHub
+- Result (20 Nov): T1 17 comment characters fixed. T2 rail measures on resize only (it forced a style and layout pass every scroll frame): long frames 6.1% → 3.1% mean over 3 alternating rounds (still > 2%; the rest is the voyage's own script, logged in phase5/homepage.md §4). Hero poster loads first: perf 82 → 86. T3 shots regenerated (immersive hero). T4 homepage.md rewritten. T5 astro check 0/0, gates pass, no overflow 6 widths × 7 routes, axe settled clean, CLS 0.002, scripted 22/22, rail tracking 5/5, smoke 8/8 (desktop test now clicks the Book in view).

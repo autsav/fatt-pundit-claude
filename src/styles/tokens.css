@@ -8,24 +8,24 @@
  *      motion, z-index. Plain custom properties, not @theme, so they don't spawn Tailwind
  *      utilities or overwrite Tailwind's own --text-* / --ease-* / --shadow-* names.
  *   3. Semantic colour tokens (--fp-*): set per SURFACE (night, deep, day, paper, paper-light,
- *      gold). A component only ever asks for a role (--fp-fg, --fp-control, --fp-errorâ€¦), so the
+ *      gold). A component only ever asks for a role (--fp-fg, --fp-control, --fp-error…), so the
  *      same markup is right on every surface. scripts/check-contrast.ts reads these blocks and
  *      fails the build if a pair drops below WCAG 2.2 AA.
  */
 @layer base {
   :root {
     /* ---- Type steps: fluid between 390 and 1440 px, rem so they follow the reader's font-size ---- */
-    --step-display-xl: clamp(3.25rem, 1.207rem + 8.381vw, 8.75rem);   /* 52 â†’ 140  home hero, AT Bold caps */
-    --step-display: clamp(2.75rem, 1.636rem + 4.571vw, 5.75rem);      /* 44 â†’ 92   branch name, AT Bold caps */
-    --step-h2: clamp(2.375rem, 1.261rem + 4.571vw, 5.375rem);         /* 38 â†’ 86   section headline, AT Light sentence case */
-    --step-h3: clamp(1.375rem, 1.143rem + 0.952vw, 2rem);             /* 22 â†’ 32   object title, AT Bold caps */
-    --step-h4: clamp(1.1875rem, 1.118rem + 0.286vw, 1.375rem);        /* 19 â†’ 22   ledger row, tag title, AT Bold */
-    --step-spoken: clamp(1.25rem, 1.018rem + 0.952vw, 1.875rem);      /* 20 â†’ 30   the one spoken line, Lora */
-    --step-body: clamp(1.0625rem, 1.016rem + 0.19vw, 1.1875rem);      /* 17 â†’ 19 */
-    --step-small: clamp(0.9375rem, 0.914rem + 0.095vw, 1rem);         /* 15 â†’ 16   labels, hints, secondary UI */
-    --step-label: clamp(0.875rem, 0.852rem + 0.095vw, 0.9375rem);     /* 14 â†’ 15   section label */
+    --step-display-xl: clamp(3.25rem, 1.207rem + 8.381vw, 8.75rem);   /* 52 → 140  home hero, AT Bold caps */
+    --step-display: clamp(2.75rem, 1.636rem + 4.571vw, 5.75rem);      /* 44 → 92   branch name, AT Bold caps */
+    --step-h2: clamp(2.375rem, 1.261rem + 4.571vw, 5.375rem);         /* 38 → 86   section headline, AT Light sentence case */
+    --step-h3: clamp(1.375rem, 1.143rem + 0.952vw, 2rem);             /* 22 → 32   object title, AT Bold caps */
+    --step-h4: clamp(1.1875rem, 1.118rem + 0.286vw, 1.375rem);        /* 19 → 22   ledger row, tag title, AT Bold */
+    --step-spoken: clamp(1.25rem, 1.018rem + 0.952vw, 1.875rem);      /* 20 → 30   the one spoken line, Lora */
+    --step-body: clamp(1.0625rem, 1.016rem + 0.19vw, 1.1875rem);      /* 17 → 19 */
+    --step-small: clamp(0.9375rem, 0.914rem + 0.095vw, 1rem);         /* 15 → 16   labels, hints, secondary UI */
+    --step-label: clamp(0.875rem, 0.852rem + 0.095vw, 0.9375rem);     /* 14 → 15   section label */
     --step-fine: 0.875rem;                                            /* 14        captions, legal */
-    --step-tag: clamp(0.75rem, 0.727rem + 0.095vw, 0.8125rem);        /* 12 â†’ 13   tracked caps, objects only */
+    --step-tag: clamp(0.75rem, 0.727rem + 0.095vw, 0.8125rem);        /* 12 → 13   tracked caps, objects only */
     --step-btn: 1.0625rem;                                            /* 17 */
     --step-btn-sm: 1rem;                                              /* 16 */
     --step-input: 1.0625rem;                                          /* 17: never under 16, or iOS zooms on focus */
@@ -42,10 +42,10 @@
     /* ---- Spacing: 4 px base ---- */
     --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
     --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px; --space-10: 128px;
-    --section-pad: clamp(4rem, 2.51rem + 6.095vw, 8rem);              /* 64 â†’ 128  section top and bottom */
-    --section-gap: clamp(2.25rem, 1.786rem + 1.905vw, 3.5rem);        /* 36 â†’ 56   headline to content */
+    --section-pad: clamp(4rem, 2.51rem + 6.095vw, 8rem);              /* 64 → 128  section top and bottom */
+    --section-gap: clamp(2.25rem, 1.786rem + 1.905vw, 3.5rem);        /* 36 → 56   headline to content */
 
-    /* ---- Layout: 4 / 8 / 12 columns at <640 / 640â€“1023 / â‰¥1024 (see .desk) ---- */
+    /* ---- Layout: 4 / 8 / 12 columns at <640 / 640–1023 / ≥1024 (see .desk) ---- */
     --grid-max: 1320px;
     --grid-margin: clamp(20px, 5vw, 80px);
     --grid-gutter: clamp(16px, 2vw, 24px);
@@ -92,8 +92,8 @@
     :root { --dur-press: 0ms; --dur-fast: 0ms; --dur-panel: 0ms; --dur-story: 0ms; --dur-story-long: 0ms; --stagger: 0ms; }
   }
 
-  /* ---- Surfaces â†’ semantic colour tokens -------------------------------------------------------
-     Day is the page default (html is sand). Legacy containers that are dark (.ink, .bar, .footâ€¦)
+  /* ---- Surfaces → semantic colour tokens -------------------------------------------------------
+     Day is the page default (html is sand). Legacy containers that are dark (.ink, .bar, .foot…)
      get the night set too, so system components work inside them before those pages are redone.
      Objects (tickets, tags, postcards) are paper, so their insides use the paper sets. */
   :root,

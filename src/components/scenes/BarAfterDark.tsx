@@ -87,10 +87,10 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
 
   return (
     <section id="bar" className="bar-dark relative overflow-hidden text-sand" aria-labelledby="bar-title">
-      <div className="relative mx-auto flex max-w-[1240px] flex-col gap-[clamp(28px,4vw,48px)] px-[clamp(16px,4vw,40px)] py-[clamp(64px,8vw,110px)]">
-        <header className="flex flex-col items-center gap-3 text-center">
-          <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[20px] text-gold">After dark</p>
-          <h2 id="bar-title" className="m-0 w-full max-w-[760px]">
+      <div className="wrap relative py-[var(--section-pad)]">
+        <header className="fp-section-head chapter-head">
+          <p className="fp-section-label"><span className="fp-section-no">03</span> The bar</p>
+          <h2 id="bar-title" className="bar-title m-0">
             <span className="sr-only">The bar</span>
             <svg viewBox="0 0 760 150" className="block h-auto w-full" aria-hidden="true">
               <defs>
@@ -100,15 +100,15 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
                   <rect width="1.6" height="5" fill="#b9a38c" />
                 </pattern>
               </defs>
-              <text x="380" y="122" textAnchor="middle" className="bar-embroidery" fill="url(#bar-satin)">
+              <text x="6" y="122" className="bar-embroidery" fill="url(#bar-satin)">
                 THE BAR
               </text>
-              <text x="380" y="122" textAnchor="middle" className="bar-embroidery bar-stitch">
+              <text x="6" y="122" className="bar-embroidery bar-stitch">
                 THE BAR
               </text>
             </svg>
           </h2>
-          <p className="m-0 max-w-[560px] text-[clamp(16px,1.5vw,18px)] leading-snug">Fruit coolers inspired by India's street fruit vendors, spiced and salted. Have one straight, or spike it with a paired spirit.</p>
+          <p className="chapter-intro">Fruit coolers inspired by India's street fruit vendors, spiced and salted. Have one straight, or spike it with a paired spirit.</p>
         </header>
 
         <div className="grid items-center gap-[clamp(24px,4vw,56px)] lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
