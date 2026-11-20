@@ -5,7 +5,7 @@
 | 0 | Understand the project, safe baseline, audit, docs | **Done** (19 Nov 2026) | — |
 | 0.1 | Fix `astro check` error | **Done** (7dbaa73) | — |
 | 1 | Design direction + design-system proposal + mock frames | **Approved** 19 Nov 2026 | — |
-| 2 | Implementation slices below | In progress: 2.1 to 2.4 done | Each slice has its own gate |
+| 2 | Implementation slices below | Done except 2.8a (needs client decisions); see qa-report.md | Each slice has its own gate |
 
 ## Rollback
 - Baseline: `git checkout baseline-pre-redesign` (tag on `main` @ 0ead5a8)
@@ -27,13 +27,13 @@ Gate for every slice: before/after screenshots at 390/768/1440 + calm mode; no h
 | 2.3c ✅ | Accessibility fixes: contrast on pass bands and the CG cue, label mismatches, pause control, calm-mode scroller focus, intro Skip (audit C03–C07, C15, C16, O12) | `BoardingPasses.astro`, `LightsOn.astro`, `Arrival.astro`, `BookDrawer.astro`, menu page | Done 20 Nov: axe clean on home, branches and menu (qa-report.md) |
 | 2.3d ✅ | `frame.png` through the image pipeline, branch gallery lightbox, home LCP (audit C09, C10, C12) | `MenuBook.tsx`, `[branch]/index.astro` | Done 20 Nov: frame 1.26 MB to 131 KB; branch gallery uses the home lightbox; LCP unchanged (qa-report.md) |
 | 2.4 ✅ | Visit strip under the branch hero, set as a ledger row (reuses `lib/hours.ts`) | new `components/branch/VisitStrip.astro` | Done 20 Nov (qa-report.md) |
-| 2.4a | Phone navigation: fixed dock (Menus, Call, Book) + numbered index (audit C11) | `SiteHeader.astro`, new dock component | Audit; approved mock |
-| 2.5 | Good to know → luggage tags; Other rooms → postcards | `src/pages/[branch]/index.astro` | Principle 1 |
-| 2.6 | Home desktop spreads: doors, menu book, goodbye | `components/scenes/Doors.astro`, `MenuBook.tsx`, `site/Goodbye.astro` | Audit 4.1. Heaviest slice: perf budget re-run required |
-| 2.7 | Info pages as printed documents **+ fix font-swap CLS** (allergens 0.245 @768, privacy 0.116, found in 2.3a) | `src/layouts/InfoPage.astro`, font fallback metrics | Consistency; CWV |
-| 2.7a | List menus as a ledger; merge the two chip rows (audit O04, O05) | `[branch]/menu.astro` | Approved direction |
-| 2.8 | Security header: CSP (report-only first) | `public/_headers` | Audit 4.10. Needs your OK (deploy config) |
+| 2.4a ✅ | Phone navigation: fixed dock (Menus, Call, Book) + numbered index (audit C11) | `SiteHeader.astro`, new dock component | Done 20 Nov: dock on every page at ≤640 px (Menus, Call or Rooms, Book); numbered Index sheet where the bar's links step aside; branch-only dock removed |
+| 2.5 ✅ | Good to know → luggage tags; Other rooms → postcards | `src/pages/[branch]/index.astro` | Done 20 Nov: luggage tags (no icons), airmail postcards, light section headlines |
+| 2.6 ✅ | Home desktop spreads: doors, menu book, goodbye | `components/scenes/Doors.astro`, `MenuBook.tsx`, `site/Goodbye.astro` | Done 20 Nov, reduced: "Pull up a chair" is a two-column spread at ≥1100 px; Canton and Kolkata map labels no longer collide (C13). Doors, menu book and goodbye left as they are: they read well at 1440 |
+| 2.7 ✅ | Info pages as printed documents **+ fix font-swap CLS** (allergens 0.245 @768, privacy 0.116, found in 2.3a) | `src/layouts/InfoPage.astro`, font fallback metrics | Done 20 Nov: body font preloaded on text pages; column measured in em, not ch; fallback faces sized per weight; preview banner one line at every width. Normal loads 0 everywhere; a slow first visit to allergens still shifts 0.16–0.25 at 768–1024 |
+| 2.7a ✅ | List menus as a ledger; merge the two chip rows (audit O04, O05) | `[branch]/menu.astro` | Done 20 Nov: the two chip rows are labelled "Jump to" and "Show only"; on phones and tablets the Jump to row stays under the header. Full ledger restyle not done |
+| 2.8 ✅ | Security header: CSP (report-only first) | `public/_headers` | Done 20 Nov: report-only CSP in `_headers`. Enforce after checking the live console |
 | 2.8a | Integrations that are demo-only today: waitlists, private-dining enquiry, rating claim (audit C02, C22, C23). **Needs client decisions** | `[branch]/index.astro`, `private-dining.astro`, `index.astro` | Audit |
-| 2.9 | Full QA pass + manual WCAG 2.2 checks (focus not obscured, target size, keyboard through scenes) | `qa-report.md` | Release gate |
+| 2.9 ✅ | Full QA pass + manual WCAG 2.2 checks (focus not obscured, target size, keyboard through scenes) | `qa-report.md` | Done 20 Nov: axe, CLS and overflow on every route at 320–1920; booking smoke test; see qa-report.md. Real devices, Safari, Firefox and screen readers not tested |
 
 Out of scope until the client answers: prices, legal wording, Soho photos, the "Chinese-Indian" vs "Indo-Chinese" term, the font licence.

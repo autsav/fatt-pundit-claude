@@ -226,6 +226,24 @@ Also run: `npm run check` 0 errors, `npm test` passes, build 17 pages, booking s
 - Fixed during the gate: the "Good to know" luggage tags (2.5 work already on the branch) were a `<dl>` with an extra wrapper div, which axe flags (`definition-list`, `dlitem`). Now a list of tags with an `h3` each; looks the same.
 - Screenshots: `slices/2.4/`. Also run: `npm run check` 0 errors, `npm test` passes, build 17 pages, booking smoke test 8 of 8.
 
+### Slices 2.4a to 2.9 (20 Nov 2026)
+
+**Checks on the final build** (every route, local preview, Edge headless):
+- `npm run check` 0 errors; `npm test` passes; build 17 pages; booking smoke test 8 of 8 (phones now book from the dock).
+- axe (WCAG 2.0 to 2.2 A and AA) at 390 and 1440, normal and calm: **0 violations** on every page except two. On home, 2 to 4 contrast readings on headings caught mid fade-in, which clear once the animation ends (0 after waiting). `/styleguide/` fails, as before (C19, internal page).
+- Sideways scroll: none on any page at 320, 375, 768, 1024, 1440 or 1920, apart from `/styleguide/`. Fixed on the way: the footer's goodbye line and the "ACCESSIBILITY" title at 320.
+- Load shift (CLS): 0 on every info and menu page at every width. Branch heroes read 0.001 on most loads, but about one load in three reads 0.023 to 0.066 at 1024 (0.033 at 1440 on CG). The build from before these slices (49a9828) gives the same readings, so this is the existing C17, not new.
+
+**2.4a phone navigation.** At ≤640 px the bar shows the name and an **Index** link. The fixed dock at the bottom has Menus, Call (on branch pages) or Rooms (elsewhere), and Book. The Index is a numbered sheet of every destination and also appears where the bar's text links don't fit (641–719 px; 720–919 px on home and info pages). The page ends above the dock.
+
+**2.5** Good to know is three luggage tags; the other rooms are airmail postcards. **2.6** "Pull up a chair" is a two-column spread at ≥1100 px; the Canton and Kolkata labels no longer collide at 390 (C13).
+
+**2.7 font-swap shift.** Before → after, normal load: allergens 0.252 → 0 at 768, 0.162 → 0 at 1024, 0.055 → 0 at 1440; privacy 0.023 → 0 at 768. How: the body font is preloaded on text pages, the text column is measured in em (a `ch` changes width with the font), the fallback is Courier New sized per weight (bold split into capitals and the rest), and the preview banner never wraps. Still open: a slow first visit (200 KB/s) to allergens shifts 0.16 to 0.25 at 768 to 1024, because one paragraph re-wraps.
+
+**2.7a menu list.** The two chip rows are labelled "Jump to" and "Show only". On phones and tablets the Jump to row stays under the header while you read. The full ledger restyle of the menu list is not done.
+
+**2.8** `public/_headers` has a **report-only** Content-Security-Policy: it logs and blocks nothing. Check the browser console on the live host, then rename it to `Content-Security-Policy` to enforce it. Not testable locally (the preview server ignores `_headers`).
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 

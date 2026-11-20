@@ -40,6 +40,8 @@ const branches = await getBranches();
   .wide .info-body { max-width: none; }
   .info-kicker { margin: 0; color: var(--color-tiger-deep); }
   .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
+  /* Small phones: one long capital word ("ACCESSIBILITY") must fit a 260px column. */
+  @media (max-width: 380px) { .info-title { font-size: 28px; } }
   /* The measure is in em, not ch: a ch is as wide as the font's zero, so the column changed width
      (and the text re-wrapped) when the brand font replaced the fallback. 32.7em = the old 64ch. */
   .info-body { font-size: 18px; line-height: 1.65; max-width: 32.7em; overflow-wrap: anywhere; }

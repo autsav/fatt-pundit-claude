@@ -11,3 +11,8 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   X-Frame-Options: SAMEORIGIN
+  # Content Security Policy, report-only for now: the browser logs anything that would be blocked
+  # but blocks nothing. Watch the console on the live host, then rename the header to
+  # Content-Security-Policy to enforce it. Inline scripts are allowed because the pages carry small
+  # inline scripts and JSON-LD; plausible.io is the analytics host (off until its domain is set).
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self'; connect-src 'self' https://plausible.io; form-action 'self' https:; frame-ancestors 'self'; base-uri 'self'; object-src 'none'

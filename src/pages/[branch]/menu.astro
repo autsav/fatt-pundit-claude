@@ -73,6 +73,7 @@ const ld = {
   <div class="menu-layout">
   <div class="menu-tools" data-menu-tools>
     <nav class="menu-jump" aria-label="Menus">
+      <span class="tool-lab" aria-hidden="true">Jump to</span>
       {menus.map((m) => <a href={`#${m.id}`}>{m.title}</a>)}
     </nav>
     <label class="menu-search">
@@ -81,6 +82,7 @@ const ld = {
     </label>
     <fieldset class="menu-diet">
       <legend class="sr-only">Show only</legend>
+      <span class="tool-lab" aria-hidden="true">Show only</span>
       {TAGS.map(([t, label]) => <label class="diet-chip"><input type="checkbox" value={t} data-menu-tag /><span><b>{t}</b> {label}</span></label>)}
     </fieldset>
     <p class="menu-count" data-menu-count aria-live="polite"></p>
@@ -128,6 +130,16 @@ const ld = {
   .menu-search input:focus-visible, .diet-chip input:focus-visible + span { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
   .menu-diet { display: flex; gap: 6px; overflow-x: auto; border: 0; padding: 0 0 2px; margin: 0; min-width: 0; }
   .menu-tools > * { min-width: 0; }
+  /* The two chip rows say what they do: one moves you, the other filters. */
+  .tool-lab { flex: none; align-self: center; margin-right: 4px; font-size: 14px; color: #5b544b; white-space: nowrap; }
+  /* Phones and tablets: the page is long, so the "Jump to" row stays under the header while you read. */
+  @media (max-width: 899px) {
+    .menu-tools { display: contents; }
+    .menu-tools > * { margin-top: 10px; }
+    .menu-jump { position: sticky; top: var(--menu-bar, 56px); z-index: 5; margin: 0 calc(-1 * clamp(28px, 5vw, 64px)); padding: 8px clamp(28px, 5vw, 64px); background: var(--color-paper-light); border-bottom: 2px solid var(--color-ink); }
+    .menu-jump a.is-here { background: var(--color-ink); color: var(--color-sand); }
+    .menu-block { scroll-margin-top: 130px; }
+  }
   .diet-chip { flex: none; position: relative; }
   /* Big screens: the tools ride along under the header while you read. */
   @media (min-width: 900px) and (min-height: 700px) { .menu-tools { position: sticky; top: 66px; } }
@@ -158,6 +170,8 @@ const ld = {
     .menu-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 56px; align-items: start; }
     .menu-tools, .menu-tools:is(*) { position: sticky; top: 92px; margin: 0; padding: 18px; border: 2px solid var(--color-ink); max-height: calc(100svh - 120px); overflow-y: auto; gap: 14px; }
     .menu-jump { flex-direction: column; overflow: visible; gap: 0; border-top: 1px dotted rgb(44 41 37 / 0.4); }
+    .menu-jump .tool-lab { align-self: flex-start; margin: 0 0 6px; }
+    .menu-diet .tool-lab { flex-basis: 100%; }
     .menu-jump a { border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); padding: 9px 2px; font-size: 15px; }
     .menu-jump a:hover { color: var(--color-tiger-deep); }
     .menu-jump a.is-here { color: var(--color-tiger-deep); box-shadow: inset 4px 0 0 var(--color-tiger); padding-left: 12px; }
