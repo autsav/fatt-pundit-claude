@@ -4,7 +4,7 @@ One site for Fatt Pundit Soho, Covent Garden and Dubai. Astro 7 (static) + Tailw
 
 ```bash
 npm install
-npm run dev          # http://localhost:4321  (internal check page: /styleguide/)
+npm run dev          # http://localhost:4321  (design system showcase: /styleguide/, preview builds only)
 npm run build        # runs scripts/validate-data.mjs first, then astro build
 npm run check        # astro type check
 ```

@@ -58,3 +58,6 @@ Review at the start of every session. Add a line after any correction.
 - Split-flap boards that step alphabetically can spell words mid-flight: animate through digits/signs, never letters.
 - Compare perf against the previous build in interleaved runs on the same machine before calling something a regression (a git worktree on another port does it).
 - `npm i` prunes hand-made symlinks in node_modules (playwright): re-link before perf:budget, or the budget silently can't run.
+- Windows PowerShell 5.1 `Get-Content -Raw` reads BOM-less UTF-8 as ANSI: a read/replace/write round trip mangles → × “ ’. Edit files with the Edit tool or Python (utf-8), never a PowerShell string round trip.
+- `outline-color` reads as currentColor whenever `:focus-visible` didn't match, so a ring check can silently pass. Check the `--fp-ring` token on the control instead.
+- Re-validating a field on blur moves the form (its message disappears) just as the guest taps the next control, and the tap misses. Clear errors on input.

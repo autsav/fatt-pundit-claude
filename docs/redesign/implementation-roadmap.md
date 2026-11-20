@@ -6,6 +6,8 @@
 | 0.1 | Fix `astro check` error | **Done** (7dbaa73) | — |
 | 1 | Design direction + design-system proposal + mock frames | **Approved** 19 Nov 2026 | — |
 | 2 | Implementation slices below | Done except 2.8a (needs client decisions); see qa-report.md | Each slice has its own gate |
+| 3 | Design system: tokens, `fp-` components, contrast gate, `/styleguide/` showcase | **Done 20 Nov 2026**, recommended options adopted (`phase3/design-system.md`). Pages unchanged except the drawer focus-ring fix | Contrast 150/150 in prebuild; computed-style check on 8 routes; axe 0 on `/styleguide/` |
+| 4 | Page redesigns onto the system, one slice per page (migration map in `phase3/design-system.md` §10) | Next | Phase 2 slice gate + `/styleguide/` unchanged |
 
 ## Rollback
 - Baseline: `git checkout baseline-pre-redesign` (tag on `main` @ 0ead5a8)

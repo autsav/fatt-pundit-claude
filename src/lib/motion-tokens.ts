@@ -2,8 +2,12 @@
  * One motion language for the whole site (plan: "Motion language").
  * Fast = feedback (hover, tap). Slow = story (reveals). Nothing in between.
  */
-export const DURATION = { fast: 0.2, story: 0.9, storyLong: 1.2 } as const; // seconds (Motion)
-export const MS = { fast: 200, story: 900, storyLong: 1200 } as const; // milliseconds (anime.js)
+// Same values as the CSS tokens in src/styles/tokens.css (--dur-press, --dur-fast, --dur-panel,
+// --dur-story, --dur-story-long, --stagger). Change both together.
+export const DURATION = { press: 0.06, fast: 0.2, panel: 0.26, story: 0.9, storyLong: 1.2 } as const; // seconds (Motion)
+export const MS = { press: 60, fast: 200, panel: 260, story: 900, storyLong: 1200 } as const; // milliseconds (anime.js)
+/** Gap between siblings in a sequence; never more than 6 in one sequence. */
+export const STAGGER_MS = 60;
 
 /** Springs: things with weight. */
 export const SPRING = {

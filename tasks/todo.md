@@ -7,7 +7,7 @@ Plan: "Fatt Pundit Website Rebuild Plan" doc (10-day schedule). Tick only with p
 - [ ] Client confirms every row in docs/content-discrepancies.md
 - [ ] Logo SVGs from B3 branding pack replace PNG placeholders in src/assets/images/brand/
 - [ ] Geo coordinates for Soho and Covent Garden (schema + map)
-- [ ] Remove or protect /styleguide/
+- [x] Remove or protect /styleguide/: preview builds only, not generated when PUBLIC_LAUNCH=true (20 Nov, Phase 3)
 
 ## Day 1: inputs and content  ✅ done 18 Nov
 - [x] Crawl old site (no sitemap; 7 live URLs) → docs/redirects.csv
@@ -221,3 +221,12 @@ Gate for every item: before/after screenshots 390 + 1440, contrast 4.5:1, `npm r
 - [x] 9 Kept American Typewriter for copy: guidelines p.20–21 say titles AND copy, so "typewriter only for headlines" would break them. Licence backup instead: FONT_BACKUP=1 swaps to Kameron (OFL), checked 360–1440 with no overflow; buying steps in HANDOVER
 - [x] Arrival overlay goes aria-hidden + inert the moment the shutter starts (Lighthouse kept sampling the fade)
 - QA: no overflow 9 pages × 4 widths; focus ring 0/549, 0/523; a11y 100 on all 4 (home 100 ×2); budget met twice: home 88–92, dropped frames 0.8–1.5% (was 2.0–2.2), 970 KB; Dubai 100
+
+## Phase 3: design system (20 Nov) ✅
+- [x] tokens.css: type, spacing, layout, controls, elevation, motion, layers; 6 surfaces × 25 semantic colour roles
+- [x] components.css (fp-): buttons (7 states), links, nav links, fields, chips, stepper, messages, ledger, hours, facts, badges, print/ticket/tag/postcard, dialogs, desk recipes
+- [x] Contrast gate in prebuild (scripts/check-contrast.ts): 150/150 pairs pass
+- [x] /styleguide/ is the showcase (preview builds only)
+- [x] Decisions: sentence-case buttons, AT Light section headlines (recommended options)
+- Verified: astro check 0; computed styles identical on 8 routes × 390/1440 except the Book drawer focus ring (gold on sand 1.6:1 → ink 8.8:1, fixed); styleguide axe 0, no overflow, 0 JS errors at 390/768/1440/calm; dialog and form behaviour scripted.
+- Next: Phase 4, move pages onto the system (phase3/design-system.md §10)

@@ -1,5 +1,7 @@
 # Design system — as found (baseline)
 
+> **Superseded for new work by `phase3/design-system.md` (Phase 3, 20 Nov 2026).** This file stays as the record of the baseline and the Phase 1–2 rules.
+
 This documents what exists today. The proposed changes come in Phase 1 and will be marked as such.
 Sources: `src/styles/global.css`, `src/styles/site.css`, `src/lib/motion-tokens.ts`, `astro.config.mjs`, brand guidelines (B3, Aug 2026) as cited in code comments.
 

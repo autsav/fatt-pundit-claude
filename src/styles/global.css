@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+/* Phase 3 design system: foundation + semantic surface tokens (docs/redesign/phase3/design-system.md). */
+@import './tokens.css';
+@import './components.css';
 
 /*
  * Brand tokens — Fatt Pundit Branding Guidelines, B3 Designers, Aug 2026 (p.18, p.20–21).
@@ -27,6 +30,8 @@
   --color-slate-deep: #465460;
   --color-tiger-bright: #f5836a;
   --color-ink-deep: #1a1714;
+  /* Slate lifted to the same hue (like tiger-bright): success text on ink, 7.0:1. */
+  --color-slate-bright: #a9b6bf;
   /* Two papers only: card stock (menus, tickets, postcards) and greaseproof (sheets, cards). China, receipts
      and the menu book pages keep their own material colours. */
   --color-paper: #f6efe4;
@@ -41,6 +46,9 @@
   /* Guidelines tracking 100 / 50 (InDesign units = 1/1000 em) */
   --tracking-title: 0.1em;
   --tracking-copy: 0.05em;
+  /* Phase 3: AT Light section headlines (sentence case), and tracked caps on objects only. */
+  --tracking-display: -0.03em;
+  --tracking-tag: 0.16em;
 }
 
 @layer base {
@@ -60,40 +68,16 @@
     letter-spacing: var(--tracking-title);
     line-height: 1;
   }
-  /* One focus ring everywhere, coloured by the surface so it always shows (3:1+):
-     ink on sand and paper, gold on the dark rooms. */
-  :root { --fp-ring: var(--color-ink); }
-  /* Set on surfaces, not on a control that happens to wear the colour (a dark tab on sand keeps the ink ring). */
-  :is(.ink, .bar, .foot, .bg-ink, .bar-dark, .tonight, .rail, .voyage, .rain, .arrival, .doors, [data-dock], .book, .room-lightbox, .room-strip, .gallery-sec):not(a, button, input, label) { --fp-ring: var(--color-gold); }
-  :is(.gold-bg, .bg-gold, .voyage-ticket):not(a, button, input, label) { --fp-ring: var(--color-ink-deep); }
+  /* One focus ring everywhere, coloured by the surface so it always shows (3:1+): --fp-ring is set
+     per surface in tokens.css (ink on sand and paper, gold on the dark rooms). The Book drawer
+     (.book) is a sand sheet: it used to be listed with the dark rooms, which drew a gold ring on
+     sand (1.6:1). Phase 3 dropped it from that list. */
   :focus-visible {
-    outline: 3px solid var(--fp-ring);
-    outline-offset: 3px;
+    outline: var(--ring-width) solid var(--fp-ring);
+    outline-offset: var(--ring-offset);
   }
 
-  /* Layout foundation (docs/redesign/design-system.md, Phase 1). Plain custom properties, not @theme,
-     so they don't spawn Tailwind utilities or collide with its --spacing / --text-* namespaces. */
-  :root {
-    /* Spacing, 4px base */
-    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-    --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px; --space-10: 128px;
-    --section-pad: var(--space-8);
-    /* Grid: 4 / 8 / 12 columns at <640 / 640–1023 / >=1024 (set on .desk) */
-    --grid-max: 1320px;
-    --grid-margin: clamp(20px, 5vw, 80px);
-    --grid-gutter: clamp(16px, 2vw, 24px);
-    /* Type steps, fluid between 390 and 1440 px */
-    --step-h2: clamp(34px, 1.4rem + 5.3vw, 96px);
-    --step-h3: clamp(22px, 1rem + 1vw, 32px);
-    --step-spoken: clamp(20px, 0.9rem + 1vw, 30px);
-    --step-body: clamp(17px, 1rem + 0.2vw, 19px);
-    --step-label: clamp(12px, 0.7rem + 0.1vw, 13px);
-    --step-fine: 14px;
-    /* Elevation: print-like hard offsets only. No blurred shadows (they repaint in scroll scenes). */
-    --lift-1: 3px 3px 0 rgb(26 23 20 / 0.35);
-    --lift-2: 6px 6px 0 rgb(26 23 20 / 0.35);
-  }
-  @media (min-width: 1024px) { :root { --section-pad: var(--space-10); } }
+  /* Spacing, grid, type steps, elevation and motion tokens now live in tokens.css (Phase 3). */
 }
 
 @layer components {
@@ -124,10 +108,7 @@
   .desk-bleed-start { margin-inline-start: calc(-1 * var(--grid-margin)); }
   .desk-bleed-end { margin-inline-end: calc(-1 * var(--grid-margin)); }
 
-  /* Surfaces: night (ink), day (sand), paper. Each sets its own focus-ring colour (lesson 55). */
-  .surface-night { --fp-ring: var(--color-gold); background: var(--color-ink); color: var(--color-sand); }
-  .surface-day { --fp-ring: var(--color-ink); background: var(--color-sand); color: var(--color-ink); }
-  .surface-paper { --fp-ring: var(--color-ink); background: var(--color-paper); color: var(--color-ink); }
+  /* Surfaces (.surface-night/-deep/-day/-paper/-paper-light/-gold) and their tokens: tokens.css. */
   .surface-night .accent-text { color: var(--color-tiger-bright); }
   :is(.surface-day, .surface-paper) .accent-text { color: var(--color-tiger-deep); }
 

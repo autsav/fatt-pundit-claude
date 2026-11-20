@@ -1,0 +1,566 @@
+---
+/**
+ * Design system showcase (Phase 3). Every component on every surface, in every state, built from
+ * the real tokens and the real site data. Spec: docs/redesign/phase3/design-system.md.
+ * Not linked anywhere and noindex. Preview builds only: with PUBLIC_LAUNCH=true the route is not
+ * generated at all (launch blocker in tasks/todo.md, audit C19).
+ * Static states use [data-force]: the same CSS rules as the live :hover / :focus-visible / :active.
+ */
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/site/SiteHeader.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import { getBranches, dish, priceOf, fullAddress, prettyPhone } from '../../lib/site-data';
+import { prettyTime } from '../../lib/hours';
+import { getEntry } from 'astro:content';
+import { measure, readPalette, readSurfaces } from '../../lib/contrast';
+import tokensCss from '../../styles/tokens.css?raw';
+import globalCss from '../../styles/global.css?raw';
+import room from '../../assets/images/covent-garden/gallery-01.jpg';
+
+export function getStaticPaths() {
+  return import.meta.env.PUBLIC_LAUNCH === 'true' ? [] : [{ params: { rest: undefined } }];
+}
+
+const branches = await getBranches();
+const cg = branches.find((b) => b.id === 'covent-garden')!;
+const open = branches.filter((b) => b.status === 'open');
+const menu = await getEntry('menus', 'a-la-carte');
+if (!menu) throw new Error('a-la-carte menu missing');
+const firstSection = menu.data.sections[0];
+const rows = await Promise.all(firstSection.items.slice(0, 5).map(async ({ dish: id }) => { const d = await dish(id); return { name: d.name, note: d.description, price: priceOf(d), tags: d.tags }; }));
+const DAYS = [['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'], ['fri', 'Friday'], ['sat', 'Saturday'], ['sun', 'Sunday']] as const;
+const hours = DAYS.map(([k, label]) => ({ k, label, text: (cg.hours?.[k] ?? []).map(([a, z]) => `${prettyTime(a)} to ${prettyTime(z)}`).join(', ') || 'Closed' }));
+
+const palette = readPalette(globalCss);
+const surfaces = readSurfaces(tokensCss, palette);
+const results = measure(surfaces);
+const passCount = results.filter((r) => r.ok).length;
+const SURFACES = [
+  ['surface-night', 'Night', 'Evening sections: hero, bar, visit, footer'],
+  ['surface-deep', 'Deep', 'Header sheets, dock, index'],
+  ['surface-day', 'Day', 'Sand. The page default'],
+  ['surface-paper', 'Paper', 'Documents, postcards'],
+  ['surface-paper-light', 'Paper light', 'Tickets, tags, strips'],
+  ['surface-gold', 'Gold', 'Rare: the doors, a ticket'],
+] as const;
+const surfaceKey: Record<string, string> = { 'surface-day': ':root' };
+
+const BRAND = [
+  ['ink', 'Main · Pantone Black C'], ['tiger', 'Main · Pantone 171 C'], ['gold', 'Main · Pantone 7407 C'], ['sand', 'Additional · Pantone 482 C'], ['slate', 'Additional · Pantone 7544 C'],
+  ['ink-deep', 'Derived: text on tiger, gold'], ['tiger-deep', 'Derived: tiger text on light'], ['tiger-bright', 'Derived: tiger text on night'], ['gold-deep', 'Derived: gold text on light'],
+  ['slate-deep', 'Derived: success on light'], ['slate-bright', 'Derived: success on night (new)'], ['paper', 'Paper: card stock'], ['paper-light', 'Paper: tickets, fields'],
+] as const;
+// Slate is mid-tone: paper on it is 3.5:1, ink-deep 4.6:1.
+const darkSwatch = new Set(['ink', 'ink-deep', 'tiger-deep', 'gold-deep', 'slate-deep']);
+
+const TYPE = [
+  ['fp-display-xl', '--step-display-xl', '52 to 140', 'AT Bold caps, 0.1em', 'Fatt Pundit'],
+  ['fp-display', '--step-display', '44 to 92', 'AT Bold caps, 0.1em', 'Covent Garden'],
+  ['fp-h2', '--step-h2', '38 to 86', 'AT Light, sentence case, −0.03em', 'The room comes alive after dark'],
+  ['fp-h3', '--step-h3', '22 to 32', 'AT Bold caps (object titles)', 'Boarding pass'],
+  ['fp-h4', '--step-h4', '19 to 22', 'AT Bold (rows, tag titles)', 'Kid goat momo'],
+  ['fp-spoken', '--step-spoken', '20 to 30', 'Lora Medium Italic: one per section', 'Pull up a chair, the kitchen is still open.'],
+  ['fp-body', '--step-body', '17 to 19', 'AT Regular, 1.55, 0.05em', 'Hakka families sailed from Canton to Kolkata and cooked what they found there. £9.50 · 22:30'],
+  ['fp-small', '--step-small', '15 to 16', 'Labels, hints, secondary UI', 'Opens SevenRooms in a new tab with your choices filled in.'],
+  ['fp-fine', '--step-fine', '14', 'Captions, legal', 'Fig. 1 · The dining room at Covent Garden.'],
+  ['fp-caps', '--step-tag', '12 to 13', 'AT Bold caps, 0.16em: objects only', 'Gate WC2 · Flight 2019'],
+] as const;
+
+const SPACE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => [n, [4, 8, 12, 16, 24, 32, 48, 64, 96, 128][n - 1]] as const);
+const MOTION = [
+  ['--dur-press', '60 ms', '--curve-out', 'Press down (stamp)'],
+  ['--dur-fast', '200 ms', '--curve-stamp / --curve-out', 'Hover lift, focus, colour change'],
+  ['--dur-panel', '260 ms', '--curve-panel', 'Drawer or sheet travelling in'],
+  ['--dur-story', '900 ms', '--curve-out', 'A reveal in a scene (strip slides up)'],
+  ['--dur-story-long', '1200 ms', '--curve-in-out', 'Long reveal (flip board, receipt)'],
+  ['--stagger', '60 ms', '', 'Between siblings; at most 6'],
+] as const;
+const STATES = [['Default', ''], ['Hover', 'hover'], ['Focus', 'focus'], ['Active', 'active']] as const;
+---
+<Base title="Design system · Fatt Pundit" description="Fatt Pundit design system: tokens and components." noindex>
+  <a class="skip" href="#content">Skip to content</a>
+  <SiteHeader branches={branches} />
+  <main id="content">
+    <header class="surface-night fp-section sg-intro">
+      <div class="fp-container fp-stack">
+        <p class="fp-section-label sg-plain"><span class="fp-section-no">P3</span> Design system</p>
+        <h1 class="fp-display">Desk &amp; ledger</h1>
+        <p class="fp-spoken">Objects for moments, ledger for facts.</p>
+        <p class="fp-body sg-measure">Tokens and components from <code>src/styles/tokens.css</code> and <code>components.css</code>. Everything below uses the live CSS and the site's own data. Contrast is measured from the token file at build time: <strong>{passCount} of {results.length} pairs pass</strong> WCAG 2.2 AA.</p>
+        <nav aria-label="Sections of this page" class="fp-cluster sg-toc">
+          {['Colour', 'Type', 'Layout', 'Buttons', 'Links', 'Forms', 'Ledger', 'Objects', 'Dialogs', 'Motion'].map((s, i) => <a class="fp-nav-link" href={`#${s.toLowerCase()}`}><span class="fp-section-no">{String(i + 1).padStart(2, '0')}</span>{s}</a>)}
+        </nav>
+      </div>
+    </header>
+
+    <!-- 01 Colour -->
+    <section id="colour" class="surface-day fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">01</span> Colour</p>
+          <h2 class="fp-h2">Five brand colours, six surfaces</h2>
+        </div>
+        <ul class="sg-swatches" role="list">
+          {BRAND.map(([n, role]) => (
+            <li class="sg-swatch" style={`background: var(--color-${n}); color: var(--color-${darkSwatch.has(n) ? 'paper-light' : 'ink-deep'})`}>
+              <b>{n}</b><span class="fp-num">{palette[n]}</span><span class="fp-fine">{role}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="fp-body sg-measure">Components never ask for a brand colour. They ask for a role (<code>--fp-fg</code>, <code>--fp-control</code>, <code>--fp-error</code>), and the surface they sit on answers. The same markup in each panel:</p>
+        <div class="sg-surfaces">
+          {SURFACES.map(([cls, name, use]) => {
+            const t = surfaces[surfaceKey[cls] ?? cls] ?? {};
+            const mine = results.filter((r) => r.surface === (surfaceKey[cls] ?? cls));
+            const worst = mine.reduce((a, b) => (b.ratio / b.min < a.ratio / a.min ? b : a), mine[0]);
+            return (
+              <div class={`${cls} sg-surface`}>
+                <p class="fp-h4">{name}</p>
+                <p class="fp-small fp-muted">{use}</p>
+                <p class="fp-small"><span class="fp-section-no">03</span> Label · <a class="fp-link" href="#colour">A link</a> · <span class="fp-accent">accent</span></p>
+                <div class="fp-cluster"><button class="fp-btn fp-btn--primary fp-btn--sm" type="button">Book</button><button class="fp-btn fp-btn--sm" type="button">Menus</button></div>
+                <input class="fp-input" aria-label={`Sample field on ${name}`} placeholder="you@example.com" />
+                <div class="fp-choices"><label class="fp-choice"><input type="radio" name={`s-${cls}`} checked /><span>Soho</span></label><label class="fp-choice"><input type="radio" name={`s-${cls}`} /><span>Covent Garden</span></label></div>
+                <p class="fp-msg fp-msg--error">Enter an email address</p>
+                <p class="fp-msg fp-msg--success">You're on the list</p>
+                <p class="fp-fine fp-muted fp-num">bg {t.bg} · fg {t.fg} · tightest pair {worst?.fg} on {worst?.bg} {worst?.ratio}:1</p>
+              </div>
+            );
+          })}
+        </div>
+        <details class="sg-details">
+          <summary class="fp-h4">All {results.length} measured pairs</summary>
+          <div class="sg-scroll" tabindex="0" role="region" aria-label="Contrast table">
+            <table class="sg-table fp-num">
+              <thead><tr><th scope="col">Surface</th><th scope="col">Pair</th><th scope="col">Use</th><th scope="col">Colours</th><th scope="col">Ratio</th><th scope="col">Needs</th></tr></thead>
+              <tbody>{results.map((r) => <tr><td>{r.surface === ':root' ? 'day' : r.surface.replace('surface-', '')}</td><td>{r.fg} on {r.bg}</td><td>{r.use}</td><td><span class="sg-chip" style={`background:${r.fgHex}`}></span><span class="sg-chip" style={`background:${r.bgHex}`}></span></td><td>{r.ratio.toFixed(2)}{r.ok ? '' : ' ✗'}</td><td>{r.min}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- 02 Type -->
+    <section id="type" class="surface-paper fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">02</span> Type</p>
+          <h2 class="fp-h2">Two families, sized by role</h2>
+          <p class="fp-spoken">American Typewriter for everything set; Lora for the one spoken line.</p>
+        </div>
+        <ol class="fp-ledger sg-type" role="list">
+          {TYPE.map(([cls, tok, size, rule, sample]) => (
+            <li class="sg-type-row">
+              <div class="sg-type-meta fp-fine"><b>.{cls}</b><br /><code>{tok}</code><br /><span class="fp-num">{size} px</span><br /><span class="fp-muted">{rule}</span></div>
+              <p class={`${cls} sg-type-sample`}>{sample}</p>
+            </li>
+          ))}
+        </ol>
+        <p class="fp-small fp-muted sg-measure">Sizes are fluid between 390 and 1440 px and written in rem, so they follow the reader's own text size. Body copy is never wider than <code>--measure</code> (32.7em, about 64 characters). Prices, hours and numbers use tabular figures (<code>.fp-num</code>).</p>
+      </div>
+    </section>
+
+    <!-- 03 Layout -->
+    <section id="layout" class="surface-day fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">03</span> Layout</p>
+          <h2 class="fp-h2">A desk on a grid</h2>
+        </div>
+        <div class="sg-grid-demo" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => <span class={i >= 8 ? 'sg-c12' : i >= 4 ? 'sg-c8' : ''}>{i + 1}</span>)}
+        </div>
+        <p class="fp-small fp-muted">4 columns under 640 px, 8 to 1023, 12 from 1024. Margin <code>clamp(20px, 5vw, 80px)</code>, gutter <code>clamp(16px, 2vw, 24px)</code>, content up to 1320 px. Resize the window: the bar above shows the live column count.</p>
+        <div class="sg-space">
+          {SPACE.map(([n, px]) => <div class="sg-space-row fp-fine fp-num"><code>--space-{n}</code><span style={`width:${px}px`}></span>{px}</div>)}
+        </div>
+        <p class="fp-small fp-muted">Section rhythm: <code>--section-pad</code> 64 to 128 px top and bottom; <code>--section-gap</code> 36 to 56 px from headline to content. Night and day sections alternate.</p>
+      </div>
+      <div class="desk sg-spread">
+        <figure class="fp-print fp-print--tilt-left spread-photo sg-print">
+          <Image class="fp-photo" src={room} alt="The Covent Garden dining room: green walls, lamps and banquettes" widths={[480, 800, 1200]} sizes="(min-width: 1024px) 60vw, 100vw" />
+          <figcaption>Fig. 1 · Recipe "photo + object": the photo bleeds left, the object overlaps it.</figcaption>
+        </figure>
+        <article class="fp-ticket spread-object sg-ticket">
+          <div class="fp-ticket-band fp-caps"><span>Boarding pass</span><span>WC2</span></div>
+          <div class="fp-ticket-body">
+            <p class="fp-h3">{cg.shortName}</p>
+            <p class="fp-small">{fullAddress(cg)}</p>
+            <p class="fp-badge fp-badge--open">Open until 10.30pm</p>
+          </div>
+          <div class="fp-ticket-stub">
+            <a class="fp-btn fp-btn--primary fp-btn--block" href={cg.booking?.url} data-book={cg.id} target="_blank" rel="noopener">Book a table</a>
+            <a class="fp-link fp-link--strong" href={`tel:${cg.phone}`}>Call {prettyPhone(cg.phone!)}</a>
+          </div>
+        </article>
+      </div>
+      <div class="fp-container"><p class="fp-small fp-muted sg-note">Desktop: side by side with overlap. Tablet: the ticket is pulled up over the photo's foot. Phone: stacked, no tilt, no overlap.</p></div>
+    </section>
+
+    <!-- 04 Buttons -->
+    <section id="buttons" class="surface-paper fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">04</span> Buttons</p>
+          <h2 class="fp-h2">Three kinds, one press</h2>
+          <p class="fp-body sg-measure">Primary is the action (tiger means “press me”). Secondary is an outline. Text is underlined with no box. Sentence case, 50 px tall (44 small); hover lifts on a hard shadow, press stamps down.</p>
+        </div>
+        {[['surface-paper', 'Paper'], ['surface-night', 'Night'], ['surface-gold', 'Gold']].map(([s, label]) => (
+          <div class={`${s} sg-matrix`}>
+            <p class="fp-small"><b>{label}</b></p>
+            <div class="sg-matrix-grid">
+              <span></span>{STATES.map(([n]) => <span class="fp-fine fp-muted">{n}</span>)}<span class="fp-fine fp-muted">Disabled</span><span class="fp-fine fp-muted">Loading</span><span class="fp-fine fp-muted">Done</span>
+              {[['fp-btn--primary', 'Primary', 'Book'], ['', 'Secondary', 'Menus'], ['fp-btn--text', 'Text', 'Directions']].map(([v, n, txt]) => (
+                <>
+                  <span class="fp-fine fp-muted">{n}</span>
+                  {STATES.map(([, f]) => <span><button type="button" class={`fp-btn ${v}`} data-force={f || undefined} tabindex="-1">{txt}</button></span>)}
+                  <span><button type="button" class={`fp-btn ${v}`} disabled>{txt}</button></span>
+                  <span><button type="button" class={`fp-btn ${v}`} aria-busy="true" tabindex="-1">Wait</button></span>
+                  <span><button type="button" class={`fp-btn ${v}`} data-state="done" tabindex="-1">Sent</button></span>
+                </>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div class="fp-cluster">
+          <button type="button" class="fp-btn fp-btn--primary fp-btn--sm">Small · 44</button>
+          <button type="button" class="fp-btn fp-btn--icon" aria-label="Close">×</button>
+          <button type="button" class="fp-btn fp-btn--icon fp-btn--primary" aria-label="Next photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+          <button type="button" class="fp-btn fp-btn--primary" data-demo-send>Try loading, then done</button>
+          <span class="fp-small" role="status" data-demo-status></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Links -->
+    <section id="links" class="surface-day fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">05</span> Links</p>
+          <h2 class="fp-h2">Underlined, always</h2>
+        </div>
+        <div class="sg-two">
+          <div class="fp-stack">
+            <p class="fp-body">Inline: read the <a class="fp-link" href="#links">allergen guide</a> before you order. States: <a class="fp-link" data-force="hover" href="#links">hover</a>, <a class="fp-link" data-force="focus" href="#links" tabindex="-1">focus</a>, <a class="fp-link" data-force="active" href="#links" tabindex="-1">active</a>.</p>
+            <p class="fp-body">Quiet (inherits the text colour, for dense facts): <a class="fp-link fp-link--quiet" href="#links">28 Maiden Lane</a>.</p>
+            <p class="fp-cluster"><a class="fp-link fp-link--strong" href="#links">Call</a><a class="fp-link fp-link--strong" href="https://maps.google.com" target="_blank" rel="noopener">Directions<span class="sr-only"> (opens in a new tab)</span></a></p>
+            <p class="fp-fine fp-muted">A link that opens a new tab says so to screen readers (hidden text), not with an icon.</p>
+          </div>
+          <div class="surface-deep sg-pad">
+            <p class="fp-fine fp-muted">Navigation, numbered like the sections. Current page: underline in the label colour.</p>
+            <nav aria-label="Navigation sample" class="fp-cluster sg-nav">
+              {open.map((b, i) => <a class="fp-nav-link" href={`/${b.id}/`} aria-current={b.id === 'covent-garden' ? 'page' : undefined}><span class="fp-section-no">{String(i + 1).padStart(2, '0')}</span>{b.shortName}</a>)}
+              <a class="fp-nav-link" data-force="hover" href="#links"><span class="fp-section-no">03</span>Menus</a>
+              <a class="fp-nav-link" href="/private-dining/"><span class="fp-section-no">04</span>Groups</a>
+            </nav>
+            <p class="fp-fine fp-muted">The live header, the Index sheet and the phone dock (under 640 px) on this page are the site's own; they already follow these rules.</p>
+            <button type="button" class="fp-btn fp-btn--sm" data-index-open aria-haspopup="dialog">Open the Index</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Forms -->
+    <section id="forms" class="surface-paper fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">06</span> Forms</p>
+          <h2 class="fp-h2">Fields that say what they need</h2>
+          <p class="fp-body sg-measure">Label above, hint under the label, message under the field. Optional fields say “(optional)”; required ones don't wear an asterisk. Errors appear after the guest has typed (<code>:user-invalid</code>) or when the script sets <code>aria-invalid</code>, and the message is linked with <code>aria-describedby</code>.</p>
+        </div>
+        <div class="sg-fields">
+          <div class="fp-field"><label class="fp-label" for="f1">Default</label><input class="fp-input" id="f1" placeholder="you@example.com" /></div>
+          <div class="fp-field"><label class="fp-label" for="f2">Hover</label><input class="fp-input" id="f2" data-force="hover" placeholder="you@example.com" /></div>
+          <div class="fp-field"><label class="fp-label" for="f3">Focus</label><input class="fp-input" id="f3" data-force="focus" value="sam@" /></div>
+          <div class="fp-field"><label class="fp-label" for="f4">Error</label><input class="fp-input" id="f4" aria-invalid="true" aria-describedby="f4-m" value="sam@" /><p class="fp-msg fp-msg--error" id="f4-m">Enter an email address like name@example.com</p></div>
+          <div class="fp-field" data-state="success"><label class="fp-label" for="f5">Success</label><input class="fp-input" id="f5" aria-describedby="f5-m" value="sam@example.com" /><p class="fp-msg fp-msg--success" id="f5-m">We'll write to this address</p></div>
+          <div class="fp-field"><label class="fp-label" for="f6">Disabled</label><input class="fp-input" id="f6" disabled value="Covent Garden" /></div>
+          <div class="fp-field"><label class="fp-label" for="f7">Read-only</label><input class="fp-input" id="f7" readonly value="Thursday 20 November" /></div>
+          <div class="fp-field"><label class="fp-label" for="f8">Restaurant</label><span class="fp-select"><select class="fp-input" id="f8">{open.map((b) => <option>{b.shortName}</option>)}</select></span></div>
+        </div>
+
+        <form class="fp-form surface-paper-light sg-form" data-demo-form novalidate>
+          <p class="fp-h3">Group enquiry</p>
+          <fieldset class="fp-fieldset">
+            <legend class="fp-legend">Which restaurant?</legend>
+            <div class="fp-choices">{open.map((b, i) => <label class="fp-choice"><input type="radio" name="where" value={b.id} checked={i === 0} /><span>{b.shortName}</span></label>)}<label class="fp-choice"><input type="radio" name="where" disabled /><span>Dubai</span></label></div>
+          </fieldset>
+          <div class="fp-form-row">
+            <div class="fp-field"><label class="fp-label" for="d-date">Date</label><input class="fp-input" id="d-date" type="date" required aria-describedby="d-date-m" /><p class="fp-msg fp-msg--error" id="d-date-m" hidden>Choose a date</p></div>
+            <div class="fp-field"><span class="fp-label" id="d-guests-l">Guests</span><div class="fp-stepper" role="group" aria-labelledby="d-guests-l"><button type="button" data-step="-1" aria-label="One fewer guest">−</button><output data-size aria-live="polite">10</output><button type="button" data-step="1" aria-label="One more guest">+</button></div></div>
+          </div>
+          <div class="fp-form-row">
+            <div class="fp-field"><label class="fp-label" for="d-name">Your name</label><input class="fp-input" id="d-name" autocomplete="name" required aria-describedby="d-name-m" /><p class="fp-msg fp-msg--error" id="d-name-m" hidden>Tell us your name</p></div>
+            <div class="fp-field"><label class="fp-label" for="d-tel">Phone <span class="fp-optional">(optional)</span></label><input class="fp-input" id="d-tel" type="tel" autocomplete="tel" /></div>
+          </div>
+          <div class="fp-field"><label class="fp-label" for="d-email">Email</label><p class="fp-hint" id="d-email-h">The restaurant replies here, usually within a day.</p><input class="fp-input" id="d-email" type="email" autocomplete="email" required aria-describedby="d-email-h d-email-m" /><p class="fp-msg fp-msg--error" id="d-email-m" hidden>Enter an email address like name@example.com</p></div>
+          <fieldset class="fp-fieldset">
+            <legend class="fp-legend">Dietary needs <span class="fp-optional">(optional)</span></legend>
+            <div class="fp-choices">{[['V', 'Vegetarian'], ['VG', 'Vegan'], ['GF', 'Gluten free'], ['H', 'Halal']].map(([c, l]) => <label class="fp-choice"><input type="checkbox" name="diet" value={c} /><span>{l}</span></label>)}</div>
+          </fieldset>
+          <div class="fp-field"><label class="fp-label" for="d-notes">Anything else <span class="fp-optional">(optional)</span></label><textarea class="fp-input" id="d-notes" rows="3"></textarea></div>
+          <label class="fp-check"><input type="checkbox" required /> I'm happy for the restaurant to call me</label>
+          <div class="fp-status fp-msg" data-form-status role="status" hidden></div>
+          <button class="fp-btn fp-btn--primary sg-submit" type="submit">Send enquiry</button>
+          <p class="fp-fine fp-muted">Demo only: nothing is sent. Submit empty to see errors, then fill it in to see loading and done.</p>
+        </form>
+
+        <div class="sg-status">
+          <p class="fp-status fp-msg fp-msg--info"><strong>Tables of nine or more</strong> are planned with you by phone.</p>
+          <p class="fp-status fp-msg fp-msg--success"><strong>Enquiry sent</strong> Covent Garden will reply by email.</p>
+          <p class="fp-status fp-msg fp-msg--warning"><strong>Closed on Mondays</strong> Pick another day.</p>
+          <p class="fp-status fp-msg fp-msg--error"><strong>Two things to fix</strong> Date and email address.</p>
+        </div>
+
+        <form class="fp-form surface-night sg-form sg-news" onsubmit="return false">
+          <div class="fp-field"><label class="fp-label" for="n-email">Newsletter, on night</label><div class="fp-cluster sg-news-row"><input class="fp-input" id="n-email" type="email" placeholder="you@example.com" autocomplete="email" /><button class="fp-btn fp-btn--primary" type="submit">Join the list</button></div></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 07 Ledger -->
+    <section id="ledger" class="surface-night fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">07</span> Ledger</p>
+          <h2 class="fp-h2">Facts are set as a manifest</h2>
+          <p class="fp-spoken">Sentence case, hairline rules, tabular figures.</p>
+        </div>
+        <dl class="fp-facts">
+          <div><dt>Today</dt><dd><span class="fp-badge fp-badge--open">Open</span> · noon to 10.30pm</dd></div>
+          <div><dt>Address</dt><dd>{fullAddress(cg)}</dd></div>
+          <div><dt>Phone</dt><dd><a class="fp-link fp-link--quiet" href={`tel:${cg.phone}`}>{prettyPhone(cg.phone!)}</a></dd></div>
+          <div><dt>Status badges</dt><dd class="fp-cluster"><span class="fp-badge fp-badge--open">Open</span><span class="fp-badge fp-badge--closed">Closed</span><span class="fp-badge fp-badge--soon">Soon</span></dd></div>
+        </dl>
+        <div class="sg-two">
+          <div>
+            <ol class="fp-ledger fp-ledger--numbered" role="list">
+              {[...open.map((b) => [b.shortName, b.address.street, `/${b.id}/menu/`]), ['Private dining', 'Tables for nine or more', '/private-dining/'], ['Allergens', 'Ask before you order', '/allergens/']].map(([n, note, href], i) => (
+                <li><a class="fp-ledger-row" href={href} data-force={i === 1 ? 'hover' : undefined}><span class="fp-ledger-no">{String(i + 1).padStart(2, '0')}</span><span class="fp-ledger-name">{n}</span><span class="fp-ledger-meta">{note}</span></a></li>
+              ))}
+            </ol>
+            <p class="fp-fine fp-muted sg-note">Linked rows: the whole row is the target. Row 02 shows hover.</p>
+          </div>
+          <table class="fp-hours" data-hours-table data-tz={cg.timezone}>
+            <caption>{cg.shortName} · opening hours</caption>
+            <tbody>{hours.map((h) => <tr data-day={h.k}><th scope="row">{h.label}<span class="sr-only" data-today-word hidden>, today</span></th><td>{h.text}</td></tr>)}</tbody>
+          </table>
+        </div>
+        <div class="surface-paper sg-pad">
+          <p class="fp-section-label"><span class="fp-section-no">{firstSection.title}</span></p>
+          <ul class="fp-ledger" role="list">
+            {rows.map((r) => <li class="fp-ledger-row"><span><span class="fp-ledger-name">{r.name}</span>{r.note && <span class="fp-ledger-note">{r.note}{r.tags.length > 0 && ` · ${r.tags.join(' ')}`}</span>}</span><span class="fp-price">{r.price}</span></li>)}
+          </ul>
+          <p class="fp-fine fp-muted sg-note">Prices from <code>dishes.json</code> via <code>menus.json</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 Objects -->
+    <section id="objects" class="surface-day fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">08</span> Objects</p>
+          <h2 class="fp-h2">At most one kind per section</h2>
+          <p class="fp-body sg-measure">Six object types replace cards: print, ticket (above, in Layout), luggage tag, postcard, board and receipt. Board and receipt stay as built (Tonight's board on branch pages; the receipt in the footer below). Each object has one target of 44 px or more.</p>
+        </div>
+        <ul class="fp-grid-auto" role="list">
+          {[['Groups', 'Tables for nine or more are planned with you by phone.', 'Send an enquiry', '/private-dining/'], ['Allergens', 'Tell your server about any allergy before you order.', 'Read the allergen guide', '/allergens/'], ['Step-free', 'The ground floor has step-free access from the street.', 'Accessibility', '/accessibility/']].map(([t, p, l, href]) => (
+            <li class="fp-tag"><div class="fp-tag-in"><p class="fp-h4">{t}</p><p class="fp-small">{p}</p><a class="fp-link fp-small" href={href}>{l}</a></div></li>
+          ))}
+        </ul>
+        <div class="fp-grid-auto">
+          {open.map((b) => <a class="fp-postcard" href={`/${b.id}/`}><span class="fp-caps fp-accent">Other rooms</span><span class="fp-h3">{b.shortName}</span><span class="fp-small">{b.address.street}</span></a>)}
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 Dialogs -->
+    <section id="dialogs" class="surface-paper fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">09</span> Dialogs</p>
+          <h2 class="fp-h2">Native dialogs, three shapes</h2>
+          <p class="fp-body sg-measure">Side drawer (a bottom sheet on phones), centred, and full screen (the Index). Escape, the close button or a tap on the backdrop closes; focus returns to the button that opened it.</p>
+        </div>
+        <div class="fp-cluster">
+          <button class="fp-btn fp-btn--primary" type="button" data-dialog-open="dlg-side" aria-haspopup="dialog">Open side drawer</button>
+          <button class="fp-btn" type="button" data-dialog-open="dlg-center" aria-haspopup="dialog">Open centred dialog</button>
+          <button class="fp-btn fp-btn--text" type="button" data-book="">The live Book drawer</button>
+        </div>
+      </div>
+      <dialog class="fp-dialog fp-dialog--side" id="dlg-side" aria-labelledby="dlg-side-t">
+        <div class="fp-dialog-panel surface-day">
+          <div class="fp-dialog-head"><div><p class="fp-spoken fp-accent">Your table</p><h2 class="fp-h3" id="dlg-side-t">Book at Covent Garden</h2></div><button class="fp-btn fp-btn--icon" type="button" data-dialog-close aria-label="Close">×</button></div>
+          <fieldset class="fp-fieldset"><legend class="fp-legend">How many</legend><div class="fp-stepper"><button type="button" aria-label="One fewer guest">−</button><output>2</output><button type="button" aria-label="One more guest">+</button></div></fieldset>
+          <fieldset class="fp-fieldset"><legend class="fp-legend">Time</legend><div class="fp-choices">{['6pm', '6.30pm', '7pm', '7.30pm', '8pm'].map((t, i) => <label class="fp-choice"><input type="radio" name="dt" checked={i === 2} /><span>{t}</span></label>)}</div></fieldset>
+          <button class="fp-btn fp-btn--primary fp-btn--block" type="button" data-dialog-close>Find a table</button>
+          <p class="fp-fine">Demo: the real drawer opens SevenRooms with these filled in.</p>
+        </div>
+      </dialog>
+      <dialog class="fp-dialog fp-dialog--center" id="dlg-center" aria-labelledby="dlg-center-t">
+        <div class="fp-dialog-panel surface-paper-light">
+          <div class="fp-dialog-head"><h2 class="fp-h3" id="dlg-center-t">Clear your passport?</h2><button class="fp-btn fp-btn--icon" type="button" data-dialog-close aria-label="Close">×</button></div>
+          <p class="fp-body">The five dishes you stamped will be removed from this phone.</p>
+          <div class="fp-cluster"><button class="fp-btn fp-btn--primary" type="button" data-dialog-close>Clear it</button><button class="fp-btn" type="button" data-dialog-close>Keep them</button></div>
+        </div>
+      </dialog>
+    </section>
+
+    <!-- 10 Motion -->
+    <section id="motion" class="surface-night fp-section">
+      <div class="fp-container fp-stack fp-stack--lg">
+        <div class="fp-section-head">
+          <p class="fp-section-label"><span class="fp-section-no">10</span> Motion</p>
+          <h2 class="fp-h2">Things stamp, slide and flip</h2>
+          <p class="fp-body sg-measure">Physical motion only: no fades or drifting glows. Transform and opacity only. Calm mode (reduced motion) sets every duration token to 0 and shows end states. Your setting right now: <b data-motion-mode>…</b>.</p>
+        </div>
+        <ol class="fp-ledger" role="list">
+          {MOTION.map(([tok, ms, curve, use]) => <li class="fp-ledger-row"><span><span class="fp-ledger-name"><code>{tok}</code></span><span class="fp-ledger-note">{use}{curve && ` · ${curve}`}</span></span><span class="fp-ledger-meta">{ms}</span></li>)}
+        </ol>
+        <div class="sg-motion">
+          <button class="fp-btn" type="button" data-demo-motion="press">Press (hold me)</button>
+          <button class="fp-btn" type="button" data-demo-motion="slide">Slide a pass up (900 ms)</button>
+          <div class="sg-stage" aria-hidden="true"><div class="sg-pass" data-demo-pass><span class="fp-caps">Gate WC2</span></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <SiteFooter branches={branches} />
+</Base>
+
+<style>
+  .sg-plain { border-top: 0; padding-top: 0; }
+  .sg-measure { max-width: var(--measure); }
+  .sg-intro h1 { overflow-wrap: anywhere; }
+  .sg-toc { gap: 0 var(--space-5); }
+  code { font-family: var(--font-body); font-size: 0.9em; font-weight: 700; white-space: nowrap; }
+  .sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+  .sg-swatch { display: grid; gap: 2px; min-height: 104px; padding: var(--space-3); align-content: end; box-shadow: inset 0 0 0 1px rgb(26 23 20 / 0.15); }
+  .sg-surfaces { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr)); }
+  .sg-surface { display: grid; gap: var(--space-3); align-content: start; padding: var(--space-5); box-shadow: inset 0 0 0 1px rgb(26 23 20 / 0.2); }
+  .sg-surface p { margin: 0; }
+  .sg-details summary { cursor: pointer; min-height: var(--target-min); display: flex; align-items: center; }
+  .sg-scroll { max-height: 28rem; overflow: auto; margin-top: var(--space-3); }
+  .sg-table { width: 100%; border-collapse: collapse; font-size: var(--step-fine); }
+  .sg-table :is(th, td) { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--fp-rule); text-align: left; white-space: nowrap; }
+  .sg-chip { display: inline-block; width: 14px; height: 14px; margin-right: 3px; vertical-align: -2px; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3); }
+  .sg-type { border-top: 0; }
+  .sg-type-row { display: grid; gap: var(--space-3) var(--space-6); padding-block: var(--space-5); }
+  @media (min-width: 1024px) { .sg-type-row { grid-template-columns: 15rem minmax(0, 1fr); align-items: baseline; } }
+  .sg-type-meta { line-height: 1.5; }
+  .sg-type-sample { margin: 0; overflow-wrap: anywhere; }
+  .sg-grid-demo { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: var(--grid-gutter); }
+  .sg-grid-demo span { display: grid; place-items: center; height: 48px; background: rgb(241 93 61 / 0.18); box-shadow: inset 0 0 0 1px var(--color-tiger-deep); font-size: var(--step-fine); font-weight: 700; }
+  .sg-grid-demo .sg-c8, .sg-grid-demo .sg-c12 { display: none; }
+  @media (min-width: 640px) { .sg-grid-demo { grid-template-columns: repeat(8, 1fr); } .sg-grid-demo .sg-c8 { display: grid; } }
+  @media (min-width: 1024px) { .sg-grid-demo { grid-template-columns: repeat(12, 1fr); } .sg-grid-demo .sg-c12 { display: grid; } }
+  .sg-space { display: grid; gap: 6px; }
+  .sg-space-row { display: grid; grid-template-columns: 6.5rem auto 3ch; gap: var(--space-3); align-items: center; justify-content: start; }
+  .sg-space-row span { display: block; height: 14px; background: var(--color-ink); }
+  .sg-spread { margin-top: var(--section-gap); }
+  .sg-print { height: clamp(260px, 42vw, 560px); }
+  .sg-ticket { max-width: 26rem; }
+  @media (min-width: 1024px) { .sg-ticket { max-width: none; } }
+  .sg-note { margin-top: var(--space-4); }
+  .sg-matrix { padding: var(--space-5); box-shadow: inset 0 0 0 1px rgb(26 23 20 / 0.2); overflow-x: auto; }
+  .sg-matrix p { margin: 0 0 var(--space-3); }
+  .sg-matrix-grid { display: grid; grid-template-columns: 5.5rem repeat(7, max-content); gap: var(--space-4) var(--space-4); align-items: center; }
+  .sg-two { display: grid; gap: var(--section-gap) var(--space-8); }
+  @media (min-width: 1024px) { .sg-two { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
+  .sg-two p { margin: 0; }
+  .sg-pad { display: grid; gap: var(--space-4); align-content: start; padding: var(--space-5); }
+  .sg-nav { gap: 0 var(--space-5); }
+  .sg-fields { display: grid; gap: var(--space-5) var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr)); }
+  .sg-form { max-width: 44rem; padding: clamp(20px, 4vw, 40px); box-shadow: var(--lift-2); }
+  .sg-form p { margin: 0; }
+  .sg-submit { justify-self: start; }
+  @media (max-width: 639px) { .sg-submit { justify-self: stretch; } }
+  .sg-status { display: grid; gap: var(--space-3); max-width: 44rem; }
+  .sg-news { box-shadow: none; }
+  .sg-news-row { flex-wrap: nowrap; }
+  .sg-news-row .fp-input { flex: 1; min-width: 0; }
+  @media (max-width: 479px) { .sg-news-row { flex-wrap: wrap; } .sg-news-row .fp-btn { width: 100%; } }
+  .sg-motion { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+  .sg-stage { position: relative; width: 220px; height: 96px; overflow: hidden; border-bottom: 2px solid var(--fp-rule-strong); }
+  .sg-pass { position: absolute; left: 20px; right: 20px; bottom: 0; height: 72px; display: grid; place-items: center; background: var(--color-paper-light); color: var(--color-ink); transform: translateY(100%); }
+  .sg-pass.is-in { transform: none; transition: transform var(--dur-story) var(--curve-out); }
+</style>
+
+<script>
+  import { bindDialogs } from '../../lib/dialog';
+  bindDialogs();
+
+  // Calm mode indicator.
+  const mode = document.querySelector('[data-motion-mode]');
+  if (mode) mode.textContent = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'calm (reduced motion)' : 'full motion';
+
+  // Today's row in the hours table, on the restaurant's own clock.
+  const table = document.querySelector<HTMLElement>('[data-hours-table]');
+  if (table) {
+    const day = new Intl.DateTimeFormat('en-GB', { timeZone: table.dataset.tz, weekday: 'short' }).format(new Date()).slice(0, 3).toLowerCase();
+    const row = table.querySelector<HTMLElement>(`tr[data-day="${day}"]`);
+    if (row) { row.setAttribute('aria-current', 'date'); row.querySelector<HTMLElement>('[data-today-word]')!.hidden = false; }
+  }
+
+  // Loading to done on a single button.
+  const sendBtn = document.querySelector<HTMLButtonElement>('[data-demo-send]');
+  const sendStatus = document.querySelector<HTMLElement>('[data-demo-status]');
+  sendBtn?.addEventListener('click', () => {
+    const label = sendBtn.textContent;
+    sendBtn.setAttribute('aria-busy', 'true'); sendBtn.textContent = 'Sending'; if (sendStatus) sendStatus.textContent = 'Sending…';
+    setTimeout(() => {
+      sendBtn.removeAttribute('aria-busy'); sendBtn.dataset.state = 'done'; sendBtn.textContent = 'Sent'; if (sendStatus) sendStatus.textContent = 'Sent.';
+      setTimeout(() => { delete sendBtn.dataset.state; sendBtn.textContent = label; if (sendStatus) sendStatus.textContent = ''; }, 2000);
+    }, 1400);
+  });
+
+  // Demo form: errors after submit, then loading to done. Nothing is sent.
+  const form = document.querySelector<HTMLFormElement>('[data-demo-form]');
+  if (form) {
+    const size = form.querySelector<HTMLOutputElement>('[data-size]')!;
+    form.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) => b.addEventListener('click', () => {
+      const n = Math.min(40, Math.max(5, Number(size.value) + Number(b.dataset.step)));
+      size.value = String(n);
+      form.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = n <= 5;
+      form.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = n >= 40;
+    }));
+    const status = form.querySelector<HTMLElement>('[data-form-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const check = (el: HTMLInputElement) => {
+      const bad = !el.checkValidity();
+      el.setAttribute('aria-invalid', String(bad));
+      const msg = el.id ? form.querySelector<HTMLElement>(`#${el.id}-m`) : null;
+      if (msg) msg.hidden = !bad;
+      return !bad;
+    };
+    // Once a field has shown an error, re-check it while the guest types, never on blur: clearing a
+    // message on blur moves the form under the finger just as it taps the next control.
+    form.querySelectorAll<HTMLInputElement>('input[required]').forEach((el) => el.addEventListener('input', () => { if (el.getAttribute('aria-invalid') === 'true') check(el); }));
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fields = [...form.querySelectorAll<HTMLInputElement>('input[required]')];
+      const bad = fields.filter((el) => !check(el));
+      if (bad.length) {
+        status.className = 'fp-status fp-msg fp-msg--error'; status.setAttribute('role', 'alert'); status.hidden = false;
+        status.innerHTML = `<strong>${bad.length === 1 ? 'One thing' : `${bad.length} things`} to fix</strong> See the messages under the fields.`;
+        bad[0].focus();
+        return;
+      }
+      status.hidden = true; submit.setAttribute('aria-busy', 'true'); submit.textContent = 'Sending';
+      setTimeout(() => {
+        submit.removeAttribute('aria-busy'); submit.dataset.state = 'done'; submit.textContent = 'Sent';
+        status.className = 'fp-status fp-msg fp-msg--success'; status.setAttribute('role', 'status'); status.hidden = false;
+        status.innerHTML = '<strong>Enquiry sent</strong> (demo) The restaurant would reply by email.';
+      }, 1400);
+    });
+  }
+
+  // Motion demo: a pass slides up at --dur-story.
+  const pass = document.querySelector<HTMLElement>('[data-demo-pass]');
+  document.querySelector('[data-demo-motion="slide"]')?.addEventListener('click', () => {
+    if (!pass) return;
+    pass.classList.remove('is-in'); void pass.offsetWidth; pass.classList.add('is-in');
+  });
+</script>
