@@ -74,3 +74,18 @@ Rule: every object has one tap target ≥ 44 × 44 px and a visible focus ring f
 - No documented spacing scale or layout grid tokens (a 1200 content width is mentioned in todo E3, not as a token).
 - Semi Bold weight not available until fonts are licensed.
 - No written component inventory beyond this page and `/styleguide/`.
+
+---
+
+# Phase 2 direction rules (approved 19 Nov 2026; not yet implemented)
+
+Source: `phase2/creative-direction.md` §5. "Objects for moments, ledger for facts."
+
+Checklist for every section:
+1. At most one object type (print, board, pass, tag, postcard, receipt). Everything else is plain type on the surface.
+2. Facts (hours, addresses, prices, menu lists, navigation) are set as ledger rows: sentence case, hairline rules, tabular figures, no tracked capitals.
+3. Section headlines may use American Typewriter Light, sentence case, minimum 48 px on desktop. Bold capitals are for the hero name and object titles.
+4. Tiger is for things you can press, plus one accent word in a hero. Never for decoration.
+5. Sections are numbered (01, 02 …) with a small label; navigation is numbered the same way.
+6. Phones get a fixed dock: Menus, Call, Book.
+7. At most one full-bleed photograph per page, with no text on it.

@@ -6,8 +6,10 @@
  *   node scripts/perf-budget.mjs            # all pages
  *   PAGES=/,/soho/ node scripts/perf-budget.mjs
  *
- * Needs: lighthouse (CLI on PATH) and playwright (PLAYWRIGHT=path/to/index.mjs
- * if it isn't resolvable), plus Chrome (CHROME_PATH, default /usr/bin/google-chrome).
+ * Needs: lighthouse (CLI on PATH, or LIGHTHOUSE=path/to/lighthouse/cli/index.js,
+ * which is the way that works on Windows) and playwright (PLAYWRIGHT=path/to/index.mjs
+ * if it isn't resolvable), plus Chrome or Edge (CHROME_PATH; the default is
+ * /usr/bin/google-chrome, or Edge on Windows).
  *
  * Two checks per page:
  *  1. Lighthouse, mobile preset (slow 4G, 4x CPU): score, LCP, TBT, CLS, weight.
@@ -20,11 +22,16 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, isAbsolute } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const BASE = process.env.BASE ?? 'http://localhost:4321';
 const PAGES = (process.env.PAGES ?? '/,/soho/,/covent-garden/,/dubai/').split(',');
-const CHROME = process.env.CHROME_PATH ?? '/usr/bin/google-chrome';
+const WIN = process.platform === 'win32';
+const CHROME = process.env.CHROME_PATH ?? (WIN ? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe' : '/usr/bin/google-chrome');
+// On Windows the lighthouse CLI is a .cmd shim that execFileSync can't start, so run its JS entry with node.
+const LH = process.env.LIGHTHOUSE ? [process.execPath, [process.env.LIGHTHOUSE]] : ['lighthouse', []];
+const PW = process.env.PLAYWRIGHT ?? 'playwright';
 
 // Lab budgets (see tasks/todo.md "£10k upgrade"). Lighthouse's simulated LCP
 // counts the page's scripts too; the observed LCP on these pages is ~0.25 s. Real-user targets are tighter
@@ -40,8 +47,8 @@ const rows = [];
 
 for (const page of PAGES) {
   const file = join(out, `${page.replace(/\W+/g, '_') || 'home'}.json`);
-  execFileSync('lighthouse', [
-    BASE + page, '--quiet', '--output=json', `--output-path=${file}`, '--only-categories=performance',
+  execFileSync(LH[0], [
+    ...LH[1], BASE + page, '--quiet', '--output=json', `--output-path=${file}`, '--only-categories=performance',
     '--chrome-flags=--headless=new --no-sandbox --use-gl=swiftshader --enable-unsafe-swiftshader',
   ], { env: { ...process.env, CHROME_PATH: CHROME }, stdio: 'ignore' });
   const { categories, audits } = JSON.parse(readFileSync(file, 'utf8'));
@@ -62,7 +69,7 @@ for (const page of PAGES) {
   if (r.weightKB > BUDGET.weightKB) fails.push(`${page}: weight ${r.weightKB} KB > ${BUDGET.weightKB}`);
 }
 
-const { chromium } = await import(process.env.PLAYWRIGHT ?? 'playwright');
+const { chromium } = await import(isAbsolute(PW) ? pathToFileURL(PW).href : PW);
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--disable-webgl', '--disable-webgl2', '--no-sandbox'] });
 for (const r of rows) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });

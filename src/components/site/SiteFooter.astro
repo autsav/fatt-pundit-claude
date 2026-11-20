@@ -57,12 +57,33 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
     )}
     <nav aria-label="Good to know" class="foot-nav foot-nav-small">
       <a href="/allergens/">Allergens</a><a href="/booking-terms/">Booking terms</a><a href="/accessibility/">Accessibility</a><a href="/privacy/">Privacy</a>
+      <button type="button" class="motion-toggle" data-motion-toggle aria-pressed="false">Pause motion</button>
     </nav>
     <p class="tiny">We make every effort to avoid cross-contamination, but cannot guarantee dishes and drinks are allergen-free. Please tell us about any dietary requirements when you book.{import.meta.env.PUBLIC_LAUNCH !== 'true' && ' Website demo: prices and photos to be confirmed.'}</p>
   </div>
 </footer>
+<script>
+  // Pause motion (WCAG 2.2.2): stops the rain, the loop videos and the pulsing dots. Remembered on this device.
+  const html = document.documentElement;
+  const btn = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
+  const show = () => {
+    const paused = html.dataset.motion === 'paused';
+    if (btn) { btn.setAttribute('aria-pressed', String(paused)); btn.textContent = paused ? 'Play motion' : 'Pause motion'; }
+    if (paused) for (const v of document.querySelectorAll('video')) v.pause();
+  };
+  btn?.addEventListener('click', () => {
+    const paused = html.dataset.motion !== 'paused';
+    if (paused) html.dataset.motion = 'paused'; else delete html.dataset.motion;
+    try { if (paused) localStorage.setItem('fp-motion', 'paused'); else localStorage.removeItem('fp-motion'); } catch {}
+    show();
+    window.dispatchEvent(new Event('fp:motion'));
+  });
+  show();
+</script>
 <style>
   .foot :global(p) { margin: 0; }
+  .motion-toggle { min-height: 24px; padding: 0; border: 0; background: none; color: var(--color-sand); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .motion-toggle:hover { color: var(--color-gold); }
   .goodbye { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(32px, 6vw, 96px); padding-bottom: clamp(40px, 6vw, 72px); border-bottom: 1px solid rgb(203 160 82 / 0.35); }
   .goodbye-h { font-family: var(--font-display); font-size: clamp(28px, 4vw, 54px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-sand); }
   @media (max-width: 760px) { .goodbye { grid-template-columns: 1fr; text-align: center; } .goodbye-text { order: -1; align-items: center; } }

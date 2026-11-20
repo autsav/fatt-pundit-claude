@@ -1,0 +1,854 @@
+{
+ "pages": {
+  "/404.html": {
+   "title": "Lost luggage · Fatt Pundit",
+   "titleLen": 26,
+   "desc": "This page has gone missing in transit.",
+   "descLen": 38,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/404/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 2,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Lost luggage"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 16,
+   "inlineScriptKB": 6.6,
+   "inlineStyleKB": 3.1
+  },
+  "/accessibility/": {
+   "title": "Accessibility · Fatt Pundit",
+   "titleLen": 27,
+   "desc": "How the Fatt Pundit website works for everyone, and how to tell us when it doesn't.",
+   "descLen": 83,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/accessibility/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 5,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Accessibility",
+    "h2 What we've done",
+    "h2 Known gaps",
+    "h2 Tell us"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 26.4,
+   "inlineScriptKB": 7.1,
+   "inlineStyleKB": 3
+  },
+  "/allergens/": {
+   "title": "Allergens and dietary needs · Fatt Pundit",
+   "titleLen": 41,
+   "desc": "How to eat safely at Fatt Pundit: the 14 major allergens, our menu marks, and who to ask.",
+   "descLen": 89,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/allergens/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 5,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Allergens and dietary needs",
+    "h2 The 14 major allergens",
+    "h2 Marks on our menus",
+    "h2 Ask before you book"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 26.6,
+   "inlineScriptKB": 7.1,
+   "inlineStyleKB": 3
+  },
+  "/booking-terms/": {
+   "title": "Booking terms · Fatt Pundit",
+   "titleLen": 27,
+   "desc": "Booking a table at Fatt Pundit Soho or Covent Garden: groups, deposits, changes and lateness.",
+   "descLen": 93,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/booking-terms/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 5,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Booking terms",
+    "h2 Soho",
+    "h2 Covent Garden",
+    "h2 Changes and lateness"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 26.3,
+   "inlineScriptKB": 7.1,
+   "inlineStyleKB": 3
+  },
+  "/covent-garden/": {
+   "title": "Fatt Pundit Covent Garden · Indo-Chinese Hakka restaurant · 6 Maiden Lane",
+   "titleLen": 73,
+   "desc": "Colonial Kolkata on Maiden Lane. Two bars, two floors. Dinner before the curtain goes up. Book a table at 6 Maiden Lane, Covent Garden, London, WC2E 7NA.",
+   "descLen": 153,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/covent-garden/",
+   "ogImage": "https://www.fattpundit.co.uk/og/covent-garden.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 23,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Fatt Pundit Covent Garden",
+    "h2 Colonial Kolkata on Maiden Lane. Two bars, two flo",
+    "h2 White Tiger",
+    "h4 Momos",
+    "h4 Momos continued",
+    "h4 Veg",
+    "h4 Veg continued",
+    "h4 Seafood",
+    "h4 Seafood continued",
+    "h4 Meat, game + poultry",
+    "h4 Meat, game + poultry continued",
+    "h4 Bread, rice + noodles",
+    "h4 Bread, rice + noodles continued",
+    "h4 Sides",
+    "h4 Sides continued",
+    "h4 Desserts",
+    "h4 Desserts continued",
+    "h2 Turn the pages",
+    "h2 6 Maiden Lane",
+    "h3 Opening hours",
+    "h2 Good to know",
+    "h2 The other rooms"
+   ],
+   "ld": [
+    {
+     "ok": true,
+     "types": "Restaurant",
+     "geo": true,
+     "keys": [
+      "@context",
+      "@type",
+      "@id",
+      "name",
+      "url",
+      "parentOrganization",
+      "hasMenu",
+      "geo",
+      "email",
+      "servesCuisine",
+      "priceRange",
+      "address",
+      "telephone",
+      "image",
+      "acceptsReservations",
+      "openingHoursSpecification"
+     ]
+    }
+   ],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 14,
+   "imgNoDims": 1,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 236.9,
+   "inlineScriptKB": 16.2,
+   "inlineStyleKB": 1.9
+  },
+  "/covent-garden/menu/": {
+   "title": "Covent Garden menu · Fatt Pundit",
+   "titleLen": 32,
+   "desc": "Every Fatt Pundit Covent Garden menu as a list: à la carte, set and pre-theatre menus, drinks, with vegetarian, vegan, gluten-free, dairy-free and halal marks.",
+   "descLen": 159,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/covent-garden/menu/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 67,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 The menu",
+    "h2 À la carte",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Vegan",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Gluten free",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h2 Halal",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Dairy free",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Pre-theatre",
+    "h3 To start (choose one)"
+   ],
+   "ld": [
+    {
+     "ok": true,
+     "types": "Menu",
+     "geo": false,
+     "keys": [
+      "@context",
+      "@type",
+      "name",
+      "url",
+      "isPartOf",
+      "hasMenuSection"
+     ]
+    }
+   ],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 8,
+   "htmlKB": 154.8,
+   "inlineScriptKB": 29.2,
+   "inlineStyleKB": 3
+  },
+  "/dubai/": {
+   "title": "Fatt Pundit Dubai · Opening soon at The Hangout, Mall of the Emirates",
+   "titleLen": 69,
+   "desc": "Next stop: Dubai. The Hangout, Mall of the Emirates. Boarding soon. Join the list for opening news.",
+   "descLen": 99,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/dubai/",
+   "ogImage": "https://www.fattpundit.co.uk/og/dubai.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 8,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Fatt Pundit Dubai",
+    "h2 Be first through the door",
+    "h2 Next stop: Dubai. The Hangout, Mall of the Emirate",
+    "h2 What we're packing for Dubai",
+    "h2 The Hangout",
+    "h3 Opening hours",
+    "h2 The other rooms"
+   ],
+   "ld": [
+    {
+     "ok": true,
+     "types": "Restaurant",
+     "geo": true,
+     "keys": [
+      "@context",
+      "@type",
+      "@id",
+      "name",
+      "url",
+      "parentOrganization",
+      "geo",
+      "servesCuisine",
+      "priceRange",
+      "address"
+     ]
+    }
+   ],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    },
+    {
+     "action": "(none)",
+     "method": "get"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 48.9,
+   "inlineScriptKB": 12.7,
+   "inlineStyleKB": 1.9
+  },
+  "/": {
+   "title": "Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai",
+   "titleLen": 74,
+   "desc": "Indo-Chinese Hakka cooking from Tangra, Kolkata's Chinatown. Book a table at Fatt Pundit Soho or Covent Garden, London. Opening soon in Dubai.",
+   "descLen": 142,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 29,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Fatt Pundit",
+    "h2 The voyage: Canton to Kolkata, London and Dubai",
+    "h3 Canton",
+    "h3 Kolkata",
+    "h3 London",
+    "h3 Dubai",
+    "h4 Momos",
+    "h4 Momos continued",
+    "h4 Veg",
+    "h4 Veg continued",
+    "h4 Seafood",
+    "h4 Seafood continued",
+    "h4 Meat, game + poultry",
+    "h4 Meat, game + poultry continued",
+    "h4 Bread, rice + noodles",
+    "h4 Bread, rice + noodles continued",
+    "h4 Sides",
+    "h4 Sides continued",
+    "h4 Desserts",
+    "h4 Desserts continued",
+    "h2 Turn the pages",
+    "h2 The bar THE BAR THE BAR",
+    "h3 From the bar",
+    "h2 Pull up a chair",
+    "h2 Choose your gate",
+    "h3 Soho",
+    "h3 Covent Garden",
+    "h3 Dubai"
+   ],
+   "ld": [
+    {
+     "ok": true,
+     "types": "Organization",
+     "geo": false,
+     "keys": [
+      "@context",
+      "@type",
+      "@id",
+      "name",
+      "url",
+      "logo",
+      "description",
+      "sameAs",
+      "subOrganization"
+     ]
+    }
+   ],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 23,
+   "imgNoDims": 14,
+   "imgNoAlt": 3,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    },
+    {
+     "action": "(none)",
+     "method": "get"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 191.1,
+   "inlineScriptKB": 15.4,
+   "inlineStyleKB": 1.9
+  },
+  "/og/covent-garden/": {
+   "title": "Share card · Covent Garden",
+   "titleLen": 26,
+   "robots": "noindex, nofollow",
+   "ogTitle": false,
+   "h1": 1,
+   "headings": 1,
+   "headingOrder": [
+    "h1 Covent Garden"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [],
+   "inputsNoLabel": 0,
+   "htmlKB": 4.9,
+   "inlineScriptKB": 0,
+   "inlineStyleKB": 3.6
+  },
+  "/og/dubai/": {
+   "title": "Share card · Dubai",
+   "titleLen": 18,
+   "robots": "noindex, nofollow",
+   "ogTitle": false,
+   "h1": 1,
+   "headings": 1,
+   "headingOrder": [
+    "h1 Dubai"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [],
+   "inputsNoLabel": 0,
+   "htmlKB": 5,
+   "inlineScriptKB": 0,
+   "inlineStyleKB": 3.6
+  },
+  "/og/home/": {
+   "title": "Share card · Fatt Pundit",
+   "titleLen": 24,
+   "robots": "noindex, nofollow",
+   "ogTitle": false,
+   "h1": 1,
+   "headings": 1,
+   "headingOrder": [
+    "h1 Fatt Pundit"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [],
+   "inputsNoLabel": 0,
+   "htmlKB": 5,
+   "inlineScriptKB": 0,
+   "inlineStyleKB": 3.6
+  },
+  "/og/soho/": {
+   "title": "Share card · Soho",
+   "titleLen": 17,
+   "robots": "noindex, nofollow",
+   "ogTitle": false,
+   "h1": 1,
+   "headings": 1,
+   "headingOrder": [
+    "h1 Soho"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [],
+   "inputsNoLabel": 0,
+   "htmlKB": 4.9,
+   "inlineScriptKB": 0,
+   "inlineStyleKB": 3.6
+  },
+  "/privacy/": {
+   "title": "Privacy · Fatt Pundit",
+   "titleLen": 21,
+   "desc": "What the Fatt Pundit website collects (very little) and why.",
+   "descLen": 60,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/privacy/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 5,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Privacy",
+    "h2 What we collect",
+    "h2 Bookings",
+    "h2 Contact"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 26.5,
+   "inlineScriptKB": 7.1,
+   "inlineStyleKB": 3
+  },
+  "/private-dining/": {
+   "title": "Groups and private dining · Fatt Pundit",
+   "titleLen": 39,
+   "desc": "Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers.",
+   "descLen": 117,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/private-dining/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 2,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Groups and private dining"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    },
+    {
+     "action": "mailto:reservations@fattpundit.co.uk",
+     "method": "post"
+    }
+   ],
+   "inputsNoLabel": 9,
+   "htmlKB": 30.6,
+   "inlineScriptKB": 7.8,
+   "inlineStyleKB": 4.7
+  },
+  "/soho/": {
+   "title": "Fatt Pundit Soho · Indo-Chinese Hakka restaurant · 77 Berwick Street",
+   "titleLen": 68,
+   "desc": "The first Fatt Pundit. A slip of a room on Berwick Street. Incense, ginger and a queue on a Thursday. Book a table at 77 Berwick Street, Soho, London, W1F 8TH.",
+   "descLen": 159,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/soho/",
+   "ogImage": "https://www.fattpundit.co.uk/og/soho.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 23,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 Fatt Pundit Soho",
+    "h2 The first Fatt Pundit. A slip of a room on Berwick",
+    "h2 Kid goat momo",
+    "h4 Momos",
+    "h4 Momos continued",
+    "h4 Veg",
+    "h4 Veg continued",
+    "h4 Seafood",
+    "h4 Seafood continued",
+    "h4 Meat, game + poultry",
+    "h4 Meat, game + poultry continued",
+    "h4 Bread, rice + noodles",
+    "h4 Bread, rice + noodles continued",
+    "h4 Sides",
+    "h4 Sides continued",
+    "h4 Desserts",
+    "h4 Desserts continued",
+    "h2 Turn the pages",
+    "h2 77 Berwick Street",
+    "h3 Opening hours",
+    "h2 Good to know",
+    "h2 The other rooms"
+   ],
+   "ld": [
+    {
+     "ok": true,
+     "types": "Restaurant",
+     "geo": true,
+     "keys": [
+      "@context",
+      "@type",
+      "@id",
+      "name",
+      "url",
+      "parentOrganization",
+      "hasMenu",
+      "geo",
+      "email",
+      "servesCuisine",
+      "priceRange",
+      "address",
+      "telephone",
+      "acceptsReservations",
+      "openingHoursSpecification"
+     ]
+    }
+   ],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 4,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 2,
+   "htmlKB": 213.9,
+   "inlineScriptKB": 14.3,
+   "inlineStyleKB": 1.9
+  },
+  "/soho/menu/": {
+   "title": "Soho menu · Fatt Pundit",
+   "titleLen": 23,
+   "desc": "Every Fatt Pundit Soho menu as a list: à la carte, set and pre-theatre menus, drinks, with vegetarian, vegan, gluten-free, dairy-free and halal marks.",
+   "descLen": 150,
+   "robots": "noindex, nofollow",
+   "canon": "https://www.fattpundit.co.uk/soho/menu/",
+   "ogImage": "https://www.fattpundit.co.uk/og/home.png",
+   "ogTitle": true,
+   "h1": 1,
+   "headings": 73,
+   "headingOrder": [
+    "h2 Book a table",
+    "h1 The menu",
+    "h2 À la carte",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Vegan",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Halal",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Gluten free",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h2 Dairy free",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts",
+    "h2 Pescatarian",
+    "h3 Momos"
+   ],
+   "ld": [
+    {
+     "ok": true,
+     "types": "Menu",
+     "geo": false,
+     "keys": [
+      "@context",
+      "@type",
+      "name",
+      "url",
+      "isPartOf",
+      "hasMenuSection"
+     ]
+    }
+   ],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 0,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [
+    {
+     "action": "(none)",
+     "method": "dialog"
+    }
+   ],
+   "inputsNoLabel": 8,
+   "htmlKB": 162.9,
+   "inlineScriptKB": 30.4,
+   "inlineStyleKB": 3
+  },
+  "/styleguide/": {
+   "title": "Styleguide · Fatt Pundit",
+   "titleLen": 24,
+   "robots": "noindex, nofollow",
+   "ogTitle": false,
+   "h1": 1,
+   "headings": 12,
+   "headingOrder": [
+    "h1 Fatt Pundit",
+    "h2 Type",
+    "h2 Colour",
+    "h2 Branches",
+    "h2 À la carte",
+    "h3 Momos",
+    "h3 Veg",
+    "h3 Seafood",
+    "h3 Meat, game + poultry",
+    "h3 Bread, rice + noodles",
+    "h3 Sides",
+    "h3 Desserts"
+   ],
+   "ld": [],
+   "noopenerIssues": [],
+   "extScripts": [],
+   "imgs": 1,
+   "imgNoDims": 0,
+   "imgNoAlt": 0,
+   "forms": [],
+   "inputsNoLabel": 0,
+   "htmlKB": 15.6,
+   "inlineScriptKB": 0,
+   "inlineStyleKB": 1.9
+  }
+ },
+ "dupTitles": [],
+ "dupDescs": [
+  [
+   "undefined",
+   [
+    "/og/covent-garden/",
+    "/og/dubai/",
+    "/og/home/",
+    "/og/soho/",
+    "/styleguide/"
+   ]
+  ]
+ ],
+ "sitemap": [
+  "https://www.fattpundit.co.uk/",
+  "https://www.fattpundit.co.uk/soho/",
+  "https://www.fattpundit.co.uk/soho/menu/",
+  "https://www.fattpundit.co.uk/covent-garden/",
+  "https://www.fattpundit.co.uk/covent-garden/menu/",
+  "https://www.fattpundit.co.uk/dubai/",
+  "https://www.fattpundit.co.uk/private-dining/",
+  "https://www.fattpundit.co.uk/allergens/",
+  "https://www.fattpundit.co.uk/accessibility/",
+  "https://www.fattpundit.co.uk/privacy/",
+  "https://www.fattpundit.co.uk/booking-terms/"
+ ],
+ "robots": "User-agent: *\nDisallow: /\n",
+ "internalLinks": [
+  "/",
+  "/_astro/gallery-01.CO-AmVvm.jpg",
+  "/_astro/gallery-02.DqX2e8vS.jpg",
+  "/_astro/gallery-03.BjJwLRbB.jpg",
+  "/_astro/gallery-04.DcWCLPKI.jpg",
+  "/_astro/gallery-05.ZN5rxqVK.jpg",
+  "/_astro/gallery-06.Bvu973qT.jpg",
+  "/_astro/gallery-07.BeYINrP2.jpg",
+  "/_astro/gallery-08.DsATjoEU.jpg",
+  "/accessibility/",
+  "/allergens/",
+  "/booking-terms/",
+  "/covent-garden/",
+  "/covent-garden/menu/",
+  "/dubai/",
+  "/privacy/",
+  "/private-dining/",
+  "/soho/",
+  "/soho/menu/"
+ ],
+ "missingInternal": [],
+ "external": {
+  "https://deliveroo.co.uk/menu/london/soho/fatt-pundit": 1,
+  "https://maps.apple.com/": 3,
+  "https://www.facebook.com/fattpundit/": 11,
+  "https://www.google.com/maps/search/": 9,
+  "https://www.instagram.com/fattpundit/": 11,
+  "https://www.opentable.com/r/fatt-pundit-london": 18,
+  "https://www.sevenrooms.com/reservations/fattpunditcoventgarden": 17,
+  "https://www.ubereats.com/london/food-delivery/fatt-pundit/mirV7fF6QeOiVlUK8OSNPA": 1,
+  "https://x.com/FattPundit": 11
+ }
+}

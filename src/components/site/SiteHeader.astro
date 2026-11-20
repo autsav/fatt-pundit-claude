@@ -22,6 +22,15 @@ const book = current?.booking
     ? { href: '#waitlist', label: 'Join the list', external: false }
     : { href: at('#tables'), label: 'Book a table', external: false };
 const bookAttr = current?.booking ? current.id : current ? undefined : '';
+// Phones: the text links do not fit, so an Index sheet lists every destination, numbered,
+// and a fixed dock keeps Menus, Call and Book one thumb away (creative-direction.md, section 9).
+const index = [
+  ...branches.map((b) => ({ href: `/${b.id}/`, label: b.shortName, note: b.status === 'open' ? b.address.street : 'Opening soon', here: b.id === current?.id })),
+  { href: at('#menu'), label: 'Menus', note: 'Every menu, by restaurant', here: false },
+  { href: at('#story'), label: 'Our story', note: 'Canton, Kolkata, London', here: false },
+  { href: '/private-dining/', label: 'Groups and private dining', note: 'Tables for nine or more', here: Astro.url.pathname.startsWith('/private-dining') },
+];
+const menusHref = current ? (current.status === 'open' ? `/${current.id}/menu/` : '#menu') : at('#menu');
 ---
 {import.meta.env.PUBLIC_LAUNCH !== 'true' && <p class="preview-flag"><span class="pf-long">Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed</span><span class="pf-short">Website preview, not the live site</span></p>}
 <header class="bar">
@@ -41,6 +50,45 @@ const bookAttr = current?.booking ? current.id : current ? undefined : '';
       )}
       <a class="btn btn-orange btn-sm" href={book.href} data-book={bookAttr} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="lbl-long">{book.label}</span><span class="lbl-short">{current && !current.booking ? 'Join the list' : 'Book a table'}</span></a>
     </nav>
+    <button class="idx" type="button" data-index-open aria-haspopup="dialog">Index</button>
   </div>
 </header>
 <BookDrawer />
+
+<dialog class="index" data-index aria-labelledby="index-title">
+  <div class="index-head">
+    <h2 id="index-title">Index</h2>
+    <button type="button" class="index-close" data-index-close>Close</button>
+  </div>
+  <ol class="index-list">
+    {index.map((it, i) => (
+      <li>
+        <a href={it.href} aria-current={it.here ? 'page' : undefined}>
+          <span class="index-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="index-name">{it.label}</span>
+          <span class="index-note">{it.note}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</dialog>
+
+<nav class="dock" data-dock aria-label="Quick actions">
+  <a href={menusHref}>Menus</a>
+  {current?.phone
+    ? <a href={`tel:${current.phone}`} aria-label={`Call ${current.shortName}`}>Call</a>
+    : <button type="button" data-index-open aria-haspopup="dialog">Rooms</button>}
+  <a class="dock-book" href={book.href} data-book={bookAttr} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}>{current && !current.booking ? 'Join the list' : 'Book'}</a>
+</nav>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>('[data-index]');
+  if (dlg) {
+    document.addEventListener('click', (e) => {
+      const t = e.target as Element;
+      if (t.closest('[data-index-open]')) dlg.showModal();
+      // Close, a tap on the backdrop, or choosing a destination (it may be on this page).
+      else if (t === dlg || t.closest('[data-index-close], [data-index] a')) dlg.close();
+    });
+  }
+</script>

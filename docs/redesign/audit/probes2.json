@@ -1,0 +1,75 @@
+{
+ "homeDrawer": [
+  "enter url=/ open=true log=NAV /",
+  "  tab0: INPUT ",
+  "  tab1: BUTTON One fewer guest",
+  "  tab2: BUTTON One more guest",
+  "  tab3: BUTTON Thursday 19 November",
+  "  tab4: BUTTON Friday 20 November",
+  "  tab5: BUTTON Saturday 21 November",
+  "  tab6: BUTTON Sunday 22 November",
+  "  tab7: BUTTON Monday 23 November",
+  "  tab8: BUTTON Tuesday 24 November",
+  "  tab9: BUTTON Wednesday 25 November",
+  "  tab10: BUTTON Thursday 26 November",
+  "  tab11: BUTTON Friday 27 November",
+  "  tab12: BUTTON Saturday 28 November",
+  "  tab13: BUTTON Sunday 29 November",
+  "  tab14: BUTTON Monday 30 November",
+  "  tab15: BUTTON Tuesday 1 December",
+  "  tab16: BUTTON Wednesday 2 December",
+  "  tab17: BUTTON Thursday 3 December",
+  "  tab18: BUTTON Friday 4 December",
+  "  tab19: BUTTON Saturday 5 December",
+  "  tab20: BUTTON Sunday 6 December",
+  "  tab21: BUTTON Monday 7 December",
+  "  tab22: BUTTON Tuesday 8 December",
+  "  tab23: BUTTON Wednesday 9 December",
+  "  tab24: BUTTON 5pm",
+  "  tab25: BUTTON 5.30pm",
+  "  tab26: BUTTON 6pm",
+  "  tab27: BUTTON 6.30pm",
+  "  tab28: BUTTON 7pm",
+  "  tab29: BUTTON 7.30pm",
+  "after tabs url=/ open=true log=",
+  "time url=/ open=true log=",
+  "go url=/ open=false log=",
+  "opened=[\"https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-19T17%3A00&covers=2&lang=en-GB\"]"
+ ],
+ "cg": {
+  "plate": "false -> true",
+  "caption": "Kid goat momo, £8.50",
+  "galleryHref": "/_astro/gallery-01.CO-AmVvm.jpg target=_blank",
+  "galleryLog": [
+   "NAV about:blank",
+   "NAV /covent-garden/",
+   "NEWTAB /_astro/gallery-01.CO-AmVvm.jpg"
+  ],
+  "galleryDialogs": 0,
+  "videos": [
+   "cg-booths-glow.B4nEEiPZ.mp4 t 0.79->0.79 paused=true loop=true parent=arrival-media is-photo",
+   "cg-lights-on.UNRYFZUg.mp4 t 5.04->5.04 paused=true loop=false parent=frame"
+  ]
+ },
+ "chipFocus": {
+  "input": "V",
+  "focusVisible": true,
+  "labelOutline": "none 3px",
+  "labelShadow": "none",
+  "spanOutline": "solid 3px",
+  "spanShadow": "none"
+ },
+ "arrival@390": {
+  "doneAtMs": 4231,
+  "sinceCheckMs": 2190,
+  "domInteractive": 1027
+ },
+ "arrival@1440": {
+  "doneAtMs": 3362,
+  "sinceCheckMs": 2183,
+  "domInteractive": 146
+ },
+ "skipTargets": [
+  "#tables exists=true"
+ ]
+}

@@ -1,0 +1,1258 @@
+{
+ "home@390": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 7,
+    "nodes": [
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-slate > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.53 (foreground color: #faf6ef, background color: #758591, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-slate > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 3.53 (foreground color: #faf6ef, background color: #758591, font size: 9.0pt (12px), font weight: bold). Expected c"
+    ]
+   },
+   {
+    "id": "label-content-name-mismatch",
+    "impact": "serious",
+    "help": "Elements must have their visible text as part of their accessible name",
+    "n": 3,
+    "nodes": [
+     ".pass-tiger > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     ".pass-gold > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     "a[href$=\"#wl-dubai\"] ::   Text inside the element is not included in the accessible name"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 157
+   }
+  ]
+ },
+ "home@1440": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 7,
+    "nodes": [
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-slate > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.53 (foreground color: #faf6ef, background color: #758591, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-slate > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 3.53 (foreground color: #faf6ef, background color: #758591, font size: 9.0pt (12px), font weight: bold). Expected c"
+    ]
+   },
+   {
+    "id": "label-content-name-mismatch",
+    "impact": "serious",
+    "help": "Elements must have their visible text as part of their accessible name",
+    "n": 3,
+    "nodes": [
+     ".pass-tiger > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     ".pass-gold > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     "a[href$=\"#wl-dubai\"] ::   Text inside the element is not included in the accessible name"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 164
+   }
+  ]
+ },
+ "home@390-calm": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 8,
+    "nodes": [
+     ".voyage-boarding ::   Element has insufficient color contrast of 2.88 (foreground color: #f15d3d, background color: #f6efe4, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-slate > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.53 (foreground color: #faf6ef, background color: #758591, font size: 9.0pt (12px), font weight: bold). Expected c"
+    ]
+   },
+   {
+    "id": "label-content-name-mismatch",
+    "impact": "serious",
+    "help": "Elements must have their visible text as part of their accessible name",
+    "n": 3,
+    "nodes": [
+     ".pass-tiger > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     ".pass-gold > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     "a[href$=\"#wl-dubai\"] ::   Text inside the element is not included in the accessible name"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 142
+   }
+  ]
+ },
+ "home@1440-calm": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 8,
+    "nodes": [
+     ".voyage-boarding ::   Element has insufficient color contrast of 2.88 (foreground color: #f15d3d, background color: #f6efe4, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-tiger > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 3.05 (foreground color: #faf6ef, background color: #f15d3d, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-gold > .pass-main > .pass-head > span:nth-child(2) ::   Element has insufficient color contrast of 2.11 (foreground color: #f6efe4, background color: #cba052, font size: 9.0pt (12px), font weight: bold). Expected c",
+     ".pass-slate > .pass-main > .pass-head > span:nth-child(1) ::   Element has insufficient color contrast of 3.53 (foreground color: #faf6ef, background color: #758591, font size: 9.0pt (12px), font weight: bold). Expected c"
+    ]
+   },
+   {
+    "id": "label-content-name-mismatch",
+    "impact": "serious",
+    "help": "Elements must have their visible text as part of their accessible name",
+    "n": 3,
+    "nodes": [
+     ".pass-tiger > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     ".pass-gold > .pass-stub[data-tear=\"\"][target=\"_blank\"] ::   Text inside the element is not included in the accessible name",
+     "a[href$=\"#wl-dubai\"] ::   Text inside the element is not included in the accessible name"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 148
+   }
+  ]
+ },
+ "soho@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 75
+   }
+  ]
+ },
+ "soho@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 84
+   }
+  ]
+ },
+ "soho@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   },
+   {
+    "id": "scrollable-region-focusable",
+    "impact": "serious",
+    "help": "Scrollable region must have keyboard access",
+    "n": 1,
+    "nodes": [
+     ".gap-6 ::   Element should have focusable content"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 93
+   }
+  ]
+ },
+ "soho@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   },
+   {
+    "id": "scrollable-region-focusable",
+    "impact": "serious",
+    "help": "Scrollable region must have keyboard access",
+    "n": 1,
+    "nodes": [
+     ".gap-6 ::   Element should have focusable content"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 105
+   }
+  ]
+ },
+ "cg@390": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 1,
+    "nodes": [
+     ".cue ::   Element has insufficient color contrast of 2.01 (foreground color: #f15d3d, background color: #dac7b5, font size: 13.5pt (18px), font weight: normal). Expecte"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 81
+   },
+   {
+    "id": "video-caption",
+    "n": 2
+   }
+  ]
+ },
+ "cg@1440": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 1,
+    "nodes": [
+     ".cue ::   Element has insufficient color contrast of 2.01 (foreground color: #f15d3d, background color: #dac7b5, font size: 13.5pt (18px), font weight: normal). Expecte"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 95
+   },
+   {
+    "id": "video-caption",
+    "n": 2
+   }
+  ]
+ },
+ "cg@1440-calm": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 1,
+    "nodes": [
+     ".cue ::   Element has insufficient color contrast of 2.01 (foreground color: #f15d3d, background color: #dac7b5, font size: 13.5pt (18px), font weight: normal). Expecte"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 95
+   },
+   {
+    "id": "video-caption",
+    "n": 2
+   }
+  ]
+ },
+ "cg@390-calm": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 1,
+    "nodes": [
+     ".cue ::   Element has insufficient color contrast of 2.01 (foreground color: #f15d3d, background color: #dac7b5, font size: 13.5pt (18px), font weight: normal). Expecte"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 81
+   },
+   {
+    "id": "video-caption",
+    "n": 2
+   }
+  ]
+ },
+ "dubai@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 13
+   }
+  ]
+ },
+ "dubai@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 13
+   }
+  ]
+ },
+ "dubai@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 13
+   }
+  ]
+ },
+ "dubai@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 13
+   }
+  ]
+ },
+ "soho-menu@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 157
+   },
+   {
+    "id": "color-contrast",
+    "n": 10
+   }
+  ]
+ },
+ "soho-menu@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 157
+   },
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "soho-menu@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 157
+   },
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "soho-menu@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 157
+   },
+   {
+    "id": "color-contrast",
+    "n": 9
+   }
+  ]
+ },
+ "cg-menu@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 147
+   },
+   {
+    "id": "color-contrast",
+    "n": 9
+   }
+  ]
+ },
+ "cg-menu@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 147
+   },
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "cg-menu@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 147
+   },
+   {
+    "id": "color-contrast",
+    "n": 8
+   }
+  ]
+ },
+ "private-dining@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 3
+   }
+  ]
+ },
+ "cg-menu@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "aria-prohibited-attr",
+    "n": 147
+   },
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "private-dining@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "private-dining@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "private-dining@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "allergens@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "allergens@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 3
+   }
+  ]
+ },
+ "allergens@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "allergens@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "privacy@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 3
+   }
+  ]
+ },
+ "privacy@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "privacy@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "privacy@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "accessibility@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 4
+   }
+  ]
+ },
+ "accessibility@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "accessibility@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "accessibility@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "booking-terms@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 3
+   }
+  ]
+ },
+ "booking-terms@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "booking-terms@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "booking-terms@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 2
+   }
+  ]
+ },
+ "404@390": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": []
+ },
+ "404@1440": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": []
+ },
+ "404@390-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-short ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": []
+ },
+ "404@1440-calm": {
+  "violations": [
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 1,
+    "nodes": [
+     ".pf-long ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": []
+ },
+ "styleguide@390": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 4,
+    "nodes": [
+     ".bg-tiger ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-tiger > .font-bold ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: bold). Expected ",
+     ".bg-slate ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-slate > .font-bold ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: bold). Expected "
+    ]
+   },
+   {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "help": "Document should have one main landmark",
+    "n": 1,
+    "nodes": [
+     "html ::   Document does not have a main landmark"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 4,
+    "nodes": [
+     "section:nth-child(2) ::   Some page content is not contained by landmarks",
+     "section:nth-child(3) ::   Some page content is not contained by landmarks",
+     "section:nth-child(4) ::   Some page content is not contained by landmarks",
+     "section:nth-child(5) ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 1
+   }
+  ]
+ },
+ "styleguide@1440": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 4,
+    "nodes": [
+     ".bg-tiger ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-tiger > .font-bold ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: bold). Expected ",
+     ".bg-slate ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-slate > .font-bold ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: bold). Expected "
+    ]
+   },
+   {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "help": "Document should have one main landmark",
+    "n": 1,
+    "nodes": [
+     "html ::   Document does not have a main landmark"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 4,
+    "nodes": [
+     "section:nth-child(2) ::   Some page content is not contained by landmarks",
+     "section:nth-child(3) ::   Some page content is not contained by landmarks",
+     "section:nth-child(4) ::   Some page content is not contained by landmarks",
+     "section:nth-child(5) ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": []
+ },
+ "styleguide@1440-calm": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 4,
+    "nodes": [
+     ".bg-tiger ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-tiger > .font-bold ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: bold). Expected ",
+     ".bg-slate ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-slate > .font-bold ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: bold). Expected "
+    ]
+   },
+   {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "help": "Document should have one main landmark",
+    "n": 1,
+    "nodes": [
+     "html ::   Document does not have a main landmark"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 4,
+    "nodes": [
+     "section:nth-child(2) ::   Some page content is not contained by landmarks",
+     "section:nth-child(3) ::   Some page content is not contained by landmarks",
+     "section:nth-child(4) ::   Some page content is not contained by landmarks",
+     "section:nth-child(5) ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": []
+ },
+ "styleguide@390-calm": {
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "n": 4,
+    "nodes": [
+     ".bg-tiger ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-tiger > .font-bold ::   Element has insufficient color contrast of 4.39 (foreground color: #2c2925, background color: #f15d3d, font size: 12.0pt (16px), font weight: bold). Expected ",
+     ".bg-slate ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: normal). Expecte",
+     ".bg-slate > .font-bold ::   Element has insufficient color contrast of 2.32 (foreground color: #dac7b5, background color: #758591, font size: 12.0pt (16px), font weight: bold). Expected "
+    ]
+   },
+   {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "help": "Document should have one main landmark",
+    "n": 1,
+    "nodes": [
+     "html ::   Document does not have a main landmark"
+    ]
+   },
+   {
+    "id": "region",
+    "impact": "moderate",
+    "help": "All page content should be contained by landmarks",
+    "n": 4,
+    "nodes": [
+     "section:nth-child(2) ::   Some page content is not contained by landmarks",
+     "section:nth-child(3) ::   Some page content is not contained by landmarks",
+     "section:nth-child(4) ::   Some page content is not contained by landmarks",
+     "section:nth-child(5) ::   Some page content is not contained by landmarks"
+    ]
+   }
+  ],
+  "incomplete": [
+   {
+    "id": "color-contrast",
+    "n": 1
+   }
+  ]
+ }
+}

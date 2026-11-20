@@ -60,7 +60,7 @@ function byDay(b: Branch) {
               <span class="pass-code">{CODES[b.id] ?? b.shortName}</span>
             </div>
           </div>
-          <h3 id={`pass-${b.id}`} class="pass-name"><a href={`/${b.id}/`} class="pass-more" data-step>{b.shortName}</a></h3>
+          <h3 id={`pass-${b.id}`} class="pass-name"><a href={`/${b.id}/`} class="pass-more" data-step-inside>{b.shortName}</a></h3>
           <dl class="pass-fields">
             <div><dt>Gate</dt><dd>{b.address.street}</dd></div>
             <div><dt>Flight</dt><dd>FP {b.page.opened ?? '——'}</dd></div>
@@ -82,7 +82,7 @@ function byDay(b: Branch) {
           )}
           <p class="pass-links">
             {b.phone && <a href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
-            <a href={`/${b.id}/`} class="pass-more" data-step>{open ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`}</a>
+            <a href={`/${b.id}/`} class="pass-more" data-step-inside>{open ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`}</a>
           </p>
           {open && <p class="pass-links"><a href={`?at=${b.id}#menu`} data-menu-at={b.id}>See the {b.shortName} menu</a></p>}
           <span class="pass-boarding" aria-hidden="true">{open ? 'Boarding' : 'Opening soon'}</span>
@@ -93,12 +93,12 @@ function byDay(b: Branch) {
           data-tear
           href={open ? b.booking!.url : `#wl-${b.id}`}
           {...(open ? { target: '_blank', rel: 'noopener' } : {})}
-          aria-label={open ? `Book a table at ${b.shortName} on ${via} (opens in a new tab)` : `Join the ${b.shortName} waitlist`}
         >
-          {stamps[b.id] ? <Image src={stamps[b.id]} alt="" width={120} class="stub-stamp" /> : <span class="stub-stamp stub-gate">{CODES[b.id]}</span>}
+          {stamps[b.id] ? <Image src={stamps[b.id]} alt="" width={120} class="stub-stamp" /> : <span class="stub-stamp stub-gate" aria-hidden="true">{CODES[b.id]}</span>}
           <span class="stub-text">
             <span class="stub-cta">{open ? `Book at ${b.shortName}` : 'Join the list'}</span>
             <span class="stub-via">{open ? `Tear the stub: ${via}` : 'Bookings open soon'}</span>
+            {open && <span class="sr-only">(opens in a new tab)</span>}
           </span>
           <svg class="stub-bars" viewBox="0 0 196 28" preserveAspectRatio="none" aria-hidden="true">
             {bars(b.id).map((r) => <rect x={r.x} y="0" width={r.w} height="28" />)}
@@ -200,7 +200,7 @@ function byDay(b: Branch) {
   }
 
   // Stepping inside: the pass's stamp thuds, then the page morphs (view transition).
-  for (const a of document.querySelectorAll<HTMLAnchorElement>('[data-step]')) {
+  for (const a of document.querySelectorAll<HTMLAnchorElement>('a[data-step-inside]')) {
     a.addEventListener('click', (e) => {
       if (calm || e.metaKey || e.ctrlKey || e.shiftKey) return;
       e.preventDefault();
@@ -221,8 +221,7 @@ function byDay(b: Branch) {
 
   .pass-main { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 0 22px 22px; background: var(--color-paper);
     background-image: radial-gradient(rgb(44 41 37 / 0.05) 1px, transparent 1.3px); background-size: 6px 6px; border-radius: 10px 10px 0 0; overflow: hidden; }
-  .pass-head { display: flex; justify-content: space-between; margin: 0 -22px; padding: 10px 22px; background: var(--band); color: var(--color-paper); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
-  .pass-slate .pass-head, .pass-tiger .pass-head { color: var(--color-paper-light); }
+  .pass-head { display: flex; justify-content: space-between; margin: 0 -22px; padding: 10px 22px; background: var(--band); color: var(--color-ink-deep); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
   .pass-route { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 12px; }
   .pass-end { display: flex; flex-direction: column; gap: 2px; }
   .pass-to { text-align: right; }
@@ -260,7 +259,7 @@ function byDay(b: Branch) {
   .pass-stub:hover { transform: rotate(-1.5deg) translateY(2px); }
   .pass-stub:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 3px; }
   .pass-stub :global(.stub-stamp) { width: 58px; height: auto; grid-row: span 2; }
-  .stub-gate { display: grid; place-items: center; width: 58px; aspect-ratio: 0.8; border: 2px dashed var(--band); color: var(--band); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; }
+  .stub-gate { display: grid; place-items: center; width: 58px; aspect-ratio: 0.8; border: 2px dashed var(--band); color: var(--color-slate-deep); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; }
   .stub-text { display: flex; flex-direction: column; gap: 2px; }
   .stub-cta { font-size: 19px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink); }
   .pass-stub:hover .stub-cta { color: var(--band); }

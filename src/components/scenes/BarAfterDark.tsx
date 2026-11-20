@@ -43,7 +43,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
     let t0 = performance.now();
 
     const frame = (now: number) => {
-      if (mode === 'sweep' && now > tapUntil) {
+      if (mode === 'sweep' && now > tapUntil && document.documentElement.dataset.motion !== 'paused') {
         // A slow figure-of-eight across the bar.
         const t = (now - t0) / 1000;
         target.x = 50 + 34 * Math.sin(t * 0.45);

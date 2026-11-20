@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction A · The traveller's desk</title>
+<link rel="stylesheet" href="base.css">
+<style>
+body { background: var(--sand); }
+.cap { font-weight: 700; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 24px; font: 700 16px AT; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; background: var(--tiger); color: var(--ink-deep); box-shadow: 4px 4px 0 rgb(0 0 0 / .45); }
+.btn.line { background: none; box-shadow: none; border: 2px solid currentColor; color: inherit; }
+/* header */
+.hd { background: var(--ink-deep); color: var(--paper); display: flex; align-items: center; gap: 32px; padding: 14px var(--m); }
+.hd .wm { font-weight: 700; font-size: 20px; letter-spacing: .16em; text-transform: uppercase; margin-right: auto; }
+.hd nav { display: flex; gap: 28px; } .hd nav a { text-decoration: none; }
+.hd .btn { min-height: 44px; font-size: 14px; box-shadow: none; }
+.hd .menu { display: none; }
+/* hero */
+.hero { background: var(--ink-deep); color: var(--paper); padding: 56px var(--m) 0; position: relative; }
+.hero .desk { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; max-width: 1320px; margin: 0 auto; align-items: start; }
+.print { background: var(--paper-light); padding: 12px 12px 44px; box-shadow: 8px 8px 0 rgb(0 0 0 / .5); position: relative; }
+.print figcaption { position: absolute; left: 14px; bottom: 11px; font-size: 13px; color: var(--ink); letter-spacing: .04em; }
+.hero .print { grid-column: 1 / 8; margin-right: 12px; grid-row: 1; margin-left: -40px; transform: rotate(-1.2deg); height: 520px; }
+.hero .words { grid-column: 8 / 13; grid-row: 1; padding-top: 20px; position: relative; z-index: 2; }
+.hero h1 { font-size: clamp(46px, 6vw, 88px); line-height: .94; text-transform: uppercase; letter-spacing: -.01em; margin: 14px 0 20px; text-shadow: 0 0 24px var(--ink-deep), 0 0 6px var(--ink-deep); }
+.hero h1 span { color: var(--tiger); }
+.spoken { font: italic 500 clamp(20px, 2vw, 28px)/1.35 Lora, serif; color: var(--sand); max-width: 22ch; }
+.stamp { position: absolute; right: var(--m); top: 372px; width: 116px; z-index: 3; }
+.board { grid-column: 3 / 13; grid-row: 2; margin-top: -50px; position: relative; z-index: 4; background: #0e0c0a; border: 3px solid #3a3530; box-shadow: 8px 8px 0 rgb(0 0 0 / .5); padding: 6px 0; transform: translateY(44px); }
+.board .row { display: grid; grid-template-columns: 70px 1.2fr 1.4fr 1.2fr 150px; gap: 20px; align-items: center; padding: 14px 24px; border-bottom: 1px solid #2a2622; font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+.board .row:last-child { border: 0; } .board .hdr { font-size: 12px; color: #a39a8d; padding-block: 8px; }
+.board b { color: var(--paper); font-size: 22px; } .board .ok { color: #9fd18b; } .board .soon { color: #a9b7c1; }
+.board .btn { min-height: 44px; font-size: 14px; padding: 0 12px; box-shadow: none; }
+/* kitchen */
+.kitchen { padding: 150px var(--m) 110px; }
+.kitchen .in { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; }
+.kitchen h2 { grid-column: 1 / 8; font-size: clamp(38px, 6.6vw, 96px); line-height: .95; text-transform: uppercase; }
+.kitchen .lede { grid-column: 9 / 13; align-self: end; font-size: 19px; }
+.kitchen .lede .spoken { color: var(--tiger-deep); margin: 0 0 12px; max-width: none; }
+.pile { grid-column: 1 / 13; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; margin-top: 56px; }
+.pile .print { height: 380px; grid-row: 1; }
+.pile .p1 { grid-column: 1 / 6; transform: rotate(-1.5deg); z-index: 3; }
+.pile .p2 { grid-column: 5 / 10; transform: rotate(1deg) translateY(56px); z-index: 2; }
+.pile .p3 { grid-column: 9 / 13; transform: rotate(-.6deg) translateY(-14px); }
+.tag { position: absolute; right: -14px; bottom: -22px; background: var(--paper-light); border: 1.5px solid var(--ink); padding: 10px 16px 10px 34px; font-size: 15px; box-shadow: 3px 3px 0 rgb(26 23 20 / .35); max-width: 270px; }
+.tag::before { content: ""; position: absolute; left: 12px; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--sand); }
+.tag b { display: block; text-transform: uppercase; letter-spacing: .06em; }
+.kitchen .more { grid-column: 1 / 13; margin-top: 110px; display: flex; gap: 16px; flex-wrap: wrap; }
+/* gates */
+.gates { background: var(--ink-deep); color: var(--paper); padding: 96px var(--m) 110px; }
+.gates .in { max-width: 1320px; margin: 0 auto; }
+.gates h2 { font-size: clamp(38px, 6.6vw, 96px); line-height: .95; text-transform: uppercase; margin: 10px 0 48px; }
+.passes { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.pass { display: grid; grid-template-columns: 1fr 200px; background: var(--paper-light); color: var(--ink-deep); box-shadow: 8px 8px 0 rgb(0 0 0 / .5); }
+.pass .main { padding: 0 0 22px; } .pass .band { background: var(--tiger-deep); color: var(--paper-light); padding: 9px 22px; display: flex; justify-content: space-between; }
+.pass.cg .band { background: var(--gold-deep); }
+.pass .route { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; padding: 20px 22px 6px; font-weight: 700; font-size: clamp(26px, 3vw, 44px); text-transform: uppercase; line-height: 1; }
+.pass .route small { font-size: 15px; font-weight: 400; letter-spacing: .1em; }
+.pass dl { display: grid; grid-auto-flow: column; grid-template-rows: auto auto; gap: 4px 28px; padding: 12px 22px 0; justify-content: start; }
+.pass dt { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-deep); font-weight: 700; } .pass dd { font-size: 16px; }
+.pass .stub { border-left: 2px dashed var(--ink); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; background: var(--paper); }
+.pass .stub .btn { width: 100%; padding: 0 8px; font-size: 14px; text-align: center; }
+.pass.dxb { grid-column: 1 / 3; grid-template-columns: 1fr 300px; background: var(--slate-deep); color: var(--paper); }
+.pass.dxb .band { background: #0e0c0a; } .pass.dxb dt { color: var(--sand); } .pass.dxb .stub { background: #3b4853; border-color: var(--sand); }
+@media (max-width: 760px) {
+  .hd nav, .hd .wm + nav { display: none; } .hd { gap: 10px; padding-block: 10px; } .hd .wm { font-size: 16px; }
+  .hd .menu { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 2px solid var(--paper); font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+  .hd .btn { padding: 0 14px; }
+  .hero { padding-top: 28px; } .hero .desk, .kitchen .in, .pile { display: block; }
+  .hero .print { margin: 0 6px; height: 250px; padding: 8px 8px 34px; } .hero .words { margin: 26px 0 0; padding: 0; }
+  .spoken { margin-left: 0; }
+  .stamp { width: 70px; top: 318px; right: 20px; }
+  .board { transform: translateY(32px); margin-top: 24px; }
+  .board .hdr { display: none; } .board .row { grid-template-columns: 1fr 112px; gap: 2px 12px; padding: 14px 16px; font-size: 13px; }
+  .board .row > :nth-child(1) { display: none; } .board .row > :nth-child(2), .board .row > :nth-child(3), .board .row > :nth-child(4) { grid-column: 1; } .board .row > :nth-child(5) { grid-column: 2; grid-row: 1 / 4; }
+  .kitchen { padding: 96px var(--m) 72px; } .kitchen .lede { margin-top: 18px; }
+  .pile { margin-top: 36px; } .pile .print { height: 250px; transform: none !important; margin-bottom: 56px; padding: 8px 8px 30px; } .pile .p2 { margin-left: 18px; margin-right: -8px; } .pile .p3 { margin-right: 18px; }
+  .tag { right: 10px; } .kitchen .more { margin-top: 0; } .kitchen .more .btn { width: 100%; }
+  .gates { padding: 64px var(--m) 72px; } .passes { grid-template-columns: 1fr; gap: 24px; }
+  .pass, .pass.dxb { grid-column: auto; grid-template-columns: 1fr; } .pass .stub { border-left: 0; border-top: 2px dashed var(--ink); flex-direction: row; align-items: center; } .pass .stub .btn { width: auto; flex: 1; } .pass .stub .cap { font-size: 11px; max-width: 9ch; }
+  .pass dl { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: 1fr; gap: 0; } .pass dd { margin-bottom: 8px; }
+}
+</style></head><body>
+<header class="hd"><span class="wm">Fatt Pundit</span>
+<nav class="cap"><a href="#">Soho</a><a href="#">Covent Garden</a><a href="#">Dubai</a><a href="#">Menus</a><a href="#">Private dining</a></nav>
+<span class="menu">Menu</span><a class="btn" href="#">Book</a></header>
+<section class="hero"><div class="desk">
+<figure class="print"><img class="photo" src="../../../src/assets/video/cg-lights-on-lit.jpg" alt="Covent Garden dining room with blue plates on the wall"><figcaption>Covent Garden · the plate wall</figcaption></figure>
+<div class="words"><p class="cap" style="color:var(--gold)">Now arriving</p>
+<h1>Canton.<br>Kolkata.<br><span>London.</span></h1>
+<p class="spoken">Hakka cooking, carried by sea and served in Soho and Covent Garden.</p></div>
+<div class="board" role="table" aria-label="Departures">
+<div class="row hdr"><span>Gate</span><span>Destination</span><span>Address</span><span>Today · Thu</span><span></span></div>
+<div class="row"><span>01</span><b>Soho</b><span>77 Berwick Street</span><span class="ok">Open · till 22:30</span><a class="btn" href="#">Book</a></div>
+<div class="row"><span>02</span><b>Covent Garden</b><span>6 Maiden Lane</span><span class="ok">Open · till 22:30</span><a class="btn" href="#">Book</a></div>
+<div class="row"><span>03</span><b>Dubai</b><span>Mall of the Emirates</span><span class="soon">Boarding soon</span><a class="btn line" href="#">Join list</a></div>
+</div></div>
+<img class="stamp" src="../../../src/assets/images/brand/stamp-orange.png" alt="Fatt Pundit stamp (existing brand file)">
+</section>
+<section class="kitchen"><div class="in">
+<h2>From the kitchen</h2>
+<div class="lede"><p class="spoken">Order for the table. Everything is made to share.</p><p>Momos first, then the wok. Prices are from the current menu data.</p></div>
+<div class="pile">
+<figure class="print p1"><img class="photo" src="../../../src/assets/images/dishes/momo-mix-vegetable.jpg" alt="Green vegetable momo on a banana leaf"><div class="tag"><b>Mix vegetable momo</b>spinach, mushroom, courgette + tofu · £7</div></figure>
+<figure class="print p2"><img class="photo" src="../../../src/assets/images/dishes/crackling-spinach.jpg" alt="Crackling spinach with pomegranate"><div class="tag"><b>Crackling spinach</b>sweet yoghurt, date + plum sauce · £11</div></figure>
+<figure class="print p3"><img class="photo" src="../../../src/assets/images/dishes/crispy-okra-salt-n-pepper.jpg" alt="Crispy okra in a paper-lined bowl"><div class="tag"><b>Crispy okra salt ‘n’ pepper</b>pink salt, chillies, burnt garlic · £11</div></figure>
+</div>
+<div class="more"><a class="btn" href="#">See the Soho menu</a><a class="btn line" href="#">Covent Garden menu</a></div>
+</div></section>
+<section class="gates"><div class="in"><p class="cap" style="color:var(--gold)">Your table</p><h2>Choose your gate</h2>
+<div class="passes">
+<article class="pass"><div class="main"><div class="band cap"><span>Boarding pass</span><span>Gate 01</span></div><div class="route">Soho <small>London W1F 8TH</small></div>
+<dl><dt>Address</dt><dd>77 Berwick Street</dd><dt>Today</dt><dd>12:00–14:30 · 17:00–22:30</dd></dl></div>
+<div class="stub"><span class="cap">Admit your party</span><a class="btn" href="#">Book Soho</a></div></article>
+<article class="pass cg"><div class="main"><div class="band cap"><span>Boarding pass</span><span>Gate 02</span></div><div class="route">Covent Garden <small>WC2E 7NA</small></div>
+<dl><dt>Address</dt><dd>6 Maiden Lane</dd><dt>Today</dt><dd>12:00–14:30 · 17:00–22:30</dd></dl></div>
+<div class="stub"><span class="cap">Admit your party</span><a class="btn" href="#">Book Covent Gdn</a></div></article>
+<article class="pass dxb"><div class="main"><div class="band cap"><span>Standby</span><span>Gate 03</span></div><div class="route">Dubai <small>Boarding soon</small></div>
+<dl><dt>Address</dt><dd>The Hangout, Mall of the Emirates</dd><dt>Status</dt><dd>Opening date to be announced</dd></dl></div>
+<div class="stub"><span class="cap">Be first aboard</span><a class="btn line" href="#">Join the waitlist</a></div></article>
+</div></div></section>
+<p class="mocknote">Design mock · Direction A · not production · headline wording is draft · stamp and photos are existing project files</p>
+</body></html>

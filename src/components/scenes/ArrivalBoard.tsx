@@ -15,20 +15,20 @@ export default function ArrivalBoard() {
   const [text, setText] = useState(START);
 
   useEffect(() => {
-    const go = window.setTimeout(() => setText(TARGET), 250);
+    const go = window.setTimeout(() => setText(TARGET), 150);
     return () => window.clearTimeout(go);
   }, []);
 
   // Stamp the moment the last flap lands, plus a short beat so the eye reads the name.
   const settled = () => {
-    if (text === TARGET) window.setTimeout(() => window.dispatchEvent(new Event('fp:board-done')), 260);
+    if (text === TARGET) window.setTimeout(() => window.dispatchEvent(new Event('fp:board-done')), 120);
   };
 
   return (
     <SplitFlapText
       className="font-display text-[clamp(30px,7.4vw,92px)] tracking-normal"
       length={11}
-      maxFlips={6}
+      maxFlips={4}
       onSettled={settled}
       text={text}
       tileClassName="bg-[#3a3631] text-sand shadow-[inset_0_0_0_1px_rgb(203_160_82/0.35),0_6px_14px_rgb(0_0_0/0.45)]"

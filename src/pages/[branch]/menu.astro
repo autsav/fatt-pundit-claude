@@ -101,7 +101,7 @@ const ld = {
               <li class="menu-item" data-dish={i.id} data-tags={i.tags.join(' ')} data-text={`${i.name} ${i.desc}`.toLowerCase()}>
                 <div class="mi-head">
                   <span class="mi-name">{i.name}</span>
-                  {i.tags.length > 0 && <span class="mi-tags" aria-label={i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}>{i.tags.join(' · ')}</span>}
+                  {i.tags.length > 0 && <span class="mi-tags"><span aria-hidden="true">{i.tags.join(' · ')}</span><span class="sr-only">{i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}</span></span>}
                   {i.price && <span class="mi-price">{i.price}</span>}
                 </div>
                 {i.desc && <p class="mi-desc">{i.desc}</p>}

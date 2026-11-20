@@ -36,7 +36,7 @@ const H = world.h;
 /** The chart image runs past the route box on every side. */
 const SEA = world.sea;
 const PORTS: { id: string; name: string; at: Pt; dx: number; dy: number; anchor: 'start' | 'end' }[] = [
-  { id: 'canton', name: 'Canton', at: world.points.canton as Pt, dx: 14, dy: -14, anchor: 'end' },
+  { id: 'canton', name: 'Canton', at: world.points.canton as Pt, dx: 14, dy: -40, anchor: 'end' },
   { id: 'kolkata', name: 'Kolkata', at: world.points.kolkata as Pt, dx: 14, dy: -14, anchor: 'end' },
   { id: 'london', name: 'London', at: world.points.london as Pt, dx: 14, dy: 30, anchor: 'start' },
   { id: 'dubai', name: 'Dubai', at: world.points.dubai as Pt, dx: 14, dy: -14, anchor: 'end' },

@@ -114,7 +114,7 @@ function paginate(menu: MenuLite, z: Sizes): PageData[] {
 function Frame({ art, children }: { art: Art; children: ReactNode }) {
   return (
     <div className="relative size-full bg-paper-light">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-[2.6cqw]" style={{ borderStyle: 'solid', borderWidth: '3.6cqw', borderImage: `url(${art.frame}) 60 stretch` }} />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-[2.6cqw]" style={{ borderStyle: 'solid', borderWidth: '3.6cqw', borderImage: `url(${art.frame}) 2.33% 3.25% stretch` }} />
       <div className="absolute inset-[9cqw] flex flex-col">{children}</div>
     </div>
   );

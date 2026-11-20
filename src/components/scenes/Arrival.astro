@@ -1,5 +1,5 @@
 ---
-// Scene 0: arrival. First visit only, skippable, ~2 s.
+// Scene 0: arrival. First visit on this device only, ~1.5 s. Skip, a tap, a key or a scroll ends it.
 // A departure board clatters into FATT PUNDIT, the tiger stamp thuds down,
 // and the board splits open onto the rainy street.
 import { stampSrc } from '../../lib/stamp';
@@ -14,7 +14,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   // Decide before first paint, so returning guests never see a flash of the board.
   (function () {
     var d = document.documentElement, play = true;
-    try { play = !sessionStorage.getItem('fp-arrived'); } catch (e) {}
+    try { play = !(localStorage.getItem('fp-arrived') || sessionStorage.getItem('fp-arrived')); } catch (e) {}
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) play = false;
     d.dataset.arrival = play ? 'play' : 'skip';
   })();
@@ -22,10 +22,10 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 
 <!-- The stamp is the biggest thing on the first screen: fetch it first. -->
 <link rel="preload" as="image" href={stampImg.src} fetchpriority="high" />
-<div class="arrival" data-arrival-overlay aria-hidden="true">
+<div class="arrival" data-arrival-overlay>
   <div class="half top"></div>
   <div class="half bottom"></div>
-  <div class="center">
+  <div class="center" aria-hidden="true">
     <p class="kicker">Now arriving</p>
     <div class="board"><ArrivalBoard client:load /></div>
     <p class="route">Canton, Kolkata, London, Dubai</p>
@@ -59,16 +59,26 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     if (!root || !root.isConnected) return;
     root.remove();
     html.dataset.arrival = 'done';
-    try { sessionStorage.setItem('fp-arrived', '1'); } catch {}
+    try { localStorage.setItem('fp-arrived', '1'); } catch {}
     window.dispatchEvent(new Event('fp:arrived'));
   }
 
   if (root && html.dataset.arrival === 'play') {
     document.body.style.overflow = 'hidden';
+    // While the board is up, nothing behind it can take keyboard focus (only Skip can).
+    const behind: HTMLElement[] = [];
+    for (let el: HTMLElement = root; el.parentElement && el !== document.body; el = el.parentElement) {
+      for (const s of el.parentElement.children) if (s !== el && s instanceof HTMLElement && !s.inert && !/^(SCRIPT|STYLE|LINK)$/.test(s.tagName)) { s.inert = true; behind.push(s); }
+    }
+    const ac = new AbortController();
     let started = false;
     const open = (fast = false) => {
       if (started) return;
       started = true;
+      ac.abort();
+      for (const s of behind) s.inert = false;
+      // The shutter is about to open: give scrolling back now, not when the last frame lands.
+      window.setTimeout(() => { document.body.style.overflow = ''; }, fast ? 0 : 760);
       // The board is leaving: take it out of the accessibility tree and the tab order now,
       // not when the last frame lands (a fading label is not content).
       root.setAttribute('aria-hidden', 'true');
@@ -84,14 +94,17 @@ const stampImg = { src: await stampSrc(stamp, 320) };
           // …the whole board jolts from the impact…
           .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, '-=40')
           // …a breath, then it splits open like a station shutter.
-          .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, '+=220');
+          .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, '+=100');
       }
-      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 680, ease: 'inOutExpo' }, fast ? 0 : '-=120')
-        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 680, ease: 'inOutExpo' }, '<<')
+      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, fast ? 0 : '-=120')
+        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, '<<')
         .add('.arrival .skip-arrival', { opacity: 0, duration: 150 }, '<<');
     };
     window.addEventListener('fp:board-done', () => open(false), { once: true });
     root.querySelector('[data-skip]')?.addEventListener('click', () => open(true));
+    // Any attempt to get on with it ends the intro: a tap, a scroll, or a key (Tab still reaches Skip).
+    for (const ev of ['pointerdown', 'wheel', 'touchmove'] as const) window.addEventListener(ev, () => open(true), { passive: true, signal: ac.signal });
+    window.addEventListener('keydown', (e) => { if (e.key !== 'Tab' && e.key !== 'Shift') open(true); }, { signal: ac.signal });
     // Safety net: never trap a guest behind the board.
     window.setTimeout(() => open(true), 4500);
   } else {

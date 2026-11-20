@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction C · After dark</title>
+<link rel="stylesheet" href="base.css">
+<style>
+body { background: #0e0c0a; color: var(--paper); }
+.cap { font-size: 12px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; }
+.pill { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; border-radius: 999px; font: 700 14px AT; letter-spacing: .16em; text-transform: uppercase; text-decoration: none; background: var(--tiger); color: var(--ink-deep); }
+.pill.o { background: none; border: 1.5px solid var(--paper); color: var(--paper); }
+/* hero */
+.hero { position: relative; height: 860px; overflow: hidden; }
+.hero > img { position: absolute; inset: 0; }
+.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(14 12 10 / .7) 0%, rgb(14 12 10 / .1) 26%, rgb(14 12 10 / .25) 50%, rgb(14 12 10 / .94) 100%); }
+.hd { position: absolute; z-index: 3; top: 0; left: 0; right: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 22px var(--m); }
+.hd nav { display: flex; gap: 30px; } .hd nav a { text-decoration: none; }
+.hd .wm { font-weight: 700; font-size: 21px; letter-spacing: .34em; text-transform: uppercase; padding-left: .34em; }
+.hd .r { justify-self: end; display: flex; gap: 24px; align-items: center; }
+.hero .txt { position: absolute; z-index: 2; left: var(--m); right: var(--m); bottom: 148px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+.hero h1 { font: italic 500 clamp(58px, 9.4vw, 148px)/.94 Lora, serif; letter-spacing: -.02em; }
+.hero .txt p { max-width: 30ch; font-size: 18px; color: var(--sand); padding-bottom: 14px; }
+.hero .txt p .cap { display: block; color: var(--gold); margin-bottom: 10px; }
+/* booking bar */
+.bar { position: absolute; z-index: 3; left: var(--m); right: var(--m); bottom: 36px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr auto; background: rgb(26 23 20 / .92); border: 1px solid rgb(246 239 228 / .28); }
+.bar > div { padding: 14px 22px; border-right: 1px solid rgb(246 239 228 / .2); }
+.bar .cap { color: var(--gold); font-size: 11px; display: block; margin-bottom: 2px; } .bar b { font-size: 19px; font-weight: 400; }
+.bar .seg { display: flex; gap: 8px; margin-top: 4px; } .bar .seg span { padding: 3px 14px; border: 1px solid rgb(246 239 228 / .45); border-radius: 999px; font-size: 15px; } .bar .seg .on { background: var(--paper); color: var(--ink-deep); border-color: var(--paper); }
+.bar .pill { border-radius: 0; min-height: 100%; padding: 0 38px; font-size: 15px; }
+/* reel */
+.reel { padding: 120px 0 0; }
+.reel .top { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 var(--m) 40px; gap: 24px; }
+.reel h2 { font: italic 500 clamp(40px, 5.6vw, 84px)/1 Lora, serif; letter-spacing: -.015em; }
+.reel .top a { white-space: nowrap; text-underline-offset: 6px; }
+.tiles { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1.25fr; gap: 6px; padding: 0 6px; }
+.tile { position: relative; height: 560px; overflow: hidden; }
+.tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgb(14 12 10 / .92) 100%); }
+.tile div { position: absolute; z-index: 2; left: 22px; right: 22px; bottom: 20px; }
+.tile b { display: block; font: italic 500 28px/1.1 Lora, serif; } .tile span { font-size: 15px; color: var(--sand); } .tile i { font-style: normal; float: right; color: var(--gold); font-size: 17px; }
+/* rooms cta */
+.rooms { padding: 120px 6px 6px; }
+.rooms h2 { text-align: center; font: italic 500 clamp(40px, 5.6vw, 84px)/1 Lora, serif; margin-bottom: 14px; }
+.rooms > p { text-align: center; color: var(--sand); margin-bottom: 44px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.room { position: relative; height: 600px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 40px; }
+.room > img { position: absolute; inset: 0; } .room::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(14 12 10 / .1) 20%, rgb(14 12 10 / .78) 58%, rgb(14 12 10 / .96) 100%); }
+.room > :not(img) { position: relative; z-index: 2; }
+.room h3 { font-weight: 700; font-size: clamp(34px, 4.4vw, 64px); line-height: 1; text-transform: uppercase; letter-spacing: .04em; margin: 8px 0 6px; }
+.room p { color: var(--sand); margin-bottom: 22px; } .room .cap { color: var(--gold); }
+.room.ph { background: var(--tiger-deep); } .room.ph::after { background: linear-gradient(180deg, transparent 30%, rgb(14 12 10 / .75) 100%); }
+.room.ph .note { position: absolute; top: 28px; left: 40px; border: 1px dashed var(--paper); padding: 6px 12px; font-size: 13px; z-index: 2; }
+.dock { display: none; }
+@media (max-width: 760px) {
+  .hd { grid-template-columns: auto 1fr; padding: 16px var(--m); } .hd nav, .hd .r .lk, .hd .r .pill { display: none; } .hd .wm { font-size: 16px; letter-spacing: .26em; padding: 0; }
+  .hd .r::after { content: "Menu"; font-weight: 700; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; border: 1.5px solid var(--paper); border-radius: 999px; padding: 12px 18px; }
+  .hero { height: 780px; } .hero .txt { display: block; bottom: 176px; } .hero h1 { font-size: 66px; } .hero .txt p { margin-top: 14px; padding: 0; font-size: 16px; } .hero::after { background: linear-gradient(180deg, rgb(14 12 10 / .7) 0%, rgb(14 12 10 / .1) 22%, rgb(14 12 10 / .8) 52%, rgb(14 12 10 / .96) 100%); }
+  .bar { grid-template-columns: 1fr 1fr; bottom: 86px; } .bar > div { padding: 10px 14px; } .bar > div:nth-child(1) { grid-column: 1 / 3; border-right: 0; border-bottom: 1px solid rgb(246 239 228 / .2); } .bar > div:nth-child(1) { display: flex; align-items: center; gap: 14px; border: 0 !important; } .bar > div:nth-child(2), .bar > div:nth-child(3), .bar > div:nth-child(4), .bar > .pill { display: none !important; }
+  .bar > div:nth-child(2) { grid-column: 1 / 3; border: 0; display: flex; justify-content: space-between; align-items: center; } .bar > div:nth-child(2)::after { content: "2 guests · 19:30"; color: var(--sand); }
+  .reel { padding-top: 72px; } .reel .top { display: block; padding-bottom: 24px; } .reel .top a { display: inline-block; margin-top: 12px; }
+  .tiles { grid-template-columns: 78% 78% 78% 78%; overflow: hidden; padding: 0 0 0 var(--m); } .tile { height: 420px; }
+  .rooms { padding-top: 72px; } .rooms > p { padding: 0 var(--m); margin-bottom: 28px; } .split { grid-template-columns: 1fr; } .room { height: 400px; padding: 24px; } .room.ph .note { left: 24px; }
+  .dock { display: grid; grid-template-columns: 1fr 1fr 1.6fr; position: absolute; z-index: 5; left: 0; right: 0; top: 708px; height: 72px; background: #0e0c0a; border-top: 1px solid rgb(246 239 228 / .25); }
+  .dock span { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; } .dock .go { background: var(--tiger); color: var(--ink-deep); font-size: 14px; }
+}
+</style></head><body>
+<section class="hero">
+<img class="photo" src="../../../src/assets/images/covent-garden/gallery-01.jpg" alt="Green-walled Covent Garden dining room with lamps lit">
+<header class="hd"><nav class="cap"><a href="#">Rooms</a><a href="#">Menus</a><a href="#">Private dining</a></nav>
+<span class="wm">Fatt Pundit</span>
+<div class="r"><span class="cap lk">Open till 22:30</span><a class="pill o" href="#">Book</a></div></header>
+<div class="txt"><h1>Pull up<br>a chair.</h1>
+<p><span class="cap">Soho · Covent Garden · Dubai soon</span>Hakka cooking from Kolkata's Chinatown. Momos, the wok, and a long drink while you wait.</p></div>
+<div class="bar"><div><span class="cap">Room</span><div class="seg"><span class="on">Soho</span><span>Covent Garden</span></div></div>
+<div><span class="cap">Date</span><b>Tonight, Thu 19</b></div><div><span class="cap">Guests</span><b>2 people</b></div><div><span class="cap">Time</span><b>19:30</b></div>
+<a class="pill" href="#">Find a table</a></div>
+<div class="dock"><span>Menus</span><span>Call</span><span class="go">Find a table</span></div>
+</section>
+
+<section class="reel"><div class="top"><h2>Tonight, from the kitchen</h2><a class="cap" href="#">See the full menus →</a></div>
+<div class="tiles">
+<figure class="tile"><img class="photo" src="../../../src/assets/images/dishes/momo-mix-vegetable.jpg" alt="Green vegetable momo on a banana leaf"><div><i>£7</i><b>Mix vegetable momo</b><span>spinach, mushroom, courgette + tofu</span></div></figure>
+<figure class="tile"><img class="photo" src="../../../src/assets/images/dishes/crackling-spinach.jpg" alt="Crackling spinach with pomegranate"><div><i>£11</i><b>Crackling spinach</b><span>sweet yoghurt, date + plum sauce</span></div></figure>
+<figure class="tile"><img class="photo" src="../../../src/assets/images/journey/05-bar-guava-chilli-sour.jpg" alt="Guava chilli sour with fresh guava"><div><b>Guava chilli sour</b><span>from the bar</span></div></figure>
+<figure class="tile"><img class="photo" src="../../../src/assets/images/dishes/sizzling-brownie.jpg" alt="Sizzling brownie with ice cream in a skillet"><div><b>Sizzling brownie</b><span>to finish</span></div></figure>
+</div></section>
+
+<section class="rooms"><h2>Which room tonight?</h2><p>Both London rooms are open until 22:30.</p>
+<div class="split">
+<article class="room"><img class="photo" src="../../../src/assets/images/covent-garden/gallery-06.jpg" alt="Covent Garden banquette table set for dinner"><span class="cap">6 Maiden Lane · WC2E 7NA</span><h3>Covent Garden</h3><p>Today 12:00–14:30 · 17:00–22:30</p><a class="pill" href="#">Book Covent Garden</a></article>
+<article class="room ph"><span class="note">Placeholder: Soho photography not yet supplied</span><span class="cap">77 Berwick Street · W1F 8TH</span><h3>Soho</h3><p>Today 12:00–14:30 · 17:00–22:30</p><a class="pill" href="#">Book Soho</a></article>
+</div></section>
+<p class="mocknote">Design mock · Direction C · not production · body wording is draft · photos are existing project files · Soho panel is a labelled placeholder</p>
+</body></html>

@@ -20,7 +20,7 @@ interface Props {
 const { title, description, kicker, heading, noindex, wide } = Astro.props;
 const branches = await getBranches();
 ---
-<Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex}>
+<Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex} preloadBody>
   <a class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} />
   <main id="content" class="info">
@@ -40,7 +40,10 @@ const branches = await getBranches();
   .wide .info-body { max-width: none; }
   .info-kicker { margin: 0; color: var(--color-tiger-deep); }
   .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
-  .info-body { font-size: 18px; line-height: 1.65; max-width: 64ch; overflow-wrap: anywhere; }
+  /* The measure is in em, not ch: a ch is as wide as the font's zero, so the column changed width
+     (and the text re-wrapped) when the brand font replaced the fallback. 32.7em = the old 64ch. */
+  .info-body { font-size: 18px; line-height: 1.65; max-width: 32.7em; overflow-wrap: anywhere; }
+  @media (min-width: 1600px) { .info-body { font-size: 20px; } }
   .info-body :global(h2) { margin: 36px 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
   .info-body :global(p), .info-body :global(ul) { margin: 0 0 14px; }
   .info-body :global(a) { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }

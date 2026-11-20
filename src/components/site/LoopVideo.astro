@@ -21,7 +21,7 @@ const { src, poster, label, class: className } = Astro.props;
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       const v = e.target as HTMLVideoElement;
-      if (e.isIntersecting) v.play().catch(() => {});
+      if (e.isIntersecting && document.documentElement.dataset.motion !== 'paused') v.play().catch(() => {});
       else v.pause();
     }
   }, { threshold: 0.25 });
@@ -29,5 +29,7 @@ const { src, poster, label, class: className } = Astro.props;
   // browser is idle, so they never compete with the first paint.
   const watch = () => { for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-loop]')) io.observe(v); };
   const later = () => ('requestIdleCallback' in window ? requestIdleCallback(watch, { timeout: 3000 }) : setTimeout(watch, 1500));
+  // "Play motion" pressed again: look at each loop afresh so the ones on screen restart.
+  addEventListener('fp:motion', () => { if (calm || document.documentElement.dataset.motion === 'paused') return; for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-loop]')) { io.unobserve(v); io.observe(v); } });
   if (!calm) { if (document.readyState === 'complete') later(); else addEventListener('load', later, { once: true }); }
 </script>

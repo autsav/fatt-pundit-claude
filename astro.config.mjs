@@ -32,7 +32,11 @@ export default defineConfig({
       provider: fontProviders.local(),
       name: backup ? 'Kameron' : 'American Typewriter',
       cssVariable: '--font-typewriter',
-      fallbacks: ['Courier New', 'monospace'],
+      // The stand-in while the brand font loads is drawn in global.css ("FP Typewriter Fallback"),
+      // with its own width per weight: Astro's automatic one uses a single width, which is far too
+      // narrow for the bold capitals, so titles re-wrapped when the font arrived.
+      fallbacks: ['FP Typewriter Fallback', 'Courier New', 'monospace'],
+      optimizedFallbacks: false,
       options: {
         variants: backup
           ? [

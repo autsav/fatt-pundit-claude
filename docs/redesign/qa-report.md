@@ -95,6 +95,137 @@ These are single runs, so expect ±5 on Perf. For comparison, todo.md [T] record
 - **New finding, not the header:** `/allergens/` (0.245 @768 → 0.055 @1440) and `/privacy/` (0.116 @768) shift on desktop sizes because the body text reflows when the typewriter font replaces Courier New (paragraphs lose a line, content moves up ~30 px). The nav doesn't move. Phones (touch emulation): 0. Moved to slice 2.7 (info pages): needs a metric-matched fallback (`size-adjust`) or `font-display` handling for the body font.
 - **Lighthouse mobile:** Soho P99 A100 BP100. Home P86 A100 BP100 CLS 0.000. Home A/B with this slice stashed vs applied, 2 runs each: 86/87 vs 86/88, observed LCP ~0.30 s in both, so no effect from this slice. Home's lab score ranges 86–88 between runs (the baseline 88 was a single run).
 
+### Comprehensive audit (19 Nov 2026, HEAD 49a9828, no code changes)
+Findings and score: `comprehensive-audit.md`. Raw data: `audit/*.json`.
+
+**Environment and tools:**
+- Same PC, Node, Edge and WASM workaround as the baseline.
+- Tools were installed in a scratch folder, not in the project: puppeteer-core 24.43, Lighthouse 12.8.2, axe-core 4.14.1, playwright-core 1.65, sharp 0.34.
+- `@axe-core/puppeteer` would not load (package exports), so `axe.min.js` was injected directly.
+
+**Commands (measured):**
+
+| Command | Result |
+| --- | --- |
+| `npm run check` | 0 errors, 0 warnings, 5 hints |
+| `npm test` | pass |
+| `npm run validate:data` | 0 errors, 7 warnings (unchanged) |
+| `npm run build` | 17 pages, 2.7 s |
+| `npm audit` | 0 vulnerabilities |
+| `npm outdated` | astro 7.4.13 (patch), typescript 7 (major), web-vitals 6 (major) |
+
+**Sweep:**
+- **Coverage:** 13 routes × {375, 390, 768 touch, 1024, 1440, 1920} + calm {390, 1440} = 104 loads, 3 in parallel.
+- **What each load did:**
+  - measured at the top of the page
+  - scrolled 0.6 screen per step (scene pages) or 0.9 (others), waiting for in-view images, measuring each step and capturing a frame
+  - measured again at the bottom
+- **Results:**
+  - sideways scroll 0 on all public pages; `/styleguide/` 7–8 px at 375/390
+  - 0 JS errors
+  - failed request: only `cg-lights-on.mp4` (aborted range request)
+  - small targets failing the 2.5.8 spacing rule: 0
+  - CLS > 0.01: `/allergens/` 0.139 @1024, 0.055 @1440, 0.039 @1920, 0.047 @1440 calm; CG 0.033 @1440; Soho calm 0.052 (while scrolling)
+- The observed-LCP column in `sweep.json` was taken under 3× parallel load. It is not a performance measure.
+
+**axe (WCAG 2.2 AA + best practice, after a full scroll, at 390/1440 normal + calm):**
+- **serious `color-contrast`:**
+  - home: 8 nodes, boarding-pass bands, 2.11–3.05:1
+  - CG: `.cue`, 2.01:1
+  - styleguide: swatches
+- **serious `label-content-name-mismatch`:** home, 3
+- **serious `scrollable-region-focusable`:** Soho, calm only
+- **moderate `region`:** preview banner, every page
+- **moderate `landmark-one-main`:** styleguide
+- **Needs review:** `aria-prohibited-attr` 1,216 nodes (menu tag spans); `video-caption` 8 (silent loops)
+
+**Lighthouse (one run each, home ×3 on mobile):**
+- **Mobile Perf:**
+  - home 87 / 90 / 88, LCP 3.73 / 3.48 / 3.63 s
+  - Soho 98 (LCP 2.11 s)
+  - CG 96 (LCP 2.64 s)
+  - Dubai 99, Soho menu 99, allergens 100, private dining 100
+- **Desktop:** 100 on all 7 pages, LCP 0.39–0.73 s.
+- **Other scores:** A11y 100 and BP 100 everywhere. SEO 66–69 (only `is-crawlable`, noindex by design).
+
+**Scroll jank** (the same method as `perf-budget.mjs`, run with playwright-core + Edge because the script's `execFileSync('lighthouse')` fails on Windows), 2 runs each:
+
+| Page | Dropped frames |
+| --- | --- |
+| Home | 1.3% / 1.3% |
+| Soho | 0.3% / 0.2% |
+| CG | 0.7% / 1.2% |
+| Dubai | 0.3% / 0.8% |
+| Soho menu | 0.2% / 0.2% |
+
+All are under the 2% budget.
+
+**Keyboard:**
+- **Coverage:** 254 tab stops (home 1440, Soho 1440 and 768, Soho menu 1440).
+- **Focus visibility:** no focus indicator missing.
+- **Hidden focus:** 3 stops under the arrival overlay while it plays.
+- **Booking drawer:** opens on Enter, keeps focus inside over 30 tabs, closes on Escape, returns focus (Soho, CG). Days and times are 31 separate tab stops.
+
+**Probes:**
+
+| Probe | Result |
+| --- | --- |
+| Drawer URLs | Soho: `opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-19T17:00&covers=2&lang=en-GB`. CG: `sevenrooms.com/explore/fattpunditcoventgarden/reservations/create/search/?date=2026-11-19&party_size=2&start_time=17:00` |
+| Group message | Shown at 11 guests |
+| **Home drawer +/−** | **Navigates to `/undefined` (404) at 390 and 1440, normal motion; stays on `/` in calm; Soho unaffected**. Cause: `BoardingPasses.astro:203` selects every `[data-step]` |
+| Menu (390, 1440) | 186 dishes; "momo" 19; nonsense 0 + empty message; V filter 94; tools sticky at ≥1024 (780 px tall), static on phone (355 px) |
+| Dubai waitlist | Empty submit blocked; valid submit shows "Thanks. (Demo only: nothing was sent.)" |
+| Private dining | Empty submit marks date, guests, name and email invalid and focuses date |
+| CG plate | Real tap flips it (false → true) and the caption reads "Kid goat momo, £8.50" |
+| CG gallery tap | Opens `/_astro/gallery-01.CO-AmVvm.jpg` (original 665 KB) in a new tab |
+| CG loop videos | Both paused while on screen after scrolling away and back (headless; unverified) |
+| Intro | Releases the page 2.18–2.19 s after it starts (390 and 1440) |
+| Phone header | Logo + Book only on `/`, `/soho/` and `/allergens/`; dock only on branch pages |
+
+### Slice 2.3b (19 Nov 2026): home booking fix, smoke test, budget script on Windows
+
+- **Cause (audit C01):** `BoardingPasses.astro` attached its "step inside" click handler to every `[data-step]` element. The Book drawer's + and − buttons use `data-step="1"` / `"-1"`, so on the home page they were sent to `button.href`, which is `undefined`.
+- **Fix:** the pass links now use `data-step-inside`, and the handler selects `a[data-step-inside]`. Three lines changed.
+- **New test:** `npm run test:smoke` (`scripts/smoke-booking.mjs`). Home (Soho and Covent Garden chosen in the drawer), /soho/ and /covent-garden/, at phone and desktop sizes: opens the drawer, presses + and −, checks the page stays put and the count changes, then checks the booking link (OpenTable `covers=2`, SevenRooms `party_size=2`). The booking sites are never loaded.
+- **Result on the old build:** fails, "+ navigated to /undefined", home at both sizes. **On the new build:** 8 of 8 pass.
+- `npm run check`: 0 errors. `npm run build`: 17 pages.
+- **Budget script on Windows:** now runs with `LIGHTHOUSE=<path to lighthouse/cli/index.js>` and defaults to Edge. One run, home and Soho: performance 94 / 99, observed LCP 315 / 280 ms, TBT 176 / 3 ms, CLS 0 / 0, weight 975 / 267 KB, dropped frames **5.7% / 0.7%**. Home breaks the 2% dropped-frames budget in this run. The audit measured 1.3% or less with the arrival intro skipped; this script does not skip it, and the PC was short of memory during the run. Not re-run, so the cause is unconfirmed. The change in this slice only renames an attribute.
+- Not tested: real phones, Safari, Firefox. The smoke test needs a browser and playwright supplied from outside the project, like the budget script.
+
+### Slices 2.3c and 2.3d (20 Nov 2026)
+
+**2.3c accessibility.** Checked with axe (WCAG 2.0 to 2.2 A and AA rules) on `/`, `/soho/`, `/covent-garden/`, `/dubai/` and `/soho/menu/` at 390 and 1440, normal and calm: **0 violations** on all 20 loads, no sideways scroll, no JS errors.
+- Contrast (C03): pass bands now set ink-deep on the band colour (was paper, 2.1 to 3.1:1); the lights-on cue and the "Boarding soon" tag use tiger-deep; the Dubai gate code uses slate-deep.
+- Labels (C04): pass stubs take their name from the visible words, plus a hidden "(opens in a new tab)".
+- Pause (C05): a "Pause motion" button in the footer stops the rain, loop videos, the bar sweep and pulsing dots, and is remembered on the device. Measured on Covent Garden: 1 video playing, 0 after pausing, 0 after a reload, 1 after "Play motion".
+- Calm scroller (C06): the Soho room strip can take keyboard focus.
+- Intro (C07, O12): shown once per device, not once per session. While it plays, the first Tab lands on Skip and nothing behind it takes focus. A wheel, tap or key ends it (scroll back in 54 ms). The board now takes about 0.8 s from the moment it starts (it was about 1.5 s).
+- Diet tags (C15): the meaning is real hidden text, not an `aria-label` on a span.
+- Book drawer (C16): each of the day and time groups is one tab stop with arrow keys. From the day group to "Find a table" is 2 Tab presses (it was 31 or more).
+
+**2.3d weight.** `frame.png` now goes through the image pipeline: 131 KB WebP (it was a 1.26 MB PNG); seen by eye on an open menu page at 1440. Branch gallery photos open in the same lightbox as the home page, from a 1600 px WebP, not the original JPEG in a new tab.
+- Home lab LCP (C12) is unchanged: simulated 3.6 to 3.8 s, painted 0.25 to 0.37 s. Left as it is; field data decides.
+
+**Budget script, same PC, same hour:**
+
+| Build | Page | Perf | Painted LCP | TBT | CLS | Weight | Dropped frames |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Before (49a9828) | / | 88 | 246 ms | 53 ms | 0 | 976 KB | 12.4% |
+| Before (49a9828) | /covent-garden/ | 99 | 183 ms | 3 ms | 0 | 996 KB | 8.8% |
+| After 2.3d | / | 86 | 373 ms | 39 ms | 0 | 976 KB | 6.0% |
+| After 2.3d | /covent-garden/ | 99 | 162 ms | 3 ms | 0 | 996 KB | 6.3% |
+| After 2.3d | /soho/ | 99 | 324 ms | 5 ms | 0 | 267 KB | 0.7% |
+
+The dropped-frame budget (2%) fails on this PC for the old build as well, and by more. The audit measured 1.3% or less on the same code, so today's figures show a loaded machine, not a change in the site. Single runs; treat differences of a few points as noise.
+
+Also run: `npm run check` 0 errors, `npm test` passes, build 17 pages, booking smoke test 8 of 8.
+
+### Slice 2.4: visit strip under the branch hero (20 Nov 2026)
+- One ledger row on paper: today's status and hours (live, branch timezone), address, nearest stations, Call / Directions / Book. Phones show one fact per line; the actions are already in the hero. Dubai shows "Opening soon" and "Join the list".
+- Checked on `/soho/`, `/covent-garden/`, `/dubai/` at 390, 768, 1440 and calm 1440: no sideways scroll, nothing in the strip past the edge, 0 JS errors, CLS 0 to 0.033, axe (WCAG 2.0 to 2.2 A/AA) **0 violations** on all 12 loads.
+- Fixed during the gate: the "Good to know" luggage tags (2.5 work already on the branch) were a `<dl>` with an extra wrapper div, which axe flags (`definition-list`, `dlitem`). Now a list of tags with an `h3` each; looks the same.
+- Screenshots: `slices/2.4/`. Also run: `npm run check` 0 errors, `npm test` passes, build 17 pages, booking smoke test 8 of 8.
+
 ### Not tested in baseline
 Real devices, Safari/Firefox, screen readers, keyboard-only walkthrough, INP in the field, newsletter, Plausible, the live Sheet CSV, the scroll-jank part of `perf-budget.mjs` (it needs Playwright).
 

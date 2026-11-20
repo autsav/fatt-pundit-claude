@@ -190,7 +190,7 @@
 .voyage-postmark { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 3px double var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; rotate: -12deg; opacity: 0.85; }
 .voyage-pic { display: block; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: 62% 58%; border: 1px solid rgb(44 41 37 / 0.3); }
 @media (max-width: 1023px) { .voyage-pic { aspect-ratio: 16 / 5; } }
-.voyage-boarding { display: inline-block; margin-left: 4px; padding: 1px 8px; border: 2px solid var(--color-tiger); color: var(--color-tiger); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; rotate: -4deg; }
+.voyage-boarding { display: inline-block; margin-left: 4px; padding: 1px 8px; border: 2px solid var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; rotate: -4deg; }
 .fp-pill-swap { display: inline-block; animation: fp-pill-in 0.35s cubic-bezier(0.23, 1, 0.32, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -294,3 +294,17 @@
 .tonight-flap { font-size: min(32px, calc(100cqw / (var(--n, 24) * 0.8))); }
 /* Branch hero name board: the intended size, but never wider than its column (container = .board-slot). */
 .arrival-flap { font-size: min(clamp(22px, 4.6vw, 56px), calc(100cqw / (var(--n, 13) * 0.8))); }
+
+/* "Pause motion" (footer button): the loops that never end on their own stand still. */
+html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, [data-idle='true']) { animation: none !important; }
+
+/* Stand-in for the typewriter font while it loads: Courier New, resized per weight so lines break in
+   the same places and nothing jumps when the brand font arrives. Measured on this site's own text:
+   light and regular in sentence case. */
+@font-face { font-family: 'FP Typewriter Fallback'; src: local('Courier New'), local('Liberation Mono'), local('Cousine'); font-weight: 300; size-adjust: 79.8%; ascent-override: 111.4%; descent-override: 31.3%; }
+@font-face { font-family: 'FP Typewriter Fallback'; src: local('Courier New'), local('Liberation Mono'), local('Cousine'); font-weight: 400; size-adjust: 81%; ascent-override: 109.8%; descent-override: 30.9%; }
+/* Bold: in the brand font capitals are much wider than lower case; in Courier every glyph is the
+   same width. Two cuts by character range keep both capital titles and bold words in sentences on
+   the same lines. (For a moment on a slow first visit, bold capitals look larger than their lower case.) */
+@font-face { font-family: 'FP Typewriter Fallback'; src: local('Courier New Bold'), local('Courier New'), local('Liberation Mono Bold'), local('Cousine Bold'); font-weight: 700; unicode-range: U+41-5A; size-adjust: 124%; ascent-override: 71.7%; descent-override: 20.2%; }
+@font-face { font-family: 'FP Typewriter Fallback'; src: local('Courier New Bold'), local('Courier New'), local('Liberation Mono Bold'), local('Cousine Bold'); font-weight: 700; unicode-range: U+0-40, U+5B-10FFFF; size-adjust: 80%; ascent-override: 111.1%; descent-override: 31.3%; }

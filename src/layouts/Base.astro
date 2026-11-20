@@ -13,8 +13,10 @@ interface Props {
   noindex?: boolean;
   /** Share card id: public/og/<id>.png (made by scripts/make-og.mjs). */
   og?: string;
+  /** Text pages: also preload the regular cut, so paragraphs do not re-wrap (layout shift) when it lands. */
+  preloadBody?: boolean;
 }
-const { title, description, noindex = false, og = 'home' } = Astro.props;
+const { title, description, noindex = false, og = 'home', preloadBody = false } = Astro.props;
 // Until launch the whole site is a preview: hidden from search, banner on.
 // Set PUBLIC_LAUNCH=true in the host's build settings on launch day.
 const launched = import.meta.env.PUBLIC_LAUNCH === 'true';
@@ -50,6 +52,10 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <meta property="og:image:alt" content="A Fatt Pundit boarding pass with the tiger stamp" />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>
+      // The guest's own "Pause motion" choice (footer button), applied before first paint.
+      try { if (localStorage.getItem('fp-motion') === 'paused') document.documentElement.dataset.motion = 'paused'; } catch (e) {}
+    </script>
+    <script is:inline>
       // A fresh visit starts at the top. Some in-app viewers keep the last page's scroll offset,
       // which landed guests at the bottom of a shorter page. Back/forward and #links keep theirs.
       (() => {
@@ -68,7 +74,7 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
       for (const t of ['pageswap', 'pagereveal']) addEventListener(t, (e) => { const v = e.viewTransition; if (v) for (const k of ['ready', 'finished', 'updateCallbackDone']) v[k]?.catch(() => {}); });
     </script>
     <!-- Preload only the bold cut: it sets every title on the first screen. -->
-    <Font cssVariable="--font-typewriter" preload={[{ weight: 700 }]} />
+    <Font cssVariable="--font-typewriter" preload={preloadBody ? [{ weight: 700 }, { weight: 400 }] : [{ weight: 700 }]} />
     <!-- Lora italic sets the hero line and every board status: load it with
          the first paint so lines don't re-wrap (layout shift) when it lands. -->
     <Font cssVariable="--font-lora" preload />

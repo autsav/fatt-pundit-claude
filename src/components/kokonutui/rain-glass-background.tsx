@@ -577,7 +577,7 @@ export default function RainGlassBackground({
     };
     const start = () => {
       if (!woken) return;
-      if (!raf && visible && !reduceMotion) {
+      if (!raf && visible && !reduceMotion && document.documentElement.dataset.motion !== "paused") {
         last = 0;
         raf = requestAnimationFrame(frame);
       }
@@ -626,6 +626,14 @@ export default function RainGlassBackground({
       start();
     };
     document.addEventListener("visibilitychange", onVisibility);
+    // The footer's "Pause motion" button.
+    const onMotion = () => {
+      if (document.documentElement.dataset.motion === "paused") {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else start();
+    };
+    window.addEventListener("fp:motion", onMotion);
     const colorTimer = window.setInterval(() => {
       if (!visible) {
         return;
@@ -696,6 +704,7 @@ export default function RainGlassBackground({
       resizeObserver.disconnect();
       intersection.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("fp:motion", onMotion);
       root.removeEventListener("pointerdown", onDown);
       root.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);

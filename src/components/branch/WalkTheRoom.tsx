@@ -62,7 +62,7 @@ export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; acce
   if (calm) {
     return (
       <section aria-label="Walk the room" className="bg-ink py-16">
-        <div className="flex gap-6 overflow-x-auto px-[6vw] pb-4">{frames}</div>
+        <div tabIndex={0} role="group" aria-label="Stops in the room. Scroll sideways." className="flex gap-6 overflow-x-auto px-[6vw] pb-4">{frames}</div>
       </section>
     );
   }

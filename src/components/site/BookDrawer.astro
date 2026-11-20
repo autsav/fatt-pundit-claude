@@ -59,7 +59,7 @@ const data = branches.map((b) => ({
 
     <fieldset class="book-field">
       <legend>Time</legend>
-      <div class="book-times" data-book-times></div>
+      <div class="book-times" data-book-times role="radiogroup" aria-label="Time"></div>
       <p class="book-closed" data-book-closed hidden>Closed that day. Pick another day.</p>
     </fieldset>
 
@@ -162,7 +162,11 @@ const data = branches.map((b) => ({
     const radio = (el: HTMLElement, cls: string, on: boolean, label: string, html: string, onPick: () => void) => {
       const btn = document.createElement('button');
       btn.type = 'button'; btn.className = cls; btn.setAttribute('role', 'radio'); btn.setAttribute('aria-checked', String(on)); btn.setAttribute('aria-label', label);
-      btn.innerHTML = html; btn.addEventListener('click', onPick); el.append(btn);
+      // One tab stop per group (the chosen one); arrow keys move between options.
+      btn.tabIndex = on ? 0 : -1;
+      btn.innerHTML = html;
+      btn.addEventListener('click', () => { const had = el.contains(document.activeElement); onPick(); if (had) el.querySelector<HTMLElement>('[aria-checked="true"]')?.focus(); });
+      el.append(btn);
     };
 
     const drawDays = () => {
@@ -196,6 +200,14 @@ const data = branches.map((b) => ({
       go.setAttribute('aria-disabled', String(tooMany || !time));
     };
     const draw = () => { drawDays(); drawTimes(); update(); };
+    for (const g of [daysEl, timesEl]) g.addEventListener('keydown', (e) => {
+      const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+      const all = [...g.querySelectorAll<HTMLElement>('[role="radio"]')];
+      const i = all.indexOf(document.activeElement as HTMLElement);
+      if (!d || i < 0) return;
+      e.preventDefault();
+      all[(i + d + all.length) % all.length].click();
+    });
 
     const link = () => {
       const u = new URL(b.url);
