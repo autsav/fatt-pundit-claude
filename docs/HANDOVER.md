@@ -47,4 +47,4 @@ Rules that keep scrolling smooth (details in `tasks/lessons.md`):
 
 ## Hosting
 
-`public/_headers` sets a one-year cache on built files and basic security headers (Cloudflare Pages and Netlify read it). Build command `npm run build`, output folder `dist`.
+The site is hosted on **Vercel**, deploying from `main`. `vercel.json` sets a one-year cache on built files, basic security headers and a report-only Content-Security-Policy. `public/_headers` holds the same rules for Cloudflare Pages or Netlify; Vercel ignores it, so change both together. Build command `npm run build`, output folder `dist`.
