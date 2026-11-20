@@ -55,7 +55,6 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 28 | Exact Soho Google review count (shows "16k"; site says "16,000+") | Home rating line | N |
 | 29 | Press quotes or awards that can be named with a source | One line on branch pages | N |
 | 30 | Show the food hygiene rating? | Branch pages | N |
-| 44 | Home page draft wording: chapter names "01 Our story · 02 The menus · 03 The bar · 04 The room · 05 Your table"; menus labels "Open the book for" / "Or read them as a list" | Home (Phase 5) | M |
 
 ### Brand assets and photos
 | # | Need | Why / where it's used | Pri |
@@ -85,3 +84,4 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 20 Nov 2026 | Pre-theatre seating times | `branches.json` `preTheatre`: menu page, branch menu list, drawer hint |
 | 20 Nov 2026 | Guangdong (not Canton) and Calcutta (not Kolkata) everywhere a guest reads; closes #23 | All copy, map labels, alt text, meta, share images |
 | 20 Nov 2026 | Phase 4 UX decisions D1–D5 approved | `docs/redesign/phase4/ux-structure.md` |
+| 20 Nov 2026 | Home page wording approved: chapter names "01 Our story · 02 The menus · 03 The bar · 04 The room · 05 Your table"; menus labels "Open the book for" / "Or read them as a list"; closes #44 | Home (Phase 5) |

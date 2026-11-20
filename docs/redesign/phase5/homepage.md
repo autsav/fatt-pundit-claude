@@ -43,5 +43,5 @@ Not tested: real phones, Safari, Firefox, screen readers (as in every phase). On
 ## 4. Open
 
 - Scroll smoothness: 3.1% long frames against the 2% budget. The remaining cost is the voyage's own script per frame (Motion scroll tracking, route maths, React updates at each port, SVG viewBox). That needs its own pass: move port and leg state out of React, and drive the route overlay with transforms instead of `viewBox` and `--u`.
-- Draft wording for client sign-off (CLIENT-INPUTS #44): chapter names and the menus toolbar labels.
+- ~~Draft wording~~: chapter names and menus labels approved 20 Nov 2026 (CLIENT-INPUTS #44 closed).
 - Next: carry the chapter head to the branch pages.
