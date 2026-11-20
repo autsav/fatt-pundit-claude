@@ -42,6 +42,6 @@ Not tested: real phones, Safari, Firefox, screen readers (as in every phase). On
 
 ## 4. Open
 
-- Scroll smoothness: 3.1% long frames against the 2% budget. The remaining cost is the voyage's own script per frame (Motion scroll tracking, route maths, React updates at each port, SVG viewBox). That needs its own pass: move port and leg state out of React, and drive the route overlay with transforms instead of `viewBox` and `--u`.
+- Scroll smoothness. Second pass (20 Nov 2026): the voyage samples its route once instead of asking the SVG for points every frame, writes the four route dashes only when they change, and steps its stroke-scale variable in 0.4% increments (the median per-frame restyle went from 38 elements to 16–18). Pixel-identical at 1440; on a phone, one frame differs by under 1 px along the route. Six alternating rounds: old 4.2% mean long frames (2.6–6.6), new 3.7% (2.6–3.3 with the intro skipped). Still above 2%. What's left is the full-screen route overlay redrawn every frame because its viewBox moves. Getting under 2% needs the overlay rebuilt as a layer moved by transform, which is a larger change to a tuned scene.
 - ~~Draft wording~~: chapter names and menus labels approved 20 Nov 2026 (CLIENT-INPUTS #44 closed).
 - Next: carry the chapter head to the branch pages.

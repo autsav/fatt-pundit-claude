@@ -71,6 +71,16 @@ const SHIP_PX = 64;
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smooth = (t: number) => t * t * (3 - 2 * t);
+/** Points sampled along each leg once (x, y pairs), so a scroll frame never asks the SVG for geometry. */
+const SAMPLES = 480;
+
+/** A point part-way (0 to 1) along a sampled leg, by straight interpolation between samples. */
+function pointAt(pts: Float32Array, f: number) {
+  const x = clamp(f) * SAMPLES;
+  const k = Math.min(SAMPLES - 1, Math.floor(x));
+  const r = x - k;
+  return { x: lerp(pts[k * 2], pts[k * 2 + 2], r), y: lerp(pts[k * 2 + 1], pts[k * 2 + 3], r) };
+}
 
 export default function Voyage({ art }: { art: VoyageArt }) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -81,6 +91,12 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   const hullRef = useRef<SVGGElement>(null);
   const legRefs = useRef<(SVGPathElement | null)[]>([]);
   const lens = useRef<number[]>([]);
+  // Scroll-frame caches: route points sampled once, and the last values written, so a frame only
+  // touches what changed (the per-frame getPointAtLength, the four dash writes and the --u write on
+  // the whole overlay showed up as most of the voyage's frame time at 4x CPU).
+  const samples = useRef<Float32Array[]>([]);
+  const dashes = useRef<string[]>([]);
+  const lastU = useRef(0);
   const layout = useRef({ w: 1, h: 1, fx: 0, fy: 0, fit: 1, k: 1 });
   const facing = useRef(1);
   const [calm, setCalm] = useState(false);
@@ -127,7 +143,13 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     const svg = svgRef.current;
     if (svg) {
       svg.setAttribute('viewBox', `${cx - fx / ppu} ${cy - fy / ppu} ${w / ppu} ${h / ppu}`);
-      svg.style.setProperty('--u', String(1 / ppu));
+      // --u keeps strokes and markers screen-sized; a 0.4% step is invisible and spares most frames
+      // a style recalculation of everything that reads it.
+      const u = 1 / ppu;
+      if (Math.abs(u / (lastU.current || 1) - 1) > 0.004) {
+        lastU.current = u;
+        svg.style.setProperty('--u', String(u));
+      }
     }
   };
 
@@ -152,12 +174,12 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       if (leg !== -1) setLeg(-1);
       if (reached < s.hold) setReached(s.hold);
     } else {
-      const path = legRefs.current[s.leg];
       const len = lens.current[s.leg];
-      if (!path || !len) return;
+      const pts = samples.current[s.leg];
+      if (!pts || !len) return;
       const e = smooth(t);
-      const pt = path.getPointAtLength(e * len);
-      const ahead = path.getPointAtLength(Math.min(len, e * len + 4));
+      const pt = pointAt(pts, e);
+      const ahead = pointAt(pts, Math.min(1, e + 4 / len));
       const a = PORTS[s.leg].at;
       const b = PORTS[s.leg + 1].at;
       const pull = Math.sin(Math.PI * e);
@@ -173,7 +195,10 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     legRefs.current.forEach((el, i) => {
       if (!el) return;
       const f = clamp(drawn - i);
-      el.style.strokeDasharray = `${f * lens.current[i]} ${lens.current[i] + 1}`;
+      const dash = `${(f * lens.current[i]).toFixed(1)} ${lens.current[i] + 1}`;
+      if (dashes.current[i] === dash) return;
+      dashes.current[i] = dash;
+      el.style.strokeDasharray = dash;
     });
   };
 
@@ -184,6 +209,16 @@ export default function Voyage({ art }: { art: VoyageArt }) {
 
   useEffect(() => {
     lens.current = legRefs.current.map((el) => el?.getTotalLength() ?? 0);
+    samples.current = legRefs.current.map((el, i) => {
+      const out = new Float32Array((SAMPLES + 1) * 2);
+      if (!el) return out;
+      for (let k = 0; k <= SAMPLES; k++) {
+        const q = el.getPointAtLength((k / SAMPLES) * lens.current[i]);
+        out[k * 2] = q.x;
+        out[k * 2 + 1] = q.y;
+      }
+      return out;
+    });
     const c = isCalm();
     setCalm(c);
     measure();

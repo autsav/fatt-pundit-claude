@@ -284,3 +284,9 @@ Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors,
 - [x] T5 Full QA: astro check, build gates, overflow, axe settled, CLS, scripted checks, smoke, budget
 - [x] T6 Commit on branch phase5-homepage and push to GitHub
 - Result (20 Nov): T1 17 comment characters fixed. T2 rail measures on resize only (it forced a style and layout pass every scroll frame): long frames 6.1% → 3.1% mean over 3 alternating rounds (still > 2%; the rest is the voyage's own script, logged in phase5/homepage.md §4). Hero poster loads first: perf 82 → 86. T3 shots regenerated (immersive hero). T4 homepage.md rewritten. T5 astro check 0/0, gates pass, no overflow 6 widths × 7 routes, axe settled clean, CLS 0.002, scripted 22/22, rail tracking 5/5, smoke 8/8 (desktop test now clicks the Book in view).
+
+## After Phase 5 (20 Nov)
+- [x] Merged phase5-homepage into main (94216c7)
+- [x] Prices from the printed menu photos (docs/reference/menu-2026-11/): food matched; drinks list updated; CLIENT-INPUTS #13, #19 closed
+- [x] Voyage scroll pass 2: sampled route, dash and --u writes only on change. Long frames 4.2% → 3.7% mean (noisy; still > 2%). Pixel check vs old build: identical at 1440, < 1 px route difference on phone. Checks: scripted 22/22, rail 5/5, axe settled clean, smoke 8/8
+- [ ] Under 2%: rebuild the voyage route overlay as a transform-moved layer (no per-frame viewBox)
