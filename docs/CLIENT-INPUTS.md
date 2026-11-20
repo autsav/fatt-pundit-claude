@@ -20,6 +20,8 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 8 | Update the Google Business Profile "Reserve" link and the Instagram bio to `/book/?branch=…` after launch | Old reserve links and new booking desk | M |
 | 9 | Search Console access, to find any other old URLs still in Google | Redirect plan | M |
 | 40 | Confirm online party limits: Soho online up to 7 (8+ set menu, inferred), Covent Garden online up to 4 and call for 5–7 (from its old note) | `branches.json` `groups`; drawer, Index, booking desk | H |
+| 42 | Dish names "Kolkata chilli duck" and "Kolkata chilly chicken": keep (menu names) or change to Calcutta? | Menus, plate wall | M |
+| 43 | The guidelines map art (menu back page) may carry its own printed labels ("Kalkata"): fine as artwork, or supply a version reading Calcutta? | Menu book back page, voyage | N |
 | 41 | The form service's domain once chosen (#5), for the security policy | `vercel.json` / `_headers` `connect-src` | L |
 
 ### Dubai
@@ -46,7 +48,6 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | # | Need | Why / where it's used | Pri |
 | --- | --- | --- | --- |
 | 22 | House term: "Chinese-Indian" or "Indo-Chinese" | Titles and copy (mixed today) | M |
-| 23 | Map label: Kolkata, Calcutta or "Kalkata" (guidelines map) | Voyage map | M |
 | 24 | Allergen page wording sign-off | `/allergens/` (draft) | L |
 | 25 | Privacy: data controller name, address and contact | `/privacy/` (draft) | L |
 | 26 | Step-free access and accessible toilets, per restaurant | `/accessibility/`, Good to know | L |
@@ -81,4 +82,5 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 20 Nov 2026 | Google ratings: Covent Garden 4.8 (20,030 reviews), Soho 4.8 ("16k") | Home rating line |
 | 20 Nov 2026 | They take pickup orders | "At home" row shows Pickup as soon as `clickAndCollectUrl` is filled in (#3) |
 | 20 Nov 2026 | Pre-theatre seating times | `branches.json` `preTheatre`: menu page, branch menu list, drawer hint |
+| 20 Nov 2026 | Guangdong (not Canton) and Calcutta (not Kolkata) everywhere a guest reads; closes #23 | All copy, map labels, alt text, meta, share images |
 | 20 Nov 2026 | Phase 4 UX decisions D1–D5 approved | `docs/redesign/phase4/ux-structure.md` |

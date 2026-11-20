@@ -1,5 +1,5 @@
----
-// Homepage: the "Through the door" journey (plan: Creative concept, scenes 1–7).
+﻿---
+// Homepage: the "Through the door" journey (plan: Creative concept, scenes 1â€“7).
 import { getImage, Image } from 'astro:assets';
 import { stampSrc } from '../lib/stamp';
 import Arrival from '../components/scenes/Arrival.astro';
@@ -127,14 +127,14 @@ const orgLd = {
   name: 'Fatt Pundit',
   url: new URL('/', Astro.site).href,
   logo: new URL('/icon-512.png', Astro.site).href,
-  description: "Indo-Chinese Hakka cooking from Tangra, Kolkata's Chinatown, in Soho, Covent Garden and Dubai.",
+  description: "Indo-Chinese Hakka cooking from Tangra, Calcutta's Chinatown, in Soho, Covent Garden and Dubai.",
   sameAs: ['https://www.instagram.com/fattpundit/', 'https://www.facebook.com/fattpundit/', 'https://x.com/FattPundit'],
   subOrganization: branches.map((b) => ({ '@type': 'Restaurant', '@id': new URL(`/${b.id}/#restaurant`, Astro.site).href, name: b.name, url: new URL(`/${b.id}/`, Astro.site).href })),
 };
 ---
 <Base
-  title="Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai"
-  description="Indo-Chinese Hakka cooking from Tangra, Kolkata's Chinatown. Book a table at Fatt Pundit Soho or Covent Garden, London. Opening soon in Dubai."
+  title="Fatt Pundit Â· Chinese-Indian Hakka restaurant Â· Soho, Covent Garden, Dubai"
+  description="Indo-Chinese Hakka cooking from Tangra, Calcutta's Chinatown. Book a table at Fatt Pundit Soho or Covent Garden, London. Opening soon in Dubai."
   og="home"
 >
   <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
@@ -142,9 +142,9 @@ const orgLd = {
   <SiteHeader branches={branches} />
 
   <main>
-    <!-- 0 · Arrival -->
+    <!-- 0 Â· Arrival -->
     <Arrival />
-    <!-- 1 · Rain on the window -->
+    <!-- 1 Â· Rain on the window -->
     <section id="top" class="rain" aria-label="Fatt Pundit">
       <RainHero client:load src={rainSrc} poster={rainPoster}>
         <div class="hero-choose">
@@ -153,26 +153,25 @@ const orgLd = {
         </div>
       </RainHero>
     </section>
-    <!-- 2 · The doors -->
+    <!-- 2 Â· The doors -->
     <Doors />
 
-    <!-- 3 · The voyage -->
+    <!-- 3 Â· The voyage -->
     <Voyage client:idle art={voyageArt} />
 
 
-    <!-- 5 · The menu book -->
-    <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} next={{ href: '#bar', label: 'Continue to the bar' }} />
-    <p class="menu-list-link"><span>Every menu as a list, with search and diet filters:</span>{branches.filter((b) => b.status === 'open').map((b) => <a class="fp-btn fp-btn--sm" href={`/${b.id}/menu/`}>{b.shortName} menus</a>)}</p>
+    <!-- 5 Â· The menu book -->
+    <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} lists={branches.filter((b) => b.status === 'open').map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` }))} next={{ href: '#bar', label: 'Continue to the bar' }} />
 
-    <!-- 6 · The bar after dark -->
+    <!-- 6 Â· The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />
 
-    <!-- 7 · The room -->
+    <!-- 7 Â· The room -->
     <section id="room" class="sec room-halftone">
       <div class="wrap stack-lg">
         <div class="stack reveal narrow">
           <p class="kicker">The room</p>
-          <h2 class="h2">Pull up a chair</h2>
+          <h2 class="fp-h2"><span class="sr-only">The room: </span>Pull up a chair</h2>
           <p>Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
         </div>
         <RoomContactSheet client:visible frames={sheet} picks={[0, 2]} />
@@ -183,12 +182,12 @@ const orgLd = {
       </div>
     </section>
 
-    <!-- 8 · Your boarding pass -->
+    <!-- 8 Â· Your boarding pass -->
     <section id="tables" class="sec gold-bg" aria-labelledby="tables-title">
       <div class="wrap stack-lg">
         <div class="stack center reveal">
           <p class="kicker">Your table</p>
-          <h2 id="tables-title" class="h2">Choose your gate</h2>
+          <h2 id="tables-title" class="fp-h2"><span class="sr-only">Your table: </span>Choose your gate</h2>
           <p>Three passes, one for each room. Tear off a stub to book.</p>
         </div>
         <BoardingPasses branches={branches} stamps={stamps} />
@@ -285,7 +284,8 @@ const orgLd = {
     #room > .wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: clamp(32px, 4vw, 64px); align-items: start; }
     #room > .wrap > .stack { grid-column: 1; grid-row: 1; }
     #room > .wrap > .rating { grid-column: 1; grid-row: 2; }
-    #room > .wrap :global(.room-sheet) { grid-column: 2; grid-row: 1 / 3; }
+    /* Centred against the taller text column (top-aligned, it left one empty block under the sheet). */
+    #room > .wrap :global(.room-sheet) { grid-column: 2; grid-row: 1 / 3; align-self: center; }
   }
   .rating { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; border-block: 2px solid var(--color-ink); padding-block: 20px; }
   .rating-n { font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
@@ -308,8 +308,9 @@ const orgLd = {
     background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
   @media (min-width: 1100px) { .rail { display: flex; } }
   .rail.is-on { opacity: 1; pointer-events: auto; }
-  .rail a { position: relative; display: grid; place-items: center; width: 28px; height: 28px; text-decoration: none; }
-  .rail a::before { content: ''; position: absolute; left: 50%; top: -7px; height: 12px; border-left: 1px dashed rgb(203 160 82 / 0.5); }
+  /* 44px targets (were 28px); the dashed line joins one dot to the next. */
+  .rail a { position: relative; display: grid; place-items: center; width: 44px; height: 44px; text-decoration: none; }
+  .rail a::before { content: ''; position: absolute; left: 50%; top: -17px; height: 34px; border-left: 1px dashed rgb(203 160 82 / 0.5); }
   .rail a:first-child::before { display: none; }
   .rail-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--color-gold); transition: background-color .25s, transform .25s cubic-bezier(.2, 1.6, .4, 1); }
   .rail a.is-past .rail-dot { background: var(--color-gold); border-style: solid; }
@@ -317,6 +318,9 @@ const orgLd = {
   .rail-lbl { position: absolute; right: calc(100% + 14px); white-space: nowrap; padding: 4px 10px; background: var(--color-ink); border: 1px solid rgb(203 160 82 / 0.45); color: var(--color-sand);
     font-family: var(--font-note); font-style: italic; font-size: 15px; opacity: 0; translate: 6px 0; transition: opacity .2s, translate .2s; pointer-events: none; }
   .rail a:hover .rail-lbl, .rail a:focus-visible .rail-lbl { opacity: 1; translate: 0 0; }
+  /* Wide screens: the chapter you're in is always named (the margin is wide enough not to cover content). */
+  @media (min-width: 1600px) { .rail a.is-here .rail-lbl { opacity: 1; translate: 0 0; } }
+  .rail { padding: 6px; }
   .rail a:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 1px; }
   :global(.read-line) { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
   .hero-choose { display: grid; gap: 12px; justify-items: center; }

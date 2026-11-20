@@ -246,3 +246,22 @@ Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors,
 - Result (20 Nov): 13 routes × 320/390/768/1024/1440 + calm: no overflow, 0 JS errors, axe 0 (home's scroll-scene fades flag mid-animation, clean once settled, as in the baseline). CLS worst 0.020 on load. astro check 0; contrast 150/150; hours tests pass; booking smoke 8/8. Scripted: nav + Index + dock (12 checks), menus (20), drawer (20), forms with a mocked service (11) and without (5). Menu page on a phone: 34,378 → ~7,000 px (one menu at a time). After shots: docs/redesign/slices/4/.
 - Found and fixed during QA: menu Book button lost contrast to the info-page link colour; bar links and boarding-pass links under the WCAG 2.5.8 target size; the target-size fix briefly overrode the 641–919px rule (overflow at 768, caught by the probe).
 - Not done: Lighthouse runs (axe used instead, same engine); real phones, Safari, Firefox, screen readers; live form service (none chosen yet: CLIENT-INPUTS #5, #10, #41).
+
+## Header and first-screen fixes (20 Nov, after local review)
+- [x] H1 Astro dev toolbar off (local only)
+- [x] H2 Header Book button on the system: fp-btn primary, sentence case
+- [x] H3 Hero title: no dark boxes (split letters reverted after the rise; shadow fades on after)
+- [x] H4 Short screens (≥641 wide, <700 tall): slimmer bar and banner, title capped by height
+- [x] QA: screenshots before/after, one-line header 320–1920, overflow, axe, CLS, contrast, smoke
+- Result: 1280×560 chooser first row 607→445px (now in view), 1366×650 625→460; bar 70→58px and banner 32→26px only under 700px tall; title one line at those sizes; split letter spans 23→0 after the rise; header one line at 320–1920 on 3 page types (fixed an overflow at 1100px on Covent Garden from the long caps label). axe 0 (home clean once settled), CLS worst 0.005, contrast 150/150, nav checks 12/12, smoke 8/8. Phone on its side (844×390): chooser still below the fold; header Book visible.
+
+## Home story scenes pass (planned 20 Nov; waiting for go-ahead + decisions S-A to S-E)
+- [x] S1 Doors: fit below the header; "Come in." on ink below the doors; Kolkata/Canton plaques (S-D); fix edge strip + side glow; shorter scroll + skip link (S-A)
+- [x] S2 Menu book: one neutral bookmark set in two groups (S-C); restaurant choice as two fp-choice options, Dubai as a note; open on the first spread on desktop (S-B); list-menu buttons above the book; sentence case outside the book; plain sand behind it (S-E)
+- [x] S3 Chapter rail: 44px targets, current chapter's label always shown, night surface
+- [~] S4 Dropped after measuring: bar, room and passes sit on the same 1240 .wrap as the header (all start at x=380 at 1920); moving the header alone to .fp-container would break that. The mismatch came from the narrow centred doors and book (fixed in S1/S2)
+- [x] S5 Home section headings on the system (fp-h2 Light, plain-word prefix)
+- [x] S6 Boarding passes: stubs not tiger (equal choices, W1); bar and room scenes checked at 1440/1920 for the same faults
+- [x] QA: perf budget (LCP, dropped frames), CLS, axe settled, calm end states, screenshots 1280×560 / 1440×900 / 1920×1080 / 768 / 390
+- Result (20 Nov): doors fit below the header with Calcutta/Guangdong plaques, "Come in." + skip link on ink (gold 6:1 vs 1.6:1), edge strips gone (room/dim/glow inset matched to the panels), scroll 190→140vh. Book: neutral bookmarks in two groups, Soho/Covent Garden chips (ink when chosen), Dubai as a line, opens on the first spread at ≥1024 (signature dishes beside page 1), list links under the instruction, sentence case outside the book, plain sand. Rail 28→44px targets, current chapter named ≥1600. Room sheet centred. Pass stubs were already not tiger. axe 0 once settled, CLS ≤0.005, nav 12/12, menus 20/20, smoke 8/8. Frames at 4x CPU (noisy, same method on live vs local): desktop menu book 4.2–4.7% long frames vs 1.1–2.2% live (bigger open spread) — watch item; other scenes within the live range.
+- Naming (client, 20 Nov): Guangdong for Canton and Calcutta for Kolkata in all copy, labels, alt text, meta and share images (36 places). Map labels re-placed (Calcutta below its point) so the longer name does not collide at 390 calm. Dish names "Kolkata chilli duck" / "Kolkata chilly chicken" left as on the menu (CLIENT-INPUTS #42). make-og.mjs fixed for Windows paths; share images regenerated.

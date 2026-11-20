@@ -583,7 +583,7 @@ export default function PageFlip({
         </div>
       </div>
 
-      <div className="mt-6 flex items-center gap-4 font-label text-sm font-bold uppercase tracking-[0.2em] text-ink">
+      <div className="mt-6 flex items-center gap-4 font-label text-[15px] font-bold text-ink">
         <NavButton
           disabled={spread === 0}
           label="Previous page"
@@ -667,7 +667,7 @@ function NavButton({
       // so the arrow keys keep working.
       aria-disabled={disabled || undefined}
       aria-label={label}
-      className="flex size-11 items-center justify-center border-2 border-ink text-ink transition-colors duration-150 ease-out hover:bg-ink hover:text-sand focus-visible:outline-2 focus-visible:outline-[var(--fp-ring)] focus-visible:outline-offset-2 aria-disabled:cursor-default aria-disabled:opacity-30 aria-disabled:hover:bg-transparent aria-disabled:hover:text-ink"
+      className="flex size-11 items-center justify-center border-2 border-ink text-ink transition-colors duration-150 ease-out hover:bg-ink hover:text-sand focus-visible:outline-2 focus-visible:outline-[var(--fp-ring)] focus-visible:outline-offset-2 aria-disabled:cursor-default aria-disabled:border-dashed aria-disabled:opacity-60 aria-disabled:hover:bg-transparent aria-disabled:hover:text-ink"
       onClick={disabled ? undefined : onClick}
       onKeyDown={onKeyDown}
       type="button"

@@ -51,8 +51,8 @@ body { font-size: 17px; line-height: 1.55; }
 .bar-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 28px; padding-block: 12px; }
 .brand { font-weight: 700; font-size: 22px; letter-spacing: 0.18em; color: var(--color-sand); text-decoration: none; }
 .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; text-transform: uppercase; letter-spacing: 0.12em; font-size: 15px; }
-.nav a:not(.btn) { color: var(--color-sand); text-decoration: none; }
-.nav a:not(.btn):hover { color: var(--color-gold); }
+.nav a:not(.nav-book) { color: var(--color-sand); text-decoration: none; }
+.nav a:not(.nav-book):hover { color: var(--color-gold); }
 
 
 .hours { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 0; font-size: 15px; }
@@ -67,7 +67,8 @@ body { font-size: 17px; line-height: 1.55; }
 
 
 .nav a[aria-current='page'] { color: var(--color-gold); }
-.nav .btn-sm { font-size: 16px; }
+/* Book in the bar: the system's primary button, sentence case (Phase 3 decision), not the nav's tracked caps. */
+.nav .nav-book { flex: none; text-transform: none; letter-spacing: 0.04em; font-size: 16px; white-space: nowrap; }
 .brand { white-space: nowrap; }
 .nav .lbl-short { display: none; }
 
@@ -81,19 +82,19 @@ body { font-size: 17px; line-height: 1.55; }
 @media (min-width: 641px) and (max-width: 1099px) {
   .brand { font-size: 18px; letter-spacing: 0.14em; }
   .nav { gap: 8px 16px; font-size: 13px; }
-  .nav .btn-sm { font-size: 14px; padding: 0 14px; }
+  .nav .nav-book { font-size: 15px; padding-inline: 14px; }
   .nav .lbl-long { display: none; }
   .nav .lbl-short { display: inline; }
 }
-@media (min-width: 641px) and (max-width: 919px) { .nav > a:not(.btn), .nav-menus { display: none; } }
+@media (min-width: 641px) and (max-width: 919px) { .nav > a:not(.nav-book), .nav-menus { display: none; } }
 
 @media (max-width: 640px) {
   /* Phones: the bar is the name and the Index; Book lives in the dock. */
   .nav { display: none; }
-  .nav a:not(.btn) { display: none; }
+  .nav a:not(.nav-book) { display: none; }
   .brand { font-size: 17px; letter-spacing: 0.14em; }
   .bar-in { flex-wrap: nowrap; }
-  .nav .btn-sm { padding: 0 14px; font-size: 14px; letter-spacing: 0.06em; white-space: nowrap; }
+  .nav .nav-book { padding-inline: 14px; font-size: 15px; }
   .nav .lbl-long { display: none; }
   .nav .lbl-short { display: inline; }
 }
@@ -101,7 +102,7 @@ body { font-size: 17px; line-height: 1.55; }
 @media (max-width: 380px) {
   .bar-in { gap: 10px 12px; }
   .brand { font-size: 15px; letter-spacing: 0.1em; }
-  .nav .btn-sm { padding: 0 10px; letter-spacing: 0.04em; }
+  .nav .nav-book { padding-inline: 10px; letter-spacing: 0.02em; }
 }
 
 /* Index: every destination, numbered. Shown wherever the bar's text links have stepped aside. */
@@ -120,8 +121,14 @@ body { font-size: 17px; line-height: 1.55; }
 .nav-pop a:hover span, .nav-pop a[aria-current='page'] span { color: var(--color-gold); text-decoration: underline; text-underline-offset: 4px; }
 .nav-pop span { font-size: 16px; font-weight: 700; }
 .nav-pop small { font-size: 14px; color: rgb(218 199 181 / 0.85); }
+/* Short screens (laptops at 150% scaling, phones on their side): a slimmer banner and bar, so the
+   first screen keeps room for the content. The Book button stays 44px tall. */
+@media (min-width: 641px) and (max-height: 700px) {
+  .preview-flag { padding-block: 3px; }
+  .bar-in { padding-block: 6px; }
+}
 /* Every bar link is a full-height target (WCAG 2.5.8; the 1024px bar packs them 16px apart). */
-@media (min-width: 920px) { .nav > a:not(.btn) { display: inline-flex; align-items: center; min-height: 44px; } }
+@media (min-width: 920px) { .nav > a:not(.nav-book) { display: inline-flex; align-items: center; min-height: 44px; } }
 /* Current room: underline as well as colour (not colour alone). */
 .nav > a[aria-current] { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
 .index { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0 clamp(16px, 4vw, 40px) 32px; border: 0; background: var(--color-ink-deep); color: var(--color-paper); --fp-ring: var(--color-gold); }

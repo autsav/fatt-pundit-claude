@@ -36,8 +36,9 @@ const H = world.h;
 /** The chart image runs past the route box on every side. */
 const SEA = world.sea;
 const PORTS: { id: string; name: string; at: Pt; dx: number; dy: number; anchor: 'start' | 'end' }[] = [
-  { id: 'canton', name: 'Canton', at: world.points.canton as Pt, dx: 14, dy: -40, anchor: 'end' },
-  { id: 'kolkata', name: 'Kolkata', at: world.points.kolkata as Pt, dx: 14, dy: -14, anchor: 'end' },
+  { id: 'canton', name: 'Guangdong', at: world.points.canton as Pt, dx: 14, dy: -40, anchor: 'end' },
+  // Below its point (the Bay of Bengal): "Guangdong" is longer than "Canton" was and ran into it at phone width.
+  { id: 'kolkata', name: 'Calcutta', at: world.points.kolkata as Pt, dx: 14, dy: 30, anchor: 'end' },
   { id: 'london', name: 'London', at: world.points.london as Pt, dx: 14, dy: 30, anchor: 'start' },
   { id: 'dubai', name: 'Dubai', at: world.points.dubai as Pt, dx: 14, dy: -14, anchor: 'end' },
 ];
@@ -225,8 +226,8 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   };
 
   return (
-    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : '340vh' }} aria-label="The journey from Canton to Kolkata, London and Dubai">
-      <h2 className="sr-only">The voyage: Canton to Kolkata, London and Dubai</h2>
+    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : '340vh' }} aria-label="The journey from Guangdong to Calcutta, London and Dubai">
+      <h2 className="sr-only">The voyage: Guangdong to Calcutta, London and Dubai</h2>
       <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[68px] h-[calc(100svh-68px)] overflow-hidden'}>
         {/* The chart: one image, moved only by transform. */}
         <img ref={seaRef} src={art.sea} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} decoding="async" />
@@ -326,20 +327,20 @@ function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; 
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
           <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[17px] text-tiger-deep">Stop {i + 1} of 4</p>
-          <h3 className="voyage-title m-0">{['Canton', 'Kolkata', 'London', 'Dubai'][i]}</h3>
+          <h3 className="voyage-title m-0">{['Guangdong', 'Calcutta', 'London', 'Dubai'][i]}</h3>
         </div>
         <span className="voyage-postmark" aria-hidden="true">
           <span>{['China', 'Tangra', 'W1 and WC2', 'UAE'][i]}</span>
         </span>
       </header>
 
-      {i === 0 && <p className={text}>Hakka families leave Canton, southern China, carrying their recipes across the sea.</p>}
+      {i === 0 && <p className={text}>Hakka families leave Guangdong, southern China, carrying their recipes across the sea.</p>}
 
       {i === 1 && (
         <>
           <img src={art.map} alt="The hand-drawn map from the Fatt Pundit menu: southern China, the Bay of Bengal and India" className="voyage-pic" width={1295} height={1320} loading="lazy" />
           <MarkerText as="p" className={text} show={live || still}>
-            They make a new home in Kolkata. In <Mark type="circle">Tangra</Mark>, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, <Mark type="underline">new, yet familiar</Mark>.
+            They make a new home in Calcutta. In <Mark type="circle">Tangra</Mark>, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, <Mark type="underline">new, yet familiar</Mark>.
           </MarkerText>
         </>
       )}

@@ -48,7 +48,7 @@ const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
         </ul>
       </details>
       <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
-      <a class="btn btn-orange btn-sm" href={book.href} {...bookAttrs}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span></a>
+      <a class="fp-btn fp-btn--primary fp-btn--sm nav-book" href={book.href} {...bookAttrs}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span></a>
     </nav>
     <a class="idx" href="#site-index" data-index-open aria-haspopup="dialog">Index</a>
   </div>
@@ -82,7 +82,7 @@ const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
     ))}
     {[
       { href: '/private-dining/', label: 'Groups and private dining', note: onlineSummary(branches) },
-      { href: '/#story', label: 'Our story', note: 'Canton, Kolkata, London' },
+      { href: '/#story', label: 'Our story', note: 'Guangdong, Calcutta, London' },
       { href: '/allergens/', label: 'Allergens and dietary needs', note: 'Diet codes and how we cook' },
     ].map((it, i) => (
       <li class="index-row">

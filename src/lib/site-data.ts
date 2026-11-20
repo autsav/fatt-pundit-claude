@@ -108,6 +108,7 @@ export async function menuBooks(ids: string[]): Promise<MenuLite[]> {
       return {
         id,
         tab: MENU_TABS[id] ?? m.title,
+        diet: m.kind === 'diet',
         title: m.kind === 'drinks' ? 'Drinks' : m.title,
         allergyNote: m.allergyNote,
         sections: await Promise.all(

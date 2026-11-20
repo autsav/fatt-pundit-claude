@@ -247,17 +247,16 @@
 .room-lb-btn:hover, .room-lb-btn:focus-visible { background: var(--color-tiger); border-color: var(--color-tiger); }
 @media (prefers-reduced-motion: reduce) { .room-pick path { stroke-dashoffset: 0; } }
 
-/* Menu by location: luggage tags. Selected = tiger, like a ticket punched for that branch. */
-.menu-tag { position: relative; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px 0 16px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink);
-  font-family: var(--font-label); font-size: 14px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
-  clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 calc(100% - 14px), 0 14px); transition: background-color .2s, color .2s, transform .2s; }
+/* Menu by location: the restaurant choice, as the system's option chips (sentence case; chosen = ink, not tiger,
+   which is kept for actions). */
+.menu-tag { position: relative; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink);
+  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color .2s, color .2s, transform .2s; }
 .menu-tag:hover { transform: translateY(-2px); }
 .menu-tag:active { transform: translateY(1px) scale(0.98); transition-duration: .06s; }
-.menu-tag.is-on { background: var(--color-tiger); border-color: var(--color-tiger); color: var(--color-ink-deep); }
+.menu-tag.is-on { background: var(--color-ink); color: var(--color-sand); }
 .menu-tag:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 3px; }
-.menu-tag-hole { width: 10px; height: 10px; border-radius: 50%; border: 2px solid currentColor; }
 .menu-soon { padding: clamp(22px, 3vw, 32px); background: var(--color-paper); border: 2px solid var(--color-ink); box-shadow: 0 18px 40px rgb(44 41 37 / 0.2); }
-@media (max-width: 480px) { .menu-tag { gap: 8px; padding: 0 12px 0 14px; font-size: 12.5px; letter-spacing: 0.1em; clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); } }
+@media (max-width: 480px) { .menu-tag { padding: 0 14px; font-size: 15px; } }
 
 /* Below-the-fold sections: the browser skips their layout and paint until
    they come near the screen. `auto` remembers the real size once seen. */

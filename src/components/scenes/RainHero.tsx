@@ -37,8 +37,23 @@ export default function RainHero({ src, poster, children }: Props) {
     let cancelled = false;
     import('animejs').then(({ animate, stagger, splitText }) => {
       if (cancelled) return;
-      const { chars } = splitText(el, { chars: { wrap: 'clip' } });
-      animate(chars, { y: ['110%', '0%'], rotate: { from: 8, to: 0 }, duration: 900, ease: 'outExpo', delay: stagger(45) });
+      // Each letter rises out of a clipped box. The title's soft shadow would be cut to those boxes
+      // (dark rectangles behind the words), so it is held off while the letters rise, then the split
+      // is undone and the shadow returns on plain text.
+      el.style.textShadow = 'none';
+      const split = splitText(el, { chars: { wrap: 'clip' } });
+      animate(split.chars, {
+        y: ['110%', '0%'],
+        rotate: { from: 8, to: 0 },
+        duration: 900,
+        ease: 'outExpo',
+        delay: stagger(45),
+        onComplete: () => {
+          if (cancelled) return;
+          split.revert();
+          el.style.textShadow = '';
+        },
+      });
     });
     return () => {
       cancelled = true;
@@ -47,10 +62,10 @@ export default function RainHero({ src, poster, children }: Props) {
 
   const content = (
       <div className="pointer-events-none flex w-full max-w-5xl flex-col items-center gap-6 text-center">
-        <p className="note text-[19px] text-gold">Hakka cooking from Kolkata's Chinatown</p>
+        <p className="note text-[19px] text-gold">Hakka cooking from Calcutta's Chinatown</p>
         <h1
           ref={titleRef}
-          className="text-[clamp(52px,10vw,140px)] leading-[0.9] text-sand [text-shadow:0_6px_40px_rgb(0_0_0/0.55)]"
+          className="text-[length:min(clamp(52px,10vw,140px),17svh)] leading-[0.9] text-sand [text-shadow:0_6px_40px_rgb(0_0_0/0.55)] transition-[text-shadow] duration-500"
           style={{ opacity: ready ? 1 : 0 }}
         >
           Fatt Pundit

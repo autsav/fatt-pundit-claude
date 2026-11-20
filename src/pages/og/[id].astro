@@ -15,7 +15,7 @@ import '../../styles/global.css';
 export const getStaticPaths = (async () => {
   const branches = await getBranches();
   return [
-    { params: { id: 'home' }, props: { gate: 'LDN', place: 'Fatt Pundit', line: 'Soho · Covent Garden · Dubai', note: 'Hakka cooking from Tangra, Kolkata', mark: 'left' as const } },
+    { params: { id: 'home' }, props: { gate: 'LDN', place: 'Fatt Pundit', line: 'Soho · Covent Garden · Dubai', note: 'Hakka cooking from Tangra, Calcutta', mark: 'left' as const } },
     ...branches.map((b) => ({
       params: { id: b.id },
       props: {
@@ -28,7 +28,7 @@ export const getStaticPaths = (async () => {
   ];
 }) satisfies GetStaticPaths;
 
-const { gate, place, line, mark, note = 'Canton · Kolkata · London · Dubai' } = Astro.props as { gate: string; place: string; line: string; mark: 'left' | 'right'; note?: string };
+const { gate, place, line, mark, note = 'Guangdong · Calcutta · London · Dubai' } = Astro.props as { gate: string; place: string; line: string; mark: 'left' | 'right'; note?: string };
 const stamp = await stampSrc(mark === 'right' ? stampRight : stampLeft, 520);
 ---
 <html lang="en-GB">

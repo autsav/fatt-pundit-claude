@@ -6,7 +6,7 @@
  * map page on the back, as on the real menu. Bookmark tabs swap the menu.
  * Everything printed comes from menus.json + dishes.json via index.astro; nothing is typed here.
  */
-import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PageFlip from '@/components/kokonutui/page-flip';
 
 export interface MenuItemLite {
@@ -20,6 +20,8 @@ export interface MenuItemLite {
 export interface MenuLite {
   id: string;
   tab: string;
+  /** A dietary menu (vegan, halal…): grouped after the general menus on the bookmarks. */
+  diet?: boolean;
   title: string;
   sections: { title: string; note?: string; items: MenuItemLite[] }[];
   allergyNote: string;
@@ -279,25 +281,25 @@ function Back({ art }: { art: Art }) {
       <div className="flex items-start justify-between gap-[3cqw]">
         <img src={art.stampGold} alt="" className="w-[18cqw]" draggable={false} />
         <p className="m-0 flex-1 text-center font-note text-[3.3cqw] leading-[1.4]">
-          Originating from Kolkata, this unique cuisine was invented when the Hakka people migrated to India from the Chinese province of Canton, bringing their traditional cooking with them and meeting the spices of India.
+          Originating from Calcutta, this unique cuisine was invented when the Hakka people migrated to India from the Chinese province of Guangdong, bringing their traditional cooking with them and meeting the spices of India.
         </p>
         <img src={art.stampOrange} alt="" className="w-[18cqw]" draggable={false} />
       </div>
-      <img src={art.map} alt="The hand-drawn map from the menu: Canton to Kolkata" className="mt-[3cqw] min-h-0 w-full flex-1 object-contain" draggable={false} />
+      <img src={art.map} alt="The hand-drawn map from the menu: Guangdong to Calcutta" className="mt-[3cqw] min-h-0 w-full flex-1 object-contain" draggable={false} />
     </Frame>
   );
 }
 
 /* ---------- The book ---------- */
 
-const TAB_COLORS = ['bg-tiger text-ink-deep', 'bg-gold text-ink', 'bg-sand text-ink', 'bg-slate text-ink-deep', 'bg-[#efe6d8] text-ink', 'bg-ink text-sand'];
 
 export default function MenuBook({
   menus,
   art,
   next,
-  places,
+  places: allPlaces,
   signatures,
+  lists,
 }: {
   menus: MenuLite[];
   art: Art;
@@ -305,13 +307,26 @@ export default function MenuBook({
   places?: MenuPlace[];
   /** Home page: the à la carte menu opens on the signature dishes. */
   signatures?: SignatureDish[];
+  /** Links to every menu as a list, shown right under the instruction. */
+  lists?: { href: string; label: string }[];
 }) {
+  // Only rooms with a menu can be picked; an opening-soon room is a line of text, not a dead tab.
+  const places = allPlaces?.filter((p) => !p.soon);
+  const soon = allPlaces?.filter((p) => p.soon) ?? [];
   const [placeId, setPlaceId] = useState(places?.[0]?.id);
   const place = places?.find((p) => p.id === placeId);
   // The menus this branch serves, in the book's order. No places = every menu given.
-  const shown = useMemo(() => (place ? menus.filter((m) => place.menus.includes(m.id)) : menus), [menus, place]);
+  // General menus first, then the dietary ones (two groups on the bookmarks).
+  const shown = useMemo(() => {
+    const list = place ? menus.filter((m) => place.menus.includes(m.id)) : menus;
+    return [...list.filter((m) => !m.diet), ...list.filter((m) => m.diet)];
+  }, [menus, place]);
   const [active, setActive] = useState(menus[0]?.id);
   const [opened, setOpened] = useState(false);
+  // Wide screens open on the first spread (cover beside the first page) instead of a lone cover.
+  useEffect(() => {
+    if (window.matchMedia('(min-width: 1024px)').matches) setOpened(true);
+  }, []);
   const menu = shown.find((m) => m.id === active) ?? shown[0] ?? menus[0];
   const tagRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -369,12 +384,17 @@ export default function MenuBook({
 
   return (
     <section id="menu" className="relative overflow-hidden bg-sand py-[clamp(56px,6vw,88px)] text-ink" aria-label="The menus">
-      <div className="voyage-paper pointer-events-none absolute inset-0" aria-hidden="true" />
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="relative mx-auto flex max-w-[1200px] flex-col items-center px-5">
         <p className="m-0 font-note text-[22px] text-tiger-deep">The menu</p>
-        <h2 className="m-0 mt-2 text-center text-[clamp(34px,5vw,72px)] uppercase leading-[0.98] tracking-[0.06em]">Turn the pages</h2>
-        <p className="m-0 mt-3 max-w-xl text-center text-[16px] leading-snug">{places ? (signatures?.length ? 'Our signature dishes open the book. Pick a restaurant, then a menu from the bookmarks.' : 'Pick a restaurant, then a menu from the bookmarks.') : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
+        <h2 className="fp-h2 m-0 mt-2 text-center"><span className="sr-only">The menus: </span>Turn the pages</h2>
+        <p className="m-0 mt-3 max-w-xl text-center text-[17px] leading-snug">{places ? 'Choose a restaurant and a menu.' : "The menu you'll be handed at the table. Pick yours from the bookmarks."}</p>
+        {lists && lists.length > 0 && (
+          <p className="m-0 mt-2 flex flex-wrap items-center justify-center gap-x-5 text-[16px]">
+            <span>Or read them as a list, with search and diet filters:</span>
+            {lists.map((l) => <a key={l.href} className="inline-flex min-h-11 items-center font-bold text-tiger-deep underline underline-offset-4" href={l.href}>{l.label}</a>)}
+          </p>
+        )}
 
         {places && (
           <div role="radiogroup" aria-label="Restaurant" className="mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">
@@ -394,13 +414,17 @@ export default function MenuBook({
                   onKeyDown={(e) => onTagKey(e, i)}
                   className={`menu-tag ${on ? 'is-on' : ''}`}
                 >
-                  <span className="menu-tag-hole" aria-hidden="true" />
                   {p.name}
                 </button>
               );
             })}
           </div>
         )}
+        {soon.map((p) => (
+          <p key={p.id} className="m-0 mt-3 text-center text-[16px]">
+            {p.name}: the menu comes with the opening. <a className="font-bold text-tiger-deep underline underline-offset-4" href={p.soon!.href}>Join the list</a>
+          </p>
+        ))}
 
         {place?.soon ? (
           <div className="menu-soon mt-8 w-full max-w-[560px]">
@@ -419,12 +443,17 @@ export default function MenuBook({
         ) : (
         <>
         {/* Phones show one page: capped near half the screen so there is room to scroll past. */}
-        <div className="mx-auto mt-7 w-full max-sm:!max-w-[40svh]" style={{ maxWidth: 'min(1000px, calc((100svh - 340px) * 1.5))' }}>
+        <div className="mx-auto mt-7 w-full max-w-[1000px]">
           {/* Bookmarks: paper tabs standing up from the top edge of the book. */}
+          {/* Bookmarks: one paper style, the open one in ink (no colour without meaning). */}
           <div role="tablist" aria-label="Menus" className="relative z-10 flex items-end gap-[6px] overflow-x-auto px-4 [scrollbar-width:none] sm:flex-wrap sm:justify-center sm:overflow-visible">
             {shown.map((m, i) => {
               const on = m.id === menu.id;
+              const firstDiet = m.diet && !shown[i - 1]?.diet && i > 0;
               return (
+                <Fragment key={m.id}>
+                {firstDiet && <span aria-hidden="true" className="hidden h-0 basis-full sm:block" />}
+                {firstDiet && <span aria-hidden="true" className="self-center shrink-0 whitespace-nowrap px-1 pb-1 font-note text-[15px] italic text-ink/80 max-sm:hidden">For dietary needs:</span>}
                 <button
                   key={m.id}
                   role="tab"
@@ -434,27 +463,28 @@ export default function MenuBook({
                     setActive(m.id);
                     setOpened(true);
                   }}
-                  className={`${TAB_COLORS[i % TAB_COLORS.length]} min-h-11 shrink-0 whitespace-nowrap px-4 font-label text-[13px] font-bold uppercase tracking-[0.18em] shadow-[0_-2px_6px_rgb(0_0_0/0.12)] transition-[padding,transform] duration-200 ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 opacity-90 hover:translate-y-0'}`}
+                  className={`${on ? 'bg-ink text-sand border-ink' : 'bg-paper-light text-ink border-ink/50'} min-h-11 shrink-0 whitespace-nowrap border-2 border-b-0 px-4 font-label text-[15px] font-bold tracking-[0.02em] shadow-[0_-2px_6px_rgb(0_0_0/0.10)] transition-[padding,transform] duration-200 ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 hover:translate-y-0'}`}
                 >
                   {m.tab}
                 </button>
+                </Fragment>
               );
             })}
           </div>
-          <div className="relative drop-shadow-[0_24px_30px_rgb(0_0_0/0.35)]">
-            <PageFlip key={`${place?.id}-${menu.id}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
+          <div className="relative mx-auto drop-shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[40svh]" style={{ maxWidth: 'min(1000px, calc((100svh - 340px) * 1.5))' }}>
+            <PageFlip key={`${place?.id}-${menu.id}-${opened ? 'open' : 'shut'}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
           </div>
         </div>
-        <p className="m-0 mt-5 text-center font-label text-[12.5px] font-bold uppercase tracking-[0.2em] text-ink/70 sm:hidden">Swipe sideways or tap a page edge to turn</p>
+        <p className="m-0 mt-5 text-center font-note text-[16px] italic text-ink/80 sm:hidden">Swipe sideways or tap a page edge to turn</p>
         {place?.book && (
-          <a href={place.book.href} target="_blank" rel="noopener" className="btn btn-orange mt-6">
+          <a href={place.book.href} target="_blank" rel="noopener" className="fp-btn fp-btn--primary mt-6">
             {place.book.label}
           </a>
         )}
         </>
         )}
         {next && (
-          <a href={next.href} className="mt-6 inline-flex min-h-11 items-center gap-2 border-b-2 border-ink pb-0.5 font-bold uppercase tracking-[0.1em] text-ink no-underline">
+          <a href={next.href} className="mt-6 inline-flex min-h-11 items-center gap-2 border-b-2 border-ink pb-0.5 font-bold text-ink no-underline">
             {next.label} <span aria-hidden="true">↓</span>
           </a>
         )}

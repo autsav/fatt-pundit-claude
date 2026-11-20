@@ -7,6 +7,7 @@
  * Re-run when a branch name, address or opening status changes.
  */
 import { mkdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const BASE = process.env.BASE ?? 'http://localhost:4321';
 const IDS = ['home', 'soho', 'covent-garden', 'dubai'];
@@ -17,7 +18,8 @@ mkdirSync(new URL('../public/og/', import.meta.url), { recursive: true });
 for (const id of IDS) {
   await page.goto(`${BASE}/og/${id}/`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
-  const path = new URL(`../public/og/${id}.png`, import.meta.url).pathname;
+  // fileURLToPath, not .pathname: on Windows .pathname is "/C:/…", which the screenshot can't write to.
+  const path = fileURLToPath(new URL(`../public/og/${id}.png`, import.meta.url));
   await page.screenshot({ path, type: 'png' });
   console.log('wrote', path);
 }
