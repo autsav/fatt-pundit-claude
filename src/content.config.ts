@@ -48,7 +48,18 @@ const branches = defineCollection({
       delivery: z.array(z.object({ provider: z.enum(['deliveroo', 'uber-eats']), url: z.url() })),
       clickAndCollectUrl: z.url().nullable(),
       vouchersUrl: z.url().nullable(),
-      groupsNote: z.string().nullable(),
+      // Group and deposit rules (client, 20 Nov 2026). Every page prints them from here.
+      groups: z
+        .object({
+          onlineMax: z.number().int().min(1), // largest party the online booking takes
+          callAbove: z.boolean(), // parties above onlineMax (and below setMenuFrom) call the restaurant
+          setMenuFrom: z.number().int().min(2), // from this size, groups dine from the set menu
+          depositFrom: z.number().int().min(1),
+          depositPerHead: z.number().positive(), // in the branch currency
+          refundHours: z.number().int().min(0), // full refund when cancelled at least this long before
+        })
+        .nullable(),
+      preTheatre: z.tuple([time, time]).nullable(), // first and last seating for the pre-theatre menu
       menus: z.array(z.string()),
       // The branch's own page (/soho/, /covent-garden/, /dubai/).
       page: z.object({

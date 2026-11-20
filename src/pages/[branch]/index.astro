@@ -18,20 +18,17 @@ import WalkTheRoom from '../../components/branch/WalkTheRoom.tsx';
 import RoomContactSheet from '../../components/scenes/RoomContactSheet.tsx';
 import TonightBoard from '../../components/branch/TonightBoard.tsx';
 import { loadSpecials } from '../../lib/specials';
-import MenuBook from '../../components/scenes/MenuBook.tsx';
+import { getEntry } from 'astro:content';
 import LoopVideo from '../../components/site/LoopVideo.astro';
 import LightsOn from '../../components/site/LightsOn.astro';
 import lightsOnClip from '../../assets/video/cg-lights-on.mp4';
 import lightsOffStill from '../../assets/video/cg-lights-on-off.jpg';
 import lightsLitStill from '../../assets/video/cg-lights-on-lit.jpg';
 import boothsLoop from '../../assets/video/cg-booths-glow.mp4';
-import { appleMapsUrl, BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, hoursLines, menuBooks, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
+import { appleMapsUrl, BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, groupRules, hoursLines, preTheatreText, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
 import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../../assets/images/brand/logo-stamp-distressed-right.png';
 import stampGoldArt from '../../assets/images/brand/stamp-gold.png';
-import stampOrangeArt from '../../assets/images/brand/stamp-orange.png';
-import frameArt from '../../assets/images/brand/frame.png';
-import map from '../../assets/images/brand/map.webp';
 
 export const getStaticPaths = (async () => {
   const branches = await getBranches();
@@ -93,12 +90,14 @@ const sohoStops = [
   { title: 'The kitchen', zone: 'kitchen' as const, note: 'At the end of the room, where the momos come from.' },
 ];
 
-const books = open ? await menuBooks(b.menus) : [];
+// Menus as a numbered ledger, each row straight into the list page (approved mock §9, D3).
+const menuRows = open ? (await Promise.all(b.menus.map((id) => getEntry('menus', id)))).filter(Boolean).map((m) => ({ id: m!.data.id ?? m!.id, title: m!.data.title })) : [];
+const preTheatre = preTheatreText(b);
 const wallOff = (await getImage({ src: lightsOffStill, width: 1280, format: 'webp', quality: 80 })).src;
 const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'webp', quality: 80 })).src;
 // Bulb positions (% of each photo), measured from the frames.
 const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 0.6 }, { x: 65.9, y: 13.3, size: 0.6 }];
-const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
+const menuArt = { stampGold: await stampSrc(stampGoldArt, 220) };
 
 // Tonight's board: every row for this branch goes to the page; the board picks today's.
 const specials = open ? (await loadSpecials()).filter((r) => r.branch === b.id || r.branch === 'all') : [];
@@ -106,6 +105,9 @@ const others = branches.filter((o) => o.id !== b.id);
 const words = open ? [b.shortName] : [b.shortName, 'The Hangout', 'Boarding soon'];
 const pill = { shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status };
 const hours = b.hours ? hoursLines(b.hours) : [];
+const rules = groupRules(b);
+// The Dubai list sends through a form-to-email service once the Dubai address is verified (CLIENT-INPUTS #5, #10).
+const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
 
 // Search engines: one Restaurant per page.
 const DAY_NAMES: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
@@ -135,7 +137,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 <Base title={title} description={description} og={b.id}>
   {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="(min-width: 1024px) 62vw, 100vw" fetchpriority="high" />}
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <a class="skip" href="#visit">Skip to opening hours and directions</a>
+  <a class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
   <SiteHeader branches={branches} current={b} />
 
   <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
@@ -169,10 +171,9 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
           {open && b.booking ? (
             <a class="btn btn-orange" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
           ) : (
-            <a class="btn btn-orange" href="#waitlist">Join the list</a>
+            <a class="btn btn-orange" href="#waitlist" data-focus-list>Join the list</a>
           )}
-          {b.phone && <a class="btn btn-ghost-light" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
-          <a class="btn btn-ghost-light" href={directionsUrl(b)} target="_blank" rel="noopener">Directions</a>
+          {open && <a class="btn btn-ghost-light" href={`/${b.id}/menu/`}>See the menus</a>}
         </div>
       </div>
     </section>
@@ -185,14 +186,23 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <section id="waitlist" class="sec gold-bg" aria-labelledby="wl-title">
         <div class="wrap narrow stack center">
           <h2 id="wl-title" class="h2">Be first through the door</h2>
-          <p>Leave your email and we'll tell you when bookings open at The Hangout.</p>
-          <form class="wl-form row" data-waitlist>
-            <label for="wl-email" class="sr-only">Email address</label>
-            <input id="wl-email" type="email" required placeholder="you@example.com" autocomplete="email" />
-            <button class="btn btn-ink" type="submit">Join the list</button>
-          </form>
-          <p class="small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
-          <p class="wl-msg" role="status" hidden>Thanks. (Demo only: nothing was sent.)</p>
+          {listEndpoint ? (
+            <>
+              <p>Leave your email and we'll tell you when bookings open at The Hangout.</p>
+              <form class="wl-form" data-waitlist data-list={b.id} action={listEndpoint} method="post" novalidate>
+                <input type="hidden" name="list" value={`${b.shortName} opening`} />
+                <label for="wl-email" class="wl-label">Email address</label>
+                <div class="row wl-row">
+                  <input id="wl-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email" aria-describedby="wl-email-msg" />
+                  <button class="btn btn-ink" type="submit">Join the list</button>
+                </div>
+                <p id="wl-email-msg" data-wl-msg hidden></p>
+              </form>
+              <p class="small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
+            </>
+          ) : (
+            <p class="wl-soon">The Dubai list opens soon. For the opening date, follow <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">@fattpundit on Instagram<span class="sr-only"> (opens in a new tab)</span></a>.</p>
+          )}
         </div>
       </section>
     )}
@@ -203,7 +213,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <div class="wrap stack-lg">
         <div class="stack">
           <p class="kicker lead-text">{p.opened ? `The room, since ${p.opened}` : 'The room, coming soon'}</p>
-          <h2 id="room-title" class="room-lines">{p.lines.map((l) => <span>{l}</span>)}</h2>
+          <h2 id="room-title" class="room-lines"><span class="sr-only">The room: </span>{p.lines.map((l) => <span>{l}</span>)}</h2>
         </div>
         {b.id === 'covent-garden' && (
           <>
@@ -236,9 +246,10 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             </div>
             <div class="stack">
               <p class="kicker lead-text">{signature.label === 'only-here' ? `Only at ${b.shortName}` : `Born at ${b.shortName}`}</p>
-              <h2 id="sig-title" class="h2">{signature.d.name}</h2>
+              <h2 id="sig-title" class="h2"><span class="sr-only">{signature.label === 'only-here' ? 'Only here' : 'Born here'}: </span>{signature.d.name}</h2>
               {signature.d.description && <p class="sig-desc">{signature.d.description}</p>}
               <p>{signature.story}</p>
+              {open && <p><a class="sig-find" href={`/${b.id}/menu/#${signature.d.kind === 'drink' ? 'drinks' : 'a-la-carte'}`}>Find it on the menu</a></p>}
               {signature.d.tags.length > 0 && <p class="tags">{signature.d.tags.join(' · ')}</p>}
             </div>
           </div>
@@ -264,15 +275,34 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     </section>
 
     <!-- 4 · The menus here -->
-    {books.length > 0 && <MenuBook client:visible menus={books} art={menuArt} next={{ href: '#visit', label: 'Continue to visit' }} />}
-    {open && <p class="menu-list-link"><a href={`/${b.id}/menu/`}>Read every {b.shortName} menu as a list</a>, with search, diet filters and printing.</p>}
+    {menuRows.length > 0 && (
+      <section id="menu" class="sec sand menus-sec" aria-labelledby="menus-title">
+        <div class="wrap stack-lg">
+          <div class="stack">
+            <p class="kicker lead-text">The menus</p>
+            <h2 id="menus-title" class="h2 h2-light">Menus at {b.shortName}</h2>
+            <p class="menus-intro">Each one opens as a list, with search, diet filters and printing.</p>
+          </div>
+          <ol class="fp-ledger menus-ledger" role="list">
+            {menuRows.map((m, i) => (
+              <li><a class="menus-row" href={`/${b.id}/menu/#${m.id}`}>
+                <span class="menus-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span class="menus-name">{m.title}</span>
+                <span class="menus-note">{m.id === 'pre-theatre' || m.id === 'vegetarian-pre-theatre' ? (preTheatre ? `Seated ${preTheatre}` : '') : ''}</span>
+                <span class="menus-go" aria-hidden="true">›</span>
+              </a></li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )}
 
     <!-- 5 · Visit -->
-    <section id="visit" class="sec ink visit" aria-labelledby="visit-title">
+    {open && <section id="visit" class="sec ink visit" aria-labelledby="visit-title">
       <div class="wrap visit-grid">
         <div class="stack">
           <p class="kicker gold">Visit</p>
-          <h2 id="visit-title" class="h2">{b.address.street.split(',')[0]}</h2>
+          <h2 id="visit-title" class="h2"><span class="sr-only">Visit: </span>{b.address.street.split(',')[0]}</h2>
           <p>{fullAddress(b)}</p>
           <p class="small">Nearest {p.stations.length > 1 ? 'stations' : 'station'}: {p.stations.join(', ')}</p>
           <div class="row">
@@ -292,13 +322,15 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             <p>Hours are announced with the opening date.</p>
           )}
           {b.booking && <p class="small">Book online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>}
-          {b.groupsNote && <p class="small">{b.groupsNote}</p>}
-          {b.delivery.length > 0 && (
-            <p class="small">At home: {b.delivery.map((d, i) => (<>{i > 0 && ' or '}<a href={d.url} target="_blank" rel="noopener">{d.provider === 'deliveroo' ? 'Deliveroo' : 'Uber Eats'}</a></>))}</p>
+          {(b.delivery.length > 0 || b.clickAndCollectUrl) && (
+            <p class="small" id="at-home">
+              {b.clickAndCollectUrl && <>Collect it yourself: <a href={b.clickAndCollectUrl} target="_blank" rel="noopener">order for pickup<span class="sr-only"> (opens in a new tab)</span></a>. </>}
+              {b.delivery.length > 0 && <>Delivered: {b.delivery.map((d, i) => (<>{i > 0 && ' or '}<a href={d.url} target="_blank" rel="noopener">{d.provider === 'deliveroo' ? 'Deliveroo' : 'Uber Eats'}<span class="sr-only"> (opens in a new tab)</span></a></>))}.</>}
+            </p>
           )}
         </div>
       </div>
-    </section>
+    </section>}
 
     <!-- 6 · Good to know (only what we actually know) -->
     {open && (
@@ -306,7 +338,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         <div class="wrap stack-lg">
           <div class="stack">
             <p class="kicker">Good to know</p>
-            <h2 id="good-title" class="h2 h2-light">Before you travel.</h2>
+            <h2 id="good-title" class="h2 h2-light"><span class="sr-only">Good to know: </span>Before you travel.</h2>
           </div>
           <ul class="lug" role="list">
             <li class="tag"><div class="tag-in">
@@ -321,7 +353,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             </div></li>
             <li class="tag"><div class="tag-in">
               <h3 class="tag-t">Groups</h3>
-              <p>{b.groupsNote ?? 'For larger tables, please call the restaurant.'}</p>
+              <p>{rules ? `${rules.online} ${rules.call ?? ''} ${rules.setMenu} ${rules.depositShort}` : 'For larger tables, please call the restaurant.'}</p>
               <p class="tag-link"><a href="/private-dining/">Private dining and big tables</a></p>
             </div></li>
           </ul>
@@ -334,8 +366,8 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     <section class="sec sand others" aria-labelledby="others-title">
       <div class="wrap stack-lg">
         <div class="stack">
-          <p class="kicker">The other rooms</p>
-          <h2 id="others-title" class="h2 h2-light">Onward travel.</h2>
+          <p class="kicker">{open ? 'The other rooms' : 'In London'}</p>
+          <h2 id="others-title" class="h2 h2-light"><span class="sr-only">{open ? 'The other rooms: ' : 'In London: '}</span>{open ? 'Onward travel.' : 'Before then, in London.'}</h2>
         </div>
         <div class="other-grid">
           {others.map((o) => (
@@ -376,15 +408,9 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     const day = new Intl.DateTimeFormat('en-GB', { timeZone: dl.dataset.tz, weekday: 'short' }).format(new Date()).slice(0, 3).toLowerCase();
     dl.querySelector(`[data-days~="${day}"]`)?.classList.add('today');
   }
-  // Demo waitlist: no data leaves the page.
-  for (const f of document.querySelectorAll<HTMLFormElement>('[data-waitlist]')) {
-    f.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const msg = f.parentElement?.querySelector<HTMLElement>('.wl-msg');
-      if (msg) msg.hidden = false;
-      f.reset();
-    });
-  }
+  // The Dubai list: real states once PUBLIC_DUBAI_LIST_ENDPOINT is set (no form is rendered before that).
+  import { bindWaitlists } from '../../lib/waitlist';
+  bindWaitlists();
 </script>
 
 <style>
@@ -548,6 +574,25 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .other-name { font-size: clamp(30px, 3.2vw, 46px); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
   .other-addr { font-size: 17px; }
   .other-go { margin-top: 10px; font-weight: 700; color: var(--color-tiger-deep); text-decoration: underline; text-underline-offset: 4px; }
+  .wl-form { display: grid; gap: 8px; width: min(100%, 520px); margin-inline: auto; text-align: left; }
+  .wl-label { font-weight: 700; }
+  .wl-row { display: flex; gap: 8px; }
+  .wl-row input { flex: 1; min-width: 0; min-height: 48px; padding: 0 14px; font: inherit; font-size: 17px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); }
+  .wl-row input[aria-invalid='true'] { box-shadow: -6px 0 0 var(--color-tiger-deep); border-color: var(--color-tiger-deep); }
+  .wl-soon { max-width: 30em; margin-inline: auto; font-size: 19px; }
+  .wl-soon a { color: inherit; font-weight: 700; }
+  .sig-find { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 4px; }
+  /* Menus as a numbered ledger (Phase 4 D3): one row per menu, straight into the list page. */
+  .menus-intro { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 19px; }
+  .menus-ledger { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--color-ink); max-width: 860px; }
+  .menus-row { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto 1.4em; align-items: baseline; column-gap: 12px; min-height: 56px; padding: 14px 4px; border-bottom: 1px solid var(--color-ink); color: var(--color-ink); text-decoration: none; }
+  .menus-row:hover { background: var(--color-paper-light); }
+  .menus-row:hover .menus-name { text-decoration: underline; text-underline-offset: 4px; }
+  .menus-no { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--color-tiger-deep); }
+  .menus-name { font-size: clamp(19px, 1.6vw, 22px); font-weight: 700; }
+  .menus-note { font-size: 15px; color: #5b544b; text-align: right; }
+  .menus-go { font-weight: 700; text-align: right; }
+  @media (max-width: 520px) { .menus-row { grid-template-columns: 2.2em minmax(0, 1fr) 1em; } .menus-note { grid-column: 2; grid-row: 2; text-align: left; } .menus-go { grid-column: 3; grid-row: 1; } }
   .menu-list-link { margin: 0; padding: 18px 16px 0; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; }
   .menu-list-link a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
   .branch-clock { display: inline-flex; align-items: center; gap: 8px; margin: 0; min-height: 1.4em; font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; color: var(--color-sand); }

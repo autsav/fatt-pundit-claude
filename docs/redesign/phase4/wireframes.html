@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 4 UX wireframes</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#f6efe4;--surface:#faf6ef;--ink:#2c2925;--muted:#5b544b;--line:#857a6e;--fill:#e9e0d2;--night:#2c2925;--deep:#1a1714;--on-night:#f6efe4;--tiger:#f15d3d;--on-tiger:#1a1714;--note:#93321b;--gold:#cba052;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--note);text-underline-offset:2px}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:16px;z-index:9;background:var(--surface);padding:8px 12px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px 64px}
+header.doc{padding-top:32px}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:.2em 0 .4em}
+h2{font-size:clamp(23px,3vw,32px);line-height:1.2;margin:2.4em 0 .5em;padding-top:.6em;border-top:2px solid var(--ink)}
+h3{font-size:20px;line-height:1.3;margin:0 0 .3em}
+p,li{max-width:76ch}
+code{font-size:.92em;background:var(--fill);padding:0 .25em;overflow-wrap:anywhere}
+.eyebrow{font-style:italic;color:var(--note);margin:0}
+.muted{color:var(--muted)}
+.toc ol{display:flex;flex-wrap:wrap;gap:6px 22px;padding-left:1.2em}
+.legend{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));list-style:none;padding:0}
+.legend li{display:flex;gap:10px;align-items:center}
+.sw{flex:none;display:inline-block;min-width:74px;text-align:center;font-size:13px;font-weight:700}
+/* sitemap */
+.tree,.tree ul{list-style:none;margin:0;padding:0}
+.tree ul{margin-left:14px;border-left:2px solid var(--line);padding-left:14px}
+.tree li{margin:8px 0;max-width:none}
+.node{display:inline-flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;background:var(--surface);border:1.5px solid var(--ink);padding:6px 10px;max-width:100%}
+.node code{background:none;padding:0;font-weight:700}
+.tag{font-size:13px;font-weight:700;padding:0 8px;border:1.5px solid currentColor;border-radius:999px;white-space:nowrap}
+.tag.new{background:var(--tiger);color:var(--on-tiger);border-color:var(--tiger)}
+.tag.cond{border-style:dashed}
+.tag.fix{color:var(--note)}
+/* figures */
+figure{margin:28px 0 0}
+figcaption p{margin:.2em 0 .8em}
+.pair{display:grid;gap:18px 32px;align-items:start;grid-template-columns:minmax(0,1fr)}
+@media (min-width:820px){.pair{grid-template-columns:minmax(0,340px) minmax(0,1fr)}}
+.spec{margin:0;padding-left:1.7em}
+.spec li{margin:.4em 0}
+.spec li::marker{font-weight:700;color:var(--note)}
+.after{margin-top:12px}
+.states{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));margin-top:14px}
+.states figure{margin:0}
+.states figcaption{margin-top:8px;font-size:15px}
+/* wireframe primitives */
+.ph{width:100%;max-width:340px;background:var(--surface);border:2px solid var(--ink);border-radius:18px;overflow:hidden;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.dk{container-type:inline-size;background:var(--surface);border:2px solid var(--ink);border-radius:8px;overflow:hidden;margin-top:18px;overflow-wrap:anywhere}
+.dk>.in{font-size:clamp(9px,1.25cqw,14px);line-height:1.35}
+.r{position:relative;padding:.7em .9em .8em 2.6em;border-top:1px dashed var(--line)}
+.r:first-child{border-top:0}
+.r>.n{position:absolute;left:.55em;top:.65em}
+.night{background:var(--night);color:var(--on-night);--line:#8f857a}
+.deep{background:var(--deep);color:var(--on-night);--line:#8f857a}
+.gold{background:var(--gold)}
+.fillb{background:var(--fill)}
+.n{display:inline-grid;place-items:center;min-width:1.75em;height:1.75em;border-radius:50%;background:var(--note);color:#faf6ef;font-weight:700;font-size:.8em;font-style:normal}
+.night .n,.deep .n{background:var(--tiger);color:var(--on-tiger)}
+.lv{font-style:normal;font-size:.72em;font-weight:700;border:1px solid currentColor;padding:0 .3em;margin-right:.35em;vertical-align:.12em}
+.hx{display:block;font-weight:700;font-size:1.2em;margin:.15em 0}
+.hx.xl{font-size:1.9em;letter-spacing:.05em}
+.k{display:block;font-style:italic}
+.p,.s,.l{display:inline-block;margin:.35em .4em 0 0;font-weight:700}
+.p{background:var(--tiger);color:var(--on-tiger);padding:.38em .75em}
+.s{border:1.5px solid currentColor;padding:.3em .7em}
+.l{text-decoration:underline;text-underline-offset:2px}
+.p.x{background:none;color:inherit;border:1.5px dashed currentColor;padding:.3em .7em}
+.obj{border:1.5px dashed currentColor;padding:.8em .6em;margin:.45em 0;text-align:center;background:repeating-linear-gradient(135deg,transparent 0 7px,rgb(133 122 110/.2) 7px 8px)}
+.tall{padding:2.4em .6em}
+.lg{margin:.35em 0}
+.lg>div{display:flex;justify-content:space-between;gap:.6em;padding:.32em 0;border-bottom:1px solid var(--line)}
+.lg>div>:last-child{text-align:right}
+.lg .today{font-weight:700;box-shadow:inset 3px 0 0 currentColor;padding-left:.4em}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.3em .8em;font-weight:700}
+.bar .s,.bar .p{margin:0}
+.dock{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));text-align:center;background:var(--deep);color:var(--on-night);border-top:2px solid var(--tiger);font-weight:700}
+.dock.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dock>span{padding:.8em .2em;border-left:1px solid #5b544b;margin:0}
+.dock>span:first-child{border-left:0}
+.field{border:1.5px solid var(--ink);background:#fff;min-height:2.3em;padding:.45em .6em;color:var(--muted);margin:.2em 0 .1em}
+.field.bad{border-color:var(--note);box-shadow:-5px 0 0 var(--note)}
+.lab{display:block;font-weight:700;margin-top:.5em}
+.chips{display:flex;flex-wrap:wrap;gap:.35em;margin:.3em 0}
+.chips>span{border:1.5px solid currentColor;padding:.25em .55em}
+.chips>.on{background:var(--ink);color:var(--surface)}
+.night .chips>.on{background:var(--on-night);color:var(--ink)}
+.msg{border-left:4px solid var(--note);padding:.45em .6em;background:var(--fill);margin:.45em 0;color:var(--ink)}
+.msg.ok{border-color:#465460}
+.pop{background:var(--surface);color:var(--ink);border:2px solid var(--ink);padding:.5em .7em;margin:.5em 0 0 auto;max-width:22em}
+.pop>div{padding:.3em 0;border-bottom:1px solid var(--line)}
+.g2,.g3,.g4{display:grid;gap:.6em}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g37{display:grid;gap:.8em;grid-template-columns:minmax(0,3fr) minmax(0,7fr)}
+.g64{display:grid;gap:.8em;grid-template-columns:minmax(0,6fr) minmax(0,4fr)}
+.center{text-align:center}
+.rail{position:absolute;right:.6em;top:50%;transform:translateY(-50%);font-size:.8em;text-align:right;line-height:1.7}
+@container (max-width:700px){.rail{display:none}}
+/* journeys */
+.journey{margin-top:30px}
+.meta{display:flex;flex-wrap:wrap;gap:4px 18px;margin:.2em 0 .6em;font-size:15px;color:var(--muted)}
+.flow{list-style:none;margin:0;padding:0;counter-reset:step;display:grid;gap:22px}
+.flow>li{position:relative;counter-increment:step;background:var(--surface);border:1.5px solid var(--ink);padding:10px 12px 10px 48px;max-width:760px}
+.flow>li::before{content:counter(step);position:absolute;left:10px;top:9px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--surface);font-weight:700;font-size:14px}
+.flow>li:not(:last-child)::after{content:"↓" / "";position:absolute;left:18px;bottom:-22px;font-weight:700;line-height:22px}
+.flow>li.out{border-style:dashed;background:var(--fill)}
+.where{font-size:13px;font-weight:700;border:1.5px solid currentColor;border-radius:999px;padding:0 8px;margin-left:6px;white-space:nowrap}
+.alt{margin:.35em 0 0;padding-left:1.2em;font-size:15px;color:var(--muted)}
+.alt li{margin:.15em 0}
+footer.doc{border-top:2px solid var(--ink);margin-top:48px;padding-top:16px;font-size:15px;color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+<header class="doc">
+  <p class="eyebrow">Fatt Pundit redesign · Phase 4 · proposal for review, 20 November 2026</p>
+  <h1>UX structure: sitemap, navigation, journeys and wireframes</h1>
+  <p>Companion to <code>ux-structure.md</code>, which holds the analysis, the page-by-page hierarchy, CTA rules, states, redirects and the decisions. Low fidelity on purpose: these pictures fix order, hierarchy and behaviour, not the look (that is the approved Phase 3 system). Facts come from the site data; wording marked <i>(draft)</i> is a proposal.</p>
+  <nav class="toc" aria-label="Contents">
+    <ol>
+      <li><a href="#legend">How to read</a></li>
+      <li><a href="#sitemap">Sitemap</a></li>
+      <li><a href="#nav">Navigation model</a></li>
+      <li><a href="#journeys">Journeys</a></li>
+      <li><a href="#wireframes">Wireframes</a></li>
+    </ol>
+  </nav>
+</header>
+
+<main id="main">
+<section aria-labelledby="legend">
+  <h2 id="legend">How to read the wireframes</h2>
+  <p>Each wireframe is a picture followed by a numbered list. <strong>The list is the full text equivalent</strong>: reading and focus order, landmarks, heading levels, controls and their tier. Numbers in the picture match the list. The pictures are hidden from screen readers so the content is not read twice.</p>
+  <ul class="legend">
+    <li><span class="sw p">Book</span> Primary action. One per view.</li>
+    <li><span class="sw s">Menus</span> Secondary action.</li>
+    <li><span class="sw l">Call</span> Text action.</li>
+    <li><span class="sw obj">Object</span> One of the six approved objects (moment).</li>
+    <li><span class="sw" style="border-top:1px solid var(--line);border-bottom:1px solid var(--line)">Row · £11</span> Ledger: facts set as rows.</li>
+    <li><span class="sw"><i class="lv">H2</i></span> Real heading level.</li>
+    <li><span class="sw"><b class="n">3</b></span> Order marker, matches the list.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sitemap">
+  <h2 id="sitemap">1. Sitemap</h2>
+  <p>Two levels. Everything a guest does lives under the branch URL; the story lives on home. Every current URL keeps working.</p>
+  <ul class="tree">
+    <li><span class="node"><code>/</code> Home: the story, then choose a room <span class="tag">kept</span></span>
+      <ul>
+        <li><span class="node"><code>/soho/</code> Soho <span class="tag fix">reordered</span></span>
+          <ul><li><span class="node"><code>/soho/menu/</code> Soho menus, <code>#a-la-carte</code> … <code>#drinks</code> <span class="tag fix">one menu at a time</span></span></li></ul></li>
+        <li><span class="node"><code>/covent-garden/</code> Covent Garden <span class="tag fix">reordered</span></span>
+          <ul><li><span class="node"><code>/covent-garden/menu/</code> Covent Garden menus <span class="tag fix">one menu at a time</span></span></li></ul></li>
+        <li><span class="node"><code>/dubai/</code> Dubai, opening soon: the list <span class="tag">kept</span></span>
+          <ul><li><span class="node"><code>/dubai/menu/</code> appears by itself when Dubai has menus <span class="tag cond">automatic</span></span></li></ul></li>
+        <li><span class="node"><code>/book/</code> Book a table: the booking desk <span class="tag new">new · D1</span></span></li>
+        <li><span class="node"><code>/private-dining/</code> Groups and private dining <span class="tag fix">real form</span></span></li>
+        <li><span class="node"><code>/gift-vouchers/</code> only if a voucher provider exists <span class="tag cond">conditional · D7</span></span></li>
+        <li><span class="node"><code>/allergens/</code> <code>/booking-terms/</code> <code>/accessibility/</code> <code>/privacy/</code> <span class="tag fix">document pattern</span></span></li>
+        <li><span class="node">404 Lost luggage <span class="tag fix">more routes</span></span></li>
+      </ul>
+    </li>
+  </ul>
+  <p class="muted">Not in navigation: <code>/sitemap.xml</code>, <code>/robots.txt</code>, <code>/og/*</code>, <code>/styleguide/</code> (preview builds only). Old URLs redirect: <code>/soho/reserve-a-table/</code> and <code>/covent-garden/reserve-a-table/</code> → <code>/book/?branch=…</code>; <code>/soho/monetary-voucher/</code> → vouchers or <code>/soho/</code>; <code>/soho/food-pickup/</code> → <code>/soho/#at-home</code>.</p>
+</section>
+
+<section aria-labelledby="nav">
+  <h2 id="nav">2. Navigation model</h2>
+  <p>The same items in the same order on every page. Context (the branch whose pages these are) changes where Book, Call and Menus go, never which items exist.</p>
+
+  <figure>
+    <figcaption><h3>N1 · Header at 1100 px and wider</h3><p>Four states of the one bar.</p></figcaption>
+    <div class="dk" aria-hidden="true"><div class="in">
+      <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span>Soho · Covent Garden · Dubai · Menus ▾ · Groups</span><span class="p">Book a table</span></div>
+      <div class="r night bar"><b class="n">2</b><span>FATT PUNDIT</span><span>Soho · <u>Covent Garden</u> · Dubai · Menus ▾ · Groups</span><span class="p">Book at Covent Garden</span></div>
+      <div class="r night bar"><b class="n">3</b><span>FATT PUNDIT</span><span>Soho · Covent Garden · <u>Dubai</u> · Menus ▾ · Groups</span><span class="p">Join the list</span></div>
+      <div class="r night"><b class="n">4</b><div class="bar"><span>FATT PUNDIT</span><span>Soho · Covent Garden · Dubai · <u>Menus ▴</u> · Groups</span><span class="p">Book a table</span></div>
+        <div class="pop"><div>Soho menus · 77 Berwick Street</div><div>Covent Garden menus · 6 Maiden Lane</div></div></div>
+    </div></div>
+    <ol class="spec after">
+      <li><strong>Home, info pages, groups, the booking desk, 404.</strong> Book a table opens the drawer; the guest picks the room (last choice first).</li>
+      <li><strong>A branch and its menu page</strong> (here Covent Garden). The branch link carries <code>aria-current="page"</code>, shown by an underline, not colour alone. Book names the room and opens the drawer preset.</li>
+      <li><strong>Dubai.</strong> The action reads Join the list and moves focus into the email field.</li>
+      <li><strong>Menus open.</strong> A disclosure button (<code>aria-expanded</code>) with two plain links, current or last-viewed room first. Escape closes and keeps focus on the button. Without JavaScript it is a link to the footer's menu links.</li>
+    </ol>
+  </figure>
+
+  <figure>
+    <figcaption><h3>N2 · Phone header and the Index sheet</h3><p>The Index becomes a ledger: each room row carries its own Menus and Book.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r deep"><b class="n">2</b>
+          <div class="bar"><span class="hx"><i class="lv">H2</i> Index</span><span class="s">Close</span></div>
+          <div class="lg">
+            <div><span><b>01 Soho</b><br>77 Berwick Street · Open until 10.30pm</span><span><span class="l">Menus</span> <span class="l">Book</span></span></div>
+            <div><span><b>02 Covent Garden</b><br>6 Maiden Lane · Opens 4.45pm</span><span><span class="l">Menus</span> <span class="l">Book</span></span></div>
+            <div><span><b>03 Dubai</b><br>Opening soon</span><span class="l">Join the list</span></div>
+            <div><span><b>04 Groups and private dining</b><br>Online up to 7 at Soho, 4 at Covent Garden</span><span></span></div>
+            <div><span><b>05 Our story</b></span><span></span></div>
+            <div><span><b>06 Allergens and dietary needs</b></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner.</strong> Wordmark (home link), then the Index button (<code>aria-haspopup="dialog"</code>). Without JavaScript the button is a link to the footer navigation (<code>#site-index</code>).</li>
+        <li><strong>Index</strong>, a modal dialog labelled by its heading. Close comes first. Six numbered rows; in each, the name is the main link and Menus, Book or Join the list are separate links of at least 44 px. Open or closed is said in words. Group limits come from the data (decision D6). Escape closes; focus returns to Index.</li>
+      </ol>
+    </div>
+  </figure>
+
+  <figure>
+    <figcaption><h3>N3 · Phone dock by context</h3><p>Three slots at most. It hides when the footer is in view.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r"><b class="n">1</b>A branch page or its menu page</div>
+        <div class="dock"><span>Menus</span><span>Call</span><span class="p">Book</span></div>
+        <div class="r"><b class="n">2</b>Dubai (opening soon)</div>
+        <div class="dock two"><span>Rooms</span><span class="p">Join the list</span></div>
+        <div class="r"><b class="n">3</b>Everywhere else</div>
+        <div class="dock"><span>Menus</span><span>Rooms</span><span class="p">Book</span></div>
+        <div class="r deep"><b class="n">4</b><span class="hx"><i class="lv">H2</i> Which room's menus?</span>
+          <div class="lg"><div><span>Soho menus</span><span>77 Berwick Street</span></div><div><span>Covent Garden menus</span><span>6 Maiden Lane</span></div></div></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Branch context</strong> (<code>/soho/</code>, <code>/soho/menu/</code>): Menus goes to that room's menu page, Call dials it, Book opens the drawer preset. Today the menu page's dock sends guests to the home page (finding F1).</li>
+        <li><strong>Dubai:</strong> Rooms opens the Index; Join the list focuses the email field. The dead Menus link goes (F3).</li>
+        <li><strong>No context</strong> (home, groups, info, 404): Menus opens the chooser (4), Rooms opens the Index, Book opens the drawer.</li>
+        <li><strong>Menus chooser</strong>: a bottom sheet with the same two links as the desktop Menus disclosure.</li>
+      </ol>
+    </div>
+  </figure>
+</section>
+
+<section aria-labelledby="journeys">
+  <h2 id="journeys">3. Journeys</h2>
+  <p>Critical tasks, with the paths that go wrong. Dashed steps happen off our site. Tap counts are counted on our pages only.</p>
+
+  <article class="journey" aria-labelledby="j1">
+    <h3 id="j1">J1 · Book a table tonight</h3>
+    <p class="meta"><span>Tonight decider, phone</span><span>Google → <code>/soho/</code></span><span>Our taps: 2 (as today), now confirmed</span></p>
+    <ol class="flow">
+      <li>Lands on Soho. First screen: "Open until 10.30pm", Book a table, See the menus; the facts row below it.</li>
+      <li>Taps Book a table. The drawer opens for Soho: today, 2 guests, first time after 7pm chosen.
+        <ul class="alt"><li>Closed today: opens on the next open day and says "Soho is closed on Sundays".</li><li>Last booking passed: tomorrow, said in words.</li><li>No JavaScript: the link goes to <code>/book/?branch=soho</code>.</li></ul></li>
+      <li>Changes guests, day or time if needed.
+        <ul class="alt"><li>8 or more guests: the group path (set menu) (J3).</li></ul></li>
+      <li>Taps Find a table. OpenTable opens in a new tab with the choices.
+        <ul class="alt"><li>Pop-up blocked: same tab.</li></ul></li>
+      <li>The drawer stays open: "OpenTable is open in a new tab: 2 guests, Saturday 21 November, 7pm. Not there? Open OpenTable again." Close returns focus to Book.</li>
+      <li class="out">Books on OpenTable.<span class="where">Provider</span></li>
+    </ol>
+  </article>
+
+  <article class="journey" aria-labelledby="j2">
+    <h3 id="j2">J2 · Check the menu for a diet, then book</h3>
+    <p class="meta"><span>Dietary guest, phone</span><span>From <code>/covent-garden/</code></span><span>Our taps: about 6 and a 38–44 screen page → 4–5</span></p>
+    <ol class="flow">
+      <li>Taps Menus in the dock. <code>/covent-garden/menu/</code> opens on À la carte, under "Covent Garden › Menus".</li>
+      <li>Taps Show only: VG. "14 dishes" is announced; a line offers "There's also a full Vegan menu".
+        <ul class="alt"><li>Nothing matches: "No dishes match … " with Clear filters and Search all menus.</li></ul></li>
+      <li>Or opens "Menu: À la carte ▾" and picks Vegan. The address becomes <code>#vegan</code>; Back returns to À la carte.</li>
+      <li>Reads the allergy note; Allergens and dietary needs is one link away.</li>
+      <li>Taps Book (dock or page foot). The drawer opens for Covent Garden; it never asks "Where?".</li>
+      <li class="out">Find a table → SevenRooms.<span class="where">Provider</span></li>
+    </ol>
+  </article>
+
+  <article class="journey" aria-labelledby="j3">
+    <h3 id="j3">J3 · Plan a group of 12</h3>
+    <p class="meta"><span>Group organiser, desktop</span><span>Any page</span><span>Our taps: about 17 → about 6; room, date and guests not retyped</span></p>
+    <ol class="flow">
+      <li>Header Groups → <code>/private-dining/</code>, or Book a table → the drawer.</li>
+      <li>In the drawer, types 12 into the guest number.
+        <ul class="alt"><li>Above the room's online limit (Soho: 8 or more is a set-menu group, from the data): Find a table is replaced by "Send a group enquiry", with Call beside it.</li></ul></li>
+      <li>Picks a day, taps Send a group enquiry. The groups page opens with room, date and guests filled in.</li>
+      <li>Adds name, email and the occasion; taps Send enquiry. The button shows it is busy.
+        <ul class="alt"><li>A field missing or wrong: a summary at the top, focus on the first field, each message says what to do.</li><li>Network fails: nothing is lost; "Try again, or email reservations@fattpundit.co.uk".</li></ul></li>
+      <li>"Enquiry sent" replaces the form: what was sent and when to expect a reply (client to confirm).</li>
+      <li class="out">Receipt by email; the restaurant replies.<span class="where">Email</span></li>
+    </ol>
+  </article>
+
+  <article class="journey" aria-labelledby="j4">
+    <h3 id="j4">J4 · Find the door</h3>
+    <p class="meta"><span>Guest on the street, phone</span><span><code>/covent-garden/</code></span><span>Our taps: 1</span></p>
+    <ol class="flow">
+      <li>Facts row: 6 Maiden Lane, WC2E 7NA; nearest stations Covent Garden, Charing Cross.</li>
+      <li>Taps Directions (new tab announced).</li>
+      <li class="out">Google Maps walks them there.<span class="where">Maps app</span>
+        <ul class="alt"><li>Running late: Call 020 7836 8883, in the same row and the dock.</li></ul></li>
+    </ol>
+  </article>
+
+  <article class="journey" aria-labelledby="j5">
+    <h3 id="j5">J5 · Join the Dubai list</h3>
+    <p class="meta"><span>Dubai local, phone</span><span>Instagram → <code>/dubai/</code></span><span>Our taps: 3 → 2, and the email is kept</span></p>
+    <ol class="flow">
+      <li>First screen: Opening soon at The Hangout, Mall of the Emirates; Join the list.</li>
+      <li>Join the list moves focus into the email field; the keyboard opens.</li>
+      <li>Types an email, taps Join the list. The button shows it is busy.
+        <ul class="alt"><li>Not an email: "Enter an email address like name@example.com".</li><li>Network fails: "We couldn't add you. Try again in a moment." The email stays in the field.</li></ul></li>
+      <li>"You're on the list. We'll email you when Dubai takes bookings." Focus moves to the message.</li>
+    </ol>
+  </article>
+
+  <article class="journey" aria-labelledby="j6">
+    <h3 id="j6">J6 · An old "Reserve a table" link</h3>
+    <p class="meta"><span>Returning guest</span><span>Bookmark, Google profile or Instagram bio</span><span>Today: 404</span></p>
+    <ol class="flow">
+      <li>Opens <code>/soho/reserve-a-table/</code>.</li>
+      <li class="out">301 to <code>/book/?branch=soho</code>.<span class="where">Server</span></li>
+      <li>The drawer opens for Soho over the booking desk.
+        <ul class="alt"><li>No JavaScript: the desk lists Soho first, with Book at Soho on OpenTable.</li></ul></li>
+      <li>Continues as J1, step 3.</li>
+    </ol>
+  </article>
+
+  <article class="journey" aria-labelledby="j7">
+    <h3 id="j7">J7 · The story first, then a table</h3>
+    <p class="meta"><span>First visit, desktop</span><span>Instagram → <code>/</code></span><span>Unchanged: the story is the brand's main asset</span></p>
+    <ol class="flow">
+      <li>Home. The intro plays once per device and can be skipped.</li>
+      <li>Scrolls the story. Book stays in the header; the chapter rail shows where they are.</li>
+      <li>At the menu book, "Soho menus" opens the list if they want detail.</li>
+      <li>Choose your gate: tears the Soho stub.
+        <ul class="alt"><li>Calm mode: the stub is a plain link.</li></ul></li>
+      <li class="out">OpenTable in a new tab.<span class="where">Provider</span></li>
+    </ol>
+  </article>
+</section>
+
+<section aria-labelledby="wireframes">
+  <h2 id="wireframes">4. Wireframes</h2>
+  <p>Phone first (390 px), then desktop (1440 px) for the three busiest page types. Desktop keeps the phone's order and numbers; only the layout changes.</p>
+
+  <!-- W1 Home -->
+  <figure>
+    <figcaption><h3>W1 · Home <code>/</code></h3><p>The story stays. The task routes get stronger and the group line tells the truth for both rooms.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r night center"><b class="n">2</b><span class="k">Hakka cooking from Kolkata's Chinatown</span><span class="hx xl"><i class="lv">H1</i>FATT PUNDIT</span>
+          <div class="lg" style="text-align:left"><div><span>W1 Soho</span><span>Open until 10.30pm ›</span></div><div><span>WC2 Covent Garden</span><span>Opens 4.45pm ›</span></div><div><span>DXB Dubai</span><span>Opening soon ›</span></div></div>
+          <span class="p">Book a table</span><br><span class="l">Or see the menus first</span></div>
+        <div class="r night"><b class="n">3</b><span class="hx"><i class="lv">H2</i>Our story</span><div class="obj tall">Doors, then the voyage map</div></div>
+        <div class="r"><b class="n">4</b><span class="hx"><i class="lv">H2</i>The menus</span><div class="obj tall">Menu book</div><span class="s">Soho menus</span><span class="s">Covent Garden menus</span></div>
+        <div class="r night"><b class="n">5</b><span class="hx"><i class="lv">H2</i>The bar</span><div class="obj">Apron drinks card</div></div>
+        <div class="r"><b class="n">6</b><span class="hx"><i class="lv">H2</i>Pull up a chair</span><div class="obj">Contact sheet</div><span class="k">Rating only with source and date</span></div>
+        <div class="r gold"><b class="n">7</b><span class="hx"><i class="lv">H2</i>Choose your gate</span>
+          <div class="obj">Soho pass · stub <span class="s">Book at Soho</span></div><div class="obj">Covent Garden pass · stub <span class="s">Book at Covent Garden</span></div><div class="obj">Dubai pass · stub <span class="s">Join the list</span></div>
+          <span>Soho books online for up to 7, Covent Garden for up to 4. 8 or more at Soho: set menu. </span><span class="l">Bigger table? Plan a group</span></div>
+        <div class="r night"><b class="n">8</b>Receipt (home only) · Soho, Covent Garden, Dubai blocks · Menus · Groups · Our story · Allergens · Booking terms · Accessibility · Privacy · Pause motion</div>
+        <div class="dock"><span>Menus</span><span>Rooms</span><span class="p">Book</span></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner.</strong> Skip link "Skip to your table" (first focus), wordmark, Index. At 640 px and up: Book a table in the bar.</li>
+        <li><strong>Hero.</strong> Spoken line, <strong>H1</strong> Fatt Pundit. Gate board: three links whose text includes the live status ("Soho, open until 10.30pm"). <strong>Primary</strong> Book a table opens the drawer. Text link "Or see the menus first" jumps to 4.</li>
+        <li><strong>H2 Our story.</strong> Doors and voyage scene, no controls. Calm mode shows the finished map.</li>
+        <li><strong>H2 The menus.</strong> The menu book (its own tabs), then two <strong>secondary</strong> buttons to the list pages (were one text line).</li>
+        <li><strong>H2 The bar.</strong> Object only.</li>
+        <li><strong>H2 Pull up a chair.</strong> Contact sheet with lightbox. The rating appears only with a named source and date (decision D8).</li>
+        <li><strong>H2 Choose your gate.</strong> Three passes; stub links Book at Soho, Book at Covent Garden, Join the list. They are three equal choices, so none is tiger: the stubs keep the pass's own styling. Group line printed from the data.</li>
+        <li><strong>Content info</strong> (footer). Receipt ends the story here only. Branch blocks: address, phone, Menus, Book. Navigation, legal links, Pause motion.</li>
+        <li><strong>Quick actions</strong> (dock, under 640 px): Menus (chooser), Rooms (Index), Book (drawer).</li>
+      </ol>
+    </div>
+    <div class="dk" aria-hidden="true"><div class="in">
+      <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span>Soho · Covent Garden · Dubai · Menus ▾ · Groups</span><span class="p">Book a table</span></div>
+      <div class="r night center"><b class="n">2</b><span class="k">Hakka cooking from Kolkata's Chinatown</span><span class="hx xl"><i class="lv">H1</i>FATT PUNDIT</span>
+        <div class="lg" style="max-width:34em;margin:.4em auto;text-align:left"><div><span>W1 Soho</span><span>Open until 10.30pm ›</span></div><div><span>WC2 Covent Garden</span><span>Opens 4.45pm ›</span></div><div><span>DXB Dubai</span><span>Opening soon ›</span></div></div>
+        <span class="p">Book a table</span> <span class="l">Or see the menus first</span>
+        <div class="rail">The window ●<br>The voyage ○<br>The menu ○<br>The bar ○<br>The room ○<br>Your table ○</div></div>
+      <div class="r night"><b class="n">3</b><span class="hx"><i class="lv">H2</i>Our story</span><div class="obj tall">Desk spread: doors, then the voyage map across the full width</div></div>
+      <div class="r"><b class="n">4</b><div class="g64"><div class="obj tall">Menu book, two-page spread</div><div><span class="hx"><i class="lv">H2</i>The menus</span><span class="s">Soho menus</span><span class="s">Covent Garden menus</span></div></div></div>
+      <div class="r night"><b class="n">5</b><div class="g37"><span class="hx"><i class="lv">H2</i>The bar</span><div class="obj">Apron drinks card</div></div></div>
+      <div class="r"><b class="n">6</b><div class="g37"><span class="hx"><i class="lv">H2</i>Pull up a chair</span><div class="obj">Contact sheet</div></div></div>
+      <div class="r gold"><b class="n">7</b><span class="hx center"><i class="lv">H2</i>Choose your gate</span><div class="g3"><div class="obj">Soho pass<br><span class="s">Book at Soho</span></div><div class="obj">Covent Garden pass<br><span class="s">Book at Covent Garden</span></div><div class="obj">Dubai pass<br><span class="s">Join the list</span></div></div><p class="center" style="margin:.4em 0 0">Soho online up to 7, Covent Garden up to 4. <span class="l">Bigger table? Plan a group</span></p></div>
+      <div class="r night"><b class="n">8</b><div class="g4"><div class="obj">Receipt</div><div>Soho<br>77 Berwick Street<br><span class="l">Menus</span> <span class="l">Book</span></div><div>Covent Garden<br>6 Maiden Lane<br><span class="l">Menus</span> <span class="l">Book</span></div><div>Dubai<br>Opening soon<br><span class="l">Join the list</span></div></div></div>
+    </div></div>
+    <p class="after">Desktop: the full bar replaces Index and the dock; the chapter rail (right) marks the story chapters; the menu book and the bar become two-column spreads; the three passes sit side by side.</p>
+  </figure>
+
+  <!-- W2 Branch open -->
+  <figure>
+    <figcaption><h3>W2 · Branch, open <code>/covent-garden/</code> (same template for Soho)</h3><p>Facts and two actions first, story second, the full plan last. Contact details appear once in the first screen, not twice.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r night"><b class="n">2</b><div class="obj">Photo band (room)</div><span class="k">Fatt Pundit</span><span class="hx xl"><i class="lv">H1</i>COVENT GARDEN</span><span class="k">Colonial Kolkata on Maiden Lane.</span><span>● Open until 10.30pm</span><br><span class="p">Book a table</span><span class="s">See the menus</span></div>
+        <div class="r"><b class="n">3</b><div class="lg"><div><span>Today</span><span>12–2.30pm, 4.45–10.30pm</span></div><div><span>6 Maiden Lane, WC2E 7NA</span><span class="l">Directions</span></div><div><span>Stations</span><span>Covent Garden, Charing Cross</span></div><div><span>020 7836 8883</span><span class="l">Call</span></div></div></div>
+        <div class="r night"><b class="n">4</b><span class="hx"><i class="lv">H2</i>Tonight</span><div class="obj">Split-flap board (only when there are specials)</div></div>
+        <div class="r"><b class="n">5</b><span class="hx"><i class="lv">H2</i>The room: two bars, two floors</span><div class="obj tall">Lights on, then the plate wall</div></div>
+        <div class="r"><b class="n">6</b><span class="hx"><i class="lv">H2</i>Born here: White Tiger</span><div class="obj">Ticket</div><span class="l">Find it on the menu</span></div>
+        <div class="r"><b class="n">7</b><span class="hx"><i class="lv">H2</i>Menus</span><div class="lg"><div><span>01 À la carte</span><span>›</span></div><div><span>02 Set menu</span><span>›</span></div><div><span>03 Pre-theatre</span><span>›</span></div><div><span>04 Vegetarian pre-theatre</span><span>›</span></div><div><span>05–08 Vegan, Gluten free, Dairy free, Halal</span><span>›</span></div><div><span>09 Drinks</span><span>›</span></div></div></div>
+        <div class="r night"><b class="n">8</b><span class="hx"><i class="lv">H2</i>Visit: 6 Maiden Lane</span><div class="obj">Boarding pass · stub <span class="p">Book a table</span></div>
+          <div class="lg"><div><span>Mon</span><span>Closed</span></div><div><span>Tue</span><span>4.45–10.30pm</span></div><div><span>Wed</span><span>12–2.30pm, 4.45–10.30pm</span></div><div><span>Thu</span><span>12–2.30pm, 4.45–10.30pm</span></div><div class="today"><span>Fri (today)</span><span>12–2.30pm, 4.45–10.30pm</span></div><div><span>Sat</span><span>12–10.30pm</span></div><div><span>Sun</span><span>12–9pm</span></div></div>
+          <span class="s">Google Maps</span><span class="s">Apple Maps</span><span class="l">Call</span><span class="l">Email</span></div>
+        <div class="r"><b class="n">9</b><span class="hx"><i class="lv">H2</i>Good to know: before you travel.</span><div class="g3"><div class="obj">Dietary menus</div><div class="obj">Allergies</div><div class="obj">Groups: online up to 4</div></div></div>
+        <div class="r"><b class="n">10</b><span class="hx"><i class="lv">H2</i>The other rooms: onward travel.</span><div class="g2"><div class="obj">Soho postcard</div><div class="obj">Dubai postcard</div></div></div>
+        <div class="r night"><b class="n">11</b>Footer, no receipt</div>
+        <div class="dock"><span>Menus</span><span>Call</span><span class="p">Book</span></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner.</strong> Covent Garden link current; Book at Covent Garden at 640 px and up.</li>
+        <li><strong>Arrival</strong> (night). <strong>H1</strong> Fatt Pundit Covent Garden (the flap board is decorative). One spoken line. Status in words. <strong>Primary</strong> Book a table (drawer, preset). <strong>Secondary</strong> See the menus.</li>
+        <li><strong>Facts row</strong> (a description list): today's hours, address with Directions (new tab announced), nearest stations, phone with Call. No second Book.</li>
+        <li><strong>H2 Tonight.</strong> Board, only when the Sheet has rows.</li>
+        <li><strong>H2 The room</strong>, plain words first, brand lines after. Lights on, plate wall (Soho: walk the room).</li>
+        <li><strong>H2 Born here.</strong> Ticket, story, "Find it on the menu" (deep link to the right menu).</li>
+        <li><strong>H2 Menus.</strong> Numbered ledger: one link per menu, to <code>/covent-garden/menu/#id</code>. Replaces the page-flip book here (approved mock §9).</li>
+        <li><strong>H2 Visit.</strong> Pass with the Book stub (the second primary, a full screen away from the first). Hours table with a caption; today marked with a bar and the word "today". Maps, Call, Email. Soho adds an "At home" row (<code>#at-home</code>: Deliveroo, Uber Eats).</li>
+        <li><strong>H2 Good to know.</strong> Three luggage tags; the Groups tag prints the room's online limit from the data.</li>
+        <li><strong>H2 The other rooms.</strong> Two postcards, each one link.</li>
+        <li><strong>Footer</strong> without the receipt.</li>
+      </ol>
+    </div>
+    <div class="dk" aria-hidden="true"><div class="in">
+      <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span>Soho · <u>Covent Garden</u> · Dubai · Menus ▾ · Groups</span><span class="p">Book at Covent Garden</span></div>
+      <div class="r night"><b class="n">2</b><div class="g37" style="grid-template-columns:minmax(0,4fr) minmax(0,6fr)"><div><span class="k">Fatt Pundit</span><span class="hx xl"><i class="lv">H1</i>COVENT GARDEN</span><span class="k">Colonial Kolkata on Maiden Lane.</span><span>● Open until 10.30pm</span><br><span class="p">Book a table</span><span class="s">See the menus</span></div><div class="obj tall">Room photo with the booth-lamp loop</div></div></div>
+      <div class="r"><b class="n">3</b><div class="g4"><div><b>Today</b><br>12–2.30pm, 4.45–10.30pm</div><div><b>Address</b><br>6 Maiden Lane, WC2E 7NA <span class="l">Directions</span></div><div><b>Stations</b><br>Covent Garden, Charing Cross</div><div><b>Phone</b><br>020 7836 8883 <span class="l">Call</span></div></div></div>
+      <div class="r"><b class="n">5</b><span class="hx"><i class="lv">H2</i>The room: two bars, two floors</span><div class="obj tall">Lights on (full width), then the plate wall</div></div>
+      <div class="r"><b class="n">7</b><div class="g37" style="grid-template-columns:minmax(0,5fr) minmax(0,7fr)"><div class="obj tall">Photo print</div><div><span class="hx"><i class="lv">H2</i>Menus</span><div class="lg"><div><span>01 À la carte</span><span>›</span></div><div><span>02 Set menu</span><span>›</span></div><div><span>03 Pre-theatre</span><span>›</span></div><div><span>04 … 09 Drinks</span><span>›</span></div></div></div></div></div>
+      <div class="r night"><b class="n">8</b><div class="g2"><div><span class="hx"><i class="lv">H2</i>Visit: 6 Maiden Lane</span><div class="obj">Boarding pass · stub <span class="p">Book a table</span></div></div><div><div class="lg"><div><span>Mon</span><span>Closed</span></div><div class="today"><span>Fri (today)</span><span>12–2.30pm, 4.45–10.30pm</span></div><div><span>…</span><span>7 rows</span></div></div><span class="s">Google Maps</span><span class="s">Apple Maps</span><span class="l">Call</span><span class="l">Email</span></div></div></div>
+      <div class="r"><b class="n">9</b><span class="hx"><i class="lv">H2</i>Good to know: before you travel.</span><div class="g3"><div class="obj">Dietary menus</div><div class="obj">Allergies</div><div class="obj">Groups</div></div></div>
+      <div class="r"><b class="n">10</b><span class="hx"><i class="lv">H2</i>The other rooms: onward travel.</span><div class="g2"><div class="obj">Soho postcard</div><div class="obj">Dubai postcard</div></div></div>
+    </div></div>
+    <p class="after">Desktop: words left, photo right in the arrival; the facts row runs four across under it; menus and visit become two-column spreads. Sections 4 (Tonight), 6 (Born here) and 11 (footer) keep their phone order and are left out of this picture.</p>
+  </figure>
+
+  <!-- W3 Dubai -->
+  <figure>
+    <figcaption><h3>W3 · Branch, opening soon <code>/dubai/</code></h3><p>One job: the list. Empty sections and the dead Menus link go.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r night"><b class="n">2</b><div class="obj">Gate art, DXB</div><span class="hx xl"><i class="lv">H1</i>DUBAI</span><span class="k">Opening soon at The Hangout, Mall of the Emirates.</span><span>◇ Opening soon</span><br><span class="p">Join the list</span></div>
+        <div class="r"><b class="n">3</b><div class="lg"><div><span>Where</span><span>The Hangout, Mall of the Emirates, Al Barsha</span></div><div><span>Opening</span><span>Date to be announced</span></div><div><span>Hours</span><span>With the opening date</span></div><div><span>Station</span><span>Mall of the Emirates (Red Line)</span></div></div></div>
+        <div class="r gold"><b class="n">4</b><span class="hx"><i class="lv">H2</i>Be first through the door</span><span class="lab">Email address</span><div class="field">you@example.com</div><span class="p">Join the list</span><span class="k">We'll only email you about the Dubai opening. Unsubscribe any time.</span></div>
+        <div class="r"><b class="n">5</b><span class="hx"><i class="lv">H2</i>What we're packing for Dubai</span><div class="g3"><div class="obj">Kid goat momo</div><div class="obj">Crackling spinach</div><div class="obj">Sizzling brownie</div></div></div>
+        <div class="r"><b class="n">6</b><span class="hx"><i class="lv">H2</i>In London before then? <i>(draft)</i></span><div class="g2"><div class="obj">Soho postcard</div><div class="obj">Covent Garden postcard</div></div></div>
+        <div class="dock two"><span>Rooms</span><span class="p">Join the list</span></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner.</strong> Dubai current; the bar's action reads Join the list.</li>
+        <li><strong>Arrival.</strong> <strong>H1</strong> Fatt Pundit Dubai, the opening line, status "Opening soon" (diamond and words). <strong>Primary</strong> Join the list: an in-page link that moves focus to the email field.</li>
+        <li><strong>Facts row</strong>: where, opening (date to be announced), hours (with the opening date), station.</li>
+        <li><strong>H2 Be first through the door.</strong> Visible label "Email address", the field (<code>autocomplete="email"</code>), <strong>primary</strong> Join the list, the consent line. States below. The second primary sits a screen below the first; the dock's Join the list is the same action.</li>
+        <li><strong>H2 What we're packing for Dubai.</strong> Three tickets, from the data's teaser list.</li>
+        <li><strong>H2 In London before then?</strong> Two postcards. Removed from today's page: the Visit section with empty hours, and the dock's Menus link to a menu that doesn't exist.</li>
+      </ol>
+    </div>
+    <div class="states">
+      <figure><div class="ph" aria-hidden="true"><div class="r gold"><span class="lab">Email address</span><div class="field bad">you@example</div><div class="msg">Enter an email address like name@example.com</div><span class="p">Join the list</span></div></div>
+        <figcaption><strong>Invalid.</strong> On submit: <code>aria-invalid</code>, the message tied by <code>aria-describedby</code>, focus on the field. Re-checked on input, never on blur.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r gold"><span class="lab">Email address</span><div class="field">guest@example.com</div><span class="p">Join the list …</span></div></div>
+        <figcaption><strong>Sending.</strong> <code>aria-busy="true"</code> on the button, label kept, typing dots, a second press is ignored.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r gold"><div class="msg ok"><b>You're on the list.</b> We'll email guest@example.com when Dubai takes bookings.</div></div></div>
+        <figcaption><strong>Done.</strong> The message replaces the form (<code>role="status"</code>) and takes focus.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r gold"><div class="msg">We couldn't add you. Try again in a moment.</div><span class="lab">Email address</span><div class="field">guest@example.com</div><span class="p">Join the list</span></div></div>
+        <figcaption><strong>Failed.</strong> <code>role="alert"</code>; the email stays. Needs a real list provider (decision D9).</figcaption></figure>
+    </div>
+  </figure>
+
+  <!-- W4 Menu -->
+  <figure>
+    <figcaption><h3>W4 · Menus <code>/soho/menu/</code></h3><p>One menu at a time; search covers them all. The page keeps its branch: Book, Call and Menus all mean Soho.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r"><b class="n">2</b><span class="l">Soho</span> › Menus</div>
+        <div class="r"><b class="n">3</b><span class="k">Fatt Pundit Soho</span><span class="hx"><i class="lv">H1</i>Soho menus</span><span>Diet codes on every dish; tell us about allergies when you order. <i>(draft)</i></span><br><span class="l">Covent Garden menus</span></div>
+        <div class="r fillb"><b class="n">4</b><span class="s">Menu: À la carte ▾</span><span class="lab">Search all menus</span><div class="field">momo, chilli, paneer</div><span class="lab">Show only</span><div class="chips"><span>V</span><span class="on">VG ✓</span><span>GF</span><span>DF</span><span>H</span></div><span>14 dishes</span></div>
+        <div class="r"><b class="n">5</b><span class="hx"><i class="lv">H2</i>À la carte</span><span class="hx" style="font-size:1em"><i class="lv">H3</i>Momos</span><div class="lg"><div><span>Mix vegetable momo · V VG DF H</span><span>£7.00</span></div></div><span class="hx" style="font-size:1em"><i class="lv">H3</i>Veg</span><div class="lg"><div><span>Crispy okra salt 'n' pepper · V VG GF DF H</span><span>£11.00</span></div></div><span class="k">There's also a full Vegan menu ›</span></div>
+        <div class="r"><b class="n">6</b>Allergy note · <span class="l">Allergens and dietary needs</span></div>
+        <div class="r"><b class="n">7</b><span class="s">Your shortlist (2)</span></div>
+        <div class="r"><b class="n">8</b><span class="p">Book at Soho</span><span class="l">Print this menu</span><span class="l">Back to Soho</span></div>
+        <div class="dock"><span>Menus</span><span>Call</span><span class="p">Book</span></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner</strong> in Soho context (today it has none: finding F1).</li>
+        <li><strong>Breadcrumb</strong> navigation: Soho › Menus (current page not a link).</li>
+        <li><strong>H1 Soho menus</strong> (was "The menu"), one line on diet codes and allergies, link to the other room's menus.</li>
+        <li><strong>Tools</strong>, sticky under the header on phones. "Menu: À la carte" opens a sheet listing every menu in two groups (Menus; For dietary needs) as links; the choice is in the address (<code>#vegan</code>) so Back works and links can be shared. Search with a visible label, across all menus. Show only: five checkboxes with their words for screen readers. Live count (<code>aria-live="polite"</code>).</li>
+        <li><strong>H2</strong> the chosen menu, <strong>H3</strong> its sections, dishes as ledger rows with the price right-aligned. With a diet filter on, a link to the matching dietary menu when one exists. Without JavaScript every menu shows, as today.</li>
+        <li>The menu's allergy note and the allergens page.</li>
+        <li>Dish passport (as built).</li>
+        <li><strong>Primary</strong> Book at Soho (drawer, preset), Print this menu (the shown menu), Back to Soho.</li>
+      </ol>
+    </div>
+    <div class="dk" aria-hidden="true"><div class="in">
+      <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span><u>Soho</u> · Covent Garden · Dubai · Menus ▾ · Groups</span><span class="p">Book at Soho</span></div>
+      <div class="r"><b class="n">3</b><span class="l">Soho</span> › Menus <span class="hx"><i class="lv">H1</i>Soho menus</span></div>
+      <div class="r"><div class="g37"><div class="fillb" style="padding:.6em"><b class="n">4</b> <b>Menus</b><div class="lg"><div><b>À la carte</b><span>●</span></div><div><span>Set menu</span><span></span></div><div><span>Pre-theatre</span><span></span></div><div><span>Veg pre-theatre</span><span></span></div><div><span>Drinks</span><span></span></div></div><b>For dietary needs</b><div class="lg"><div><span>Vegan</span><span></span></div><div><span>Gluten free · Dairy free</span><span></span></div><div><span>Halal · Pescatarian</span><span></span></div></div><div class="field">Search all menus</div><div class="chips"><span>V</span><span class="on">VG ✓</span><span>GF</span><span>DF</span><span>H</span></div>14 dishes</div>
+        <div><b class="n">5</b> <span class="hx"><i class="lv">H2</i>À la carte</span><span class="hx" style="font-size:1em"><i class="lv">H3</i>Momos</span><div class="lg"><div><span>Mix vegetable momo · V VG DF H</span><span>£7.00</span></div></div><span class="hx" style="font-size:1em"><i class="lv">H3</i>Veg</span><div class="lg"><div><span>Crispy okra salt 'n' pepper · V VG GF DF H</span><span>£11.00</span></div><div><span>…</span><span></span></div></div><span class="k">There's also a full Vegan menu ›</span><br><b class="n">8</b> <span class="p">Book at Soho</span><span class="l">Print this menu</span></div></div></div>
+    </div></div>
+    <p class="after">Desktop (1024 px and up): the sticky left index (built in slice E3) lists every menu, so the phone's menu sheet isn't needed; search and filters sit under it.</p>
+    <div class="states">
+      <figure><div class="ph" aria-hidden="true"><div class="r"><div class="msg">No dishes match "lamb" with Vegan on.</div><span class="s">Clear filters</span><span class="s">Search all menus</span></div></div>
+        <figcaption><strong>Empty.</strong> Says what was searched and offers both ways out; the live count says "No dishes".</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r"><span>"momo": 6 dishes in 3 menus</span><span class="hx" style="font-size:1em"><i class="lv">H2</i>À la carte (3)</span><span class="hx" style="font-size:1em"><i class="lv">H2</i>Set menu (2)</span><span class="hx" style="font-size:1em"><i class="lv">H2</i>Halal (1)</span></div></div>
+        <figcaption><strong>Search.</strong> Results from every menu, grouped under each menu's name.</figcaption></figure>
+    </div>
+  </figure>
+
+  <!-- W5 Drawer -->
+  <figure>
+    <figcaption><h3>W5 · Book drawer: four states</h3><p>Bottom sheet on phones, 460 px drawer from 640 px. A modal <code>&lt;dialog&gt;</code> labelled by its title; focus starts on the title and returns to the opener.</p></figcaption>
+    <div class="states">
+      <figure><div class="ph" aria-hidden="true"><div class="r"><span class="hx"><i class="lv">H2</i>Book at Soho</span><span class="lab">How many</span><div class="chips"><span>−</span><span class="on">2</span><span>+</span></div><span class="lab">Which day</span><div class="chips"><span class="on">Today</span><span>Tmrw</span><span>Sun 22</span><span>…</span></div><span class="lab">Time</span><div class="chips"><span>6.30pm</span><span class="on">7pm</span><span>7.30pm</span><span>…</span></div><span class="p">Find a table</span><span class="k">Opens OpenTable in a new tab with your choices. Or call 020 7287 7900.</span></div></div>
+        <figcaption><strong>Ready.</strong> "Where" shows only without a branch context. The guest number can be typed as well as stepped (1–20). Day and time are radio groups with one tab stop each.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r"><span class="hx"><i class="lv">H2</i>Book at Soho</span><span class="lab">Which day</span><div class="chips"><span>Sat 21</span><span class="on">Sun 22</span><span>Mon 23</span></div><div class="msg">Soho is closed on Sundays. Pick another day.</div><span class="p x">Find a table</span></div></div>
+        <figcaption><strong>Closed day.</strong> The message names the room and the day; Find a table is unavailable (<code>aria-disabled</code>) with the reason in words beside it.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r"><span class="hx"><i class="lv">H2</i>Book at Soho</span><span class="lab">How many</span><div class="chips"><span>−</span><span class="on">12</span><span>+</span></div><div class="msg">For 8 or more, Soho plans a set menu with you.</div><span class="p">Send a group enquiry</span><span class="l">Call 020 7287 7900</span></div></div>
+        <figcaption><strong>Group.</strong> Above the room's online limit (from the data), the submit is replaced, not just greyed: Send a group enquiry carries room, date and guests to the groups page.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r"><div class="msg ok"><b>OpenTable is open in a new tab</b><br>2 guests, Saturday 21 November, 7pm.</div><span class="s">Open OpenTable again</span><span class="l">Close</span></div></div>
+        <figcaption><strong>Done.</strong> Today the drawer just closes. Now it confirms the hand-off (<code>role="status"</code>, focus moves to it) and offers a retry if the tab opened behind.</figcaption></figure>
+    </div>
+  </figure>
+
+  <!-- W6 Groups -->
+  <figure>
+    <figcaption><h3>W6 · Groups and private dining <code>/private-dining/</code></h3><p>What's possible per room first, then a form that ends in a clear outcome.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r"><b class="n">2</b><span class="k">Bring everyone</span><span class="hx"><i class="lv">H1</i>Groups and private dining</span>Big tables, set feasts and whole-room bookings…</div>
+        <div class="r"><b class="n">3</b><div class="lg"><div><span><b>Soho</b><br>Online up to 7. 8 or more: set menu, by this form or a call. 4 or more: £10 a person deposit.</span><span class="l">Set menu</span></div><div><span><b>Covent Garden</b><br>Online up to 4; call above that. 4 or more: £10 a person deposit.</span><span class="l">Set menu</span></div></div></div>
+        <div class="r"><b class="n">4</b><span class="lab">Which restaurant?</span><div class="chips"><span class="on">Soho</span><span>Covent Garden</span></div><div class="g2"><div><span class="lab">Date</span><div class="field">5 Dec 2026</div></div><div><span class="lab">Guests</span><div class="field">12</div></div></div><span class="lab">Lunch or dinner (optional)</span><div class="field"></div><span class="lab">Your name</span><div class="field"></div><span class="lab">Email</span><div class="field"></div><span class="lab">Phone (optional)</span><div class="field"></div><span class="lab">Occasion, dietary needs, anything else (optional)</span><div class="field" style="min-height:4em"></div><span class="p">Send enquiry</span></div>
+        <div class="r"><b class="n">5</b>Prefer to talk? Soho <span class="l">020 7287 7900</span>, Covent Garden <span class="l">020 7836 8883</span></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner.</strong> No branch context; Groups current in the bar.</li>
+        <li><strong>H1</strong> Groups and private dining, kicker and paragraph as today.</li>
+        <li><strong>What's possible</strong>: one ledger row per room, printed from the data (online limit; deposit of £10 a person for 4 or more, taken off the bill or refunded), with a link to its set menu. Space for a group is answered by phone, so the row ends with Call. Set-menu price is client content.</li>
+        <li><strong>Form</strong> on the system's fields: visible labels, "(optional)" instead of asterisks, room as a radio group with a legend. Arriving from the drawer, room, date and guests are already filled. <strong>Primary</strong> Send enquiry, a real POST (decision D9).</li>
+        <li>Phone numbers for both rooms.</li>
+      </ol>
+    </div>
+    <div class="states">
+      <figure><div class="ph" aria-hidden="true"><div class="r"><div class="msg"><b>2 things to fix</b><br><span class="l">Enter your name</span><br><span class="l">Enter an email address like name@example.com</span></div><span class="lab">Your name</span><div class="field bad"></div><div class="msg">Enter your name</div></div></div>
+        <figcaption><strong>Errors.</strong> A summary at the top (<code>role="alert"</code>) whose links jump to each field; focus moves to the summary; each field shows its own message.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r"><div class="msg ok"><b>Enquiry sent</b><br>Soho · Saturday 5 December · 12 guests. We'll reply to you@example.com as soon as we can.</div><span class="l">Back to Soho</span></div></div>
+        <figcaption><strong>Sent.</strong> A panel replaces the form, takes focus, repeats what was sent and says what happens next.</figcaption></figure>
+      <figure><div class="ph" aria-hidden="true"><div class="r"><div class="msg">We couldn't send this. Try again, or email reservations@fattpundit.co.uk.</div><span class="p">Send enquiry</span></div></div>
+        <figcaption><strong>Failed.</strong> Everything typed stays; the alternative is a real address, not a dead end.</figcaption></figure>
+    </div>
+  </figure>
+
+  <!-- W7 Book desk -->
+  <figure>
+    <figcaption><h3>W7 · Book a table <code>/book/</code> (new, decision D1)</h3><p>The target of old "Reserve" links, of every Book button without JavaScript, and of the Google and Instagram profile links.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r"><b class="n">2</b><span class="hx"><i class="lv">H1</i>Book a table</span><span class="k">Pick a room; its booking page opens with your choices filled in. <i>(draft)</i></span></div>
+        <div class="r"><b class="n">3</b><div class="lg">
+          <div><span><b>Soho</b> · 77 Berwick Street<br>Open until 10.30pm · OpenTable</span><span><span class="s">Book at Soho</span><br><span class="l">Call</span></span></div>
+          <div><span><b>Covent Garden</b> · 6 Maiden Lane<br>Opens 4.45pm · SevenRooms</span><span><span class="s">Book at Covent Garden</span><br><span class="l">Call</span></span></div>
+          <div><span><b>Dubai</b><br>Opening soon</span><span class="l">Join the list</span></div>
+          <div><span><b>8 or more at Soho</b><br>Set menu: plan a group with the room</span><span class="l">Groups</span></div></div></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner</strong>, no branch context.</li>
+        <li><strong>H1</strong> Book a table and one line.</li>
+        <li><strong>Ledger</strong>: one row per room with today's status, the provider's name, a <strong>secondary</strong> Book (two equal choices, so no tiger) and Call; Dubai's list; the group row. With <code>?branch=soho</code> and JavaScript the drawer opens preset over this page; closing it leaves the guest here. Without JavaScript the named room's row comes first and its Book goes straight to the provider.</li>
+      </ol>
+    </div>
+  </figure>
+
+  <!-- W8 Info + 404 -->
+  <figure>
+    <figcaption><h3>W8 · Info page (here Allergens) and 404</h3><p>Documents that answer first and then go into detail; a 404 that lists every task.</p></figcaption>
+    <div class="pair">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r"><b class="n">2</b><span class="hx"><i class="lv">H1</i>Allergens and dietary needs</span><span class="k">Last updated: <i>(client)</i></span></div>
+        <div class="r fillb"><b class="n">3</b><b>In short</b><br>· Tell us about allergies when you book and when you order.<br>· Every menu marks V, VG, GF, DF and H.<br>· We can't promise a dish is allergen-free.</div>
+        <div class="r"><b class="n">4</b>Contents (when more than 4 sections) · <span class="hx"><i class="lv">H2</i>Sections…</span></div>
+        <div class="r"><b class="n">5</b><b>Questions?</b><div class="lg"><div><span>Soho</span><span class="l">020 7287 7900</span></div><div><span>Covent Garden</span><span class="l">020 7836 8883</span></div></div><span class="s">Soho menus</span><span class="s">Covent Garden menus</span></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner</strong>, no branch context; skip link "Skip to content".</li>
+        <li><strong>H1</strong> and the "last updated" date (client). The draft marker stays until the client confirms the wording.</li>
+        <li><strong>In short</strong>: two to four points that answer the page's question.</li>
+        <li>Contents list, then <strong>H2</strong> sections.</li>
+        <li><strong>Questions?</strong> Each room's phone (and email), then the related task: menus with "Show only".</li>
+      </ol>
+    </div>
+    <div class="pair" style="margin-top:22px">
+      <div class="ph" aria-hidden="true">
+        <div class="r night bar"><b class="n">1</b><span>FATT PUNDIT</span><span class="s">Index</span></div>
+        <div class="r"><b class="n">2</b><div class="obj"><span class="hx"><i class="lv">H1</i>Lost luggage</span>404 · This page went missing somewhere between Canton and London.</div></div>
+        <div class="r"><b class="n">3</b><div class="lg"><div><span>Soho</span><span>›</span></div><div><span>Covent Garden</span><span>›</span></div><div><span>Dubai</span><span>›</span></div><div><span>Soho menus</span><span>›</span></div><div><span>Covent Garden menus</span><span>›</span></div><div><span>Book a table</span><span>›</span></div></div></div>
+      </div>
+      <ol class="spec">
+        <li><strong>Banner</strong> as everywhere.</li>
+        <li>The luggage tag with <strong>H1</strong> Lost luggage (as built).</li>
+        <li>A ledger of every destination (adds both menus and Book a table to today's Home and branches). No tiger: the bar's Book is enough.</li>
+      </ol>
+    </div>
+  </figure>
+</section>
+</main>
+
+<footer class="doc">
+  <p>Wireframes for review only; nothing here is built. Checked in headless Edge at 390 and 1440 px (no sideways scroll, axe). Not tested with guests, real phones or screen readers. Source of truth for decisions: <code>ux-structure.md</code> §10.</p>
+</footer>
+</div>
+</body>
+</html>

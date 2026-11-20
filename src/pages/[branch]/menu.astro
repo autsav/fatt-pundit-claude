@@ -2,14 +2,14 @@
 /**
  * /<branch>/menu/ — every menu for one room as a plain, searchable list.
  * Fast to scan on a phone, filters for diets, prints cleanly, and gives
- * search engines a real menu page per branch. The page-flip book stays the
- * showpiece; this is the practical twin.
+ * search engines a real menu page per branch. One menu at a time (#hash), search
+ * across all of them (Phase 4, ux-structure.md D2). The page-flip book stays on home.
  */
 import type { GetStaticPaths } from 'astro';
 import { getEntry } from 'astro:content';
 import InfoShell from '../../layouts/InfoPage.astro';
 import DishPassport from '../../components/site/DishPassport.astro';
-import { dish, getBranches, MENU_TABS, priceOf, type Branch } from '../../lib/site-data';
+import { dish, getBranches, MENU_TABS, preTheatreText, priceOf, type Branch } from '../../lib/site-data';
 
 export const getStaticPaths = (async () => {
   const branches = await getBranches();
@@ -24,6 +24,7 @@ const menus = await Promise.all(
       id,
       title: MENU_TABS[id] ?? m.title,
       intro: m.title,
+      kind: m.kind,
       allergyNote: m.allergyNote,
       sections: await Promise.all(
         m.sections.map(async (sec) => ({
@@ -40,6 +41,12 @@ const menus = await Promise.all(
     };
   }),
 );
+// The menu switcher's two groups: general menus, then the dietary ones.
+const groups = [
+  { key: 'menus', label: 'Menus', items: menus.filter((m) => m.kind !== 'diet') },
+  { key: 'diet', label: 'For dietary needs', items: menus.filter((m) => m.kind === 'diet') },
+].filter((g) => g.items.length > 0);
+const preTheatre = preTheatreText(b);
 const TAGS = [
   ['V', 'Vegetarian'],
   ['VG', 'Vegan'],
@@ -66,26 +73,38 @@ const ld = {
   title={`${b.shortName} menu`}
   description={`Every Fatt Pundit ${b.shortName} menu as a list: à la carte, set and pre-theatre menus, drinks, with vegetarian, vegan, gluten-free, dairy-free and halal marks.`}
   kicker={`Fatt Pundit ${b.shortName}`}
-  heading="The menu"
+  heading={`${b.shortName} menus`}
   wide
+  branch={b.id}
+  crumbs={[{ href: `/${b.id}/`, label: b.shortName }, { label: 'Menus' }]}
 >
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <div class="menu-layout">
+  <div class="menu-layout" data-menu-layout>
   <div class="menu-tools" data-menu-tools>
-    <nav class="menu-jump" aria-label="Menus">
-      <span class="tool-lab" aria-hidden="true">Jump to</span>
-      {menus.map((m) => <a href={`#${m.id}`}>{m.title}</a>)}
-    </nav>
+    <div class="menu-pickbar">
+      <!-- Phones: one button names the menu you're reading and opens the list of menus. Shown by the script. -->
+      <button type="button" class="menu-pick" data-menu-pick aria-expanded="false" aria-controls="menu-nav" hidden>Menu: <b data-menu-current>{menus[0]?.title}</b></button>
+      <nav class="menu-jump" id="menu-nav" aria-label="Menus">
+        {groups.map((g) => (
+          <div class="mj-group">
+            <p class="tool-lab" id={`mj-${g.key}`}>{g.label}</p>
+            <ul aria-labelledby={`mj-${g.key}`}>
+              {g.items.map((m) => <li><a href={`#${m.id}`} data-menu-link>{m.title}</a></li>)}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </div>
     <label class="menu-search">
-      <span class="sr-only">Search the menu</span>
-      <input type="search" placeholder="Search: momo, chilli, paneer" data-menu-q autocomplete="off" />
+      <span class="tool-lab">Search all menus</span>
+      <input type="search" placeholder="momo, chilli, paneer" data-menu-q autocomplete="off" />
     </label>
     <fieldset class="menu-diet">
-      <legend class="sr-only">Show only</legend>
-      <span class="tool-lab" aria-hidden="true">Show only</span>
+      <legend class="tool-lab">Show only</legend>
       {TAGS.map(([t, label]) => <label class="diet-chip"><input type="checkbox" value={t} data-menu-tag /><span><b>{t}</b> {label}</span></label>)}
     </fieldset>
     <p class="menu-count" data-menu-count aria-live="polite"></p>
+    <p class="menu-hint" data-menu-hint hidden>There's also a full <a href="#" data-menu-hint-link></a>.</p>
     <p class="menu-passport-tip">Tap the stamp beside a dish to collect it: your passport becomes tonight's shortlist, ready to show your server or send to the table.</p>
   </div>
   <div class="menu-list">
@@ -94,6 +113,7 @@ const ld = {
     <section class="menu-block" id={m.id} aria-labelledby={`${m.id}-h`} data-menu-block>
       <h2 id={`${m.id}-h`}>{m.title}</h2>
       {m.intro !== m.title && <p class="menu-intro">{m.intro}</p>}
+      {m.kind === 'pre-theatre' && preTheatre && <p class="menu-intro">Seated between {preTheatre}.</p>}
       {m.sections.map((s) => (
         <div class="menu-sec" data-menu-sec>
           <h3>{s.title}</h3>
@@ -115,38 +135,68 @@ const ld = {
       <p class="menu-allergy">{m.allergyNote} <a href="/allergens/">Allergens and dietary needs</a>.</p>
     </section>
   ))}
+  <!-- One menu at a time once the script runs; before it does, this picks the menu from the address so nothing jumps. -->
+  <script is:inline>
+    (function () {
+      var l = document.querySelector('[data-menu-layout]'), bs = l.querySelectorAll('[data-menu-block]');
+      var sel = document.getElementById(location.hash.slice(1));
+      if (!sel || !sel.hasAttribute('data-menu-block')) sel = bs[0];
+      l.classList.add('js-one'); sel.classList.add('is-sel');
+    })();
+  </script>
+  <div class="menu-empty" data-menu-empty hidden>
+    <p data-menu-empty-text>No dishes match.</p>
+    <p class="menu-empty-acts"><button type="button" class="fp-btn fp-btn--sm" data-menu-clear>Clear filters</button><button type="button" class="fp-btn fp-btn--sm" data-menu-all>Search all menus</button></p>
+  </div>
   <DishPassport branch={b.id} name={b.shortName} />
-  <p class="menu-empty" data-menu-empty hidden>No dishes match. Clear a filter or try another word.</p>
-  <p class="menu-foot"><a href={`/${b.id}/`}>Back to {b.shortName}</a><a href={b.booking?.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a><button type="button" class="linkish" onclick="print()">Print this menu</button></p>
+  <p class="menu-foot"><a class="fp-btn fp-btn--primary" href={b.booking?.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a><button type="button" class="linkish" onclick="print()">Print this menu</button><a href={`/${b.id}/`}>Back to {b.shortName}</a></p>
   </div>
   </div>
 </InfoShell>
 
 <style>
   .menu-tools { position: relative; z-index: 5; display: grid; gap: 10px; margin: 0 calc(-1 * clamp(28px, 5vw, 64px)) 8px; padding: 12px clamp(28px, 5vw, 64px); background: var(--color-paper-light); border-bottom: 2px solid var(--color-ink); }
-  .menu-jump { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
-  .menu-jump a { flex: none; padding: 8px 12px; border: 2px solid var(--color-ink); font-size: 14px; font-weight: 700; text-decoration: none; color: var(--color-ink); white-space: nowrap; }
-  .menu-search input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 14px; font: inherit; font-size: 17px; border: 2px solid var(--color-ink); background: #fff; color: var(--color-ink); }
+  .menu-jump { display: grid; gap: 8px; }
+  .mj-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .mj-group ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .menu-jump a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 2px solid var(--color-ink); font-size: 14px; font-weight: 700; text-decoration: none; color: var(--color-ink); white-space: nowrap; }
+  .menu-jump a[aria-current='true'] { background: var(--color-ink); color: var(--color-sand); }
+  .menu-search { display: grid; gap: 4px; }
+  .menu-search input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 14px; font: inherit; font-size: 17px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); }
+  .menu-search input::placeholder { color: #5b544b; opacity: 1; }
   .menu-search input:focus-visible, .diet-chip input:focus-visible + span { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
-  .menu-diet { display: flex; gap: 6px; overflow-x: auto; border: 0; padding: 0 0 2px; margin: 0; min-width: 0; }
+  .menu-diet { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
+  .menu-diet legend { float: left; margin-right: 4px; padding: 0; }
   .menu-tools > * { min-width: 0; }
-  /* The two chip rows say what they do: one moves you, the other filters. */
-  .tool-lab { flex: none; align-self: center; margin-right: 4px; font-size: 14px; color: #5b544b; white-space: nowrap; }
-  /* Phones and tablets: the page is long, so the "Jump to" row stays under the header while you read. */
+  .tool-lab { flex: none; margin: 0 4px 0 0; font-size: 14px; color: #5b544b; white-space: nowrap; }
+  .diet-chip { flex: none; position: relative; }
+  .diet-chip input { position: absolute; opacity: 0; }
+  .diet-chip span { white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; min-height: 44px; padding: 0 12px; border: 2px solid var(--color-ink); font-size: 14px; cursor: pointer; background: var(--color-paper-light); }
+  .diet-chip input:checked + span { background: var(--color-ink); color: var(--color-sand); }
+  .diet-chip input:checked + span::after { content: "✓" / ""; }
+  .menu-count { margin: 0; font-size: 15px; min-height: 1em; font-weight: 700; }
+  .menu-hint { margin: 0; font-size: 15px; }
+  .menu-hint a, .menu-empty a { color: var(--color-tiger-deep); font-weight: 700; }
+  .menu-pick { display: none; }
+  /* One menu at a time (Phase 4 D2). Without JavaScript every menu shows, as before. */
+  .js-one [data-menu-block]:not(.is-sel):not(.is-match) { display: none; }
+  /* Phones and tablets: the menu button stays under the header; the list of menus opens beneath it. */
   @media (max-width: 899px) {
     .menu-tools { display: contents; }
     .menu-tools > * { margin-top: 10px; }
-    .menu-jump { position: sticky; top: var(--menu-bar, 56px); z-index: 5; margin: 0 calc(-1 * clamp(28px, 5vw, 64px)); padding: 8px clamp(28px, 5vw, 64px); background: var(--color-paper-light); border-bottom: 2px solid var(--color-ink); }
-    .menu-jump a.is-here { background: var(--color-ink); color: var(--color-sand); }
-    .menu-block { scroll-margin-top: 130px; }
+    .js-one .menu-pickbar { position: sticky; top: var(--menu-bar, 56px); z-index: 6; margin: 10px calc(-1 * clamp(28px, 5vw, 64px)) 0; padding: 8px clamp(28px, 5vw, 64px); background: var(--color-paper-light); border-bottom: 2px solid var(--color-ink); }
+    .js-one .menu-pick { display: flex; width: 100%; align-items: center; gap: 8px; min-height: 48px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: 17px; cursor: pointer; }
+    .js-one .menu-pick::after { content: ""; margin-left: auto; width: 8px; height: 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
+    .js-one .menu-pick[aria-expanded='true']::after { transform: translateY(2px) rotate(-135deg); }
+    .js-one .menu-jump { display: none; }
+    .js-one .menu-jump.is-open { display: grid; position: absolute; left: clamp(28px, 5vw, 64px); right: clamp(28px, 5vw, 64px); top: calc(100% - 2px); max-height: 70svh; overflow-y: auto; padding: 14px; gap: 14px; background: var(--color-paper-light); border: 2px solid var(--color-ink); box-shadow: 6px 6px 0 var(--color-ink); }
+    .js-one .menu-jump.is-open .mj-group { display: block; }
+    .js-one .menu-jump.is-open ul { display: grid; gap: 0; margin-top: 4px; }
+    .js-one .menu-jump.is-open a { width: 100%; border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); font-size: 17px; }
+    .menu-block { scroll-margin-top: 140px; }
   }
-  .diet-chip { flex: none; position: relative; }
   /* Big screens: the tools ride along under the header while you read. */
   @media (min-width: 900px) and (min-height: 700px) { .menu-tools { position: sticky; top: 66px; } }
-  .diet-chip input { position: absolute; opacity: 0; }
-  .diet-chip span { white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; min-height: 40px; padding: 0 12px; border: 2px solid var(--color-ink); font-size: 14px; cursor: pointer; background: #fff; }
-  .diet-chip input:checked + span { background: var(--color-ink); color: var(--color-sand); }
-  .menu-count { margin: 0; font-size: 14px; min-height: 1em; }
   .menu-block { padding-top: 28px; scroll-margin-top: 200px; }
   .menu-block h2 { margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 3px double var(--color-ink); padding-bottom: 8px; }
   .menu-intro, .menu-note { font-family: var(--font-note); font-style: italic; }
@@ -157,67 +207,126 @@ const ld = {
   .mi-name { font-weight: 700; }
   /* Name and price share the first line; diet marks drop under the name. */
   .mi-tags { order: 3; flex-basis: 100%; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: var(--color-gold-deep); }
-  .mi-price { margin-left: auto; font-weight: 700; }
+  .mi-price { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
   .mi-desc { margin: 2px 0 0 !important; font-size: 16px; }
   .menu-allergy { margin-top: 16px !important; font-size: 14px; }
   .menu-passport-tip { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 15px; }
-  .menu-empty { font-family: var(--font-note); font-style: italic; }
-  .menu-foot { display: flex; flex-wrap: wrap; gap: 8px 24px;  margin-top: 32px !important; }
-  .linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--color-tiger-deep); font-weight: 700; text-decoration: underline; cursor: pointer; }
+  .menu-empty { margin-top: 24px; padding: 16px 18px; border-left: 4px solid var(--color-tiger-deep); background: var(--color-paper); }
+  .menu-empty p { margin: 0 0 10px !important; font-family: var(--font-note); font-style: italic; }
+  .menu-empty .menu-empty-acts { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 !important; font-style: normal; }
+  .menu-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 32px !important; }
+  .linkish { min-height: 44px; background: none; border: 0; padding: 0; font: inherit; color: var(--color-tiger-deep); font-weight: 700; text-decoration: underline; cursor: pointer; }
   [hidden] { display: none !important; }
   /* Desktop: the tools become a sticky index on the left, the menu reads down the right. */
   @media (min-width: 1024px) {
     .menu-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 56px; align-items: start; }
     .menu-tools, .menu-tools:is(*) { position: sticky; top: 92px; margin: 0; padding: 18px; border: 2px solid var(--color-ink); max-height: calc(100svh - 120px); overflow-y: auto; gap: 14px; }
-    .menu-jump { flex-direction: column; overflow: visible; gap: 0; border-top: 1px dotted rgb(44 41 37 / 0.4); }
-    .menu-jump .tool-lab { align-self: flex-start; margin: 0 0 6px; }
-    .menu-diet .tool-lab { flex-basis: 100%; }
-    .menu-jump a { border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); padding: 9px 2px; font-size: 15px; }
+    .menu-jump { gap: 12px; }
+    .mj-group { display: block; }
+    .mj-group ul { display: grid; gap: 0; border-top: 1px dotted rgb(44 41 37 / 0.4); }
+    .menu-jump a { width: 100%; border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); padding: 0 2px; font-size: 15px; }
     .menu-jump a:hover { color: var(--color-tiger-deep); }
-    .menu-jump a.is-here { color: var(--color-tiger-deep); box-shadow: inset 4px 0 0 var(--color-tiger); padding-left: 12px; }
-    .menu-diet { flex-wrap: wrap; overflow: visible; }
+    .menu-jump a[aria-current='true'] { background: none; color: var(--color-tiger-deep); box-shadow: inset 4px 0 0 var(--color-tiger); padding-left: 12px; }
+    .menu-diet .tool-lab { flex-basis: 100%; }
     .menu-search input { font-size: 15px; }
     .menu-list { max-width: 760px; }
     .menu-block { padding-top: 0; margin-bottom: 48px; scroll-margin-top: 100px; }
     .menu-block h2 { font-size: 40px; }
   }
   @media print {
-    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), .menu-tools, .menu-foot, :global([data-dock]) { display: none !important; }
+    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), :global(.crumbs), .menu-tools, .menu-foot, .menu-empty, :global([data-dock]) { display: none !important; }
     :global(.info) { padding: 0 !important; background: none !important; }
     :global(.sheet) { border: 0 !important; box-shadow: none !important; padding: 0 !important; }
-    .menu-block { break-before: page; }
+    .menu-block + .menu-block { break-before: page; }
     .menu-item { break-inside: avoid; }
   }
 </style>
 
 <script>
-  const items = [...document.querySelectorAll<HTMLElement>('[data-dish]')];
-  const q = document.querySelector<HTMLInputElement>('[data-menu-q]');
-  const tags = [...document.querySelectorAll<HTMLInputElement>('[data-menu-tag]')];
-  const count = document.querySelector<HTMLElement>('[data-menu-count]')!;
-  const empty = document.querySelector<HTMLElement>('[data-menu-empty]')!;
+  // One menu at a time, chosen by the address (#vegan), so Back works and links can be shared.
+  // Search looks across every menu; diet filters apply to the menu shown (or to all, on request).
+  const layout = document.querySelector<HTMLElement>('[data-menu-layout]')!;
+  const blocks = [...layout.querySelectorAll<HTMLElement>('[data-menu-block]')];
+  const items = [...layout.querySelectorAll<HTMLElement>('[data-dish]')];
+  const links = [...layout.querySelectorAll<HTMLAnchorElement>('[data-menu-link]')];
+  const q = layout.querySelector<HTMLInputElement>('[data-menu-q]')!;
+  const tags = [...layout.querySelectorAll<HTMLInputElement>('[data-menu-tag]')];
+  const count = layout.querySelector<HTMLElement>('[data-menu-count]')!;
+  const empty = layout.querySelector<HTMLElement>('[data-menu-empty]')!;
+  const emptyText = layout.querySelector<HTMLElement>('[data-menu-empty-text]')!;
+  const allBtn = layout.querySelector<HTMLButtonElement>('[data-menu-all]')!;
+  const clearBtn = layout.querySelector<HTMLButtonElement>('[data-menu-clear]')!;
+  const hint = layout.querySelector<HTMLElement>('[data-menu-hint]')!;
+  const hintLink = layout.querySelector<HTMLAnchorElement>('[data-menu-hint-link]')!;
+  const pick = layout.querySelector<HTMLButtonElement>('[data-menu-pick]')!;
+  const nav = layout.querySelector<HTMLElement>('#menu-nav')!;
+  const current = layout.querySelector<HTMLElement>('[data-menu-current]')!;
+  const NAME = Object.fromEntries(links.map((a) => [a.hash.slice(1), a.textContent ?? '']));
+  const DIET: Record<string, string> = { VG: 'vegan', GF: 'gluten-free', DF: 'dairy-free', H: 'halal' };
+  let everyMenu = false;
+  pick.hidden = false;
+
+  const selected = () => blocks.find((b) => b.id === location.hash.slice(1))?.id ?? blocks[0].id;
   const run = () => {
-    const words = (q?.value ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+    const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
     const need = tags.filter((t) => t.checked).map((t) => t.value);
+    const all = everyMenu || words.length > 0;
+    const sel = selected();
+    const hit = new Set<string>();
     let shown = 0;
     for (const li of items) {
+      const blk = li.closest<HTMLElement>('[data-menu-block]')!;
       const have = (li.dataset.tags ?? '').split(' ');
-      const ok = need.every((t) => have.includes(t)) && words.every((w) => li.dataset.text!.includes(w));
+      const ok = (all || blk.id === sel) && need.every((t) => have.includes(t)) && words.every((w) => li.dataset.text!.includes(w));
       li.hidden = !ok;
-      if (ok) shown++;
+      if (ok) { shown++; hit.add(blk.id); }
     }
-    for (const sec of document.querySelectorAll<HTMLElement>('[data-menu-sec]')) sec.hidden = !sec.querySelector('[data-dish]:not([hidden])');
-    for (const blk of document.querySelectorAll<HTMLElement>('[data-menu-block]')) blk.hidden = !blk.querySelector('[data-dish]:not([hidden])');
+    for (const sec of layout.querySelectorAll<HTMLElement>('[data-menu-sec]')) sec.hidden = !sec.querySelector('[data-dish]:not([hidden])');
+    for (const blk of blocks) {
+      blk.classList.toggle('is-sel', !all && blk.id === sel);
+      blk.classList.toggle('is-match', all && hit.has(blk.id));
+      blk.hidden = !hit.has(blk.id);
+    }
+    for (const a of links) a.setAttribute('aria-current', String(!all && a.hash.slice(1) === sel));
+    current.textContent = all ? 'All menus' : NAME[sel];
     const filtering = words.length > 0 || need.length > 0;
-    count.textContent = filtering ? `${shown} dish${shown === 1 ? '' : 'es'} match` : '';
+    count.textContent = !filtering ? '' : shown === 0 ? 'No dishes match' : all ? `${shown} dish${shown === 1 ? '' : 'es'} in ${hit.size} menu${hit.size === 1 ? '' : 's'}` : `${shown} dish${shown === 1 ? '' : 'es'}`;
     empty.hidden = shown > 0;
+    emptyText.textContent = `No dishes match${words.length ? ` "${q.value.trim()}"` : ''}${need.length ? ` with ${need.join(', ')} on` : ''}${all ? '' : ` in the ${NAME[sel]} menu`}.`;
+    allBtn.hidden = all;
+    clearBtn.hidden = !filtering;
+    // A diet filter on a general menu: point to the full dietary menu when this room has one.
+    const diet = need.length === 1 ? DIET[need[0]] : undefined;
+    hint.hidden = !(diet && !all && diet !== sel && NAME[diet]);
+    if (!hint.hidden) { hintLink.href = `#${diet}`; hintLink.textContent = `${NAME[diet!]} menu`; }
   };
-  q?.addEventListener('input', run);
-  // Light the menu you are reading in the index.
-  const jumps = new Map([...document.querySelectorAll<HTMLAnchorElement>('.menu-jump a')].map((a) => [a.hash.slice(1), a]));
-  const spy = new IntersectionObserver((es) => {
-    for (const e of es) if (e.isIntersecting) { jumps.forEach((a) => a.classList.remove('is-here')); jumps.get(e.target.id)?.classList.add('is-here'); }
-  }, { rootMargin: '-30% 0px -60% 0px' });
-  document.querySelectorAll('[data-menu-block]').forEach((b) => spy.observe(b));
+  const show = (id: string) => {
+    everyMenu = false;
+    if (q.value) q.value = '';
+    history.pushState(null, '', `#${id}`);
+    run();
+    nav.classList.remove('is-open'); pick.setAttribute('aria-expanded', 'false');
+    document.getElementById(id)?.scrollIntoView({ block: 'start' });
+  };
+  layout.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('[data-menu-link], [data-menu-hint-link]');
+    if (!a) return;
+    e.preventDefault();
+    show(a.hash.slice(1));
+  });
+  pick.addEventListener('click', () => {
+    const open = !nav.classList.contains('is-open');
+    nav.classList.toggle('is-open', open);
+    pick.setAttribute('aria-expanded', String(open));
+    if (open) nav.querySelector<HTMLElement>('[aria-current="true"]')?.focus();
+  });
+  nav.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nav.classList.contains('is-open')) { nav.classList.remove('is-open'); pick.setAttribute('aria-expanded', 'false'); pick.focus(); } });
+  allBtn.addEventListener('click', () => { everyMenu = true; run(); q.focus(); });
+  clearBtn.addEventListener('click', () => { q.value = ''; tags.forEach((t) => (t.checked = false)); everyMenu = false; run(); q.focus(); });
+  q.addEventListener('input', () => { if (!q.value) everyMenu = false; run(); });
   tags.forEach((t) => t.addEventListener('change', run));
+  addEventListener('popstate', () => { everyMenu = false; run(); });
+  addEventListener('hashchange', () => { everyMenu = false; run(); });
+  run();
+  if (location.hash) document.getElementById(selected())?.scrollIntoView({ block: 'start' });
 </script>

@@ -9,7 +9,7 @@ import { directionsUrl, fullAddress, prettyPhone, type Branch } from '../../lib/
 
 interface Props { branch: Branch; stations: string[] }
 const { branch: b, stations } = Astro.props;
-const open = b.status === 'open';
+
 ---
 <div class="visit-strip" data-visit-strip>
   <div class="wrap vs-in">
@@ -31,12 +31,10 @@ const open = b.status === 'open';
         </div>
       )}
     </dl>
+    <!-- Directions and Call only: Book is the arrival's one primary action above (ux-structure.md F7). -->
     <p class="vs-act">
-      {b.phone && <a href={`tel:${b.phone}`} aria-label={`Call ${prettyPhone(b.phone)}`}>Call</a>}
       <a href={directionsUrl(b)} target="_blank" rel="noopener">Directions<span class="sr-only"> (opens in a new tab)</span></a>
-      {open && b.booking
-        ? <a class="btn btn-orange btn-sm vs-book" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
-        : <a class="btn btn-orange btn-sm vs-book" href="#waitlist">Join the list</a>}
+      {b.phone && <a href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
     </p>
   </div>
 </div>
@@ -81,10 +79,10 @@ const open = b.status === 'open';
   .visit-strip :global(*) { --fp-ring: var(--color-ink-deep); }
   @media (max-width: 1100px) { .vs-facts { grid-template-columns: 1.5fr 1fr; } .vs-stations { display: none; } }
   @media (max-width: 960px) { .vs-in { grid-template-columns: 1fr; row-gap: 8px; } }
-  /* Phones: one fact per line. Call, Directions and Book sit just above in the hero, and Book is in the dock. */
+  /* Phones: one fact per line, then Directions and Call (Book is in the hero and the dock). */
   @media (max-width: 760px) {
     .vs-in { padding-block: 16px; }
     .vs-facts { grid-template-columns: 1fr; row-gap: 10px; }
-    .vs-act { display: none; }
+    .vs-act { flex-wrap: wrap; gap: 4px 22px; }
   }
 </style>

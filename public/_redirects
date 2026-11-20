@@ -1,0 +1,9 @@
+# Old site URLs (docs/redirects.csv). Vercel uses vercel.json; this file is for Cloudflare Pages / Netlify. Change both together.
+/soho/reserve-a-table /book/?branch=soho 301
+/soho/reserve-a-table/ /book/?branch=soho 301
+/covent-garden/reserve-a-table /book/?branch=covent-garden 301
+/covent-garden/reserve-a-table/ /book/?branch=covent-garden 301
+/soho/monetary-voucher /soho/ 301
+/soho/monetary-voucher/ /soho/ 301
+/soho/food-pickup /soho/#at-home 301
+/soho/food-pickup/ /soho/#at-home 301

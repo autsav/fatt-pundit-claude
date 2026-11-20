@@ -12,6 +12,7 @@ interface Props {
   stamps: Record<string, ImageMetadata>;
 }
 const { branches, stamps } = Astro.props;
+const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
 
 const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', dubai: 'DXB' };
 
@@ -70,16 +71,19 @@ function byDay(b: Branch) {
               <dd data-today={byDay(b)} data-tz={b.timezone}>{b.hours ? 'See hours below' : 'Opening soon'}</dd>
             </div>
           </dl>
-          {b.status === 'opening-soon' && (
-            <form class="pass-waitlist" data-waitlist id={`wl-form-${b.id}`}>
+          {b.status === 'opening-soon' && (listEndpoint ? (
+            <form class="pass-waitlist" data-waitlist data-list={b.id} id={`wl-form-${b.id}`} action={listEndpoint} method="post" novalidate>
+              <input type="hidden" name="list" value={`${b.shortName} opening`} />
               <label for={`wl-${b.id}`}>Be first through the gate</label>
               <div class="pass-wl-row">
-                <input id={`wl-${b.id}`} type="email" required placeholder="you@example.com" autocomplete="email" />
+                <input id={`wl-${b.id}`} name="email" type="email" required placeholder="you@example.com" autocomplete="email" aria-describedby={`wl-${b.id}-msg`} />
                 <button class="btn btn-orange btn-sm" type="submit">Join</button>
               </div>
-              <p class="wl-msg" role="status" hidden>Thanks. (Demo only: nothing was sent.)</p>
+              <p id={`wl-${b.id}-msg`} data-wl-msg hidden></p>
             </form>
-          )}
+          ) : (
+            <p class="pass-soon">The list opens soon: follow <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">@fattpundit<span class="sr-only"> on Instagram (opens in a new tab)</span></a> for the date.</p>
+          ))}
           <p class="pass-links">
             {b.phone && <a href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
             <a href={`/${b.id}/`} class="pass-more" data-step-inside>{open ? `Step inside ${b.shortName}` : `See the ${b.shortName} gate`}</a>
@@ -237,7 +241,7 @@ function byDay(b: Branch) {
   .pass-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; padding-top: 12px; border-top: 1px dashed rgb(44 41 37 / 0.35); }
   .pass-fields dd { margin: 2px 0 0; font-size: 15px; font-weight: 700; }
   .pass-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin: 0; font-size: 14px; }
-  .pass-links a { color: inherit; font-weight: 700; text-underline-offset: 4px; }
+  .pass-links a { display: inline-flex; align-items: center; min-height: 32px; color: inherit; font-weight: 700; text-underline-offset: 4px; }
   .pass-links .pass-more { text-transform: uppercase; letter-spacing: 0.08em; }
   .pass-boarding { position: absolute; right: 16px; top: 112px; padding: 2px 10px; border: 3px double var(--band); color: var(--band); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -10deg; opacity: 0.9; pointer-events: none; }
   .pass-gold .pass-boarding { color: var(--color-gold-deep); border-color: var(--color-gold-deep); }
@@ -248,7 +252,8 @@ function byDay(b: Branch) {
   .pass-waitlist label { font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
   .pass-wl-row { display: flex; gap: 8px; }
   .pass-wl-row input { flex: 1 1 auto; min-width: 0; min-height: 46px; padding: 0 12px; border: 2px solid var(--color-ink); background: #fff; color: var(--color-ink); font: inherit; font-size: 16px; }
-  .wl-msg { margin: 0; font-weight: 700; color: var(--color-slate); }
+  .pass-soon { margin: 0; font-size: 15px; }
+  .pass-soon a { color: inherit; font-weight: 700; }
 
   /* The stub, below a perforated line with punched notches at each end. */
   .pass-stub { position: relative; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: center; gap: 10px 14px; padding: 18px 22px 16px; background: var(--color-paper); color: var(--color-ink); text-decoration: none; border-radius: 0 0 10px 10px;

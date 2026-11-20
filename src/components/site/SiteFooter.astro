@@ -11,21 +11,21 @@ const h = (hash: string) => (home ? hash : `/${hash}`);
 // Newsletter: shows once the client's email tool is set (its form POST URL,
 // e.g. Mailchimp/Klaviyo embed action) in PUBLIC_NEWSLETTER_ACTION.
 const newsletter = import.meta.env.PUBLIC_NEWSLETTER_ACTION as string | undefined;
-// Gift vouchers: the first branch voucher link in branches.json, else the passes.
-const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables');
+// Gift vouchers: only when a voucher link exists in branches.json (no link that leads elsewhere).
+const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
 ---
 <footer class="foot">
   <div class="wrap stack-lg">
-    <!-- 9 · Goodbye: the bill holder opens and the receipt prints our hours. -->
-    <div class="goodbye">
+    <!-- 9 · Goodbye: the bill holder opens and the receipt prints our hours. The end of the home story only. -->
+    {home && <div class="goodbye">
       <Goodbye branches={branches} />
       <div class="stack goodbye-text">
         <p class="kicker gold">Goodbye, for now</p>
         <p class="goodbye-h">Thank you for travelling with Fatt Pundit</p>
         <p class="note gold">Hakka cooking from Tangra, Kolkata's Chinatown.</p>
       </div>
-    </div>
-    <div class="foot-grid">
+    </div>}
+    <div class="foot-grid" id="footer-menus">
       <div class="stack-sm">
         <p class="brand">FATT PUNDIT</p>
         <p class="note foot-tag">Hakka cooking from Kolkata's Chinatown, since 2019.</p>
@@ -40,14 +40,15 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
           <a class="foot-h" href={`/${b.id}/`}>{b.shortName}</a>
           <p>{b.address.street}{b.address.postcode ? `, ${b.address.postcode}` : ''}</p>
           {b.phone ? <a class="foot-tel" href={`tel:${b.phone.replace(/\s/g, '')}`}>{prettyPhone(b.phone)}</a> : <p>Opening soon</p>}
+          {b.status === 'open' && <a class="foot-menus" href={`/${b.id}/menu/`}>{b.shortName} menus</a>}
           {b.status === 'open' && b.booking
             ? <a class="foot-cta" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}</a>
-            : <a class="foot-cta" href={`/${b.id}/#waitlist`}>Join the list</a>}
+            : <a class="foot-cta" href={`/${b.id}/#waitlist`} data-focus-list>Join the list</a>}
         </div>
       ))}
     </div>
-    <nav aria-label="Footer" class="foot-nav">
-      <a href={h('#menu')}>Menus</a><a href={h('#story')}>Our story</a><a href="/private-dining/">Groups and private dining</a><a href={vouchers}>Gift vouchers</a>
+    <nav aria-label="Footer" class="foot-nav" id="site-index">
+      {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}<a href={h('#story')}>Our story</a><a href="/private-dining/">Groups and private dining</a><a href="/book/">Book a table</a>{vouchers && <a href={vouchers} target="_blank" rel="noopener">Gift vouchers<span class="sr-only"> (opens in a new tab)</span></a>}
     </nav>
     {newsletter && (
       <form class="news" action={newsletter} method="post" target="_blank">
@@ -103,6 +104,8 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
   .social svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .foot-branch { font-size: 16px; line-height: 1.5; }
   .foot-tel { color: var(--color-sand); text-decoration: none; }
+  .foot-menus { width: fit-content; color: var(--color-sand); text-underline-offset: 3px; }
+  .foot-menus:hover { color: var(--color-gold); }
   .foot-tel:hover { color: var(--color-gold); }
   .foot-cta { width: fit-content; margin-top: 8px; padding-bottom: 2px; color: var(--color-tiger-bright); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; text-decoration: none; border-bottom: 1.5px solid currentColor; }
   .foot-cta:hover { color: var(--color-gold); }

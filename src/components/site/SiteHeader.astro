@@ -1,56 +1,56 @@
 ---
 /**
- * The ink bar across the top of every page. On the home page the links jump to sections;
- * on a branch page they lead home, list the three rooms, and Book goes straight to that room.
+ * The ink bar across the top of every page (ux-structure.md §3).
+ * Same items, same order everywhere: the three rooms, Menus, Groups, Book. A page belongs to a branch
+ * when its URL starts with /<branch>/ (its menu page too); then Book, Call and Menus mean that branch.
+ * Phones: wordmark + Index (a numbered ledger), and a dock whose actions depend on the page.
  */
 import type { Branch } from '@/lib/site-data';
+import { onlineSummary } from '@/lib/site-data';
 import BookDrawer from './BookDrawer.astro';
 
 interface Props {
   branches: Branch[];
-  /** The branch whose page this is; absent on the home page. */
+  /** The branch whose pages these are; absent on home, groups, info pages and the booking desk. */
   current?: Branch;
 }
 const { branches, current } = Astro.props;
-// Home page = the long story page; other pages without a branch (allergens,
-// privacy…) link back to its sections.
-const home = !current && Astro.url.pathname === '/';
-const at = (hash: string) => (home ? hash : `/${hash}`);
-const book = current?.booking
-  ? { href: current.booking.url, label: `Book at ${current.shortName}`, external: true }
+const path = Astro.url.pathname;
+const open = branches.filter((b) => b.status === 'open');
+const onMenu = Boolean(current && path.startsWith(`/${current.id}/menu`));
+const onBranchHome = Boolean(current && path === `/${current.id}/`);
+// The current room's menus first.
+const menuRooms = [...open].sort((a, b) => Number(b.id === current?.id) - Number(a.id === current?.id));
+
+type Act = { href: string; label: string; short: string; external: boolean; book?: string; list?: boolean };
+const book: Act = current?.booking
+  ? { href: current.booking.url, label: `Book at ${current.shortName}`, short: 'Book a table', external: true, book: current.id }
   : current
-    ? { href: '#waitlist', label: 'Join the list', external: false }
-    : { href: at('#tables'), label: 'Book a table', external: false };
-const bookAttr = current?.booking ? current.id : current ? undefined : '';
-// Phones: the text links do not fit, so an Index sheet lists every destination, numbered,
-// and a fixed dock keeps Menus, Call and Book one thumb away (creative-direction.md, section 9).
-const index = [
-  ...branches.map((b) => ({ href: `/${b.id}/`, label: b.shortName, note: b.status === 'open' ? b.address.street : 'Opening soon', here: b.id === current?.id })),
-  { href: at('#menu'), label: 'Menus', note: 'Every menu, by restaurant', here: false },
-  { href: at('#story'), label: 'Our story', note: 'Canton, Kolkata, London', here: false },
-  { href: '/private-dining/', label: 'Groups and private dining', note: 'Tables for nine or more', here: Astro.url.pathname.startsWith('/private-dining') },
-];
-const menusHref = current ? (current.status === 'open' ? `/${current.id}/menu/` : '#menu') : at('#menu');
+    ? { href: onBranchHome ? '#waitlist' : `/${current.id}/#waitlist`, label: 'Join the list', short: 'Join the list', external: false, list: true }
+    : { href: '/book/', label: 'Book a table', short: 'Book a table', external: false, book: '' };
+const bookAttrs = { 'data-book': book.book, 'data-focus-list': book.list ? '' : undefined, ...(book.external ? { target: '_blank', rel: 'noopener' } : {}) };
+const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
 ---
 {import.meta.env.PUBLIC_LAUNCH !== 'true' && <p class="preview-flag"><span class="pf-long">Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed</span><span class="pf-short">Website preview, not the live site</span></p>}
 <header class="bar">
   <div class="wrap bar-in">
-    <a class="brand" href={home ? '#top' : '/'}>FATT PUNDIT</a>
+    <a class="brand" href={path === '/' ? '#top' : '/'}>FATT PUNDIT</a>
     <nav aria-label="Main" class="nav">
-      {!current ? (
-        <>
-          <a href={at('#menu')}>Menus</a>
-          <a href={at('#story')}>Our story</a>
-          {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}
-        </>
-      ) : (
-        branches.map((b) => (
-          <a href={`/${b.id}/`} aria-current={b.id === current?.id ? 'page' : undefined}>{b.shortName}</a>
-        ))
-      )}
-      <a class="btn btn-orange btn-sm" href={book.href} data-book={bookAttr} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="lbl-long">{book.label}</span><span class="lbl-short">{current && !current.booking ? 'Join the list' : 'Book a table'}</span></a>
+      {branches.map((b) => (
+        <a href={`/${b.id}/`} aria-current={b.id === current?.id ? (onBranchHome ? 'page' : 'true') : undefined}>{b.shortName}</a>
+      ))}
+      <details class="nav-menus" data-menus-pop>
+        <summary>Menus</summary>
+        <ul class="nav-pop">
+          {menuRooms.map((b) => (
+            <li><a href={`/${b.id}/menu/`} aria-current={onMenu && b.id === current?.id ? 'page' : undefined}><span>{b.shortName} menus</span><small>{b.address.street}</small></a></li>
+          ))}
+        </ul>
+      </details>
+      <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
+      <a class="btn btn-orange btn-sm" href={book.href} {...bookAttrs}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span></a>
     </nav>
-    <button class="idx" type="button" data-index-open aria-haspopup="dialog">Index</button>
+    <a class="idx" href="#site-index" data-index-open aria-haspopup="dialog">Index</a>
   </div>
 </header>
 <BookDrawer />
@@ -58,13 +58,36 @@ const menusHref = current ? (current.status === 'open' ? `/${current.id}/menu/` 
 <dialog class="index" data-index aria-labelledby="index-title">
   <div class="index-head">
     <h2 id="index-title">Index</h2>
-    <button type="button" class="index-close" data-index-close>Close</button>
+    <button type="button" class="index-close" data-sheet-close>Close</button>
   </div>
   <ol class="index-list">
-    {index.map((it, i) => (
-      <li>
-        <a href={it.href} aria-current={it.here ? 'page' : undefined}>
+    {branches.map((b, i) => (
+      <li class="index-row">
+        <a class="index-main" href={`/${b.id}/`} aria-current={b.id === current?.id && onBranchHome ? 'page' : undefined}>
           <span class="index-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="index-name">{b.shortName}</span>
+          <span class="index-note">{b.status === 'open' ? b.address.street : 'Opening soon'}</span>
+        </a>
+        <span class="index-acts">
+          {b.status === 'open' && b.booking ? (
+            <>
+              <a href={`/${b.id}/menu/`}>Menus<span class="sr-only"> at {b.shortName}</span></a>
+              <a href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book<span class="sr-only"> at {b.shortName}</span></a>
+            </>
+          ) : (
+            <a href={`/${b.id}/#waitlist`} data-focus-list>Join the list<span class="sr-only"> for {b.shortName}</span></a>
+          )}
+        </span>
+      </li>
+    ))}
+    {[
+      { href: '/private-dining/', label: 'Groups and private dining', note: onlineSummary(branches) },
+      { href: '/#story', label: 'Our story', note: 'Canton, Kolkata, London' },
+      { href: '/allergens/', label: 'Allergens and dietary needs', note: 'Diet codes and how we cook' },
+    ].map((it, i) => (
+      <li class="index-row">
+        <a class="index-main" href={it.href} aria-current={here(it.href)}>
+          <span class="index-no" aria-hidden="true">{String(branches.length + i + 1).padStart(2, '0')}</span>
           <span class="index-name">{it.label}</span>
           <span class="index-note">{it.note}</span>
         </a>
@@ -73,22 +96,68 @@ const menusHref = current ? (current.status === 'open' ? `/${current.id}/menu/` 
   </ol>
 </dialog>
 
-<nav class="dock" data-dock aria-label="Quick actions">
-  <a href={menusHref}>Menus</a>
-  {current?.phone
-    ? <a href={`tel:${current.phone}`} aria-label={`Call ${current.shortName}`}>Call</a>
-    : <button type="button" data-index-open aria-haspopup="dialog">Rooms</button>}
-  <a class="dock-book" href={book.href} data-book={bookAttr} {...(book.external ? { target: '_blank', rel: 'noopener' } : {})}>{current && !current.booking ? 'Join the list' : 'Book'}</a>
+<dialog class="index index-menus" data-menus aria-labelledby="menus-title">
+  <div class="index-head">
+    <h2 id="menus-title">Which restaurant's menus?</h2>
+    <button type="button" class="index-close" data-sheet-close>Close</button>
+  </div>
+  <ol class="index-list">
+    {menuRooms.map((b, i) => (
+      <li class="index-row">
+        <a class="index-main" href={`/${b.id}/menu/`}>
+          <span class="index-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="index-name">{b.shortName} menus</span>
+          <span class="index-note">{b.address.street}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</dialog>
+
+<nav class={`dock${current && current.status !== 'open' ? ' dock-two' : ''}`} data-dock aria-label="Quick actions">
+  {current?.status === 'open' ? (
+    <>
+      <a href={`/${current.id}/menu/`} aria-current={onMenu ? 'page' : undefined}>Menus</a>
+      {current.phone && <a href={`tel:${current.phone}`} aria-label={`Call ${current.shortName}`}>Call</a>}
+    </>
+  ) : current ? (
+    <a href="#site-index" data-index-open aria-haspopup="dialog">Rooms</a>
+  ) : (
+    <>
+      <a href="#footer-menus" data-menus-open aria-haspopup="dialog">Menus</a>
+      <a href="#site-index" data-index-open aria-haspopup="dialog">Rooms</a>
+    </>
+  )}
+  <a class="dock-book" href={book.href} {...bookAttrs}>{book.list ? 'Join the list' : 'Book'}</a>
 </nav>
 
 <script>
-  const dlg = document.querySelector<HTMLDialogElement>('[data-index]');
-  if (dlg) {
-    document.addEventListener('click', (e) => {
-      const t = e.target as Element;
-      if (t.closest('[data-index-open]')) dlg.showModal();
+  const sheets = { index: document.querySelector<HTMLDialogElement>('[data-index]'), menus: document.querySelector<HTMLDialogElement>('[data-menus]') };
+  const pop = document.querySelector<HTMLDetailsElement>('[data-menus-pop]');
+  document.addEventListener('click', (e) => {
+    const t = e.target as Element;
+    const opener = t.closest<HTMLElement>('[data-index-open], [data-menus-open]');
+    if (opener) {
+      e.preventDefault();
+      (opener.hasAttribute('data-menus-open') ? sheets.menus : sheets.index)?.showModal();
+      return;
+    }
+    for (const d of Object.values(sheets)) {
       // Close, a tap on the backdrop, or choosing a destination (it may be on this page).
-      else if (t === dlg || t.closest('[data-index-close], [data-index] a')) dlg.close();
-    });
-  }
+      if (d?.open && (t === d || t.closest('[data-sheet-close]') || (d.contains(t) && t.closest('a')))) d.close();
+    }
+    if (pop?.open && !pop.contains(t)) pop.open = false;
+    // "Join the list": put the guest straight into the email field when it is on this page.
+    const list = t.closest('[data-focus-list]');
+    const field = document.querySelector<HTMLInputElement>('#wl-email');
+    if (list && field && list.getAttribute('href')?.endsWith('#waitlist') && location.pathname === new URL((list as HTMLAnchorElement).href).pathname) {
+      e.preventDefault();
+      field.scrollIntoView({ block: 'center' });
+      field.focus({ preventScroll: true });
+    }
+  });
+  // The Menus dropdown: Escape closes it and returns focus to its button.
+  pop?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pop.open) { pop.open = false; pop.querySelector('summary')?.focus(); }
+  });
 </script>

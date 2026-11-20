@@ -10,11 +10,10 @@
  *   OpenTable  /restref/client/?rid=&restref=&datetime=YYYY-MM-DDTHH:MM&covers=N
  *   SevenRooms /explore/<venue>/reservations/create/search/?date=&party_size=&start_time=HH:MM
  */
-import { getBranches, prettyPhone } from '@/lib/site-data';
+import { getBranches, groupRules, preTheatreText, prettyPhone } from '@/lib/site-data';
 
 const branches = (await getBranches()).filter((b) => b.status === 'open' && b.booking);
-// Bigger parties go to the groups page (Covent Garden asks above 4).
-const GROUP_AT = 9;
+// Bigger parties go to the groups page; the limits come from branches.json `groups` (client, 20 Nov 2026).
 const data = branches.map((b) => ({
   id: b.id,
   name: b.shortName,
@@ -25,7 +24,12 @@ const data = branches.map((b) => ({
   widgetId: b.booking!.widgetId,
   phone: b.phone,
   phonePretty: b.phone ? prettyPhone(b.phone) : '',
-  maxOnline: b.groupsNote ? 4 : GROUP_AT - 1,
+  maxOnline: b.groups?.onlineMax ?? 8,
+  setMenuFrom: b.groups?.setMenuFrom ?? 99,
+  depositFrom: b.groups?.depositFrom ?? 99,
+  deposit: groupRules(b)?.depositShort ?? '',
+  pre: b.preTheatre,
+  preText: preTheatreText(b),
 }));
 ---
 <dialog class="book" data-book-drawer aria-labelledby="book-title">
@@ -47,9 +51,11 @@ const data = branches.map((b) => ({
       <legend>How many</legend>
       <div class="book-step">
         <button type="button" class="book-pm" data-step="-1" aria-label="One fewer guest">−</button>
-        <output data-book-size aria-live="polite">2</output>
+        <input class="book-size" data-book-size type="number" inputmode="numeric" min="1" max="20" value="2" aria-label="Guests" />
         <button type="button" class="book-pm" data-step="1" aria-label="One more guest">+</button>
       </div>
+      <p class="book-note" data-book-deposit hidden></p>
+      <span class="sr-only" data-book-size-said aria-live="polite"></span>
     </fieldset>
 
     <fieldset class="book-field">
@@ -60,17 +66,32 @@ const data = branches.map((b) => ({
     <fieldset class="book-field">
       <legend>Time</legend>
       <div class="book-times" data-book-times role="radiogroup" aria-label="Time"></div>
-      <p class="book-closed" data-book-closed hidden>Closed that day. Pick another day.</p>
+      <p class="book-closed" data-book-closed hidden></p>
+      <p class="book-note" data-book-pre hidden></p>
     </fieldset>
 
-    <p class="book-group" data-book-group hidden>
-      For <span data-book-group-n></span> or more, the restaurant plans your table with you:
-      <a href="/private-dining/">send a group enquiry</a> or call <a data-book-tel href="#"></a>.
-    </p>
+    <div class="book-group" data-book-group hidden>
+      <p data-book-group-text></p>
+      <a class="btn btn-orange book-go" data-book-enquire href="/private-dining/">Send a group enquiry</a>
+      <p class="book-small">Ask about space for your group: call <a data-book-tel href="#"></a>.</p>
+    </div>
 
-    <button type="submit" class="btn btn-orange book-go" data-book-go value="go">Find a table</button>
-    <p class="book-small">Opens <span data-book-provider></span> in a new tab with your choices filled in. Or call <a data-book-tel2 href="#"></a>.</p>
+    <div class="book-go-wrap" data-book-go-wrap>
+      <button type="submit" class="btn btn-orange book-go" data-book-go value="go">Find a table</button>
+      <p class="book-small">Opens <span data-book-provider></span> in a new tab with your choices filled in. Or call <a data-book-tel2 href="#"></a>.</p>
+    </div>
   </form>
+  <!-- After the hand-off: say what opened, keep a way back to it (ux-structure.md F12). -->
+  <div class="book-sheet book-done" data-book-done hidden>
+    <div class="book-head">
+      <p class="book-kicker">Your table</p>
+      <h2 class="book-title" tabindex="-1" data-book-done-title></h2>
+      <button type="button" class="book-x" data-book-close aria-label="Close">×</button>
+    </div>
+    <p class="book-done-what" role="status" data-book-done-what></p>
+    <a class="btn btn-ink book-go" data-book-again href="#" target="_blank" rel="noopener"></a>
+    <button type="button" class="book-link" data-book-change>Change the details</button>
+  </div>
 </dialog>
 
 <script is:inline type="application/json" data-book-data set:html={JSON.stringify(data)} />
@@ -103,28 +124,39 @@ const data = branches.map((b) => ({
   .book-step { display: inline-flex; align-items: center; border: 2px solid var(--color-ink); background: var(--color-paper-light); }
   .book-pm { width: 52px; height: 48px; font-size: 26px; background: none; border: 0; color: var(--color-ink); cursor: pointer; }
   .book-pm:disabled { opacity: 0.35; cursor: default; }
-  .book-step output { min-width: 56px; text-align: center; font-size: 24px; font-weight: 700; }
+  .book-size { width: 64px; min-height: 48px; border: 0; border-inline: 2px solid var(--color-ink); background: none; color: var(--color-ink); font: inherit; font-size: 24px; font-weight: 700; text-align: center; -moz-appearance: textfield; }
+  .book-size::-webkit-inner-spin-button, .book-size::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .book-size:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
+  .book-note { margin: 8px 0 0; font-size: 15px; }
+  .book-group { display: grid; gap: 12px; }
+  .book-group > p:first-child { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  .book-done-what { margin: 0; font-size: 18px; }
+  .book-link { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-tiger-deep); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+  .book-done[hidden], .book-sheet[hidden] { display: none; }
+  .book-go-wrap { display: grid; gap: 18px; }
   .book-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
   .book :global(.book-day) { flex: none; flex-direction: column; min-width: 64px; padding: 6px 10px; line-height: 1.15; scroll-snap-align: start; }
   .book :global(.book-day small) { display: block; font-size: 12px; font-weight: 400; }
   .book :global(.book-time) { min-width: 84px; padding: 0 10px; }
-  .book-closed, .book-group { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 18px; }
-  .book-group a, .book-small a { color: var(--color-tiger-deep); font-weight: 700; }
-  .book-go { width: 100%; margin-top: 4px; }
+  .book-closed { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  .book-small a { color: var(--color-tiger-deep); font-weight: 700; }
+  .book-go { width: 100%; margin-top: 4px; justify-content: center; }
   .book-go[aria-disabled='true'] { opacity: 0.45; pointer-events: none; }
   .book-small { margin: 0; font-size: 14px; }
 </style>
 
 <script>
   type Span = [string, string];
-  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number }
+  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
   const dlg = document.querySelector<HTMLDialogElement>('[data-book-drawer]');
   const raw = document.querySelector('[data-book-data]')?.textContent;
   if (dlg && raw) {
     const all: B[] = JSON.parse(raw);
     const $ = <T extends Element>(s: string) => dlg.querySelector<T>(s)!;
     const form = $<HTMLFormElement>('[data-book-form]');
-    const sizeOut = $<HTMLOutputElement>('[data-book-size]');
+    const sizeIn = $<HTMLInputElement>('[data-book-size]');
+    const form$ = $<HTMLElement>('[data-book-form]');
+    const done = dlg.querySelector<HTMLElement>('[data-book-done]')!;
     const daysEl = $<HTMLElement>('[data-book-days]');
     const timesEl = $<HTMLElement>('[data-book-times]');
     const go = $<HTMLButtonElement>('[data-book-go]');
@@ -183,23 +215,47 @@ const data = branches.map((b) => ({
     const drawTimes = () => {
       timesEl.replaceChildren();
       const list = slots(day);
-      $<HTMLElement>('[data-book-closed]').hidden = list.length > 0;
+      const closed = $<HTMLElement>('[data-book-closed]');
+      closed.hidden = list.length > 0;
+      // Name the room and the reason: closed all day, or no tables left today.
+      closed.textContent = (b.hours[KEYS[wd(day)]] ?? []).length
+        ? `No more tables at ${b.name} ${day === local(b.tz).ymd ? 'today' : 'that day'}. Pick another day.`
+        : `${b.name} is closed on ${new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' })}s. Pick another day.`;
       if (!list.some((m) => hhmm(m) === time)) time = list.find((m) => m >= 19 * 60) !== undefined ? hhmm(list.find((m) => m >= 19 * 60)!) : list[0] !== undefined ? hhmm(list[0]) : '';
       for (const m of list) radio(timesEl, 'book-time', hhmm(m) === time, pretty(m), pretty(m), () => { time = hhmm(m); drawTimes(); update(); });
     };
     const update = () => {
       const tooMany = size > b.maxOnline;
       $<HTMLElement>('[data-book-group]').hidden = !tooMany;
-      $<HTMLElement>('[data-book-group-n]').textContent = String(b.maxOnline + 1);
+      $<HTMLElement>('[data-book-go-wrap]').hidden = tooMany;
+      $<HTMLElement>('[data-book-group-text]').textContent = size >= b.setMenuFrom
+        ? `For ${b.setMenuFrom} or more, ${b.name} plans a set menu with you.`
+        : `${b.name} books online for up to ${b.maxOnline}. For ${size}, please call or send an enquiry.`;
+      const q = new URLSearchParams({ branch: b.id, guests: String(size), ...(day ? { date: day } : {}), ...(time ? { time } : {}) });
+      $<HTMLAnchorElement>('[data-book-enquire]').href = `/private-dining/?${q}`;
+      const dep = $<HTMLElement>('[data-book-deposit]');
+      dep.hidden = size < b.depositFrom || !b.deposit;
+      dep.textContent = b.deposit;
+      const pre = $<HTMLElement>('[data-book-pre]');
+      const tm = time ? toMin(time) : -1;
+      pre.hidden = !(b.pre && b.preText && tm >= toMin(b.pre[0]) && tm <= toMin(b.pre[1]));
+      pre.textContent = `Pre-theatre menu: seated ${b.preText}.`;
+      $<HTMLElement>('[data-book-size-said]').textContent = `${size} guest${size === 1 ? '' : 's'}`;
       for (const a of dlg.querySelectorAll<HTMLAnchorElement>('[data-book-tel],[data-book-tel2]')) { a.href = `tel:${b.phone}`; a.textContent = b.phonePretty; }
       $<HTMLElement>('[data-book-name]').textContent = `at ${b.name}`;
       $<HTMLElement>('[data-book-provider]').textContent = PROVIDER[b.provider] ?? 'the booking page';
-      sizeOut.value = String(size);
+      if (document.activeElement !== sizeIn) sizeIn.value = String(size);
       dlg.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = size <= 1;
       dlg.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = size >= 20;
       go.setAttribute('aria-disabled', String(tooMany || !time));
     };
     const draw = () => { drawDays(); drawTimes(); update(); };
+    sizeIn.addEventListener('input', () => { const n = Math.round(Number(sizeIn.value)); if (n >= 1 && n <= 20) { size = n; update(); } });
+    sizeIn.addEventListener('change', () => { size = Math.min(20, Math.max(1, Math.round(Number(sizeIn.value)) || 2)); sizeIn.value = String(size); update(); });
+    const showForm = () => { form$.hidden = false; done.hidden = true; };
+    const longDay = (ymd: string) => new Date(`${ymd}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+    done.querySelector('[data-book-close]')!.addEventListener('click', () => dlg.close());
+    done.querySelector('[data-book-change]')!.addEventListener('click', () => { showForm(); go.focus(); });
     for (const g of [daysEl, timesEl]) g.addEventListener('keydown', (e) => {
       const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
       const all = [...g.querySelectorAll<HTMLElement>('[role="radio"]')];
@@ -243,9 +299,18 @@ const data = branches.map((b) => ({
       const href = link();
       // Same pattern as the boarding passes: new tab, no opener; same tab if blocked.
       const w = window.open(href, '_blank');
-      if (w) w.opener = null; else location.href = href;
       window.dispatchEvent(new CustomEvent('fp:booking-click', { detail: { branch: b.id, size } }));
-      dlg.close();
+      if (!w) { location.href = href; return; }
+      w.opener = null;
+      // Done state: confirm the hand-off and keep a way back to it.
+      const provider = PROVIDER[b.provider] ?? 'The booking page';
+      done.querySelector<HTMLElement>('[data-book-done-title]')!.textContent = `${provider} is open in a new tab`;
+      done.querySelector<HTMLElement>('[data-book-done-what]')!.textContent = `${size} guest${size === 1 ? '' : 's'} at ${b.name}, ${longDay(day)}, ${pretty(toMin(time))}. Finish booking there. Not there? Open it again.`;
+      const again = done.querySelector<HTMLAnchorElement>('[data-book-again]')!;
+      again.href = href;
+      again.textContent = `Open ${provider} again`;
+      form$.hidden = true; done.hidden = false;
+      done.querySelector<HTMLElement>('[data-book-done-title]')!.focus();
     });
     dlg.addEventListener('close', () => opener?.focus());
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
@@ -263,6 +328,7 @@ const data = branches.map((b) => ({
       let saved: string | null = null;
       try { saved = localStorage.getItem('fp-menu-at'); } catch {}
       pick(id || saved || all[0].id);
+      showForm();
       dlg.showModal();
     });
   }

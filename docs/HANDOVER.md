@@ -22,6 +22,12 @@ After a JSON change: `npm run build`. `scripts/validate-data.mjs` runs first and
 | `SPECIALS_CSV_URL` / `PUBLIC_SPECIALS_CSV_URL` | The Sheet's "Publish to web → CSV" link. Build reads the first; the page re-reads the second so changes show without a rebuild. |
 | `PUBLIC_PLAUSIBLE_DOMAIN` | Turns on cookie-free analytics (visits, Book clicks, passport stamps, real-phone speed). |
 | `PUBLIC_NEWSLETTER_ACTION` | The email tool's form address (Mailchimp, Klaviyo…). Shows the footer sign-up. |
+| `PUBLIC_FORM_ENDPOINT` | A form-to-email service address (Formspree, Web3Forms…) for **group enquiries**. The form POSTs to it and shows "Enquiry sent" or keeps everything on failure. Unset: the form opens the guest's email app instead. |
+| `PUBLIC_DUBAI_LIST_ENDPOINT` | The same kind of address for the **Dubai list** (sends to the verified Dubai email). Unset: no form, the page says the list opens soon. |
+
+When either form address is set, add its domain to `connect-src` in the Content-Security-Policy (`vercel.json` and `public/_headers`), or the browser will block the send once the policy is enforced.
+
+Group and deposit rules (online limit, set menu from, deposit, refund hours) and pre-theatre seating times live in `src/data/branches.json` under `groups` and `preTheatre`. Every page, the Book drawer and the booking terms print them from there.
 
 ## Launch checklist
 

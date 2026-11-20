@@ -56,7 +56,34 @@ export const directionsUrl = (b: Branch) =>
 /** Same, for iPhones that prefer Apple Maps. */
 export const appleMapsUrl = (b: Branch) => `https://maps.apple.com/?q=${encodeURIComponent(`Fatt Pundit, ${fullAddress(b)}`)}`;
 
-export const BOOKING_NAMES = { opentable: 'OpenTable', sevenrooms: 'SevenRooms', resdiary: 'ResDiary', other: 'online' } as const;
+/** "17:00" → "5pm" for page copy. */
+export const timeText = t;
+
+/**
+ * Group and deposit rules in words, from branches.json `groups` (ux-structure.md D6).
+ * One wording everywhere: drawer, Index, home, Good to know, groups page, booking terms.
+ */
+export function groupRules(b: Branch) {
+  const g = b.groups;
+  if (!g) return null;
+  const money = formatPrice({ [b.currency]: g.depositPerHead } as Parameters<typeof formatPrice>[0], b.currency);
+  return {
+    online: `${b.shortName} books online for up to ${g.onlineMax} guests.`,
+    call: g.callAbove && g.setMenuFrom - 1 > g.onlineMax ? `For ${g.onlineMax + 1} to ${g.setMenuFrom - 1}, please call the restaurant.` : null,
+    setMenu: `Groups of ${g.setMenuFrom} or more dine from the set menu.`,
+    deposit: `Tables of ${g.depositFrom} or more pay a ${money} a person deposit, taken off the bill or refunded in full if you cancel at least ${g.refundHours} hours before.`,
+    depositShort: `Tables of ${g.depositFrom} or more: ${money} a person deposit, refundable up to ${g.refundHours} hours before.`,
+  };
+}
+
+/** "Online up to 7 at Soho, 4 at Covent Garden" */
+export const onlineSummary = (branches: Branch[]) =>
+  'Online up to ' + branches.filter((b) => b.groups).map((b) => `${b.groups!.onlineMax} at ${b.shortName}`).join(', ');
+
+/** "5–5.45pm" */
+export const preTheatreText = (b: Branch) => (b.preTheatre ? `${t(b.preTheatre[0]).replace(/(am|pm)$/, (x) => (t(b.preTheatre![1]).endsWith(x) ? '' : x))}–${t(b.preTheatre[1])}` : null);
+
+export const BOOKING_NAMES ={ opentable: 'OpenTable', sevenrooms: 'SevenRooms', resdiary: 'ResDiary', other: 'online' } as const;
 
 /** Bookmark label for each menu in the menu book. */
 export const MENU_TABS: Record<string, string> = {

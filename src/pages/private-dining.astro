@@ -1,65 +1,173 @@
 ---
+/**
+ * Groups and private dining (ux-structure.md §5, W6). What's possible per room first (from branches.json
+ * `groups`), then an enquiry that ends in a clear outcome.
+ * Sending: PUBLIC_FORM_ENDPOINT (a form-to-email service, e.g. Formspree or Web3Forms) receives a normal
+ * POST and emails the restaurant; the page shows "Enquiry sent" or keeps everything if it fails.
+ * Until it is set, the form opens the guest's email app addressed to the room (the old behaviour).
+ * Arriving from the Book drawer, ?branch=&date=&guests=&time= fill the form in.
+ */
 import InfoPage from '../layouts/InfoPage.astro';
-import { getBranches, prettyPhone } from '../lib/site-data';
+import { getBranches, groupRules, prettyPhone } from '../lib/site-data';
 const open = (await getBranches()).filter((b) => b.status === 'open' && b.email);
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
 const today = new Date().toISOString().slice(0, 10);
 ---
 <InfoPage title="Groups and private dining" description="Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups and private dining">
   <p>Big tables, set feasts and whole-room bookings for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible.</p>
-  {open.filter((b) => b.groupsNote).map((b) => <p><strong>{b.shortName}:</strong> {b.groupsNote}</p>)}
 
-  <form class="enquiry" data-enquiry action={`mailto:${open[0]?.email}`} method="post" enctype="text/plain">
-    <fieldset>
-      <legend>Which restaurant?</legend>
-      <div class="choices">
+  <h2>What's possible</h2>
+  <ul class="rules" role="list">
+    {open.map((b) => {
+      const r = groupRules(b)!;
+      return (
+        <li>
+          <strong>{b.shortName}</strong>
+          <span>{r.online}{r.call && ` ${r.call}`} {r.setMenu} <a href={`/${b.id}/menu/#set-menu`}>See the {b.shortName} set menu</a>.</span>
+        </li>
+      );
+    })}
+  </ul>
+  <p>{groupRules(open[0])?.deposit} Ask about space for your group when you call or write.</p>
+
+  <h2 id="enquiry-title">Send an enquiry</h2>
+  <div class="status-slot" data-enquiry-top></div>
+  <form class="fp-form surface-paper-light enquiry" data-enquiry aria-labelledby="enquiry-title" novalidate
+    action={endpoint ?? `mailto:${open[0]?.email}`} method="post" data-endpoint={endpoint ? '' : undefined}>
+    <input type="hidden" name="_subject" value="Group enquiry" data-subject />
+    <fieldset class="fp-fieldset">
+      <legend class="fp-legend">Which restaurant?</legend>
+      <div class="fp-choices">
         {open.map((b, i) => (
-          <label class="choice"><input type="radio" name="restaurant" value={b.id} data-email={b.email} data-name={b.shortName} checked={i === 0} required /> <span>{b.shortName}</span></label>
+          <label class="fp-choice"><input type="radio" name="restaurant" value={b.shortName} data-id={b.id} data-email={b.email} checked={i === 0} /><span>{b.shortName}</span></label>
         ))}
       </div>
     </fieldset>
-    <div class="row">
-      <label>Date<input type="date" name="date" min={today} required /></label>
-      <label>Guests<input type="number" name="guests" min="5" max="120" inputmode="numeric" placeholder="e.g. 12" required /></label>
+    <div class="fp-form-row">
+      <div class="fp-field">
+        <label class="fp-label" for="eq-date">Date</label>
+        <input class="fp-input" id="eq-date" name="date" type="date" min={today} required aria-describedby="eq-date-msg" />
+        <p class="fp-msg fp-msg--error" id="eq-date-msg" hidden></p>
+      </div>
+      <div class="fp-field">
+        <label class="fp-label" for="eq-guests">Guests</label>
+        <input class="fp-input" id="eq-guests" name="guests" type="number" inputmode="numeric" min="2" max="200" required aria-describedby="eq-guests-msg" />
+        <p class="fp-msg fp-msg--error" id="eq-guests-msg" hidden></p>
+      </div>
     </div>
-    <div class="row">
-      <label>Your name<input name="name" autocomplete="name" required /></label>
-      <label>Phone<input type="tel" name="phone" autocomplete="tel" /></label>
+    <div class="fp-field">
+      <label class="fp-label" for="eq-time">Time (optional)</label>
+      <input class="fp-input" id="eq-time" name="time" type="time" step="900" />
     </div>
-    <label>Email<input type="email" name="email" autocomplete="email" required /></label>
-    <label>The occasion, dietary needs, anything else<textarea name="notes" rows="4"></textarea></label>
-    <button class="btn btn-orange" type="submit">Send enquiry</button>
-    <p class="hint">This opens your email app with everything filled in, addressed to the restaurant. Prefer to talk? {open.map((b, i) => <>{i > 0 && ', '}{b.shortName} <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a></>)}</p>
+    <div class="fp-form-row">
+      <div class="fp-field">
+        <label class="fp-label" for="eq-name">Your name</label>
+        <input class="fp-input" id="eq-name" name="name" autocomplete="name" required aria-describedby="eq-name-msg" />
+        <p class="fp-msg fp-msg--error" id="eq-name-msg" hidden></p>
+      </div>
+      <div class="fp-field">
+        <label class="fp-label" for="eq-email">Email</label>
+        <input class="fp-input" id="eq-email" name="email" type="email" autocomplete="email" required aria-describedby="eq-email-msg" />
+        <p class="fp-msg fp-msg--error" id="eq-email-msg" hidden></p>
+      </div>
+    </div>
+    <div class="fp-field">
+      <label class="fp-label" for="eq-phone">Phone (optional)</label>
+      <input class="fp-input" id="eq-phone" name="phone" type="tel" autocomplete="tel" />
+    </div>
+    <div class="fp-field">
+      <label class="fp-label" for="eq-notes">The occasion, dietary needs, anything else (optional)</label>
+      <textarea class="fp-input" id="eq-notes" name="notes" rows="4"></textarea>
+    </div>
+    <div>
+      <button class="fp-btn fp-btn--primary" type="submit" data-enquiry-send>Send enquiry</button>
+    </div>
+    <p class="fp-hint">{endpoint ? "We'll reply by email as soon as we can." : 'This opens your email app with everything filled in, addressed to the restaurant.'} Prefer to talk? {open.map((b, i) => <>{i > 0 && ', '}{b.shortName} <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a></>)}</p>
   </form>
-  <p class="todo">To switch to the restaurant's own enquiry system (SevenRooms events or a form service), change this form's action; the fields stay the same.</p>
 </InfoPage>
 
 <style>
-  .enquiry { display: grid; gap: 16px; margin-top: 28px; }
-  .enquiry fieldset { border: 0; padding: 0; margin: 0; }
-  .enquiry legend { font-weight: 700; margin-bottom: 8px; }
-  .choices { display: flex; flex-wrap: wrap; gap: 10px; }
-  .choice { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 2px solid var(--color-ink); background: #fff; cursor: pointer; font-weight: 700; }
-  .choice:has(input:checked) { background: var(--color-tiger); color: var(--color-ink-deep); border-color: var(--color-tiger); }
-  .choice input { accent-color: var(--color-ink); width: 18px; height: 18px; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
-  .enquiry label:not(.choice) { display: grid; gap: 6px; font-weight: 700; font-size: 16px; }
-  .enquiry input:not([type='radio']), .enquiry textarea { font: inherit; font-weight: 400; font-size: 17px; padding: 12px 14px; border: 2px solid var(--color-ink); background: #fff; color: var(--color-ink); min-height: 48px; box-sizing: border-box; width: 100%; }
-  .enquiry input:focus-visible, .enquiry textarea:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
-  .enquiry button { justify-self: start; }
-  .hint { font-size: 15px; }
+  .rules { display: grid; gap: 0; margin: 0 0 16px !important; padding: 0; list-style: none; border-top: 2px solid var(--color-ink); }
+  .rules li { display: grid; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--color-ink); }
+  .enquiry { margin-top: 8px; background: none; }
+  .enquiry :global(.fp-hint a) { color: var(--color-tiger-deep); font-weight: 700; }
+  .status-slot:empty { display: none; }
+  .status-slot { margin-bottom: 16px; }
+  .status-slot :global(ul) { margin: 6px 0 0 !important; padding-left: 1.2em; }
+  .status-slot :global(a) { color: inherit !important; }
 </style>
 
 <script>
-  const form = document.querySelector<HTMLFormElement>('[data-enquiry]');
-  form?.addEventListener('submit', (e) => {
+  const form = document.querySelector<HTMLFormElement>('[data-enquiry]')!;
+  const top = document.querySelector<HTMLElement>('[data-enquiry-top]')!;
+  const send = form.querySelector<HTMLButtonElement>('[data-enquiry-send]')!;
+  const usesService = form.hasAttribute('data-endpoint');
+  const field = (n: string) => form.elements.namedItem(n) as HTMLInputElement;
+
+  // Arriving from the Book drawer: room, date, guests and time are already chosen.
+  const q = new URLSearchParams(location.search);
+  const room = q.get('branch');
+  if (room) form.querySelectorAll<HTMLInputElement>('input[name="restaurant"]').forEach((r) => (r.checked = r.dataset.id === room));
+  for (const k of ['date', 'guests', 'time']) { const v = q.get(k); if (v) field(k).value = v; }
+
+  // Messages say what to do. Checked on submit, then re-checked as the guest types (never on blur: lesson 63).
+  const RULES: [string, (i: HTMLInputElement) => string][] = [
+    ['date', (i) => (!i.value ? 'Choose a date' : i.value < i.min ? 'Choose today or a later date' : '')],
+    ['guests', (i) => (!i.value ? 'Enter how many guests' : Number(i.value) < 2 ? 'Enter 2 or more guests' : '')],
+    ['name', (i) => (!i.value.trim() ? 'Enter your name' : '')],
+    ['email', (i) => (!i.value.trim() ? 'Enter your email address' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.value.trim()) ? 'Enter an email address like name@example.com' : '')],
+  ];
+  const mark = (name: string, msg: string) => {
+    const i = field(name);
+    const out = document.getElementById(`eq-${name}-msg`)!;
+    i.setAttribute('aria-invalid', String(Boolean(msg)));
+    out.textContent = msg;
+    out.hidden = !msg;
+  };
+  const check = () => RULES.map(([n, f]) => { const msg = f(field(n)); mark(n, msg); return [n, msg] as const; }).filter(([, m]) => m);
+  for (const [n, f] of RULES) field(n).addEventListener('input', () => { if (field(n).getAttribute('aria-invalid') === 'true') mark(n, f(field(n))); });
+
+  const status = (kind: 'error' | 'success' | 'info', html: string, role: 'alert' | 'status') => {
+    top.innerHTML = `<div class="fp-status fp-msg fp-msg--${kind}" role="${role}" tabindex="-1">${html}</div>`;
+    const box = top.firstElementChild as HTMLElement;
+    box.focus();
+    return box;
+  };
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!form.reportValidity()) return;
-    const d = new FormData(form);
+    if (send.getAttribute('aria-busy') === 'true') return;
+    const bad = check();
+    if (bad.length) {
+      status('error', `<strong>${bad.length === 1 ? '1 thing' : `${bad.length} things`} to fix</strong><ul>${bad.map(([n, m]) => `<li><a href="#eq-${n}">${esc(m)}</a></li>`).join('')}</ul>`, 'alert');
+      return;
+    }
     const pick = form.querySelector<HTMLInputElement>('input[name="restaurant"]:checked')!;
+    const d = new FormData(form);
     const date = new Date(`${d.get('date')}T12:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const subject = `Group enquiry: ${d.get('guests')} guests on ${date}`;
-    const body = [`Restaurant: ${pick.dataset.name}`, `Date: ${date}`, `Guests: ${d.get('guests')}`, `Name: ${d.get('name')}`, `Email: ${d.get('email')}`, `Phone: ${d.get('phone') || '-'}`, '', `${d.get('notes') || ''}`].join('\n');
-    location.href = `mailto:${pick.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const summary = `${pick.value} · ${date}${d.get('time') ? ` at ${d.get('time')}` : ''} · ${d.get('guests')} guests`;
+    const subject = `Group enquiry: ${d.get('guests')} guests on ${date} at ${pick.value}`;
+    if (!usesService) {
+      const body = [`Restaurant: ${pick.value}`, `Date: ${date}`, `Time: ${d.get('time') || '-'}`, `Guests: ${d.get('guests')}`, `Name: ${d.get('name')}`, `Email: ${d.get('email')}`, `Phone: ${d.get('phone') || '-'}`, '', `${d.get('notes') || ''}`].join('\n');
+      location.href = `mailto:${pick.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      status('info', `<strong>Your email app should open now</strong>Everything is filled in, addressed to ${esc(pick.value)}. If nothing opens, email <a href="mailto:${esc(pick.dataset.email!)}">${esc(pick.dataset.email!)}</a>.`, 'status');
+      return;
+    }
+    form.querySelector<HTMLInputElement>('[data-subject]')!.value = subject;
+    d.set('_subject', subject);
+    d.set('to', pick.dataset.email!);
+    send.setAttribute('aria-busy', 'true');
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: d, headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(String(res.status));
+      form.hidden = true;
+      status('success', `<strong>Enquiry sent</strong>${esc(summary)}. We'll reply to ${esc(String(d.get('email')))} as soon as we can.`, 'status');
+      window.dispatchEvent(new CustomEvent('fp:enquiry-sent', { detail: { branch: pick.dataset.id } }));
+    } catch {
+      status('error', `<strong>We couldn't send this</strong>Everything you typed is still here. Try again, or email <a href="mailto:${esc(pick.dataset.email!)}">${esc(pick.dataset.email!)}</a>.`, 'alert');
+    } finally {
+      send.removeAttribute('aria-busy');
+    }
   });
 </script>

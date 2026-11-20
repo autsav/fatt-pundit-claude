@@ -6,7 +6,7 @@
 import Base from './Base.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
-import { getBranches } from '../lib/site-data';
+import { getBranches, prettyPhone } from '../lib/site-data';
 
 interface Props {
   title: string;
@@ -16,18 +16,49 @@ interface Props {
   noindex?: boolean;
   /** A wider sheet for long lists (the menus) with their own layout. */
   wide?: boolean;
+  /** The branch this page belongs to (its menu page): Book, Call and Menus then mean that branch. */
+  branch?: string;
+  /** Breadcrumb trail above the title; the last item is this page. */
+  crumbs?: { href?: string; label: string }[];
+  /** "In short": two to four points that answer the page's question (ux-structure.md, info pages). */
+  summary?: string[];
+  /** A closing "Questions?" block with each room's phone and email, plus related links. */
+  questions?: { related?: { href: string; label: string }[] };
 }
-const { title, description, kicker, heading, noindex, wide } = Astro.props;
+const { title, description, kicker, heading, noindex, wide, branch, crumbs, summary, questions } = Astro.props;
 const branches = await getBranches();
+const current = branches.find((b) => b.id === branch);
 ---
 <Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex} preloadBody>
   <a class="skip" href="#content">Skip to content</a>
-  <SiteHeader branches={branches} />
+  <SiteHeader branches={branches} current={current} />
   <main id="content" class="info">
     <article class:list={["sheet wrap", wide ? "wide" : "narrow"]}>
+      {crumbs && (
+        <nav aria-label="Breadcrumb" class="crumbs">
+          <ol>{crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}</ol>
+        </nav>
+      )}
       <p class="kicker info-kicker">{kicker}</p>
       <h1 class="h2 info-title">{heading}</h1>
+      {summary && (
+        <section class="in-short" aria-labelledby="in-short-h">
+          <h2 id="in-short-h">In short</h2>
+          <ul>{summary.map((s) => <li>{s}</li>)}</ul>
+        </section>
+      )}
       <div class="info-body"><slot /></div>
+      {questions && (
+        <section class="questions" aria-labelledby="questions-h">
+          <h2 id="questions-h">Questions?</h2>
+          <ul class="q-rooms">
+            {branches.filter((b) => b.status === 'open').map((b) => (
+              <li><strong>{b.shortName}</strong>{b.phone && <a href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}{b.email && <a href={`mailto:${b.email}`}>{b.email}</a>}</li>
+            ))}
+          </ul>
+          {questions.related && <p class="q-related">{questions.related.map((r) => <a class="fp-btn fp-btn--sm" href={r.href}>{r.label}</a>)}</p>}
+        </section>
+      )}
     </article>
   </main>
   <SiteFooter branches={branches} />
@@ -39,6 +70,19 @@ const branches = await getBranches();
   .sheet.wide { max-width: 1180px; }
   .wide .info-body { max-width: none; }
   .info-kicker { margin: 0; color: var(--color-tiger-deep); }
+  .in-short { max-width: 32.7em; margin: 0 0 28px; padding: 18px 22px; background: var(--color-paper); border-left: 4px solid var(--color-ink); font-size: 18px; line-height: 1.55; }
+  .in-short h2, .questions h2 { margin: 0 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .in-short ul { margin: 0; padding-left: 1.2em; }
+  .in-short li + li { margin-top: 6px; }
+  .questions { max-width: 32.7em; margin-top: 40px; padding-top: 20px; border-top: 2px solid var(--color-ink); font-size: 17px; }
+  .q-rooms { list-style: none; margin: 0; padding: 0; }
+  .q-rooms li { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--color-ink); }
+  .q-rooms strong { min-width: 8em; }
+  .q-rooms a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; overflow-wrap: anywhere; }
+  .q-related { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+  .crumbs ol { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 0 0 14px; padding: 0; list-style: none; font-size: 16px; }
+  .crumbs li + li::before { content: "›" / ""; margin: 0 10px; color: var(--color-ink); }
+  .crumbs a { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 24px; }
   .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
   /* Small phones: one long capital word ("ACCESSIBILITY") must fit a 260px column. */
   @media (max-width: 380px) { .info-title { font-size: 28px; } }
@@ -48,6 +92,6 @@ const branches = await getBranches();
   @media (min-width: 1600px) { .info-body { font-size: 20px; } }
   .info-body :global(h2) { margin: 36px 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
   .info-body :global(p), .info-body :global(ul) { margin: 0 0 14px; }
-  .info-body :global(a) { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
+  .info-body :global(a:not(.fp-btn)) { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
   .info-body :global(.todo) { font-family: var(--font-note); font-style: italic; color: var(--color-gold-deep); }
 </style>

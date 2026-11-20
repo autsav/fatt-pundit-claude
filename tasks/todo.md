@@ -230,3 +230,19 @@ Gate for every item: before/after screenshots 390 + 1440, contrast 4.5:1, `npm r
 - [x] Decisions: sentence-case buttons, AT Light section headlines (recommended options)
 - Verified: astro check 0; computed styles identical on 8 routes × 390/1440 except the Book drawer focus ring (gold on sand 1.6:1 → ink 8.8:1, fixed); styleguide axe 0, no overflow, 0 JS errors at 390/768/1440/calm; dialog and form behaviour scripted.
 - Next: Phase 4, move pages onto the system (phase3/design-system.md §10)
+
+## Phase 4: build the approved UX structure (docs/redesign/phase4/ux-structure.md) — started 20 Nov
+Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors, axe 0 on touched routes, booking smoke test. Full Lighthouse + CLS + screenshots at the end.
+- [x] 4.1 Navigation: group/deposit/pre-theatre rules as data; menu page in branch context; one header (branches, Menus ▾, Groups, Book); Index ledger; dock per context + menus chooser; vouchers link only when set; no-JS fallbacks
+- [x] 4.2 Redirects (vercel.json, _redirects, redirects.csv) + /book/ booking desk; trailing slash
+- [x] 4.3 Branch pages: arrival = Book + See the menus; facts row without Book; menu ledger instead of page-flip; plain-word headings; receipt on home only; Dubai cleanup
+- [x] 4.4 Menu page: one menu at a time (#hash), phone menu sheet, search across menus, empty state, h1 "<Branch> menus", breadcrumb
+- [x] 4.5 Book drawer: typeable guests, done state + retry, group hand-off pre-filled, deposit note at 4+
+- [x] 4.6 Groups page: fp-form, rules ledger, prefill from query, states; PUBLIC_FORM_ENDPOINT (form-to-email), mailto until set
+- [x] 4.7 Dubai list: states; off ("coming soon") until PUBLIC_DUBAI_LIST_ENDPOINT is set
+- [x] 4.8 Info pages "In short" + Questions block; 404 ledger
+- [x] 4.9 Pre-theatre times on menu, branch ledger and drawer hint; pickup row when clickAndCollectUrl is set
+- [x] Final QA: axe, CLS, screenshots, smoke test, docs + roadmap
+- Result (20 Nov): 13 routes × 320/390/768/1024/1440 + calm: no overflow, 0 JS errors, axe 0 (home's scroll-scene fades flag mid-animation, clean once settled, as in the baseline). CLS worst 0.020 on load. astro check 0; contrast 150/150; hours tests pass; booking smoke 8/8. Scripted: nav + Index + dock (12 checks), menus (20), drawer (20), forms with a mocked service (11) and without (5). Menu page on a phone: 34,378 → ~7,000 px (one menu at a time). After shots: docs/redesign/slices/4/.
+- Found and fixed during QA: menu Book button lost contrast to the info-page link colour; bar links and boarding-pass links under the WCAG 2.5.8 target size; the target-size fix briefly overrode the 641–919px rule (overflow at 768, caught by the probe).
+- Not done: Lighthouse runs (axe used instead, same engine); real phones, Safari, Firefox, screen readers; live form service (none chosen yet: CLIENT-INPUTS #5, #10, #41).

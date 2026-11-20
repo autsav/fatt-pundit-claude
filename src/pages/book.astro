@@ -1,0 +1,69 @@
+---
+/**
+ * The booking desk (ux-structure.md D1): where old "Reserve a table" links land, where every Book
+ * button goes without JavaScript, and the link for Google and Instagram profiles.
+ * With ?branch=<id> and JavaScript, the Book drawer opens for that room over this page.
+ */
+import InfoPage from '../layouts/InfoPage.astro';
+import { BOOKING_NAMES, fullAddress, getBranches, groupRules, prettyPhone } from '../lib/site-data';
+const branches = await getBranches();
+const open = branches.filter((b) => b.status === 'open' && b.booking);
+const soon = branches.filter((b) => b.status === 'opening-soon');
+const rules = groupRules(open[0]);
+---
+<InfoPage title="Book a table" description="Book a table at Fatt Pundit Soho or Covent Garden, or join the list for Dubai." kicker="Your table" heading="Book a table">
+  <p>Pick a restaurant: its booking page opens with your choices filled in.</p>
+  <ul class="desk" role="list">
+    {open.map((b) => (
+      <li class="desk-row" id={`book-${b.id}`}>
+        <div>
+          <h2 class="desk-name">{b.shortName}</h2>
+          <p class="desk-addr">{fullAddress(b)}</p>
+          <p class="desk-note">Books online with {BOOKING_NAMES[b.booking!.provider]} for up to {b.groups?.onlineMax ?? 8} guests.</p>
+        </div>
+        <div class="desk-acts">
+          <a class="fp-btn" href={b.booking!.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a>
+          {b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
+        </div>
+      </li>
+    ))}
+    {soon.map((b) => (
+      <li class="desk-row">
+        <div>
+          <h2 class="desk-name">{b.shortName}</h2>
+          <p class="desk-addr">Opening soon at {b.address.street}</p>
+        </div>
+        <div class="desk-acts"><a class="fp-link fp-link--strong" href={`/${b.id}/#waitlist`}>Join the list<span class="sr-only"> for {b.shortName}</span></a></div>
+      </li>
+    ))}
+    {rules && (
+      <li class="desk-row">
+        <div>
+          <h2 class="desk-name">A bigger table</h2>
+          <p class="desk-addr">{rules.setMenu} {rules.depositShort}</p>
+        </div>
+        <div class="desk-acts"><a class="fp-link fp-link--strong" href="/private-dining/">Plan a group</a></div>
+      </li>
+    )}
+  </ul>
+</InfoPage>
+
+<style>
+  .desk { list-style: none; margin: 28px 0 0; padding: 0; border-top: 2px solid var(--color-ink); }
+  .desk-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px; padding: 20px 0; border-bottom: 1px solid var(--color-ink); }
+  .desk-row > div:first-child { flex: 1 1 18em; }
+  .desk-name { margin: 0 !important; font-size: 22px !important; }
+  .desk-addr, .desk-note { margin: 4px 0 0 !important; font-size: 16px; }
+  .desk-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+</style>
+
+<script>
+  // ?branch=soho opens the drawer for that room at once; closing it leaves the guest on the desk.
+  const id = new URLSearchParams(location.search).get('branch');
+  const trigger = id ? document.querySelector<HTMLElement>(`.desk [data-book="${CSS.escape(id)}"]`) : null;
+  // After load, so the drawer's own script is listening (otherwise the click would open the provider).
+  if (trigger) addEventListener('load', () => {
+    document.getElementById(`book-${id}`)?.scrollIntoView({ block: 'center' });
+    trigger.click();
+  });
+</script>

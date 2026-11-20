@@ -12,7 +12,7 @@ import BarAfterDark from '../components/scenes/BarAfterDark.tsx';
 import RoomContactSheet from '../components/scenes/RoomContactSheet.tsx';
 import BoardingPasses from '../components/scenes/BoardingPasses.astro';
 import Base from '../layouts/Base.astro';
-import { getBranches, dish, priceOf, hoursLines, menuBooks, prettyPhone } from '../lib/site-data';
+import { getBranches, dish, priceOf, hoursLines, menuBooks, prettyPhone, groupRules, onlineSummary } from '../lib/site-data';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 
@@ -162,7 +162,7 @@ const orgLd = {
 
     <!-- 5 · The menu book -->
     <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} next={{ href: '#bar', label: 'Continue to the bar' }} />
-    <p class="menu-list-link">Read the menus as a list for {branches.filter((b) => b.status === 'open').map((b, i) => <>{i > 0 && ' or '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}</p>
+    <p class="menu-list-link"><span>Every menu as a list, with search and diet filters:</span>{branches.filter((b) => b.status === 'open').map((b) => <a class="fp-btn fp-btn--sm" href={`/${b.id}/menu/`}>{b.shortName} menus</a>)}</p>
 
     <!-- 6 · The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />
@@ -177,8 +177,8 @@ const orgLd = {
         </div>
         <RoomContactSheet client:visible frames={sheet} picks={[0, 2]} />
         <div class="rating reveal">
-          <span class="rating-n">4.6 / 5</span>
-          <span>from more than 1,170 diners on OpenTable (Soho, November 2026)</span>
+          <span class="rating-n">4.8 / 5</span>
+          <span>on Google at both restaurants: 20,030 reviews for Covent Garden and 16,000+ for Soho (November 2026)</span>
         </div>
       </div>
     </section>
@@ -192,7 +192,7 @@ const orgLd = {
           <p>Three passes, one for each room. Tear off a stub to book.</p>
         </div>
         <BoardingPasses branches={branches} stamps={stamps} />
-        <p class="center small reveal">Five or more guests? Please call the restaurant. Larger bookings need a deposit.</p>
+        <p class="center small reveal">{onlineSummary(branches)}. {groupRules(branches[0])?.depositShort} {groupRules(branches[0])?.setMenu} <a href="/private-dining/">Plan a group</a>.</p>
       </div>
     </section>
   </main>
@@ -210,13 +210,9 @@ const orgLd = {
 
 <script>
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Demo waitlist: no backend yet, so say so honestly.
-  document.querySelectorAll<HTMLFormElement>('[data-waitlist]').forEach((f) =>
-    f.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      f.querySelector<HTMLElement>('.wl-msg')?.removeAttribute('hidden');
-    }),
-  );
+  // The Dubai list on its boarding pass (rendered only once PUBLIC_DUBAI_LIST_ENDPOINT is set).
+  import { bindWaitlists } from '../lib/waitlist';
+  bindWaitlists();
   // Story rail + reading line. Only transform/opacity change per frame.
   const rail = document.querySelector<HTMLElement>('[data-rail]');
   const bar = document.querySelector<HTMLElement>('.bar');
@@ -326,5 +322,6 @@ const orgLd = {
   .hero-choose { display: grid; gap: 12px; justify-items: center; }
   .hero-book { min-width: min(280px, 100%); }
   .menu-list-link { margin: 0; padding: 18px 16px 8px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; background: var(--color-sand); }
-  .menu-list-link a { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
+  .menu-list-link { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 14px; }
+  .menu-list-link > span { flex-basis: 100%; }
 </style>

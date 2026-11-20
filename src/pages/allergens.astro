@@ -1,9 +1,20 @@
 ---
 import InfoPage from '../layouts/InfoPage.astro';
-import { getBranches, prettyPhone } from '../lib/site-data';
+import { getBranches } from '../lib/site-data';
 const open = (await getBranches()).filter((b) => b.status === 'open');
 ---
-<InfoPage title="Allergens and dietary needs" description="How to eat safely at Fatt Pundit: the 14 major allergens, our menu marks, and who to ask." kicker="Before you order" heading="Allergens and dietary needs">
+<InfoPage
+  title="Allergens and dietary needs"
+  description="How to eat safely at Fatt Pundit: the 14 major allergens, our menu marks, and who to ask."
+  kicker="Before you order"
+  heading="Allergens and dietary needs"
+  summary={[
+    'Tell your server about any allergy or intolerance before you order, every visit.',
+    'Every menu marks V, VG, GF, DF and H, and there are full vegan, gluten-free, dairy-free and halal menus.',
+    "Our kitchens share woks, fryers and steamers, so we can't promise a dish is free of traces.",
+  ]}
+  questions={{ related: open.map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` })) }}
+>
   <p>Please tell your server about any allergy or intolerance <strong>before you order</strong>, every time you visit. Recipes and suppliers change, and the team will check each dish with the kitchen for you.</p>
   <h2>The 14 major allergens</h2>
   <p>Our team can tell you which of the 14 major allergens are in every dish: celery, cereals containing gluten, crustaceans, eggs, fish, lupin, milk, molluscs, mustard, tree nuts, peanuts, sesame, soya and sulphites.</p>
@@ -11,10 +22,7 @@ const open = (await getBranches()).filter((b) => b.status === 'open');
   <ul>
     <li><strong>V</strong> vegetarian, <strong>VG</strong> vegan, <strong>GF</strong> gluten free, <strong>DF</strong> dairy free, <strong>H</strong> halal.</li>
   </ul>
+  <p>On each menu page, "Show only" keeps just the dishes with the marks you choose.</p>
   <p>Our kitchens are busy and share woks, fryers and steamers, so we can't promise any dish is completely free of traces of an allergen.</p>
-  <h2>Ask before you book</h2>
-  <ul>
-    {open.map((b) => <li>{b.shortName}: <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a>{b.email && <>, <a href={`mailto:${b.email}`}>{b.email}</a></>}</li>)}
-  </ul>
   <p class="todo">Draft wording, to be confirmed by Fatt Pundit's kitchen team before launch.</p>
 </InfoPage>

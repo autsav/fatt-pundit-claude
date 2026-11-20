@@ -54,7 +54,7 @@ for (const [view, viewport] of VIEWS) {
       const dlg = pg.locator('[data-book-drawer]');
       await dlg.waitFor({ state: 'visible', timeout: 3000 });
       if (branch) await dlg.locator(`label:has(input[name="where"][value="${branch}"])`).click();
-      const size = async () => Number(await dlg.locator('[data-book-size]').textContent());
+      const size = async () => Number(await dlg.locator('[data-book-size]').inputValue());
       const before = await size();
       await dlg.locator('[data-step="1"]').click();
       await pg.waitForTimeout(600); // longer than the 240 ms delayed navigation the old bug used

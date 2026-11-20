@@ -21,8 +21,10 @@ assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026
 assert.equal(statusLine('Soho', openStatus(soho.hours, 'Europe/London', at('2026-11-21T23:00:00Z'))), 'Soho opens Mon 12pm');
 // Covent Garden Sunday 20:30 → open until 9pm
 assert.deepEqual(openStatus(cg.hours, 'Europe/London', at('2026-11-22T20:30:00Z')), { open: true, until: '9pm' });
-// Covent Garden Sunday 22:00 → Monday closed → opens Tuesday 5pm
-assert.equal(statusLine('Covent Garden', openStatus(cg.hours, 'Europe/London', at('2026-11-22T22:00:00Z'))), 'Covent Garden opens Tue 5pm');
+// Covent Garden Sunday 22:00 → Monday closed → opens Tuesday 4.45pm (pre-theatre from 4.45, client 20 Nov 2026)
+assert.equal(statusLine('Covent Garden', openStatus(cg.hours, 'Europe/London', at('2026-11-22T22:00:00Z'))), 'Covent Garden opens Tue 4.45pm');
+// Covent Garden Wednesday 16:50 London → open (Soho at the same moment is still closed)
+assert.equal(openStatus(cg.hours, 'Europe/London', at('2026-11-18T16:50:00Z')).open, true);
 
 // Summer (BST = UTC+1): Wed 15 Jul 2026 16:45 UTC = 17:45 London → open until 10.30pm
 assert.deepEqual(openStatus(soho.hours, 'Europe/London', at('2026-07-15T16:45:00Z')), { open: true, until: '10.30pm' });

@@ -98,7 +98,18 @@
     ],
     "clickAndCollectUrl": null,
     "vouchersUrl": null,
-    "groupsNote": null,
+    "groups": {
+      "onlineMax": 7,
+      "callAbove": false,
+      "setMenuFrom": 8,
+      "depositFrom": 4,
+      "depositPerHead": 10,
+      "refundHours": 24
+    },
+    "preTheatre": [
+      "17:00",
+      "17:45"
+    ],
     "menus": [
       "a-la-carte",
       "vegan",
@@ -167,7 +178,7 @@
       "mon": [],
       "tue": [
         [
-          "17:00",
+          "16:45",
           "22:30"
         ]
       ],
@@ -177,7 +188,7 @@
           "14:30"
         ],
         [
-          "17:00",
+          "16:45",
           "22:30"
         ]
       ],
@@ -187,7 +198,7 @@
           "14:30"
         ],
         [
-          "17:00",
+          "16:45",
           "22:30"
         ]
       ],
@@ -197,7 +208,7 @@
           "14:30"
         ],
         [
-          "17:00",
+          "16:45",
           "22:30"
         ]
       ],
@@ -217,7 +228,18 @@
     "delivery": [],
     "clickAndCollectUrl": null,
     "vouchersUrl": null,
-    "groupsNote": "Tables for more than 4 guests: please call the restaurant. Larger bookings need a deposit.",
+    "groups": {
+      "onlineMax": 4,
+      "callAbove": true,
+      "setMenuFrom": 8,
+      "depositFrom": 4,
+      "depositPerHead": 10,
+      "refundHours": 24
+    },
+    "preTheatre": [
+      "16:45",
+      "17:30"
+    ],
     "menus": [
       "a-la-carte",
       "vegan",
@@ -289,7 +311,8 @@
     "delivery": [],
     "clickAndCollectUrl": null,
     "vouchersUrl": null,
-    "groupsNote": null,
+    "groups": null,
+    "preTheatre": null,
     "menus": [],
     "page": {
       "lines": [

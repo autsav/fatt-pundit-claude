@@ -7,7 +7,8 @@
 | 1 | Design direction + design-system proposal + mock frames | **Approved** 19 Nov 2026 | — |
 | 2 | Implementation slices below | Done except 2.8a (needs client decisions); see qa-report.md | Each slice has its own gate |
 | 3 | Design system: tokens, `fp-` components, contrast gate, `/styleguide/` showcase | **Done 20 Nov 2026**, recommended options adopted (`phase3/design-system.md`). Pages unchanged except the drawer focus-ring fix | Contrast 150/150 in prebuild; computed-style check on 8 routes; axe 0 on `/styleguide/` |
-| 4 | Page redesigns onto the system, one slice per page (migration map in `phase3/design-system.md` §10) | Next | Phase 2 slice gate + `/styleguide/` unchanged |
+| 4.0 | UX structure: sitemap, navigation model, journeys, page hierarchy, CTA rules, states, redirects, wireframes (`phase4/ux-structure.md`, `phase4/wireframes.html`) | **Approved** 20 Nov 2026 (D1–D5 yes; D6, D8, D9 answered; D7 open) | `phase4/ux-structure.md` §10 |
+| 4 | Build the UX structure, slices 4.1–4.9 (`phase4/ux-structure.md` §11; results in `tasks/todo.md`) | **Done 20 Nov 2026**; forms wait for a form service (client) | Phase 2 slice gate + `/styleguide/` unchanged |
 
 ## Rollback
 - Baseline: `git checkout baseline-pre-redesign` (tag on `main` @ 0ead5a8)
