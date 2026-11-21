@@ -290,3 +290,26 @@ Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors,
 - [x] Prices from the printed menu photos (docs/reference/menu-2026-11/): food matched; drinks list updated; CLIENT-INPUTS #13, #19 closed
 - [x] Voyage scroll pass 2: sampled route, dash and --u writes only on change. Long frames 4.2% → 3.7% mean (noisy; still > 2%). Pixel check vs old build: identical at 1440, < 1 px route difference on phone. Checks: scripted 22/22, rail 5/5, axe settled clean, smoke 8/8
 - [ ] Under 2%: rebuild the voyage route overlay as a transform-moved layer (no per-frame viewBox)
+
+## Phase 6: every page after home (docs/redesign/phase6/report.md), 20 Nov. Waiting for visual approval
+- [x] Routes grouped: branch open (2), branch soon (1), menus (2), booking desk, groups form, text (4), 404; /og and /styleguide not public
+- [x] Branch pages: numbered chapter heads (home rhythm), system buttons/facts/badge/hours table/ledger/tags/postcards, Book as Visit primary, no green, one gap between sand chapters
+- [x] Document desk (InfoPage): chapter-head h1, label rail with build-time contents (5+ sections), reading column, summary + questions in the side column
+- [x] Booking desk ledger with live status; groups facts beside a form sheet; menu index rail + toolbar + printed-menu sheet; 404 tag without tiger, with footer
+- [x] Shared: footer sentence case; Book drawer, passport, 2 home pieces on .fp-btn; legacy .btn deleted
+- [x] Menu page load shifts: 0.18 → 0.002 (slow 4G phone), deep link #vegan 0.57 → 0.015
+- [x] QA: astro check 0/0; gates; 376/376 scripted (overflow/errors/CLS 13 routes × 6 widths + calm, axe 0 at 390/1440, interactions); smoke 8/8; Lighthouse 96–99 on 10 redesigned routes
+- [x] Home perf 74–78 / TBT ~450 ms on this machine (same for the previous commit, interleaved): investigate separately (Phase 7 D2: 84–86 / 98–121 ms)
+- [x] Menu deep link to a long menu (#drinks) still 0.26 CLS on slow 4G (was 0.56) (Phase 7 D3: 0.03, Lighthouse 0)
+- [ ] Client: Phase 6 wording (CLIENT-INPUTS #45)
+
+## Phase 7: premium pass (docs/redesign/phase7/report.md), 21 Nov. Steps that need nothing from the client
+- [x] 7.0 D1 menu price row (container query), D2 voyage hydrates on approach (home perf 74 → 86, TBT 490 → ~110 ms), D3 passport tip in the body face (#drinks CLS 0.12 → 0.03), D4 heroes top-aligned 900–1023, D5 sample specials dropped at launch + build check
+- [x] 7.1 nav sentence case + gold underline; footer hours today, 15px, plain social glyphs; NextStep page-end strip on every page but home; rhythm fixes
+- [x] 7.2 What to order (approved photos), Google rating block, branch menus as two link columns
+- [x] 7.3 menu rows (weight on the name, quiet marks, Born here + photo, dismissable tip)
+- [x] 7.4 booking desk picker (shared src/lib/booking.ts with the drawer); groups photo + phone jump link
+- [x] 7.5 Dubai: list in the hero, no empty room chapter
+- [x] Checks: astro check 0/0; gates; QA 419/419 (7 widths + calm, axe, interactions); menu rows; rhythm 21/22 (Dubai tickets' shadow); Lighthouse 97–99 on 8 routes, home 84–86
+- [ ] Home scroll dropped frames 2.5–3.3% (> 2%, was 2.8% before this pass): voyage overlay as a transform layer
+- [ ] Waiting on client: home changes (#52), photos (#35, #36, #46), quotes (#29), logo (#32), spaces/set price (#2, #47), allergen matrix (#48), story (#49), FAQ pages (#51), dish picks (#53), wording (#54)

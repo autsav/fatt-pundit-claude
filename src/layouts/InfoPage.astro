@@ -1,21 +1,34 @@
 ---
 /**
- * Plain pages (allergens, privacy, private dining…): the same header and
- * footer, one sheet of paper, a typewriter title and short sections.
+ * Document pages (allergens, privacy, accessibility, booking terms, the booking desk, groups, the menus).
+ * Phase 6: they open like a home chapter, a label on a rule beside a light headline (.fp-section-head),
+ * and their body sits on the same 12-column desk as the branch chapters: label rail (cols 1–2),
+ * reading column, and a side column for "In short" and "Questions?" on wide screens.
+ *
+ *   layout="doc"  (default) text: rail = contents (when there are 5+ sections), body 3–8, aside 9–12
+ *   layout="full" task pages (book, groups): body 3–12, the aside follows below
+ *   layout="wide" the menus: body 1–12 (the page brings its own index)
  */
 import Base from './Base.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
+import NextStep from '../components/site/NextStep.astro';
+import { dishPhoto } from '../lib/dish-photos';
+import type { ComponentProps } from 'astro/types';
 import { getBranches, prettyPhone } from '../lib/site-data';
 
 interface Props {
   title: string;
   description: string;
+  /** The label on the rule beside the headline (was a Lora kicker). */
   kicker: string;
   heading: string;
   noindex?: boolean;
-  /** A wider sheet for long lists (the menus) with their own layout. */
+  /** Kept for the menu page: same as layout="wide". */
   wide?: boolean;
+  layout?: 'doc' | 'full' | 'wide';
+  /** One line under the headline. */
+  intro?: string;
   /** The branch this page belongs to (its menu page): Book, Call and Menus then mean that branch. */
   branch?: string;
   /** Breadcrumb trail above the title; the last item is this page. */
@@ -24,74 +37,134 @@ interface Props {
   summary?: string[];
   /** A closing "Questions?" block with each room's phone and email, plus related links. */
   questions?: { related?: { href: string; label: string }[] };
+  /** The page-end strip (Phase 7 §3.7). Default: book or see the menus. `false` leaves it out. */
+  next?: ComponentProps<typeof NextStep> | false;
 }
-const { title, description, kicker, heading, noindex, wide, branch, crumbs, summary, questions } = Astro.props;
+const { title, description, kicker, heading, noindex, wide, intro, branch, crumbs, summary, questions } = Astro.props;
+const next = Astro.props.next ?? {
+  title: 'Hungry yet?',
+  line: 'Two rooms in London, open tonight.',
+  actions: [{ href: '/book/', label: 'Book a table', primary: true }, { href: '/soho/menu/', label: 'Soho menus' }, { href: '/covent-garden/menu/', label: 'Covent Garden menus' }],
+  photo: dishPhoto('momo-mix-vegetable'),
+};
+const layout = Astro.props.layout ?? (wide ? 'wide' : 'doc');
 const branches = await getBranches();
-const current = branches.find((b) => b.id === branch);
+const current = branches.find((b) => b.status === 'open' && b.id === branch);
+
+// Section headings get ids, and long documents (more than four sections) get a contents list
+// in the label rail (ux-structure.md §5, info pages). Text pages only: task pages keep their own markup.
+let body = await Astro.slots.render('default');
+const contents: { id: string; label: string }[] = [];
+if (layout === 'doc') {
+  const used = new Set<string>();
+  body = body.replace(/<h2(\s[^>]*)?>([\s\S]*?)<\/h2>/g, (whole, attrs = '', inner: string) => {
+    if (/\sid=/.test(attrs)) return whole;
+    const label = inner.replace(/<[^>]+>/g, '').trim();
+    let id = label.toLowerCase().replace(/&[a-z#0-9]+;/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'section';
+    while (used.has(id)) id += '-2';
+    used.add(id);
+    contents.push({ id, label });
+    return `<h2${attrs} id="${id}">${inner}</h2>`;
+  });
+}
+const showContents = contents.length > 4;
 ---
 <Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex} preloadBody>
   <a class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} current={current} />
-  <main id="content" class="info">
-    <article class:list={["sheet wrap", wide ? "wide" : "narrow"]}>
+  <main id="content" class:list={['info', `info--${layout}`, { 'has-next': next }]}>
+    <div class="wrap">
       {crumbs && (
         <nav aria-label="Breadcrumb" class="crumbs">
-          <ol>{crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}</ol>
+          <ol>{crumbs.map((c) => <li>{c.href ? <a class="fp-link" href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}</ol>
         </nav>
       )}
-      <p class="kicker info-kicker">{kicker}</p>
-      <h1 class="h2 info-title">{heading}</h1>
-      {summary && (
-        <section class="in-short" aria-labelledby="in-short-h">
-          <h2 id="in-short-h">In short</h2>
-          <ul>{summary.map((s) => <li>{s}</li>)}</ul>
-        </section>
-      )}
-      <div class="info-body"><slot /></div>
-      {questions && (
-        <section class="questions" aria-labelledby="questions-h">
-          <h2 id="questions-h">Questions?</h2>
-          <ul class="q-rooms">
-            {branches.filter((b) => b.status === 'open').map((b) => (
-              <li><strong>{b.shortName}</strong>{b.phone && <a href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}{b.email && <a href={`mailto:${b.email}`}>{b.email}</a>}</li>
-            ))}
-          </ul>
-          {questions.related && <p class="q-related">{questions.related.map((r) => <a class="fp-btn fp-btn--sm" href={r.href}>{r.label}</a>)}</p>}
-        </section>
-      )}
-    </article>
+      <header class="fp-section-head chapter-head info-head">
+        <p class="fp-section-label">{kicker}</p>
+        <h1 class="fp-h2">{heading}</h1>
+        {intro && <p class="chapter-intro">{intro}</p>}
+      </header>
+
+      <div class="info-desk">
+        {showContents && (
+          <nav class="info-toc" aria-labelledby="toc-h">
+            <p id="toc-h" class="info-toc-h">On this page</p>
+            <ol>{contents.map((c, i) => <li><a class="fp-link fp-link--quiet" href={`#${c.id}`}><span class="fp-section-no">{String(i + 1).padStart(2, '0')}</span> {c.label}</a></li>)}</ol>
+          </nav>
+        )}
+        <!-- Source order is the phone order (summary, text, questions); the grid moves the summary and
+             the questions into the side column on wide screens. -->
+        {summary && (
+          <section class="in-short surface-paper-light" aria-labelledby="in-short-h">
+            <h2 id="in-short-h" class="fp-h4">In short</h2>
+            <ul>{summary.map((s) => <li>{s}</li>)}</ul>
+          </section>
+        )}
+        <div class:list={['info-body', layout === 'doc' && 'fp-prose']}>
+          <Fragment set:html={body} />
+        </div>
+        {questions && (
+          <section class="questions" aria-labelledby="questions-h">
+            <h2 id="questions-h" class="fp-h4">Questions?</h2>
+            <ul class="fp-ledger q-rooms" role="list">
+              {branches.filter((b) => b.status === 'open').map((b) => (
+                <li><strong>{b.shortName}</strong>{b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}{b.email && <a class="fp-link q-mail" href={`mailto:${b.email}`}>{b.email}</a>}</li>
+              ))}
+            </ul>
+            {questions.related && <p class="fp-cluster q-related">{questions.related.map((r) => <a class="fp-btn fp-btn--sm" href={r.href}>{r.label}</a>)}</p>}
+          </section>
+        )}
+      </div>
+    </div>
+    {next && <NextStep {...next} />}
   </main>
   <SiteFooter branches={branches} />
 </Base>
 
 <style>
-  .info { background: var(--color-sand); padding-block: clamp(56px, 8vw, 112px); }
-  .sheet { background: var(--color-paper-light); border: 2px solid var(--color-ink); padding: clamp(28px, 5vw, 64px); box-shadow: 8px 8px 0 var(--color-ink); }
-  .sheet.wide { max-width: 1180px; }
-  .wide .info-body { max-width: none; }
-  .info-kicker { margin: 0; color: var(--color-tiger-deep); }
-  .in-short { max-width: 32.7em; margin: 0 0 28px; padding: 18px 22px; background: var(--color-paper); border-left: 4px solid var(--color-ink); font-size: 18px; line-height: 1.55; }
-  .in-short h2, .questions h2 { margin: 0 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
-  .in-short ul { margin: 0; padding-left: 1.2em; }
-  .in-short li + li { margin-top: 6px; }
-  .questions { max-width: 32.7em; margin-top: 40px; padding-top: 20px; border-top: 2px solid var(--color-ink); font-size: 17px; }
-  .q-rooms { list-style: none; margin: 0; padding: 0; }
-  .q-rooms li { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--color-ink); }
-  .q-rooms strong { min-width: 8em; }
-  .q-rooms a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; overflow-wrap: anywhere; }
-  .q-related { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
-  .crumbs ol { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 0 0 14px; padding: 0; list-style: none; font-size: 16px; }
-  .crumbs li + li::before { content: "›" / ""; margin: 0 10px; color: var(--color-ink); }
-  .crumbs a { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 24px; }
-  .info-title { margin: 6px 0 28px; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
-  /* Small phones: one long capital word ("ACCESSIBILITY") must fit a 260px column. */
-  @media (max-width: 380px) { .info-title { font-size: 28px; } }
-  /* The measure is in em, not ch: a ch is as wide as the font's zero, so the column changed width
-     (and the text re-wrapped) when the brand font replaced the fallback. 32.7em = the old 64ch. */
-  .info-body { font-size: 18px; line-height: 1.65; max-width: 32.7em; overflow-wrap: anywhere; }
-  @media (min-width: 1600px) { .info-body { font-size: 20px; } }
-  .info-body :global(h2) { margin: 36px 0 8px; font-size: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
-  .info-body :global(p), .info-body :global(ul) { margin: 0 0 14px; }
-  .info-body :global(a:not(.fp-btn)) { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
+  .info { background: var(--color-sand); color: var(--color-ink); padding-block: var(--space-7) var(--section-pad); }
+  .info.has-next { padding-bottom: 0; }
+  .crumbs ol { display: flex; flex-wrap: wrap; margin: 0 0 var(--space-5); padding: 0; list-style: none; font-size: var(--step-small); }
+  .crumbs li + li::before { content: "›" / ""; margin: 0 var(--space-3); }
+  .crumbs a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 700; }
+  /* Small phones: one long word ("Accessibility") must fit a 280px column. */
+  @media (max-width: 380px) { .info-head .fp-h2 { font-size: 2rem; } }
+
+  /* The desk. Phones and tablets: one column (contents, body, aside). 1024+: the 12-column grid. */
+  .info-desk { display: grid; gap: var(--section-gap) var(--grid-gutter); align-items: start; }
+  .info-body { min-width: 0; overflow-wrap: anywhere; }
+  @media (min-width: 1024px) {
+    .info-desk { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .info-desk > * { grid-column: 3 / 13; }
+    .info--wide .info-desk > * { grid-column: 1 / 13; }
+    /* Text pages: contents | text | summary above questions. */
+    .info--doc .info-desk { grid-template-rows: auto auto 1fr; row-gap: var(--space-7); }
+    .info--doc .info-toc { grid-column: 1 / 3; grid-row: 1 / 4; position: sticky; top: 96px; }
+    .info--doc .info-body { grid-column: 3 / 9; grid-row: 1 / 4; }
+    .info--doc .in-short { grid-column: 9 / 13; grid-row: 1; }
+    .info--doc .questions { grid-column: 9 / 13; grid-row: 2; }
+  }
+
+  /* Contents: a numbered list in the label rail, like the chapter labels. */
+  .info-toc { padding-top: var(--space-3); border-top: var(--border-rule) solid var(--fp-rule-strong); font-size: var(--step-small); }
+  .info-toc-h { margin: 0 0 var(--space-2); font-weight: 700; }
+  .info-toc ol { display: grid; margin: 0; padding: 0; list-style: none; }
+  .info-toc a { display: flex; gap: var(--space-2); align-items: baseline; min-height: 44px; padding-block: var(--space-2); box-sizing: border-box; text-decoration-color: transparent; }
+  .info-toc a:hover { text-decoration-color: currentColor; }
+
+  /* Text pages: section headings as ledger rules, sentence case. */
+  .info--doc .info-body :global(h2:not(.fp-h4)) { margin: var(--space-7) 0 var(--space-3); padding-top: var(--space-3); border-top: var(--border-hair) solid var(--fp-rule); scroll-margin-top: 96px; }
   .info-body :global(.todo) { font-family: var(--font-note); font-style: italic; color: var(--color-gold-deep); }
+
+  /* In short: a paper note with an ink bar (a fact box, not an object). */
+  .in-short { padding: var(--space-5); border-left: 4px solid var(--color-ink); font-size: var(--step-body); line-height: var(--lh-body); }
+  .in-short h2 { margin: 0 0 var(--space-2); }
+  .in-short ul { margin: 0; padding-left: 1.2em; }
+  .in-short li + li { margin-top: var(--space-2); }
+  .questions { min-width: 0; }
+  .questions h2 { margin: 0 0 var(--space-3); }
+  .q-rooms li { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); align-items: baseline; padding-block: var(--space-2); }
+  .q-rooms strong { min-width: 8em; }
+  .q-mail { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; overflow-wrap: anywhere; }
+  .q-related { margin: var(--space-4) 0 0; }
 </style>

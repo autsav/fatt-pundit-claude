@@ -27,30 +27,15 @@ body { font-size: 17px; line-height: 1.55; }
 .skip { position: absolute; left: -999px; top: 8px; z-index: 50; background: var(--color-tiger); color: var(--color-ink); padding: 10px 16px; font-weight: 700; }
 .skip:focus { left: 8px; }
 
-/* Buttons: three kinds only.
-   1. Solid: .btn-orange (the action), .btn-ink (the action on gold/tiger paper).
-   2. Outline: .btn-ghost-light on dark, .btn-line on light.
-   3. Text link: underlined tiger-deep (or tiger-bright on dark), no box.
-   Same size, weight and press everywhere; .btn-sm only for rows of secondary links. */
-.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 26px; font-weight: 700; font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border: 2px solid transparent; cursor: pointer; font-family: inherit;
-  transition: transform .18s cubic-bezier(.2, 1.4, .4, 1), box-shadow .18s ease, background-color .15s ease, color .15s ease; }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 0 rgb(26 23 20 / 0.35); }
-/* Press like a rubber stamp: down, flat, no shadow. */
-.btn:active { transform: translateY(1px) scale(0.98); box-shadow: none; transition-duration: .06s; }
-.btn-sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
-.btn-orange { background: var(--color-tiger); color: var(--color-ink-deep); }
-.btn-ink { background: var(--color-ink); color: var(--color-sand); }
-.btn-line { border-color: var(--color-ink); color: var(--color-ink); }
-.btn-line:hover { background: var(--color-ink); color: var(--color-sand); }
-.btn-ghost-light { border-color: var(--color-sand); color: var(--color-sand); }
-.btn-ghost-light:hover { background: var(--color-sand); color: var(--color-ink); box-shadow: 0 4px 0 rgb(0 0 0 / 0.4); }
-@media (prefers-reduced-motion: reduce) { .btn:hover, .btn:active { transform: none; } }
+/* Buttons: the system's .fp-btn (components.css). The legacy capitals .btn set was removed in Phase 6
+   once its last users (branch pages, Book drawer, dish passport, footer, two home pieces) had moved. */
 
 /* Header */
 .bar { position: sticky; top: 0; z-index: 40; background: var(--color-ink); color: var(--color-sand); border-bottom: 2px solid var(--color-gold); }
 .bar-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 28px; padding-block: 12px; }
 .brand { font-weight: 700; font-size: 22px; letter-spacing: 0.18em; color: var(--color-sand); text-decoration: none; }
-.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; text-transform: uppercase; letter-spacing: 0.12em; font-size: 15px; }
+/* Phase 7 §3.3: sentence case, no tracking (capitals stay on objects and the wordmark). */
+.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; font-size: 16px; }
 .nav a:not(.nav-book) { color: var(--color-sand); text-decoration: none; }
 .nav a:not(.nav-book):hover { color: var(--color-gold); }
 
@@ -60,13 +45,13 @@ body { font-size: 17px; line-height: 1.55; }
 /* Footer */
 .foot { background: var(--color-ink); color: var(--color-sand); padding-block: 64px 40px; }
 .foot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; }
-.foot-h { font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-gold); }
 .foot-nav { display: flex; flex-wrap: wrap; gap: 10px 26px; border-top: 1px solid var(--color-gold); padding-top: 22px; font-size: 15px; }
 .foot-nav a { color: var(--color-sand); }
 .foot-nav a:hover { color: var(--color-gold); }
 
 
-.nav a[aria-current='page'] { color: var(--color-gold); }
+/* The page you're on: gold with a 2px gold underline (on a branch's sub-pages too). */
+.nav a[aria-current]:not(.nav-book) { color: var(--color-gold); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
 /* Book in the bar: the system's primary button, sentence case (Phase 3 decision), not the nav's tracked caps. */
 .nav .nav-book { flex: none; text-transform: none; letter-spacing: 0.04em; font-size: 16px; white-space: nowrap; }
 .brand { white-space: nowrap; }
@@ -115,7 +100,7 @@ body { font-size: 17px; line-height: 1.55; }
 .nav-menus > summary::after { content: ""; width: 7px; height: 7px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
 .nav-menus[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .nav-menus > summary:hover { color: var(--color-gold); }
-.nav:has(.nav-pop a[aria-current='page']) .nav-menus > summary { color: var(--color-gold); }
+.nav:has(.nav-pop a[aria-current='page']) .nav-menus > summary { color: var(--color-gold); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
 .nav-pop { position: absolute; z-index: 45; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); min-width: 270px; margin: 0; padding: 6px 0; list-style: none; background: var(--color-ink-deep); border: 1.5px solid var(--color-gold); text-transform: none; letter-spacing: 0.04em; white-space: normal; }
 .nav-pop a { display: grid; gap: 2px; padding: 10px 18px; color: var(--color-sand); text-decoration: none; }
 .nav-pop a:hover span, .nav-pop a[aria-current='page'] span { color: var(--color-gold); text-decoration: underline; text-underline-offset: 4px; }

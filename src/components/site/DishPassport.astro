@@ -19,9 +19,9 @@ const { branch, name } = Astro.props;
       <p class="pp-empty" data-pp-empty>No stamps yet. Tap the stamp beside a dish to collect it.</p>
       <p class="pp-hint">Show this to your server, or send it to the table.</p>
       <div class="pp-actions">
-        <button type="button" class="btn btn-orange btn-sm" data-pp-share>Send the list</button>
-        <button type="button" class="btn btn-sm pp-ghost" data-pp-clear>Clear</button>
-        <button type="button" class="btn btn-sm pp-ghost" data-pp-close>Close</button>
+        <button type="button" class="fp-btn fp-btn--primary fp-btn--sm" data-pp-share>Send the list</button>
+        <button type="button" class="fp-btn fp-btn--sm" data-pp-clear>Clear</button>
+        <button type="button" class="fp-btn fp-btn--sm" data-pp-close>Close</button>
       </div>
       <p class="pp-done" data-pp-done aria-live="polite"></p>
     </div>
@@ -37,16 +37,15 @@ const { branch, name } = Astro.props;
   @media (prefers-reduced-motion: reduce) { .pp-open.is-bump { animation: none; } }
   .pp-dlg { margin: auto; border: 0; padding: 0; max-width: min(520px, calc(100vw - 24px)); width: 100%; background: transparent; }
   .pp-dlg::backdrop { background: rgb(26 23 20 / 0.6); }
-  .pp-sheet { background: var(--color-paper-light); color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-tiger); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
+  .pp-sheet { background: var(--color-paper-light); color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-ink); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
   .pp-kicker { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-tiger-deep); }
   .pp-title { margin: 2px 0 14px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 26px; }
   .pp-list { margin: 0 0 12px; padding-left: 1.4em; display: grid; gap: 6px; font-weight: 700; }
-  .pp-list :global(button) { margin-left: 8px; font: inherit; font-size: 13px; font-weight: 400; background: none; border: 0; color: var(--color-tiger-deep); text-decoration: underline; cursor: pointer; }
+  .pp-list :global(button) { min-height: 24px; margin-left: 8px; font: inherit; font-size: 13px; font-weight: 400; background: none; border: 0; color: var(--color-tiger-deep); text-decoration: underline; cursor: pointer; }
   .pp-empty, .pp-hint, .pp-done { margin: 0 0 10px; font-family: var(--font-note); font-style: italic; }
   .pp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pp-ghost { background: transparent; border-color: var(--color-ink); color: var(--color-ink); }
   /* The stamp button the script adds to each dish row. */
-  :global(.pp-stamp) { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin: -8px 0 -8px 4px; border: 0; background: none; cursor: pointer; color: rgb(44 41 37 / 0.35); }
+  :global(.pp-stamp) { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin: -8px 0 -8px 4px; border: 0; background: none; cursor: pointer; color: var(--fp-fg-muted); }
   :global(.pp-stamp svg) { width: 30px; height: 30px; transition: transform .2s ease, color .2s ease; }
   :global(.pp-stamp[aria-pressed='true']) { color: var(--color-tiger-deep); }
   :global(.pp-stamp[aria-pressed='true'] svg) { transform: rotate(-12deg) scale(1.08); }

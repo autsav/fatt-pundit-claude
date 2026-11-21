@@ -1,7 +1,7 @@
 # What we need from Fatt Pundit
 
 The one list of everything to ask the client. Add new questions here as they come up; when one is answered, move it to "Answered" with the date and where it was used.
-Last updated: 20 Nov 2026.
+Last updated: 21 Nov 2026 (#53–#54 from the Phase 7 build; #46–#52 from the Phase 7 premium plan; #45: Soho walk caption).
 
 Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** = improves the site · **N** = nice to have.
 
@@ -53,6 +53,7 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 28 | Exact Soho Google review count (shows "16k"; site says "16,000+") | Home rating line | N |
 | 29 | Press quotes or awards that can be named with a source | One line on branch pages | N |
 | 30 | Show the food hygiene rating? | Branch pages | N |
+| 45 | Phase 6 wording (draft, new or changed): chapter labels on branch pages ("01 The room, since 2021 · 02 Born at … · 03 The menus · 04 Visit · 05 Good to know · 06 The other rooms"; Dubai "01 The list … 04 In London"); room headline = first brand line, the other two as one spoken line; Visit "Book at Soho", "Email us", "At home:" (was "Delivered:"); tag link "Plan a group" (was "Private dining and big tables"); signature "Marked V, VG on the menu."; groups page "Prefer to talk?"; booking desk "Booking terms, deposits and lateness: booking terms."; Soho walk caption "5 stops, from the door to the pass" (was "Walk the room, from the door to the pass") | Branch pages, `/private-dining/`, `/book/` (Phase 6) | M |
 
 ### Brand assets and photos
 | # | Need | Why / where it's used | Pri |
@@ -66,6 +67,19 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 37 | Newsletter tool (form address) | Footer sign-up, hidden until set | N |
 | 38 | Analytics domain for Plausible | Booking and menu tracking | M |
 | 39 | Brand owner OK for real-object colours (blue-and-white plates, Westminster street sign) | Covent Garden plate wall, Soho hero | N |
+| 46 | Approve a professional photo and short-film shoot (list in `docs/redesign/phase7/premium-plan.md` §3.1), or supply existing professional photos | Every page's first screen, branch rooms, What to order, groups (Phase 7) | H |
+
+### Phase 7 (premium plan)
+| # | Need | Why / where it's used | Pri |
+| --- | --- | --- | --- |
+| 47 | Private dining: spaces per restaurant, seated and standing capacities, minimum spend (if any), photos | Groups page "Spaces" cards | M |
+| 48 | Allergen matrix: the 14 UK allergens confirmed per dish | `/allergens/` matrix, menu rows | H |
+| 49 | Story: founders' and chef's names, short bios, portraits; any archive photos of Tangra | New `/story/` page, "From the kitchen" block | M |
+| 50 | Dubai: Arabic version and AED prices at opening? | Dubai page, menus | N |
+| 51 | Which extra pages are wanted (events / what's on, careers, contact with FAQ), and the FAQ answers (dress code, children, dogs, corkage, service charge) | New pages, FAQ structured data | N |
+| 52 | Sign-off to change the approved home page (Phase 7 §4.1) and to retire heavy capitals as headlines | Home, site-wide type | H |
+| 53 | "What to order" on each branch page: which 4–6 dishes per room? We show the three à la carte dishes with approved photos (crackling spinach, mix vegetable momo, crispy okra) until the shoot | Branch pages "What to order" | M |
+| 54 | Phase 7 wording (new): "Start with these." (What to order); rating line "4.8 / 5 on Google, from … reviews of Fatt Pundit … (November 2026)"; page-end lines "Hungry already? Book at Soho." / "Hungry before Dubai opens? Both London rooms are open tonight." / "Ready? Book at …" / "Read the menus first." / "Two rooms in London. Long banquettes at Covent Garden, the bar and the kitchen at Soho." / "Hungry yet? Two rooms in London, open tonight."; Dubai hero "Be first through the door. The list opens soon…"; booking desk "Choose a day, a time and how many of you…"; groups photo caption "Covent Garden, set for dinner."; menu tip button "Got it"; footer "Open until …" per room | Branch pages, Dubai, menus, booking desk, groups, info pages, footer | M |
 
 ## Answered
 | Date | Answer | Used in |

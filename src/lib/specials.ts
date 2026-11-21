@@ -58,5 +58,7 @@ export async function loadSpecials(): Promise<Special[]> {
       console.warn(`[specials] sheet unreachable (${(e as Error).message}); using specials.json`);
     }
   }
-  return fallback.rows as Special[];
+  // D5: sample lines never reach a launched site; with no sheet the board simply doesn't show.
+  const rows = fallback.rows as Special[];
+  return import.meta.env.PUBLIC_LAUNCH === 'true' ? rows.filter((r) => !r.demo) : rows;
 }

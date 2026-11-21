@@ -72,12 +72,12 @@ const data = branches.map((b) => ({
 
     <div class="book-group" data-book-group hidden>
       <p data-book-group-text></p>
-      <a class="btn btn-orange book-go" data-book-enquire href="/private-dining/">Send a group enquiry</a>
+      <a class="fp-btn fp-btn--primary book-go" data-book-enquire href="/private-dining/">Send a group enquiry</a>
       <p class="book-small">Ask about space for your group: call <a data-book-tel href="#"></a>.</p>
     </div>
 
     <div class="book-go-wrap" data-book-go-wrap>
-      <button type="submit" class="btn btn-orange book-go" data-book-go value="go">Find a table</button>
+      <button type="submit" class="fp-btn fp-btn--primary book-go" data-book-go value="go">Find a table</button>
       <p class="book-small">Opens <span data-book-provider></span> in a new tab with your choices filled in. Or call <a data-book-tel2 href="#"></a>.</p>
     </div>
   </form>
@@ -89,7 +89,7 @@ const data = branches.map((b) => ({
       <button type="button" class="book-x" data-book-close aria-label="Close">×</button>
     </div>
     <p class="book-done-what" role="status" data-book-done-what></p>
-    <a class="btn btn-ink book-go" data-book-again href="#" target="_blank" rel="noopener"></a>
+    <a class="fp-btn book-go" data-book-again href="#" target="_blank" rel="noopener"></a>
     <button type="button" class="book-link" data-book-change>Change the details</button>
   </div>
 </dialog>
@@ -146,7 +146,7 @@ const data = branches.map((b) => ({
 </style>
 
 <script>
-  type Span = [string, string];
+  import { KEYS, PROVIDER, local, addDays, wd, toMin, hhmm, prettyMin, slots as slotsFor, providerLink, type Span } from '@/lib/booking';
   interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
   const dlg = document.querySelector<HTMLDialogElement>('[data-book-drawer]');
   const raw = document.querySelector('[data-book-data]')?.textContent;
@@ -160,36 +160,15 @@ const data = branches.map((b) => ({
     const daysEl = $<HTMLElement>('[data-book-days]');
     const timesEl = $<HTMLElement>('[data-book-times]');
     const go = $<HTMLButtonElement>('[data-book-go]');
-    const KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    const PROVIDER: Record<string, string> = { opentable: 'OpenTable', sevenrooms: 'SevenRooms', resdiary: 'ResDiary' };
     let b = all[0];
     let size = 2;
     let day = '';
     let time = '';
     let opener: HTMLElement | null = null;
 
-    // "Now" in the restaurant's own time zone, as Y-M-D and minutes past midnight.
-    const local = (tz: string, d = new Date()) => {
-      const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d).map((x) => [x.type, x.value]));
-      return { ymd: `${p.year}-${p.month}-${p.day}`, mins: +p.hour * 60 + +p.minute };
-    };
-    const addDays = (ymd: string, n: number) => { const d = new Date(`${ymd}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
-    const wd = (ymd: string) => new Date(`${ymd}T12:00:00Z`).getUTCDay();
-    const toMin = (s: string) => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
-    const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-    const pretty = (m: number) => { const h = Math.floor(m / 60) % 24; return `${h % 12 || 12}${m % 60 ? '.' + String(m % 60).padStart(2, '0') : ''}${h < 12 ? 'am' : 'pm'}`; };
-
-    // Last booking 45 minutes before closing, every half hour.
-    const slots = (ymd: string) => {
-      const spans = b.hours[KEYS[wd(ymd)]] ?? [];
-      const now = local(b.tz);
-      const out: number[] = [];
-      for (const [a, z] of spans) {
-        let end = toMin(z); if (end <= toMin(a)) end += 24 * 60;
-        for (let m = toMin(a); m <= end - 45; m += 30) if (ymd !== now.ymd || m > now.mins + 30) out.push(m);
-      }
-      return out;
-    };
+    const pretty = prettyMin;
+    // Last booking 45 minutes before closing, every half hour (src/lib/booking.ts).
+    const slots = (ymd: string) => slotsFor(b.hours, b.tz, ymd);
 
     const radio = (el: HTMLElement, cls: string, on: boolean, label: string, html: string, onPick: () => void) => {
       const btn = document.createElement('button');
@@ -265,20 +244,7 @@ const data = branches.map((b) => ({
       all[(i + d + all.length) % all.length].click();
     });
 
-    const link = () => {
-      const u = new URL(b.url);
-      if (b.provider === 'opentable' && b.widgetId) {
-        const q = new URL(`https://www.opentable.co.uk/restref/client/`);
-        q.search = new URLSearchParams({ rid: b.widgetId, restref: b.widgetId, datetime: `${day}T${time}`, covers: String(size), lang: 'en-GB' }).toString();
-        return q.href;
-      }
-      if (b.provider === 'sevenrooms' && b.widgetId) {
-        const q = new URL(`https://www.sevenrooms.com/explore/${b.widgetId}/reservations/create/search/`);
-        q.search = new URLSearchParams({ date: day, party_size: String(size), start_time: time }).toString();
-        return q.href;
-      }
-      return u.href;
-    };
+    const link = () => providerLink(b, day, time, size);
 
     const pick = (id: string) => {
       b = all.find((x) => x.id === id) ?? b;

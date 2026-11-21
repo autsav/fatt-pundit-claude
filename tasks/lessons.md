@@ -60,4 +60,15 @@ Review at the start of every session. Add a line after any correction.
 - `npm i` prunes hand-made symlinks in node_modules (playwright): re-link before perf:budget, or the budget silently can't run.
 - Windows PowerShell 5.1 `Get-Content -Raw` reads BOM-less UTF-8 as ANSI: a read/replace/write round trip mangles → × “ ’. Edit files with the Edit tool or Python (utf-8), never a PowerShell string round trip.
 - `outline-color` reads as currentColor whenever `:focus-visible` didn't match, so a ring check can silently pass. Check the `--fp-ring` token on the control instead.
+- A script that switches a page into its JS layout (one-menu mode) must run BEFORE the markup it changes is parsed; placed after it, a slow connection paints the no-JS layout first (CLS 0.18). Draw JS-only controls from a class set early, not by un-hiding them in a module script.
+- Test the budget on every page you touch, not only the default PAGES list: the menu page's 0.18 CLS had never been measured.
+- A temporary worktree with a node_modules junction: unlink the junction with `cmd /c rmdir <junction>` (removes the link only) before deleting the folder, and check the real node_modules count after. PowerShell Remove-Item on it prompts and fails in non-interactive mode.
+- A test that changes page state (a filter) and then navigates by hash on the same document keeps that state: load about:blank first, or the "failure" is the test.
+- Global `h2` styles uppercase: any new heading class must set `text-transform: none` itself.
+- A vertically centred hero shifts on slow loads: the browser can paint before the HTML has all arrived, and the centred column slides up as the rest streams in. Top-align (or stretch) a column that grows, and decide it from a server-rendered class, never `:has()` on content still arriving.
+- A chapter head and its content must share one section and one surface; a head on its own band reads as an orphan strip. Count the colour changes per screen before calling a page done.
+- `.branch :global(p) { margin: 0 }` (0,1,1) beats a single class on a `<p>`: use padding for offsets on paragraphs inside the branch page.
+- An italic Lora line above content re-wraps when Lora lands (its Georgia fallback is wider), and everything below it jumps. Short UI lines above the fold go in the body face, whose fallback is width-matched.
+- A hydration that Lighthouse charges at load (client:idle) can be moved to `client:visible` with a rootMargin of a screen: TBT 490 → 110 ms on home. Measure the scroll test before and after; it can move the cost into the scroll.
+- "Empty band" and "surface change" checks must count only edge-to-edge backgrounds and split gaps at a change of surface, or cards, fields and two chapters' padding read as failures.
 - Re-validating a field on blur moves the form (its message disappears) just as the guest taps the next control, and the tap misses. Clear errors on input.

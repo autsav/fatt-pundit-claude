@@ -198,6 +198,27 @@
 .chapter { padding-block: var(--section-pad); }
 .chapter-head { row-gap: var(--space-4); margin-bottom: var(--section-gap); }
 .chapter-intro { margin: 0; max-width: 38em; font-size: var(--step-body); line-height: var(--lh-body); text-wrap: pretty; }
+/* Phase 6 (branch and document pages): what follows a chapter head lines up with the headline, not the
+   label rail. One column of the 12 + its gutter = (100% + gutter) / 12, so two of them is the rail. */
+@media (min-width: 1024px) { .chapter-body { margin-inline-start: calc((100% + var(--grid-gutter)) * 2 / 12); } }
+/* A chapter that is only its head (the story continues in the next full-bleed scene) keeps a short foot. */
+.branch .chapter:not(:has(.chapter-body, .room-walk)) { padding-bottom: var(--section-gap); }
+/* Page-end strip after a sand chapter: the chapter's own bottom space is the gap (no 200px empty band). */
+.branch .chapter:not(.ink, .gold-bg) + .fp-next { padding-top: 0; }
+.branch .chapter:not(:has(.chapter-body, .room-walk)) .chapter-head { margin-bottom: 0; }
+/* Soho's walk lives inside its chapter. Its track bleeds off the right edge only and starts where the
+   headline starts (the .wrap edge on phones, past the label rail from 1024px); caption and progress rule
+   share that line. Percentages here are the full-bleed width, so this mirrors .wrap + .chapter-body. */
+.room-walk { --walk-pad: clamp(16px, 4vw, 40px); --walk-edge: calc((100% - min(100%, 1240px)) / 2 + var(--walk-pad)); --walk-start: var(--walk-edge); }
+@media (min-width: 1024px) { .room-walk { --walk-start: calc(var(--walk-edge) + (min(100%, 1240px) - 2 * var(--walk-pad) + var(--grid-gutter)) * 2 / 12); } }
+.chapter:has(.room-walk) .chapter-head { margin-bottom: 0; }
+/* The walk's own track already ends in space: half the usual bottom padding below it. */
+.chapter:has(.room-walk) { padding-bottom: calc(var(--section-pad) / 2); } /* the pinned view centres itself: that is the gap */
+.walk-track, .walk-cap { padding-inline: var(--walk-start) var(--walk-edge); }
+.walk-bar { margin-inline: var(--walk-start) var(--walk-edge); }
+.walk-cap { font-family: var(--font-note); font-style: italic; font-size: var(--step-small); line-height: var(--lh-small); color: var(--fp-fg-muted); }
+.walk-stop { margin: 0; font-size: var(--step-label); font-weight: 700; line-height: 1.3; color: var(--color-gold); font-variant-numeric: tabular-nums; }
+.walk-title { margin: 0; padding-top: var(--space-2); font-family: var(--font-display); font-weight: 300; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; letter-spacing: var(--tracking-display); text-transform: none; color: var(--color-sand); }
 /* A headline that is an object (the bar's embroidery) still sits on the rule, like .fp-h2. */
 @media (min-width: 1024px) { .chapter-head > h2:not(.fp-h2) { padding-top: var(--space-2); border-top: var(--border-rule) solid var(--fp-rule-strong); } }
 /* The menus toolbar: which room's book is open, or the list pages. Two groups side by side when there's room. */

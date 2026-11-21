@@ -8,31 +8,51 @@
  * Arriving from the Book drawer, ?branch=&date=&guests=&time= fill the form in.
  */
 import InfoPage from '../layouts/InfoPage.astro';
+import tables from '../assets/images/covent-garden/gallery-04.jpg';
+import setTable from '../assets/images/covent-garden/gallery-06.jpg';
+import { Image } from 'astro:assets';
 import { getBranches, groupRules, prettyPhone } from '../lib/site-data';
 const open = (await getBranches()).filter((b) => b.status === 'open' && b.email);
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
 const today = new Date().toISOString().slice(0, 10);
 ---
-<InfoPage title="Groups and private dining" description="Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups and private dining">
-  <p>Big tables, set feasts and whole-room bookings for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible.</p>
+<InfoPage title="Groups and private dining" description="Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups and private dining" layout="full"
+  intro="Big tables, set feasts and whole-room bookings for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible."
+  next={{ label: 'See the rooms', title: 'Two rooms in London.', line: 'Long banquettes at Covent Garden, the bar and the kitchen at Soho.', actions: [{ href: '#enquiry-title', label: 'Send an enquiry', primary: true }, ...open.map((b) => ({ href: `/${b.id}/`, label: b.shortName }))], photo: tables }}>
+  <figure class="pd-photo">
+    <Image src={setTable} alt="A pink booth against a green plaster wall, glasses set for dinner" widths={[480, 800, 1200, 1600]} sizes="(min-width: 1240px) 1160px, 100vw" loading="eager" />
+    <figcaption>Covent Garden, set for dinner.</figcaption>
+  </figure>
+  <!-- Phones and tablets: the form is far down, so one tap takes you there. -->
+  <p class="pd-jump"><a class="fp-btn fp-btn--primary" href="#enquiry-title">Send an enquiry</a></p>
+  <div class="pd">
+  <section class="pd-rules" aria-labelledby="rules-h">
+    <h2 id="rules-h" class="fp-h4">What's possible</h2>
+    <ul class="fp-ledger rules" role="list">
+      {open.map((b) => {
+        const r = groupRules(b)!;
+        return (
+          <li>
+            <strong class="fp-ledger-name">{b.shortName}</strong>
+            <span>{r.online}{r.call && ` ${r.call}`} {r.setMenu}</span>
+            <a class="fp-link fp-link--strong" href={`/${b.id}/menu/#set-menu`}>See the {b.shortName} set menu</a>
+          </li>
+        );
+      })}
+    </ul>
+    <p class="pd-deposit">{groupRules(open[0])?.deposit} Ask about space for your group when you call or write.</p>
+    <h2 class="fp-h4 pd-other-h">Prefer to talk?</h2>
+    <ul class="fp-ledger pd-other" role="list">
+      {open.map((b) => (
+        <li><strong>{b.shortName}</strong><a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone!)}</a><a class="fp-link pd-mail" href={`mailto:${b.email}`}>{b.email}</a></li>
+      ))}
+    </ul>
+  </section>
 
-  <h2>What's possible</h2>
-  <ul class="rules" role="list">
-    {open.map((b) => {
-      const r = groupRules(b)!;
-      return (
-        <li>
-          <strong>{b.shortName}</strong>
-          <span>{r.online}{r.call && ` ${r.call}`} {r.setMenu} <a href={`/${b.id}/menu/#set-menu`}>See the {b.shortName} set menu</a>.</span>
-        </li>
-      );
-    })}
-  </ul>
-  <p>{groupRules(open[0])?.deposit} Ask about space for your group when you call or write.</p>
-
-  <h2 id="enquiry-title">Send an enquiry</h2>
+  <section class="pd-sheet surface-paper-light" aria-labelledby="enquiry-title">
+  <h2 id="enquiry-title" class="pd-sheet-h">Send an enquiry</h2>
   <div class="status-slot" data-enquiry-top></div>
-  <form class="fp-form surface-paper-light enquiry" data-enquiry aria-labelledby="enquiry-title" novalidate
+  <form class="fp-form enquiry" data-enquiry aria-labelledby="enquiry-title" novalidate
     action={endpoint ?? `mailto:${open[0]?.email}`} method="post" data-endpoint={endpoint ? '' : undefined}>
     <input type="hidden" name="_subject" value="Group enquiry" data-subject />
     <fieldset class="fp-fieldset">
@@ -82,17 +102,40 @@ const today = new Date().toISOString().slice(0, 10);
     <div>
       <button class="fp-btn fp-btn--primary" type="submit" data-enquiry-send>Send enquiry</button>
     </div>
-    <p class="fp-hint">{endpoint ? "We'll reply by email as soon as we can." : 'This opens your email app with everything filled in, addressed to the restaurant.'} Prefer to talk? {open.map((b, i) => <>{i > 0 && ', '}{b.shortName} <a href={`tel:${b.phone}`}>{prettyPhone(b.phone!)}</a></>)}</p>
+    <p class="fp-hint">{endpoint ? "We'll reply by email as soon as we can." : 'This opens your email app with everything filled in, addressed to the restaurant.'}</p>
   </form>
+  </section>
+  </div>
 </InfoPage>
 
 <style>
-  .rules { display: grid; gap: 0; margin: 0 0 16px !important; padding: 0; list-style: none; border-top: 2px solid var(--color-ink); }
-  .rules li { display: grid; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--color-ink); }
-  .enquiry { margin-top: 8px; background: none; }
-  .enquiry :global(.fp-hint a) { color: var(--color-tiger-deep); font-weight: 700; }
+  /* Phones: what's possible, then the form. 1024+: rules (4 of the 10 columns) beside the form sheet (6). */
+  .pd { display: grid; gap: var(--section-gap) var(--grid-gutter); align-items: start; }
+  .pd-photo { margin: 0 0 var(--space-6); }
+  .pd-photo :global(img) { display: block; width: 100%; height: auto; aspect-ratio: 21 / 9; object-fit: cover; object-position: 50% 60%; border: 2px solid var(--color-ink); }
+  .pd-photo figcaption { margin-top: var(--space-2); font-family: var(--font-note); font-style: italic; font-size: var(--step-small); }
+  @media (max-width: 639px) { .pd-photo :global(img) { aspect-ratio: 4 / 3; } }
+  .pd-jump { margin: 0 0 var(--space-6); }
+  @media (min-width: 1024px) { .pd-jump { display: none; } }
+  #enquiry-title { scroll-margin-top: 96px; }
+  @media (min-width: 1024px) {
+    .pd { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+    .pd-rules { grid-column: 1 / 5; position: sticky; top: 96px; }
+    .pd-sheet { grid-column: 5 / 11; }
+  }
+  .pd-rules { display: grid; gap: var(--space-4); min-width: 0; font-size: var(--step-body); line-height: var(--lh-body); }
+  .pd-rules p, .pd-rules h2 { margin: 0; }
+  .rules, .pd-other { margin: 0; padding: 0; }
+  .rules li { display: grid; gap: var(--space-1); padding-block: var(--space-4); }
+  .pd-other-h { margin-top: var(--space-4) !important; }
+  .pd-other li { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); align-items: baseline; padding-block: var(--space-2); }
+  .pd-other strong { min-width: 8em; }
+  .pd-mail { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; overflow-wrap: anywhere; }
+  /* The form is the page's one object: a sheet of paper. */
+  .pd-sheet { display: grid; gap: var(--space-5); min-width: 0; padding: clamp(20px, 4vw, 48px); border: 2px solid var(--color-ink); box-shadow: 8px 8px 0 var(--color-ink); }
+  @media (max-width: 639px) { .pd-sheet { box-shadow: 5px 5px 0 var(--color-ink); } }
+  .pd-sheet-h { margin: 0; font-size: var(--step-h3); font-weight: 300; text-transform: none; line-height: 1.1; letter-spacing: var(--tracking-display); }
   .status-slot:empty { display: none; }
-  .status-slot { margin-bottom: 16px; }
   .status-slot :global(ul) { margin: 6px 0 0 !important; padding-left: 1.2em; }
   .status-slot :global(a) { color: inherit !important; }
 </style>

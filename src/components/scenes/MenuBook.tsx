@@ -447,7 +447,7 @@ export default function MenuBook({
                 </li>
               ))}
             </ul>
-            <a href={place.soon.href} className="btn btn-orange mt-6">Join the list</a>
+            <a href={place.soon.href} className="fp-btn fp-btn--primary mt-6">Join the list</a>
           </div>
         ) : (
         <>

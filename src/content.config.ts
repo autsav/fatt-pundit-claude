@@ -74,6 +74,8 @@ const branches = defineCollection({
         teaser: z.array(z.string()),
         hero: z.string().nullable(),
         gallery: z.array(z.string()),
+        // Public rating as the client gave it (CLIENT-INPUTS answered 20 Nov 2026); count as printed.
+        rating: z.object({ score: z.number().min(0).max(5), count: z.string(), source: z.string(), asOf: z.string() }).optional(),
       }),
     })
     .refine((b) => b.status !== 'open' || (b.booking && b.hours && b.phone), {

@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
 import { getBranches } from '../lib/site-data';
 const branches = await getBranches();
 ---
 <Base title="Lost luggage · Fatt Pundit" description="This page has gone missing in transit." noindex>
+  <a class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} />
-  <main class="lost">
+  <main id="content" class="lost">
     <div class="tag">
       <h1 class="tag-head">Lost luggage</h1>
       <p class="tag-code">404</p>
@@ -23,11 +25,14 @@ const branches = await getBranches();
       <p class="fortune" data-fortune hidden></p>
     </div>
   </main>
+  <SiteFooter branches={branches} />
 </Base>
 
 <style>
-  .lost { min-height: 80svh; display: grid; place-items: center; padding: 48px 16px; background: var(--color-ink); }
-  .tag { position: relative; max-width: 520px; background: var(--color-sand); color: var(--color-ink); padding: 48px 32px 32px; border: 2px solid var(--color-ink); box-shadow: 10px 10px 0 var(--color-tiger); transform: rotate(-1.5deg); text-align: center; }
+  .lost { min-height: 72svh; display: grid; place-items: center; padding: var(--section-pad) 16px; background: var(--color-ink); border-bottom: 1px solid rgb(203 160 82 / 0.35); }
+  /* The tag is the page's one object. Its shadow is a lift, not tiger (tiger means "press me"). */
+  .tag { position: relative; width: min(520px, 100%); box-sizing: border-box; background: var(--color-sand); color: var(--color-ink); padding: 48px 32px 32px; border: 2px solid var(--color-ink); box-shadow: var(--lift-3); transform: rotate(-1.5deg); text-align: center; }
+  @media (prefers-reduced-motion: reduce) { .tag { transform: none; } }
   .tag::before { content: ''; position: absolute; top: 16px; left: 50%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--color-ink); box-shadow: 0 0 0 5px var(--color-gold); }
   .tag-head { font-size: inherit; line-height: inherit; margin: 18px 0 0; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-tiger-deep); }
   .tag-code { margin: 4px 0; font-size: clamp(72px, 16vw, 128px); font-weight: 700; line-height: 1; }

@@ -39,6 +39,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
         <div class="stack-sm small foot-branch">
           <a class="foot-h" href={`/${b.id}/`}>{b.shortName}</a>
           <p>{b.address.street}{b.address.postcode ? `, ${b.address.postcode}` : ''}</p>
+          {b.status === 'open' && b.hours && <p class="foot-today" data-foot-hours={JSON.stringify(b.hours)} data-tz={b.timezone}>Hours on the {b.shortName} page</p>}
           {b.phone ? <a class="foot-tel" href={`tel:${b.phone.replace(/\s/g, '')}`}>{prettyPhone(b.phone)}</a> : <p>Opening soon</p>}
           {b.status === 'open' && <a class="foot-menus" href={`/${b.id}/menu/`}>{b.shortName} menus</a>}
           {b.status === 'open' && b.booking
@@ -53,7 +54,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
     {newsletter && (
       <form class="news" action={newsletter} method="post" target="_blank">
         <label for="news-email">News, new dishes and Dubai's opening, now and then</label>
-        <div class="news-row"><input id="news-email" type="email" name="EMAIL" autocomplete="email" required placeholder="you@example.com" /><button class="btn btn-orange btn-sm" type="submit">Join the list</button></div>
+        <div class="news-row"><input id="news-email" class="fp-input" type="email" name="EMAIL" autocomplete="email" required placeholder="you@example.com" /><button class="fp-btn fp-btn--primary fp-btn--sm" type="submit">Join the list</button></div>
       </form>
     )}
     <nav aria-label="Good to know" class="foot-nav foot-nav-small">
@@ -64,6 +65,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
   </div>
 </footer>
 <script>
+  import { openStatus, statusLine } from '@/lib/hours';
   // Pause motion (WCAG 2.2.2): stops the rain, the loop videos and the pulsing dots. Remembered on this device.
   const html = document.documentElement;
   const btn = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
@@ -80,6 +82,11 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
     window.dispatchEvent(new Event('fp:motion'));
   });
   show();
+
+  // Today's hours per room, in its own time zone ("Open until 10.30pm"). Far below the fold, so no layout shift.
+  for (const el of document.querySelectorAll<HTMLElement>('[data-foot-hours]')) {
+    try { el.textContent = statusLine('', openStatus(JSON.parse(el.dataset.footHours!), el.dataset.tz!)); } catch {}
+  }
 </script>
 <style>
   .foot :global(p) { margin: 0; }
@@ -94,20 +101,24 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
   .news { display: grid; gap: 8px; max-width: 520px; }
   .news label { font-family: var(--font-note); font-style: italic; }
   .news-row { display: flex; gap: 8px; }
-  .news input { flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; font: inherit; border: 2px solid var(--color-sand); background: transparent; color: var(--color-sand); }
-  .foot-nav-small { font-size: 14px; opacity: 0.85; }
-  .foot-h { text-decoration: none; font-size: 16px; }
+  .news input { flex: 1; min-width: 0; }
+  .foot-nav-small { font-size: 15px; }
+  .foot :global(.tiny) { font-size: 15px; line-height: 1.5; color: rgb(218 199 181 / 0.9); }
+  .foot-today { color: var(--color-gold); }
+  /* Branch names and Book links in sentence case (no tracked capitals on running information). */
+  .foot-h { width: fit-content; color: var(--color-gold); font-size: var(--step-h4); font-weight: 700; text-decoration: none; }
   .foot-tag { font-size: 17px; color: rgb(218 199 181 / 0.85); max-width: 26ch; }
-  .social { display: flex; gap: 10px; margin-top: 10px; }
-  .social a { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid rgb(218 199 181 / 0.45); color: var(--color-sand); transition: border-color .2s, color .2s, transform .2s; }
-  .social a:hover { border-color: var(--color-gold); color: var(--color-gold); transform: translateY(-2px); }
+  /* Plain glyphs, no boxes (Phase 7 §3.8); each keeps a 44px target. */
+  .social { display: flex; gap: 4px; margin: 10px 0 0 -10px; }
+  .social a { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-sand); transition: color .2s; }
+  .social a:hover { color: var(--color-gold); }
   .social svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .foot-branch { font-size: 16px; line-height: 1.5; }
   .foot-tel { color: var(--color-sand); text-decoration: none; }
   .foot-menus { width: fit-content; color: var(--color-sand); text-underline-offset: 3px; }
   .foot-menus:hover { color: var(--color-gold); }
   .foot-tel:hover { color: var(--color-gold); }
-  .foot-cta { width: fit-content; margin-top: 8px; padding-bottom: 2px; color: var(--color-tiger-bright); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; text-decoration: none; border-bottom: 1.5px solid currentColor; }
+  .foot-cta { display: inline-flex; align-items: center; width: fit-content; min-height: 44px; color: var(--color-tiger-bright); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
   .foot-cta:hover { color: var(--color-gold); }
   .foot-h:hover { text-decoration: underline; }
 </style>

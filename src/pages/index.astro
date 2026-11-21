@@ -149,7 +149,8 @@ const orgLd = {
     <Doors />
 
     <!-- 3 · The voyage -->
-    <Voyage client:idle art={voyageArt} />
+    <!-- D2: hydrates a screen before it's reached, not during page load (it was the 0.9s long task on a slow phone). -->
+    <Voyage client:visible={{ rootMargin: '100% 0px' }} art={voyageArt} />
 
 
     <!-- 5 · The menu book -->

@@ -52,6 +52,13 @@ for (const d of signatures) {
   if (!existsSync(img)) warnings.push(`signature dish "${d.id}": photo missing (src/assets/images/dishes/${d.id}.jpg)`);
 }
 
+// D5 launch check: a launch build must not lean on placeholders.
+if (process.env.PUBLIC_LAUNCH === 'true') {
+  const demo = load('specials').rows.filter((r) => r.demo).length;
+  if (demo && !process.env.SPECIALS_CSV_URL) warnings.push(`launch: no SPECIALS_CSV_URL, so Tonight's board is hidden (${demo} sample lines dropped)`);
+  if (!process.env.PUBLIC_SPECIALS_CSV_URL && process.env.SPECIALS_CSV_URL) errors.push('launch: SPECIALS_CSV_URL is set but PUBLIC_SPECIALS_CSV_URL is not (the board would not refresh)');
+}
+
 for (const w of warnings) console.warn(`  warn  ${w}`);
 for (const e of errors) console.error(`  ERROR ${e}`);
 console.log(`validate-data: ${dishes.length} items, ${menus.length} menus, ${branches.length} branches — ${errors.length} errors, ${warnings.length} warnings`);

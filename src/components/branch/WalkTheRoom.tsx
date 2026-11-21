@@ -33,7 +33,9 @@ export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; acce
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
     const track = trackRef.current;
     if (calm || !track) return;
-    const max = track.scrollWidth - track.parentElement!.clientWidth;
+    // Travel until the last stop's right edge meets the column edge (the track's end padding).
+    const last = track.lastElementChild as HTMLElement;
+    const max = Math.max(0, last.offsetLeft + last.offsetWidth + parseFloat(getComputedStyle(track).paddingRight) - track.clientWidth);
     track.style.transform = `translate3d(${-p * max}px, 0, 0)`;
     setActive(Math.min(stops.length - 1, Math.round(p * (stops.length - 1))));
   });
@@ -50,31 +52,34 @@ export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; acce
         <RoomPlan zone={s.zone} accent={accent} />
       )}
       <figcaption className="relative">
-        <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[17px] text-gold">
+        <p className="walk-stop">
           Stop {i + 1} of {stops.length}
         </p>
-        <p className="m-0 mt-2 text-[clamp(24px,3.2vw,40px)] font-bold uppercase leading-none tracking-[0.05em] text-sand">{s.title}</p>
+        <p className="walk-title">{s.title}</p>
         <p className="m-0 mt-3 max-w-md font-note text-[19px] leading-snug text-sand/85">{s.note}</p>
       </figcaption>
     </figure>
   ));
+  const caption = <p className="walk-cap m-0 pb-5">{stops.length} stops, from the door to the pass</p>;
 
+  // Sits inside the room chapter (its head names it); the track lines up with the headline (global.css .walk-*).
   if (calm) {
     return (
-      <section aria-label="Walk the room" className="bg-ink py-16">
-        <div tabIndex={0} role="group" aria-label="Stops in the room. Scroll sideways." className="flex gap-6 overflow-x-auto px-[6vw] pb-4">{frames}</div>
-      </section>
+      <div className="pb-2" style={{ paddingTop: 'var(--section-gap)' }}>
+        {caption}
+        <div tabIndex={0} role="group" aria-label="Stops in the room. Scroll sideways." className="walk-track flex gap-6 overflow-x-auto pb-4">{frames}</div>
+      </div>
     );
   }
 
   return (
-    <section ref={sectionRef} aria-label="Walk the room" className="relative h-[320svh] bg-ink max-sm:h-[240svh]">
+    <section ref={sectionRef} aria-label="Walk the room" className="relative h-[220svh] max-sm:h-[180svh]">
       <div className="sticky top-[68px] flex h-[calc(100svh-68px)] flex-col justify-center overflow-hidden">
-        <p className="m-0 px-[6vw] pb-6 font-note font-medium normal-case italic tracking-normal text-[20px] text-gold">Walk the room, from the door to the pass</p>
-        <div ref={trackRef} className="flex gap-6 px-[6vw] will-change-transform">
+        {caption}
+        <div ref={trackRef} className="walk-track flex gap-6 will-change-transform">
           {frames}
         </div>
-        <div className="mx-[6vw] mt-6 h-[3px] bg-sand/15" aria-hidden="true">
+        <div className="walk-bar mt-6 h-[3px] bg-sand/15" aria-hidden="true">
           <div className="h-full origin-left" style={{ background: accent, transform: `scaleX(${(active + 1) / stops.length})`, transition: 'transform .4s ease' }} />
         </div>
       </div>

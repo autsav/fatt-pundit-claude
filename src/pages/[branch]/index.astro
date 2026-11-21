@@ -11,6 +11,10 @@ import { stampSrc } from '../../lib/stamp';
 import Base from '../../layouts/Base.astro';
 import SiteHeader from '../../components/site/SiteHeader.astro';
 import SiteFooter from '../../components/site/SiteFooter.astro';
+import NextStep from '../../components/site/NextStep.astro';
+import { Image } from 'astro:assets';
+import { dishPhoto } from '../../lib/dish-photos';
+import momosChutney from '../../assets/images/journey/04-momos-chutney.jpg';
 import BranchArrival from '../../components/branch/BranchArrival.tsx';
 import VisitStrip from '../../components/branch/VisitStrip.astro';
 import PlateWall from '../../components/branch/PlateWall.tsx';
@@ -90,8 +94,21 @@ const sohoStops = [
   { title: 'The kitchen', zone: 'kitchen' as const, note: 'At the end of the room, where the momos come from.' },
 ];
 
-// Menus as a numbered ledger, each row straight into the list page (approved mock §9, D3).
-const menuRows = open ? (await Promise.all(b.menus.map((id) => getEntry('menus', id)))).filter(Boolean).map((m) => ({ id: m!.data.id ?? m!.id, title: m!.data.title })) : [];
+// Menus (Phase 7 §4.2): two short groups of links, the general menus and the dietary ones.
+const menuRows = open ? (await Promise.all(b.menus.map((id) => getEntry('menus', id)))).filter(Boolean).map((m) => ({ id: m!.data.id ?? m!.id, title: MENU_TABS[m!.id] ?? m!.data.title, diet: m!.data.kind === 'diet' })) : [];
+const menuGroups = [
+  { key: 'main', label: 'Menus', rows: menuRows.filter((m) => !m.diet) },
+  { key: 'diet', label: 'For dietary needs', rows: menuRows.filter((m) => m.diet) },
+].filter((g) => g.rows.length > 0);
+
+// What to order (Phase 7 §4.2): dishes on this room's à la carte that have an approved photograph.
+// More join as the shoot delivers them (CLIENT-INPUTS #36, #46).
+const ORDER = ['crackling-spinach', 'momo-mix-vegetable', 'crispy-okra-salt-n-pepper', 'momo-kid-goat', 'popcorn-cauliflower', 'hakka-chilly-paneer-lettuce-cups', 'bombay-chilly-prawns', 'malabar-monkfish-curry'];
+const alaCarte = open && b.menus.includes('a-la-carte') ? (await getEntry('menus', 'a-la-carte'))!.data.sections.flatMap((sec) => sec.items.map((i) => i.dish)) : [];
+// Where each photo's dish sits in the frame, so a square crop keeps the food.
+const FOCUS: Record<string, string> = { 'momo-mix-vegetable': '92% 18%', 'crispy-okra-salt-n-pepper': '62% 50%' };
+const toOrder = await Promise.all(ORDER.filter((id) => alaCarte.includes(id) && dishPhoto(id)).slice(0, 6).map(async (id) => ({ id, d: await dish(id), photo: dishPhoto(id)!, focus: FOCUS[id] ?? '50% 50%' })));
+const rating = p.rating;
 const preTheatre = preTheatreText(b);
 const wallOff = (await getImage({ src: lightsOffStill, width: 1280, format: 'webp', quality: 80 })).src;
 const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'webp', quality: 80 })).src;
@@ -108,6 +125,22 @@ const hours = b.hours ? hoursLines(b.hours) : [];
 const rules = groupRules(b);
 // The Dubai list sends through a form-to-email service once the Dubai address is verified (CLIENT-INPUTS #5, #10).
 const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
+
+// Chapters (Phase 6): every section after the facts row opens like the home chapters, a numbered label
+// on a rule and a light headline (.fp-section-head). Numbers follow the sections this page actually shows.
+const showRoom = open || gallery.length > 0;
+const chapters = [
+  showRoom && 'room',
+  'signature',
+  toOrder.length > 0 && 'order',
+  menuRows.length > 0 && 'menus',
+  open && 'visit',
+  open && 'good',
+  'others',
+].filter(Boolean) as string[];
+const no = (id: string) => String(chapters.indexOf(id) + 1).padStart(2, '0');
+const roomLabel = p.opened ? `The room, since ${p.opened}` : 'The room, coming soon';
+const sigLabel = signature ? (signature.label === 'only-here' ? `Only at ${b.shortName}` : `Born at ${b.shortName}`) : 'Coming with us';
 
 // Search engines: one Restaurant per page.
 const DAY_NAMES: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
@@ -160,106 +193,108 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         )}
       </div>
       <div class="arrival-shade" aria-hidden="true"></div>
-      <div class="wrap arrival-in">
+      <div class:list={['wrap arrival-in', { 'has-board': specials.length > 0 }]}>
         {mark && <span class="mark-badge" aria-hidden="true"><span class="arrival-mark" style={`-webkit-mask-image: url(${mark}); mask-image: url(${mark});`}></span></span>}
         <h1 id="branch-title" class="sr-only">Fatt Pundit {b.shortName}</h1>
         <p class="arrival-brand" aria-hidden="true">Fatt Pundit</p>
         <div aria-hidden="true" class="board-slot"><BranchArrival client:idle words={words} branch={pill} /></div>
         <p class="arrival-addr">{fullAddress(b)}</p>
         {b.geo && <p class="branch-clock" data-branch-clock data-tz={b.timezone} data-lat={b.geo.lat} data-lng={b.geo.lng} data-name={b.shortName}></p>}
-        <div class="row arrival-actions">
-          {open && b.booking ? (
-            <a class="btn btn-orange" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
-          ) : (
-            <a class="btn btn-orange" href="#waitlist" data-focus-list>Join the list</a>
-          )}
-          {open && <a class="btn btn-ghost-light" href={`/${b.id}/menu/`}>See the menus</a>}
+        <div class="fp-cluster arrival-actions">
+          {open && b.booking && <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>}
+          {open && <a class="fp-btn" href={`/${b.id}/menu/`}>See the menus</a>}
         </div>
+        <!-- Opening soon: the list sits in the hero, the one thing a guest can do yet (Phase 7 §4.3). -->
+        {!open && (
+          <div id="waitlist" class="hero-list" role="group" aria-labelledby="wl-title">
+            <h2 id="wl-title" class="hero-list-h">Be first through the door</h2>
+            {listEndpoint ? (
+              <>
+                <form class="fp-form wl-form" data-waitlist data-list={b.id} action={listEndpoint} method="post" novalidate>
+                  <input type="hidden" name="list" value={`${b.shortName} opening`} />
+                  <div class="fp-field">
+                    <label for="wl-email" class="fp-label">Email address</label>
+                    <div class="wl-row">
+                      <input id="wl-email" class="fp-input" name="email" type="email" required placeholder="you@example.com" autocomplete="email" aria-describedby="wl-email-msg" />
+                      <button class="fp-btn fp-btn--primary" type="submit">Join the list</button>
+                    </div>
+                    <p id="wl-email-msg" data-wl-msg hidden></p>
+                  </div>
+                </form>
+                <p class="fp-small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
+              </>
+            ) : (
+              <p class="hero-list-note">The list opens soon. For the opening date, follow <a class="fp-link" href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">@fattpundit on Instagram<span class="sr-only"> (opens in a new tab)</span></a>.</p>
+            )}
+          </div>
+        )}
+        <!-- Tonight's board hangs in the arrival, on the same ink, instead of a band of its own. -->
+        {specials.length > 0 && <TonightBoard client:idle branch={b.id} name={b.shortName} tz={b.timezone} rows={specials} csvUrl={import.meta.env.PUBLIC_SPECIALS_CSV_URL} />}
       </div>
     </section>
 
     <!-- The essentials before the story: today's hours, address, call, directions, book. -->
     <VisitStrip branch={b} stations={p.stations} />
 
-    <!-- Opening soon: the list comes first, it's the one thing a guest can do yet. -->
-    {!open && (
-      <section id="waitlist" class="sec gold-bg" aria-labelledby="wl-title">
-        <div class="wrap narrow stack center">
-          <h2 id="wl-title" class="h2">Be first through the door</h2>
-          {listEndpoint ? (
-            <>
-              <p>Leave your email and we'll tell you when bookings open at The Hangout.</p>
-              <form class="wl-form" data-waitlist data-list={b.id} action={listEndpoint} method="post" novalidate>
-                <input type="hidden" name="list" value={`${b.shortName} opening`} />
-                <label for="wl-email" class="wl-label">Email address</label>
-                <div class="row wl-row">
-                  <input id="wl-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email" aria-describedby="wl-email-msg" />
-                  <button class="btn btn-ink" type="submit">Join the list</button>
-                </div>
-                <p id="wl-email-msg" data-wl-msg hidden></p>
-              </form>
-              <p class="small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
-            </>
-          ) : (
-            <p class="wl-soon">The Dubai list opens soon. For the opening date, follow <a href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">@fattpundit on Instagram<span class="sr-only"> (opens in a new tab)</span></a>.</p>
-          )}
-        </div>
-      </section>
-    )}
-
-    <!-- 2 · The room -->
-    {specials.length > 0 && <TonightBoard client:visible branch={b.id} name={b.shortName} tz={b.timezone} rows={specials} csvUrl={import.meta.env.PUBLIC_SPECIALS_CSV_URL} />}
-    <section class="sec room" aria-labelledby="room-title">
-      <div class="wrap stack-lg">
-        <div class="stack">
-          <p class="kicker lead-text">{p.opened ? `The room, since ${p.opened}` : 'The room, coming soon'}</p>
-          <h2 id="room-title" class="room-lines"><span class="sr-only">The room: </span>{p.lines.map((l) => <span>{l}</span>)}</h2>
-        </div>
-        {b.id === 'covent-garden' && (
-          <>
-            <LightsOn src={lightsOnClip} off={wallOff} lit={wallLit} label={ALTS['gallery-02']} lamps={WALL_LAMPS} ratio={1760 / 1176} place="Maiden Lane" />
-            <p class="wall-intro">Now turn the plates over: each one hides something from the kitchen.</p>
-            <PlateWall client:visible dishes={plates} />
-          </>
+    <!-- 2 · The room: one chapter holds its head and everything about the room (Soho's walk on night ink,
+         Covent Garden's wall, plates and contact sheet on sand). -->
+    {showRoom && <section class={`chapter room${b.id === 'soho' ? ' ink' : ''}`} aria-labelledby="room-title">
+      <div class="wrap">
+        <!-- The brand's three lines: the first is the headline, the other two are the spoken line under it. -->
+        <header class="fp-section-head chapter-head">
+          <p class="fp-section-label"><span class="fp-section-no">{no('room')}</span> {roomLabel}</p>
+          <h2 id="room-title" class="fp-h2"><span class="sr-only">The room: </span>{p.lines[0]}</h2>
+          {p.lines.length > 1 && <p class="fp-spoken room-spoken">{p.lines.slice(1).join(' ')}</p>}
+        </header>
+        {(b.id === 'covent-garden' || gallery.length > 0) && (
+          <div class="chapter-body room-wall">
+            {b.id === 'covent-garden' && (
+              <>
+                <LightsOn src={lightsOnClip} off={wallOff} lit={wallLit} label={ALTS['gallery-02']} lamps={WALL_LAMPS} ratio={1760 / 1176} place="Maiden Lane" />
+                <p class="wall-intro">Now turn the plates over: each one hides something from the kitchen.</p>
+                <PlateWall client:visible dishes={plates} />
+              </>
+            )}
+            {gallery.length > 0 && (
+              <div class="gallery-sec room-sheet" role="group" aria-label={`Photos of ${b.shortName}`}>
+                <RoomContactSheet client:visible frames={sheet} picks={[]} />
+              </div>
+            )}
+          </div>
         )}
       </div>
-    </section>
-    {b.id === 'soho' && <WalkTheRoom client:visible stops={sohoStops} accent={p.second} />}
-    {gallery.length > 0 && (
-      <section class="gallery-sec" aria-label={`Photos of ${b.shortName}`}>
-        <div class="wrap">
-          <RoomContactSheet client:visible frames={sheet} picks={[]} />
-        </div>
-      </section>
-    )}
+      {b.id === 'soho' && <div class="room-walk"><WalkTheRoom client:visible stops={sohoStops} accent={p.second} /></div>}
+    </section>}
 
     <!-- 3 · Born here / coming with us -->
-    <section class="sec sand signature" aria-labelledby="sig-title">
+    <section class="chapter signature" aria-labelledby="sig-title">
       <div class="wrap">
+        <header class="fp-section-head chapter-head">
+          <p class="fp-section-label"><span class="fp-section-no">{no('signature')}</span> {sigLabel}</p>
+          <h2 id="sig-title" class="fp-h2">
+            {signature
+              ? <><span class="sr-only">{signature.label === 'only-here' ? 'Only here' : 'Born here'}: </span>{signature.d.name}</>
+              : <>What we're packing for Dubai</>}
+          </h2>
+          {!signature && <p class="chapter-intro">London favourites named for the Dubai opening. Prices and the full menu come with the opening date.</p>}
+        </header>
         {signature ? (
-          <div class="sig">
+          <div class="chapter-body sig">
             <div class="sig-ticket">
               <p class="sig-no">{signature.label === 'only-here' ? 'Only here' : 'Born here'}</p>
               <p class="sig-name">{signature.d.name}</p>
-              {priceOf(signature.d) && <p class="sig-price">{priceOf(signature.d)}</p>}
+              {priceOf(signature.d) && <p class="sig-price fp-num">{priceOf(signature.d)}</p>}
               <img src={menuArt.stampGold} alt="" class="sig-stamp" width="508" height="564" loading="lazy" decoding="async" />
             </div>
-            <div class="stack">
-              <p class="kicker lead-text">{signature.label === 'only-here' ? `Only at ${b.shortName}` : `Born at ${b.shortName}`}</p>
-              <h2 id="sig-title" class="h2"><span class="sr-only">{signature.label === 'only-here' ? 'Only here' : 'Born here'}: </span>{signature.d.name}</h2>
-              {signature.d.description && <p class="sig-desc">{signature.d.description}</p>}
-              <p>{signature.story}</p>
-              {open && <p><a class="sig-find" href={`/${b.id}/menu/#${signature.d.kind === 'drink' ? 'drinks' : 'a-la-carte'}`}>Find it on the menu</a></p>}
-              {signature.d.tags.length > 0 && <p class="tags">{signature.d.tags.join(' · ')}</p>}
+            <div class="fp-stack sig-text">
+              {signature.d.description && <p class="fp-spoken">{signature.d.description}</p>}
+              <p class="fp-body">{signature.story}</p>
+              {signature.d.tags.length > 0 && <p class="fp-small fp-muted">Marked {signature.d.tags.join(', ')} on the menu.</p>}
+              {open && <p><a class="fp-link fp-link--strong" href={`/${b.id}/menu/#${signature.d.kind === 'drink' ? 'drinks' : 'a-la-carte'}`}>Find it on the menu</a></p>}
             </div>
           </div>
         ) : (
-          <div class="stack-lg">
-            <div class="stack center">
-              <p class="kicker lead-text">Coming with us</p>
-              <h2 id="sig-title" class="h2">What we're packing for Dubai</h2>
-              <p class="narrow">London favourites named for the Dubai opening. Prices and the full menu come with the opening date.</p>
-            </div>
+          <div class="chapter-body">
             <ul class="teaser">
               {teaser.map((d) => (
                 <li class="sig-ticket small-ticket">
@@ -274,87 +309,128 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       </div>
     </section>
 
+    <!-- What to order: photographed dishes, with the room's public rating as proof. -->
+    {toOrder.length > 0 && (
+      <section id="order" class="chapter order" aria-labelledby="order-title">
+        <div class="wrap">
+          <header class="fp-section-head chapter-head">
+            <p class="fp-section-label"><span class="fp-section-no">{no('order')}</span> What to order</p>
+            <h2 id="order-title" class="fp-h2"><span class="sr-only">What to order: </span>Start with these.</h2>
+          </header>
+          <div class="chapter-body">
+            <ul class="order-grid" role="list">
+              {toOrder.map(({ d, photo: ph, focus }) => (
+                <li class="order-dish">
+                  <a href={`/${b.id}/menu/#a-la-carte`} class="order-link">
+                    <span class="order-photo"><Image src={ph} alt="" widths={[360, 560, 800]} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 88vw" loading="lazy" style={`object-position:${focus}`} /></span>
+                    <span class="order-name">{d.name}{priceOf(d) && <span class="order-price fp-num">{priceOf(d)}</span>}</span>
+                    {d.description && <span class="order-desc">{d.description}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {rating && (
+              <div class="proof">
+                <span class="proof-n fp-num">{rating.score}<span class="proof-of"> / 5</span></span>
+                <span class="proof-src">on {rating.source}, from {rating.count} reviews of Fatt Pundit {b.shortName} ({rating.asOf})</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    )}
+
     <!-- 4 · The menus here -->
     {menuRows.length > 0 && (
-      <section id="menu" class="sec sand menus-sec" aria-labelledby="menus-title">
-        <div class="wrap stack-lg">
-          <div class="stack">
-            <p class="kicker lead-text">The menus</p>
-            <h2 id="menus-title" class="h2 h2-light">Menus at {b.shortName}</h2>
-            <p class="menus-intro">Each one opens as a list, with search, diet filters and printing.</p>
-          </div>
-          <ol class="fp-ledger menus-ledger" role="list">
-            {menuRows.map((m, i) => (
-              <li><a class="menus-row" href={`/${b.id}/menu/#${m.id}`}>
-                <span class="menus-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <span class="menus-name">{m.title}</span>
-                <span class="menus-note">{m.id === 'pre-theatre' || m.id === 'vegetarian-pre-theatre' ? (preTheatre ? `Seated ${preTheatre}` : '') : ''}</span>
-                <span class="menus-go" aria-hidden="true">›</span>
-              </a></li>
+      <section id="menu" class="chapter menus-sec" aria-labelledby="menus-title">
+        <div class="wrap">
+          <header class="fp-section-head chapter-head">
+            <p class="fp-section-label"><span class="fp-section-no">{no('menus')}</span> The menus</p>
+            <h2 id="menus-title" class="fp-h2">Menus at {b.shortName}</h2>
+            <p class="chapter-intro">Each one opens as a list, with search, diet filters and printing.</p>
+          </header>
+          <div class="chapter-body menu-groups">
+            {menuGroups.map((g) => (
+              <div class="menu-group">
+                <h3 class="menu-group-h" id={`mg-${g.key}`}>{g.label}</h3>
+                <ul class="menu-group-list" role="list" aria-labelledby={`mg-${g.key}`}>
+                  {g.rows.map((m) => (
+                    <li><a class="menu-group-link" href={`/${b.id}/menu/#${m.id}`}><span>{m.title}</span>{(m.id === 'pre-theatre' || m.id === 'vegetarian-pre-theatre') && preTheatre && <span class="menu-group-note">Seated {preTheatre}</span>}</a></li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ol>
+          </div>
         </div>
       </section>
     )}
 
     <!-- 5 · Visit -->
-    {open && <section id="visit" class="sec ink visit" aria-labelledby="visit-title">
-      <div class="wrap visit-grid">
-        <div class="stack">
-          <p class="kicker gold">Visit</p>
-          <h2 id="visit-title" class="h2"><span class="sr-only">Visit: </span>{b.address.street.split(',')[0]}</h2>
-          <p>{fullAddress(b)}</p>
-          <p class="small">Nearest {p.stations.length > 1 ? 'stations' : 'station'}: {p.stations.join(', ')}</p>
-          <div class="row">
-            <a class="btn btn-orange btn-sm" href={directionsUrl(b)} target="_blank" rel="noopener">Google Maps</a>
-            <a class="btn btn-ghost-light btn-sm" href={appleMapsUrl(b)} target="_blank" rel="noopener">Apple Maps</a>
-            {b.phone && <a class="btn btn-ghost-light btn-sm" href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}
-            {b.email && <a class="btn btn-ghost-light btn-sm" href={`mailto:${b.email}`}>Email</a>}
-          </div>
-        </div>
-        <div class="stack">
-          <h3 class="visit-h">Opening hours</h3>
-          {hours.length > 0 ? (
-            <dl class="hours hours-lg" data-tz={b.timezone}>
-              {hours.map((l) => (<div data-days={l.keys.join(' ')}><dt>{l.days}</dt><dd>{l.text}</dd></div>))}
-            </dl>
-          ) : (
-            <p>Hours are announced with the opening date.</p>
-          )}
-          {b.booking && <p class="small">Book online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>}
-          {(b.delivery.length > 0 || b.clickAndCollectUrl) && (
-            <p class="small" id="at-home">
-              {b.clickAndCollectUrl && <>Collect it yourself: <a href={b.clickAndCollectUrl} target="_blank" rel="noopener">order for pickup<span class="sr-only"> (opens in a new tab)</span></a>. </>}
-              {b.delivery.length > 0 && <>Delivered: {b.delivery.map((d, i) => (<>{i > 0 && ' or '}<a href={d.url} target="_blank" rel="noopener">{d.provider === 'deliveroo' ? 'Deliveroo' : 'Uber Eats'}<span class="sr-only"> (opens in a new tab)</span></a></>))}.</>}
+    {open && <section id="visit" class="chapter ink visit" aria-labelledby="visit-title">
+      <div class="wrap">
+        <header class="fp-section-head chapter-head">
+          <p class="fp-section-label"><span class="fp-section-no">{no('visit')}</span> Visit</p>
+          <h2 id="visit-title" class="fp-h2"><span class="sr-only">Visit: </span>{b.address.street.split(',')[0]}</h2>
+        </header>
+        <div class="chapter-body visit-grid">
+          <div class="fp-stack visit-where">
+            <p class="fp-body">{fullAddress(b)}<br /><span class="fp-muted">Nearest {p.stations.length > 1 ? 'stations' : 'station'}: {p.stations.join(', ')}</span></p>
+            {b.booking && <p><a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}</a></p>}
+            <div class="fp-cluster">
+              <a class="fp-btn" href={directionsUrl(b)} target="_blank" rel="noopener">Google Maps<span class="sr-only"> (opens in a new tab)</span></a>
+              <a class="fp-btn" href={appleMapsUrl(b)} target="_blank" rel="noopener">Apple Maps<span class="sr-only"> (opens in a new tab)</span></a>
+            </div>
+            <p class="fp-cluster visit-links">
+              {b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
+              {b.email && <a class="fp-link fp-link--strong" href={`mailto:${b.email}`}>Email us</a>}
             </p>
-          )}
+          </div>
+          <div class="fp-stack visit-hours">
+            {hours.length > 0 ? (
+              <table class="fp-hours" data-hours-tz={b.timezone}>
+                <caption>Opening hours</caption>
+                <tbody>
+                  {hours.map((l) => (<tr data-days={l.keys.join(' ')}><th scope="row">{l.days}<span class="hours-today" hidden> (today)</span></th><td>{l.text}</td></tr>))}
+                </tbody>
+              </table>
+            ) : (
+              <p>Hours are announced with the opening date.</p>
+            )}
+            {b.booking && <p class="fp-small fp-muted">Book online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>}
+            {(b.delivery.length > 0 || b.clickAndCollectUrl) && (
+              <p class="fp-small" id="at-home">
+                {b.clickAndCollectUrl && <>Collect it yourself: <a class="fp-link" href={b.clickAndCollectUrl} target="_blank" rel="noopener">order for pickup<span class="sr-only"> (opens in a new tab)</span></a>. </>}
+                {b.delivery.length > 0 && <>At home: {b.delivery.map((d, i) => (<>{i > 0 && ' or '}<a class="fp-link" href={d.url} target="_blank" rel="noopener">{d.provider === 'deliveroo' ? 'Deliveroo' : 'Uber Eats'}<span class="sr-only"> (opens in a new tab)</span></a></>))}.</>}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </section>}
 
     <!-- 6 · Good to know (only what we actually know) -->
     {open && (
-      <section class="sec good" aria-labelledby="good-title">
-        <div class="wrap stack-lg">
-          <div class="stack">
-            <p class="kicker">Good to know</p>
-            <h2 id="good-title" class="h2 h2-light"><span class="sr-only">Good to know: </span>Before you travel.</h2>
-          </div>
-          <ul class="lug" role="list">
-            <li class="tag"><div class="tag-in">
-              <h3 class="tag-t">Dietary menus</h3>
+      <section class="chapter good" aria-labelledby="good-title">
+        <div class="wrap">
+          <header class="fp-section-head chapter-head">
+            <p class="fp-section-label"><span class="fp-section-no">{no('good')}</span> Good to know</p>
+            <h2 id="good-title" class="fp-h2"><span class="sr-only">Good to know: </span>Before you travel.</h2>
+          </header>
+          <ul class="chapter-body fp-grid-auto lug" role="list">
+            <li class="fp-tag"><div class="fp-tag-in surface-paper-light">
+              <h3 class="fp-h4">Dietary menus</h3>
               <p>{b.menus.filter((m) => !['a-la-carte', 'drinks'].includes(m)).map((m) => MENU_TABS[m] ?? m).join(', ')}.</p>
-              <p class="tag-link"><a href={`/${b.id}/menu/`}>See every menu as a list</a></p>
+              <p class="tag-link"><a class="fp-link fp-link--strong" href={`/${b.id}/menu/`}>See every menu as a list</a></p>
             </div></li>
-            <li class="tag"><div class="tag-in">
-              <h3 class="tag-t">Allergies</h3>
+            <li class="fp-tag"><div class="fp-tag-in surface-paper-light">
+              <h3 class="fp-h4">Allergies</h3>
               <p>Tell us when you book. We work hard to avoid cross-contamination but can’t promise a dish is allergen-free.</p>
-              <p class="tag-link"><a href="/allergens/">Allergens and dietary needs</a></p>
+              <p class="tag-link"><a class="fp-link fp-link--strong" href="/allergens/">Allergens and dietary needs</a></p>
             </div></li>
-            <li class="tag"><div class="tag-in">
-              <h3 class="tag-t">Groups</h3>
+            <li class="fp-tag"><div class="fp-tag-in surface-paper-light">
+              <h3 class="fp-h4">Groups</h3>
               <p>{rules ? `${rules.online} ${rules.call ?? ''} ${rules.setMenu} ${rules.depositShort}` : 'For larger tables, please call the restaurant.'}</p>
-              <p class="tag-link"><a href="/private-dining/">Private dining and big tables</a></p>
+              <p class="tag-link"><a class="fp-link fp-link--strong" href="/private-dining/">Plan a group</a></p>
             </div></li>
           </ul>
         </div>
@@ -363,24 +439,40 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
 
     <!-- 7 · The other rooms -->
-    <section class="sec sand others" aria-labelledby="others-title">
-      <div class="wrap stack-lg">
-        <div class="stack">
-          <p class="kicker">{open ? 'The other rooms' : 'In London'}</p>
-          <h2 id="others-title" class="h2 h2-light"><span class="sr-only">{open ? 'The other rooms: ' : 'In London: '}</span>{open ? 'Onward travel.' : 'Before then, in London.'}</h2>
-        </div>
-        <div class="other-grid">
+    <section class="chapter others" aria-labelledby="others-title">
+      <div class="wrap">
+        <header class="fp-section-head chapter-head">
+          <p class="fp-section-label"><span class="fp-section-no">{no('others')}</span> {open ? 'The other rooms' : 'In London'}</p>
+          <h2 id="others-title" class="fp-h2"><span class="sr-only">{open ? 'The other rooms: ' : 'In London: '}</span>{open ? 'Onward travel.' : 'Before then, in London.'}</h2>
+        </header>
+        <div class="chapter-body other-grid">
           {others.map((o) => (
-            <a class="other" href={`/${o.id}/`} style={`view-transition-name: branch-${o.id}`}>
-              <span class="other-k"><span class="other-no">{String(branches.indexOf(o) + 1).padStart(2, '0')}</span> {o.status === 'open' ? o.address.city : 'Opening soon'}</span>
+            <a class="fp-postcard surface-paper other" href={`/${o.id}/`} style={`view-transition-name: branch-${o.id}`}>
+              <span class="fp-small"><span class="other-no">{String(branches.indexOf(o) + 1).padStart(2, '0')}</span> {o.status === 'open' ? o.address.city : 'Opening soon'}</span>
               <span class="other-name">{o.shortName}</span>
-              <span class="other-addr">{o.address.street}</span>
-              <span class="other-go">{o.status === 'open' ? `Visit ${o.shortName}` : `See ${o.shortName}`} <span aria-hidden="true">→</span></span>
+              <span class="fp-body">{o.address.street}</span>
+              <span class="other-go">{o.status === 'open' ? `Visit ${o.shortName}` : `See ${o.shortName}`}</span>
             </a>
           ))}
         </div>
       </div>
     </section>
+
+    {open && b.booking ? (
+      <NextStep
+        title={`Hungry already? Book at ${b.shortName}.`}
+        line={b.address.street}
+        actions={[{ href: b.booking.url, label: `Book at ${b.shortName}`, primary: true, book: b.id, external: true }, { href: `/${b.id}/menu/`, label: 'See the menus' }]}
+        photo={b.id === 'covent-garden' && photo('gallery-03') ? photo('gallery-03') : momosChutney}
+      />
+    ) : (
+      <NextStep
+        title="Hungry before Dubai opens?"
+        line="Both London rooms are open tonight."
+        actions={[{ href: '/book/', label: 'Book in London', primary: true }, { href: '/soho/menu/', label: 'See the menus' }]}
+        photo={dishPhoto('momo-mix-vegetable')}
+      />
+    )}
   </main>
 
   <SiteFooter branches={branches} />
@@ -403,10 +495,14 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     setInterval(tick, 60_000);
   }
 
-  // Today's line in the hours list, in the branch's own time zone.
-  for (const dl of document.querySelectorAll<HTMLElement>('[data-tz]')) {
-    const day = new Intl.DateTimeFormat('en-GB', { timeZone: dl.dataset.tz, weekday: 'short' }).format(new Date()).slice(0, 3).toLowerCase();
-    dl.querySelector(`[data-days~="${day}"]`)?.classList.add('today');
+  // Today's row in the hours table, in the branch's own time zone: aria-current="date" plus the word.
+  for (const table of document.querySelectorAll<HTMLElement>('[data-hours-tz]')) {
+    const day = new Intl.DateTimeFormat('en-GB', { timeZone: table.dataset.hoursTz, weekday: 'short' }).format(new Date()).slice(0, 3).toLowerCase();
+    const row = table.querySelector(`[data-days~="${day}"]`);
+    if (!row) continue;
+    row.setAttribute('aria-current', 'date');
+    const word = row.querySelector<HTMLElement>('.hours-today');
+    if (word) word.hidden = false;
   }
   // The Dubai list: real states once PUBLIC_DUBAI_LIST_ENDPOINT is set (no form is rendered before that).
   import { bindWaitlists } from '../../lib/waitlist';
@@ -435,8 +531,14 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .board-slot { min-height: 1.2em; align-self: stretch; container-type: inline-size; }
   .arrival-addr { font-family: var(--font-note); font-style: italic; font-size: 19px; line-height: 1.4; }
   .arrival-actions { margin-top: 4px; }
+  .arrival-actions:empty { display: none; }
+  .hero-list { display: grid; gap: var(--space-3); width: 100%; max-width: 34rem; margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-gold); --fp-fg: var(--color-sand); --fp-link: var(--color-gold); }
+  .hero-list-h { margin: 0; font-family: var(--font-display); font-weight: 300; font-size: clamp(26px, 3vw, 36px); line-height: 1.1; text-transform: none; letter-spacing: var(--tracking-display); color: var(--color-sand); }
+  .hero-list-note { margin: 0; font-size: 17px; line-height: 1.5; color: var(--color-sand); }
+  .hero-list .fp-link { color: var(--color-gold); }
   @media (min-width: 900px) {
-    .arrival { display: grid; align-items: end; min-height: min(88svh, 860px); }
+    /* D4: top-aligned, so a slow first paint can't slide the words up as the rest of the hero arrives. */
+    .arrival { display: grid; align-items: start; min-height: min(88svh, 860px); }
     .arrival-media, .arrival-media.is-photo, .arrival-media.is-art { position: absolute; inset: 0; aspect-ratio: auto; }
     .arrival-shade { display: block; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(44 41 37 / 0.94) 0%, rgb(44 41 37 / 0.82) 34%, rgb(44 41 37 / 0.2) 64%, transparent 80%), linear-gradient(0deg, rgb(44 41 37 / 0.7), transparent 40%); }
     .arrival-in { padding-block: 64px; }
@@ -462,7 +564,10 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     .arrival-media, .arrival-media.is-photo, .arrival-media.is-art { position: relative; inset: auto; grid-row: 1; height: min(76svh, 720px); min-height: 520px; }
     .arrival-media.is-photo { grid-column: 1 / 9; }
     .arrival-media.is-art { grid-column: 7 / -1; }
+    /* Stretch, top-aligned: on a slow load the browser can paint before the hero's HTML has all arrived;
+       a centred column would then slide up as the rest (name board, Tonight's board) streams in. */
     .arrival-in { grid-row: 1; max-width: none; margin: 0; padding: 0; z-index: 1; }
+    .arrival-in.has-board { align-self: stretch; }
     .arrival-in > * { max-width: none; }
     .arrival-media.is-photo ~ .arrival-in {
       grid-column: 8 / 14;
@@ -508,26 +613,30 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     .gate-code { font-size: clamp(160px, 17vw, 260px); }
   }
 
+  /* Chapters (Phase 6): the home rhythm. Day chapters sit on sand; Visit is night; the Dubai list is gold. */
+  .chapter:not(.ink, .gold-bg) { background: var(--color-sand); color: var(--color-ink); }
+  /* Two sand chapters in a row share one gap, not two paddings (the old page had 256px holes). */
+  .chapter:not(.ink, .gold-bg):has(.chapter-body) + .chapter:not(.ink, .gold-bg) { padding-top: 0; }
+
   /* The room */
-  .room-lines { margin: 0; display: flex; flex-direction: column; gap: 0.2em; font-size: clamp(30px, 4.6vw, 62px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; }
-  .room-lines span:nth-child(2) { color: var(--lead-text); }
-  .room-lines span:nth-child(3) { font-family: var(--font-note); font-style: italic; text-transform: none; font-size: 0.62em; letter-spacing: 0; color: color-mix(in srgb, var(--color-ink) 75%, transparent); }
+  .room-spoken { color: var(--fp-fg-muted); }
+  .room-wall { display: grid; gap: var(--space-6); }
+  .wall-intro { font-size: var(--step-body); font-weight: 700; }
 
-  .wall-intro { text-align: center; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 17px; }
 
-  /* Contact sheet of the room's photos */
-  .gallery-sec { padding-bottom: clamp(56px, 8vw, 110px); }
+  /* Tonight's board in the arrival: no band, no centring; it lines up with the words above it. */
+  .arrival-in :global(.tonight) { align-self: stretch; background: none; padding: 0; margin-top: var(--space-5); }
+  .arrival-in :global(.tonight-board) { max-width: none; margin: 0; }
 
-  /* Born here */
+  /* Born here: the ticket (the one object) beside the words. */
   .sig { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
+  .sig-text { --stack: var(--space-4); }
   @media (max-width: 760px) { .sig { grid-template-columns: 1fr; } }
   .sig-ticket { position: relative; background: var(--color-paper-light); padding: 26px 26px 34px; min-height: 300px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.6); border-top: 2px dashed rgb(44 41 37 / 0.4); rotate: -1.5deg; }
   .sig-no { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 19px; color: var(--color-tiger-deep); border-bottom: 2px dotted rgb(44 41 37 / 0.4); padding-bottom: 8px; }
   .sig-name { font-size: clamp(26px, 2.6vw, 34px); font-weight: 700; text-transform: uppercase; line-height: 1.05; letter-spacing: 0.03em; }
-  .sig-price { font-weight: 700; font-size: 22px; color: var(--color-tiger); }
+  .sig-price { font-weight: 700; font-size: 22px; color: var(--color-tiger-deep); }
   .sig-stamp { position: absolute; right: -12px; bottom: -14px; width: 104px; }
-  .sig-desc { font-family: var(--font-note); font-style: italic; font-size: 21px; }
-  .tags { font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.22em; color: var(--color-gold-deep); }
   .teaser { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
   .small-ticket { min-height: 220px; }
   .small-ticket:nth-child(2) { rotate: 1deg; }
@@ -542,59 +651,59 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     .teaser-desc { font-size: 16px; margin: 0; }
   }
 
-  /* Visit */
-  .visit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px 72px; }
-  .visit a:not(.btn) { color: var(--color-gold); }
-  .visit-h { margin: 0; font-size: 22px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gold); }
-  .hours-lg { font-size: 17px; gap: 0; display: block; }
-  .hours-lg > div { display: grid; grid-template-columns: 9em 1fr; padding: 8px 10px; border-bottom: 1px solid rgb(203 160 82 / 0.35); }
-  .hours-lg > div.today { background: rgb(203 160 82 / 0.16); }
-  .hours-lg > div.today dt::after { content: ' (today)'; color: var(--color-gold); font-weight: 400; }
+  /* Visit (night): where and how on the left, the hours table on the right. */
+  .visit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-7) var(--space-8); align-items: start; }
+  .visit-links { --cluster: 0 var(--space-5); }
+  .visit-hours { --stack: var(--space-4); }
+  .hours-today { font-weight: 400; }
 
-  /* Good to know */
-  /* Luggage tags: clipped corners and a punched hole. The ink layer underneath draws the outline,
-     because a border would be cut off at the corners. */
-  .lug { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
-  .tag { --cut: 22px; display: flex; padding: 1.5px; background: var(--color-ink); clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%, 0 var(--cut)); }
-  .tag-in { position: relative; flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 54px 24px 24px; background: var(--color-paper-light); color: var(--color-ink); clip-path: polygon(calc(var(--cut) - 0.6px) 0, calc(100% - var(--cut) + 0.6px) 0, 100% calc(var(--cut) - 0.6px), 100% 100%, 0 100%, 0 calc(var(--cut) - 0.6px)); }
-  .tag-in::before { content: ''; position: absolute; left: 50%; top: 18px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; border: 1.5px solid var(--color-ink); background: var(--color-sand); }
-  .lug .tag-t { margin: 0; font-family: inherit; letter-spacing: normal; text-transform: none; color: inherit; font-size: 22px; font-weight: 700; line-height: 1.15; }
-  .lug p { margin: 0; line-height: 1.55; }
-  .lug .tag-link { margin-top: auto; padding-top: 10px; }
-  .tag-link a { color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 3px; }
-  .tag-link a:hover { color: var(--color-ink); }
-  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) { .tag:nth-child(odd) { rotate: -0.6deg; } .tag:nth-child(even) { rotate: 0.5deg; translate: 0 10px; } }
-  .h2-light { font-weight: 300; text-transform: none; letter-spacing: -0.02em; font-size: clamp(38px, 5.6vw, 80px); }
-  .other-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; width: 100%; }
-  /* Postcards: paper with an airmail edge. */
-  .other { display: grid; gap: 8px; padding: 26px; background: var(--color-paper); color: var(--color-ink); text-decoration: none; border: 8px solid; border-image: repeating-linear-gradient(135deg, var(--color-tiger-deep) 0 12px, var(--color-paper) 12px 24px, var(--color-slate-deep) 24px 36px, var(--color-paper) 36px 48px) 8; transition: transform .2s cubic-bezier(.2, 1.4, .4, 1); }
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) { .other:hover { transform: translateY(-4px) rotate(-0.6deg); } }
-  .other-k { font-size: 14px; }
-  .other-no { font-weight: 700; color: var(--color-tiger-deep); font-variant-numeric: tabular-nums; }
+  /* Good to know: three luggage tags (the system's .fp-tag), links pinned to the foot. */
+  .lug { margin: 0; padding: 0; list-style: none; }
+  .lug p { margin: 0; line-height: var(--lh-body); }
+  .lug .tag-link { margin-top: auto; padding-top: var(--space-2); }
+
+  /* The other rooms: postcards (the system's .fp-postcard). */
+  .other-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: var(--grid-gutter); }
+  .other-no { font-weight: 700; color: var(--fp-label); font-variant-numeric: tabular-nums; }
   .other-name { font-size: clamp(30px, 3.2vw, 46px); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
-  .other-addr { font-size: 17px; }
-  .other-go { margin-top: 10px; font-weight: 700; color: var(--color-tiger-deep); text-decoration: underline; text-underline-offset: 4px; }
-  .wl-form { display: grid; gap: 8px; width: min(100%, 520px); margin-inline: auto; text-align: left; }
-  .wl-label { font-weight: 700; }
-  .wl-row { display: flex; gap: 8px; }
-  .wl-row input { flex: 1; min-width: 0; min-height: 48px; padding: 0 14px; font: inherit; font-size: 17px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); }
-  .wl-row input[aria-invalid='true'] { box-shadow: -6px 0 0 var(--color-tiger-deep); border-color: var(--color-tiger-deep); }
-  .wl-soon { max-width: 30em; margin-inline: auto; font-size: 19px; }
-  .wl-soon a { color: inherit; font-weight: 700; }
-  .sig-find { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-tiger-deep); font-weight: 700; text-underline-offset: 4px; }
-  /* Menus as a numbered ledger (Phase 4 D3): one row per menu, straight into the list page. */
-  .menus-intro { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 19px; }
-  .menus-ledger { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--color-ink); max-width: 860px; }
-  .menus-row { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto 1.4em; align-items: baseline; column-gap: 12px; min-height: 56px; padding: 14px 4px; border-bottom: 1px solid var(--color-ink); color: var(--color-ink); text-decoration: none; }
-  .menus-row:hover { background: var(--color-paper-light); }
-  .menus-row:hover .menus-name { text-decoration: underline; text-underline-offset: 4px; }
-  .menus-no { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--color-tiger-deep); }
-  .menus-name { font-size: clamp(19px, 1.6vw, 22px); font-weight: 700; }
-  .menus-note { font-size: 15px; color: #5b544b; text-align: right; }
-  .menus-go { font-weight: 700; text-align: right; }
-  @media (max-width: 520px) { .menus-row { grid-template-columns: 2.2em minmax(0, 1fr) 1em; } .menus-note { grid-column: 2; grid-row: 2; text-align: left; } .menus-go { grid-column: 3; grid-row: 1; } }
-  .menu-list-link { margin: 0; padding: 18px 16px 0; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 18px; }
-  .menu-list-link a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
-  .branch-clock { display: inline-flex; align-items: center; gap: 8px; margin: 0; min-height: 1.4em; font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; color: var(--color-sand); }
+  .other-go { margin-top: var(--space-2); font-weight: 700; color: var(--fp-link); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+
+  /* The Dubai list (gold): the system's field, the action in ink (tiger can't sit on gold). */
+  .wl-body { display: grid; gap: var(--space-4); max-width: 40rem; }
+  .wl-row { display: flex; gap: var(--space-2); }
+  .wl-row > .fp-input { flex: 1; min-width: 0; }
+  @media (max-width: 420px) { .wl-row { flex-direction: column; } }
+
+  /* Menus ledger: the chevron rides with the note. */
+  /* Menus: two short columns of links (Phase 7 §4.2), not a 10-row ledger. */
+  .menu-groups { display: grid; gap: var(--space-6) var(--space-8); max-width: 58rem; }
+  @media (min-width: 640px) { .menu-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .menu-group-h { margin: 0 0 var(--space-2); font-size: var(--step-small); font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--fp-fg-muted); }
+  .menu-group-list { margin: 0; padding: 0; list-style: none; border-top: var(--border-rule) solid var(--fp-rule-strong); }
+  .menu-group-link { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; min-height: 48px; padding-block: 10px; border-bottom: 1px solid var(--fp-rule); font-size: var(--step-h4); font-weight: 700; color: var(--fp-fg); text-decoration: none; }
+  .menu-group-link:hover > span:first-child { text-decoration: underline; text-underline-offset: 5px; }
+  .menu-group-note { font-size: var(--step-small); font-weight: 400; color: var(--fp-fg-muted); }
+
+  /* What to order: captioned photographs, then the rating as a ledger fact. */
+  .order-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: var(--space-6); margin: 0; padding: 0; list-style: none; }
+  /* Phones: a sideways row of cards (each a link, so the row is reachable by keyboard) instead of three tall squares. */
+  @media (max-width: 639px) {
+    .order-grid { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 74%; gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(-1 * clamp(16px, 4vw, 40px)); padding: 0 clamp(16px, 4vw, 40px) var(--space-3); scrollbar-width: thin; }
+    .order-dish { scroll-snap-align: start; scroll-margin-inline: clamp(16px, 4vw, 40px); }
+  }
+  .order-link { display: grid; gap: var(--space-2); color: var(--fp-fg); text-decoration: none; }
+  .order-photo { display: block; aspect-ratio: 1; overflow: hidden; border: 2px solid var(--color-ink); background: var(--color-ink); }
+  .order-photo :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease-out, ease); }
+  .order-link:hover .order-photo :global(img) { transform: scale(1.03); }
+  .order-name { display: flex; justify-content: space-between; gap: 12px; padding-top: var(--space-2); font-size: var(--step-h4); font-weight: 700; }
+  .order-link:hover .order-name { text-decoration: underline; text-underline-offset: 5px; }
+  .order-price { font-weight: 700; white-space: nowrap; }
+  .order-desc { font-family: var(--font-note); font-style: italic; font-size: var(--step-small); line-height: var(--lh-small); color: var(--fp-fg-muted); }
+  .proof { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-4); margin: var(--space-7) 0 0; padding-block: var(--space-4); border-block: var(--border-rule) solid var(--fp-rule-strong); }
+  .proof-n { font-family: var(--font-display); font-weight: 300; font-size: clamp(44px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.02em; }
+  .proof-of { font-size: 0.45em; letter-spacing: 0; }
+  .proof-src { font-size: var(--step-small); line-height: var(--lh-small); max-width: 34em; }
+  @media (prefers-reduced-motion: reduce) { .order-photo :global(img) { transition: none; } }
+  .branch-clock { display: inline-flex; align-items: center; gap: 8px; margin: 0; min-height: 1.4em; font-size: var(--step-small); color: var(--color-sand); }
   .branch-clock :global(svg) { color: var(--color-gold); flex: none; }
 </style>

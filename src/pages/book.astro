@@ -3,67 +3,181 @@
  * The booking desk (ux-structure.md D1): where old "Reserve a table" links land, where every Book
  * button goes without JavaScript, and the link for Google and Instagram profiles.
  * With ?branch=<id> and JavaScript, the Book drawer opens for that room over this page.
+ * Phase 6: a numbered ledger of equal choices (no tiger here; the drawer holds the one action),
+ * each room with its live status, the provider named before the hand-off, and Call.
  */
 import InfoPage from '../layouts/InfoPage.astro';
+import { dishPhoto } from '../lib/dish-photos';
 import { BOOKING_NAMES, fullAddress, getBranches, groupRules, prettyPhone } from '../lib/site-data';
 const branches = await getBranches();
 const open = branches.filter((b) => b.status === 'open' && b.booking);
 const soon = branches.filter((b) => b.status === 'opening-soon');
 const rules = groupRules(open[0]);
+let n = 0;
+const no = () => String(++n).padStart(2, '0');
 ---
-<InfoPage title="Book a table" description="Book a table at Fatt Pundit Soho or Covent Garden, or join the list for Dubai." kicker="Your table" heading="Book a table">
-  <p>Pick a restaurant: its booking page opens with your choices filled in.</p>
-  <ul class="desk" role="list">
+<InfoPage title="Book a table" description="Book a table at Fatt Pundit Soho or Covent Garden, or join the list for Dubai." kicker="Your table" heading="Book a table" layout="full"
+  intro="Choose a day, a time and how many of you. Each restaurant's booking page opens with them filled in."
+  next={{ label: 'Not sure yet?', title: 'Read the menus first.', line: 'Every menu as a list, with diet filters.', actions: open.map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` })), photo: dishPhoto('crackling-spinach') }}>
+  <!-- Phase 7 §4.5: choose once, every room's link is filled in. Shown before first paint (no shift);
+       without JavaScript it stays hidden and each Book button opens the provider's own page. -->
+  <form class="desk-when" data-desk-when hidden aria-label="When and how many">
+    <label class="fp-field"><span class="fp-label">Day</span><select class="fp-input" data-desk-day></select></label>
+    <label class="fp-field"><span class="fp-label">Time</span><select class="fp-input" data-desk-time></select></label>
+    <label class="fp-field"><span class="fp-label">Guests</span><input class="fp-input" type="number" min="1" max="20" value="2" inputmode="numeric" data-desk-size /></label>
+  </form>
+  <script is:inline>document.currentScript.previousElementSibling.hidden = false;</script>
+  <ol class="fp-ledger desk" role="list">
     {open.map((b) => (
-      <li class="desk-row" id={`book-${b.id}`}>
-        <div>
+      <li class="desk-row" id={`book-${b.id}`} data-desk-room={JSON.stringify({ id: b.id, name: b.shortName, tz: b.timezone, hours: b.hours, provider: b.booking!.provider, url: b.booking!.url, widgetId: b.booking!.widgetId, max: b.groups?.onlineMax ?? 8 })}>
+        <span class="fp-ledger-no desk-no" aria-hidden="true">{no()}</span>
+        <div class="desk-main">
           <h2 class="desk-name">{b.shortName}</h2>
+          <p class="desk-status" data-desk-hours={JSON.stringify(b.hours)} data-tz={b.timezone}></p>
           <p class="desk-addr">{fullAddress(b)}</p>
-          <p class="desk-note">Books online with {BOOKING_NAMES[b.booking!.provider]} for up to {b.groups?.onlineMax ?? 8} guests.</p>
+          <p class="desk-note" data-desk-fit>Books online with {BOOKING_NAMES[b.booking!.provider]} for up to {b.groups?.onlineMax ?? 8} guests.</p>
         </div>
         <div class="desk-acts">
-          <a class="fp-btn" href={b.booking!.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a>
+          <a class="fp-btn" href={b.booking!.url} data-book={b.id} data-desk-go target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a>
           {b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
         </div>
       </li>
     ))}
     {soon.map((b) => (
       <li class="desk-row">
-        <div>
+        <span class="fp-ledger-no desk-no" aria-hidden="true">{no()}</span>
+        <div class="desk-main">
           <h2 class="desk-name">{b.shortName}</h2>
-          <p class="desk-addr">Opening soon at {b.address.street}</p>
+          <p class="desk-status"><span class="fp-badge fp-badge--soon">Opening soon</span></p>
+          <p class="desk-addr">{b.address.street}</p>
         </div>
-        <div class="desk-acts"><a class="fp-link fp-link--strong" href={`/${b.id}/#waitlist`}>Join the list<span class="sr-only"> for {b.shortName}</span></a></div>
+        <div class="desk-acts"><a class="fp-btn" href={`/${b.id}/#waitlist`}>Join the list<span class="sr-only"> for {b.shortName}</span></a></div>
       </li>
     ))}
     {rules && (
       <li class="desk-row">
-        <div>
+        <span class="fp-ledger-no desk-no" aria-hidden="true">{no()}</span>
+        <div class="desk-main">
           <h2 class="desk-name">A bigger table</h2>
           <p class="desk-addr">{rules.setMenu} {rules.depositShort}</p>
         </div>
-        <div class="desk-acts"><a class="fp-link fp-link--strong" href="/private-dining/">Plan a group</a></div>
+        <div class="desk-acts"><a class="fp-btn" href="/private-dining/">Plan a group</a></div>
       </li>
     )}
-  </ul>
+  </ol>
+  <p class="fp-small desk-foot">Booking terms, deposits and lateness: <a class="fp-link" href="/booking-terms/">booking terms</a>.</p>
 </InfoPage>
 
 <style>
-  .desk { list-style: none; margin: 28px 0 0; padding: 0; border-top: 2px solid var(--color-ink); }
-  .desk-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 28px; padding: 20px 0; border-bottom: 1px solid var(--color-ink); }
-  .desk-row > div:first-child { flex: 1 1 18em; }
-  .desk-name { margin: 0 !important; font-size: 22px !important; }
-  .desk-addr, .desk-note { margin: 4px 0 0 !important; font-size: 16px; }
-  .desk-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+  .desk { margin: 0; padding: 0; }
+  .desk-when { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); max-width: 44rem; margin: 0 0 var(--space-4); padding: var(--space-4); background: var(--color-paper-light); border: 2px solid var(--color-ink); }
+  .desk-when .fp-field { display: grid; gap: var(--space-1); min-width: 0; }
+  .desk-when .fp-field:first-child { grid-column: 1 / -1; }
+  @media (min-width: 640px) { .desk-when { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); } .desk-when .fp-field:first-child { grid-column: auto; } }
+  .desk-when select, .desk-when input { width: 100%; }
+  /* The line under each room says what its button will do for the chosen time and party. */
+  .desk-note.is-off { color: var(--color-tiger-deep); }
+  .desk-row { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); gap: var(--space-3) var(--space-3); padding-block: var(--space-6); }
+  .desk-no { padding-top: 0.55em; }
+  .desk-main { display: grid; gap: var(--space-1); }
+  .desk-name { margin: 0; font-size: var(--step-h3); font-weight: 300; text-transform: none; line-height: 1.1; letter-spacing: var(--tracking-display); }
+  /* Filled by the script: the line's height is reserved so nothing moves when it arrives (lesson 50). */
+  .desk-status { margin: var(--space-1) 0 0; min-height: 1.3em; }
+  .desk-addr, .desk-note { margin: 0; font-size: var(--step-body); line-height: var(--lh-body); }
+  .desk-note { color: var(--fp-fg-muted); font-size: var(--step-small); }
+  .desk-acts { grid-column: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); }
+  /* Tablet up: actions on the right of each row, aligned to the name. */
+  @media (min-width: 720px) {
+    .desk-row { grid-template-columns: 2.75rem minmax(0, 1fr) auto; align-items: start; }
+    .desk-acts { grid-column: 3; justify-content: flex-end; padding-top: 0.2em; }
+  }
+  .desk-foot { margin: var(--space-5) 0 0; }
 </style>
 
 <script>
+  import { openStatus, statusLine, type Hours } from '../lib/hours';
+  import { addDays, hhmm, local, prettyMin, providerLink, slots, PROVIDER, type Span } from '../lib/booking';
+  // Each room's status on the guest's clock, in the room's own time zone (dot or ring, plus words).
+  for (const el of document.querySelectorAll<HTMLElement>('[data-desk-hours]')) {
+    const hours = JSON.parse(el.dataset.deskHours!) as Hours | null;
+    if (!hours) continue;
+    const paint = () => {
+      const s = openStatus(hours, el.dataset.tz!);
+      el.innerHTML = '';
+      const badge = document.createElement('span');
+      badge.className = `fp-badge ${s.open ? 'fp-badge--open' : 'fp-badge--closed'}`;
+      badge.textContent = statusLine('', s);
+      el.append(badge);
+    };
+    paint();
+    setInterval(paint, 60_000);
+  }
+
   // ?branch=soho opens the drawer for that room at once; closing it leaves the guest on the desk.
   const id = new URLSearchParams(location.search).get('branch');
   const trigger = id ? document.querySelector<HTMLElement>(`.desk [data-book="${CSS.escape(id)}"]`) : null;
   // After load, so the drawer's own script is listening (otherwise the click would open the provider).
+  let viaParam = false;
   if (trigger) addEventListener('load', () => {
     document.getElementById(`book-${id}`)?.scrollIntoView({ block: 'center' });
-    trigger.click();
+    viaParam = true; trigger.click(); viaParam = false;
   });
+
+  // The desk picker: one day, time and party size for every room.
+  type Room = { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId: string | null; max: number };
+  const when = document.querySelector<HTMLFormElement>('[data-desk-when]');
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-desk-room]')].map((el) => ({ el, r: JSON.parse(el.dataset.deskRoom!) as Room }));
+  if (when && rows.length) {
+    const daySel = when.querySelector<HTMLSelectElement>('[data-desk-day]')!;
+    const timeSel = when.querySelector<HTMLSelectElement>('[data-desk-time]')!;
+    const sizeIn = when.querySelector<HTMLInputElement>('[data-desk-size]')!;
+    const today = local(rows[0].r.tz).ymd;
+    const longDay = (ymd: string) => new Date(`${ymd}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+    for (let i = 0; i < 21; i++) {
+      const ymd = addDays(today, i);
+      const short = new Date(`${ymd}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+      daySel.add(new Option(i === 0 ? `Today, ${short}` : i === 1 ? `Tomorrow, ${short}` : short, ymd));
+    }
+    const size = () => Math.min(20, Math.max(1, Math.round(Number(sizeIn.value)) || 2));
+    const fillTimes = () => {
+      const keep = timeSel.value;
+      const all = [...new Set(rows.flatMap(({ r }) => slots(r.hours, r.tz, daySel.value)))].sort((a, b) => a - b);
+      timeSel.replaceChildren(...all.map((m) => new Option(prettyMin(m), hhmm(m))));
+      if (!all.length) timeSel.add(new Option('No tables that day', ''));
+      const pick = all.find((m) => m >= 19 * 60) ?? all[0];
+      timeSel.value = all.some((m) => hhmm(m) === keep) ? keep : pick !== undefined ? hhmm(pick) : '';
+    };
+    const paint = () => {
+      const day = daySel.value, time = timeSel.value, n = size();
+      const when$ = `${day === today ? 'today' : 'that day'}`;
+      for (const { el, r } of rows) {
+        const fit = el.querySelector<HTMLElement>('[data-desk-fit]')!;
+        const go = el.querySelector<HTMLAnchorElement>('[data-desk-go]')!;
+        const ok = Boolean(time) && slots(r.hours, r.tz, day).some((m) => hhmm(m) === time);
+        if (n > r.max) {
+          fit.textContent = `${r.name} books online for up to ${r.max}. For ${n}, call or plan a group.`;
+          go.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`;
+          go.removeAttribute('target');
+        } else if (!ok) {
+          fit.textContent = time ? `No tables at ${r.name} at ${timeSel.selectedOptions[0]?.text} ${when$}. Try another time.` : `${r.name} is closed ${when$}.`;
+          go.href = r.url; go.target = '_blank';
+        } else {
+          fit.textContent = `${PROVIDER[r.provider] ?? 'The booking page'} opens with ${n} guest${n === 1 ? '' : 's'}, ${longDay(day)}, ${timeSel.selectedOptions[0]?.text}.`;
+          go.href = providerLink(r, day, time, n); go.target = '_blank';
+        }
+        fit.classList.toggle('is-off', n > r.max || !ok);
+      }
+    };
+    daySel.addEventListener('change', () => { fillTimes(); paint(); });
+    timeSel.addEventListener('change', paint);
+    sizeIn.addEventListener('input', paint);
+    sizeIn.addEventListener('change', () => { sizeIn.value = String(size()); paint(); });
+    // A room's Book button goes straight to its filled-in page (the drawer is for the ?branch= hand-off).
+    for (const { el, r } of rows) el.querySelector<HTMLAnchorElement>('[data-desk-go]')!.addEventListener('click', (e) => {
+      if (viaParam) return;
+      e.stopPropagation();
+      window.dispatchEvent(new CustomEvent('fp:booking-click', { detail: { branch: r.id, size: size() } }));
+    });
+    fillTimes(); paint();
+  }
 </script>

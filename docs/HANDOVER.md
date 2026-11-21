@@ -18,7 +18,7 @@ After a JSON change: `npm run build`. `scripts/validate-data.mjs` runs first and
 
 | Setting | What it does |
 | --- | --- |
-| `PUBLIC_LAUNCH=true` | **Launch day.** Removes the preview banner, lets search engines in (robots.txt, no `noindex`). |
+| `PUBLIC_LAUNCH=true` | **Launch day.** Removes the preview banner, lets search engines in (robots.txt, no `noindex`), and drops the sample lines on Tonight's board (the board hides until `SPECIALS_CSV_URL` is set; the build log warns). |
 | `SPECIALS_CSV_URL` / `PUBLIC_SPECIALS_CSV_URL` | The Sheet's "Publish to web → CSV" link. Build reads the first; the page re-reads the second so changes show without a rebuild. |
 | `PUBLIC_PLAUSIBLE_DOMAIN` | Turns on cookie-free analytics (visits, Book clicks, passport stamps, real-phone speed). |
 | `PUBLIC_NEWSLETTER_ACTION` | The email tool's form address (Mailchimp, Klaviyo…). Shows the footer sign-up. |

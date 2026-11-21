@@ -143,7 +143,8 @@
       },
       "teaser": [],
       "hero": null,
-      "gallery": []
+      "gallery": [],
+      "rating": { "score": 4.8, "count": "16,000+", "source": "Google", "asOf": "November 2026" }
     }
   },
   {
@@ -280,7 +281,8 @@
         "gallery-06",
         "gallery-07",
         "gallery-08"
-      ]
+      ],
+      "rating": { "score": 4.8, "count": "20,030", "source": "Google", "asOf": "November 2026" }
     }
   },
   {
