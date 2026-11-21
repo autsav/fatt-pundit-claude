@@ -147,7 +147,13 @@ body { font-size: 17px; line-height: 1.55; }
   .dock.dock-two { grid-template-columns: 1fr 1.5fr; }
   .dock > a[aria-current='page'] { text-decoration: underline; text-underline-offset: 5px; }
   body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  .dock[data-after-hero] { transition: transform .25s var(--ease-out, ease), visibility .25s; }
 }
+/* Phase 8: on a room's page the hero has the one Book; the header Book and the dock wait for it to scroll away. */
+.nav-book[data-after-hero] { transition: opacity .2s, visibility .2s; }
+html[data-hero='in'] .nav-book[data-after-hero] { opacity: 0; visibility: hidden; }
+html[data-hero='in'] .dock[data-after-hero] { transform: translateY(100%); visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .nav-book[data-after-hero], .dock[data-after-hero] { transition: none; } }
 @media print { .dock, .idx { display: none !important; } body { padding-bottom: 0; } }
 /* Book and Index sit together at the right end of the bar. */
 .bar-in > .nav { margin-left: auto; }

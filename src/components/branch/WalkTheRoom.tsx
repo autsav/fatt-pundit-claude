@@ -1,14 +1,12 @@
 /**
  * Soho's signature moment: walk the long, narrow room from the door to the pass.
- * Scrolling down pans sideways along the room, one stop at a time.
+ * Phase 8: one stop at a time, moved with Previous / Next (or a swipe); the next stop waits behind a
+ * fade, never cut mid-word. It no longer pins and pans with the page scroll (that cost two screens).
  * Until the Soho photo shoot, each stop shows a floor plan of the room (drawn from the
  * DesignMyNight review of it) with that part lit and the walk so far dotted in.
  * A stop's photo replaces the plan as soon as it is set.
- * Calm mode: a plain sideways-scrolling strip.
  */
-import { useMotionValueEvent, useScroll } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { isCalm } from '@/lib/motion-tokens';
 
 export type Zone = 'door' | 'bar' | 'tables' | 'graffiti' | 'kitchen';
 
@@ -22,28 +20,36 @@ export interface RoomStop {
 }
 
 export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; accent: string }) {
-  const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const [calm, setCalm] = useState(false);
   const [active, setActive] = useState(0);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
 
-  useEffect(() => setCalm(isCalm()), []);
+  // Scroll position at which stop i sits at the track's start (the track is the stops' offset parent).
+  const posOf = (track: HTMLElement, i: number) => (track.children[i] as HTMLElement).offsetLeft - parseFloat(getComputedStyle(track).paddingLeft);
 
-  useMotionValueEvent(scrollYProgress, 'change', (p) => {
+  // Which stop is in view: the one nearest the track's start; at the very end, the last one.
+  const onScroll = () => {
     const track = trackRef.current;
-    if (calm || !track) return;
-    // Travel until the last stop's right edge meets the column edge (the track's end padding).
-    const last = track.lastElementChild as HTMLElement;
-    const max = Math.max(0, last.offsetLeft + last.offsetWidth + parseFloat(getComputedStyle(track).paddingRight) - track.clientWidth);
-    track.style.transform = `translate3d(${-p * max}px, 0, 0)`;
-    setActive(Math.min(stops.length - 1, Math.round(p * (stops.length - 1))));
-  });
+    if (!track) return;
+    const x = track.scrollLeft;
+    let best = 0;
+    for (let i = 1; i < stops.length; i++) if (Math.abs(posOf(track, i) - x) < Math.abs(posOf(track, best) - x)) best = i;
+    if (x + track.clientWidth >= track.scrollWidth - 4) best = stops.length - 1;
+    setActive(best);
+  };
+  useEffect(onScroll, []);
+
+  const go = (i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    track.scrollTo({ left: posOf(track, Math.max(0, Math.min(stops.length - 1, i))), behavior: smooth ? 'smooth' : 'auto' });
+  };
 
   const frames = stops.map((s, i) => (
     <figure
       key={s.title}
-      className={`relative m-0 flex h-[58svh] w-[78vw] max-w-[760px] shrink-0 flex-col justify-end overflow-hidden border-2 p-6 transition-[opacity,transform] duration-500 sm:w-[60vw] ${calm || i === active ? 'opacity-100' : 'opacity-60'}`}
+      aria-label={`Stop ${i + 1} of ${stops.length}: ${s.title}`}
+      className="relative m-0 flex h-[min(62svh,540px)] min-h-[440px] w-[84%] max-w-[720px] shrink-0 snap-start flex-col justify-end overflow-hidden border-2 p-6 sm:w-[70%]"
       style={{ borderColor: accent, background: `linear-gradient(160deg, ${accent}2e, transparent 55%), repeating-linear-gradient(90deg, rgb(218 199 181 / 0.06) 0 2px, transparent 2px 46px), #24211e` }}
     >
       {s.image ? (
@@ -60,28 +66,34 @@ export default function WalkTheRoom({ stops, accent }: { stops: RoomStop[]; acce
       </figcaption>
     </figure>
   ));
-  const caption = <p className="walk-cap m-0 pb-5">{stops.length} stops, from the door to the pass</p>;
 
+  const atEnd = active === stops.length - 1;
   // Sits inside the room chapter (its head names it); the track lines up with the headline (global.css .walk-*).
-  if (calm) {
-    return (
-      <div className="pb-2" style={{ paddingTop: 'var(--section-gap)' }}>
-        {caption}
-        <div tabIndex={0} role="group" aria-label="Stops in the room. Scroll sideways." className="walk-track flex gap-6 overflow-x-auto pb-4">{frames}</div>
-      </div>
-    );
-  }
-
   return (
-    <section ref={sectionRef} aria-label="Walk the room" className="relative h-[220svh] max-sm:h-[180svh]">
-      <div className="sticky top-[68px] flex h-[calc(100svh-68px)] flex-col justify-center overflow-hidden">
-        {caption}
-        <div ref={trackRef} className="walk-track flex gap-6 will-change-transform">
-          {frames}
+    <section aria-label="Walk the room, from the door to the pass" className="walk" style={{ paddingTop: 'var(--section-gap)' }}>
+      <div className="walk-cap walk-head">
+        <p className="m-0">From the door to the pass, in {stops.length} stops</p>
+        <div className="walk-nav">
+          {/* aria-disabled, not disabled: a keyboard user's focus stays on the button at either end. */}
+          <button type="button" className="walk-btn" onClick={() => active > 0 && go(active - 1)} aria-disabled={active === 0} aria-controls="walk-track">
+            Previous<span className="sr-only"> stop</span>
+          </button>
+          <span className="walk-count" aria-live="polite">{active + 1} of {stops.length}</span>
+          <button type="button" className="walk-btn" onClick={() => !atEnd && go(active + 1)} aria-disabled={atEnd} aria-controls="walk-track">
+            Next<span className="sr-only"> stop</span>
+          </button>
         </div>
-        <div className="walk-bar mt-6 h-[3px] bg-sand/15" aria-hidden="true">
-          <div className="h-full origin-left" style={{ background: accent, transform: `scaleX(${(active + 1) / stops.length})`, transition: 'transform .4s ease' }} />
-        </div>
+      </div>
+      <div
+        id="walk-track"
+        ref={trackRef}
+        onScroll={onScroll}
+        tabIndex={0}
+        role="group"
+        aria-label="Stops in the room"
+        className={`walk-track relative flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 ${atEnd ? '' : 'walk-fade'}`}
+      >
+        {frames}
       </div>
     </section>
   );
@@ -98,8 +110,8 @@ const SPAN = 440;
  */
 function RoomPlan({ zone, accent }: { zone: Zone; accent: string }) {
   const x = Math.min(1000 - SPAN, Math.max(0, CENTRE[zone] - SPAN / 2));
-  const on = (z: Zone) => (z === zone ? { stroke: accent, fill: `${accent}26` } : { stroke: 'rgb(218 199 181 / 0.42)', fill: 'none' });
-  const label = (z: Zone) => ({ fill: z === zone ? accent : 'rgb(218 199 181 / 0.55)' });
+  const on = (z: Zone) => (z === zone ? { stroke: accent, fill: `${accent}26` } : { stroke: 'rgb(218 199 181 / 0.6)', fill: 'none' });
+  const label = (z: Zone) => ({ fill: z === zone ? accent : 'rgb(218 199 181 / 0.8)' });
   const walkTo = CENTRE[zone];
   return (
     <svg
@@ -109,7 +121,7 @@ function RoomPlan({ zone, accent }: { zone: Zone; accent: string }) {
       aria-hidden="true"
       fontFamily="var(--font-label)"
       fontWeight="700"
-      fontSize="13"
+      fontSize="20"
       letterSpacing="2.4"
     >
       <g fill="none" strokeWidth="2" strokeLinejoin="round">
@@ -173,7 +185,7 @@ function RoomPlan({ zone, accent }: { zone: Zone; accent: string }) {
       <circle cx={walkTo} cy="160" r="9" fill={accent} />
       <circle cx={walkTo} cy="160" r="17" fill="none" stroke={accent} strokeWidth="2" opacity="0.5" />
       <g textAnchor="middle">
-        <text x="66" y="318" {...label('door')} fontSize="11">BERWICK ST</text>
+        <text x="66" y="318" {...label('door')} fontSize="17">BERWICK ST</text>
         <text x="270" y="70" {...label('bar')}>BAR</text>
         <text x="420" y="306" {...label('tables')}>TABLES</text>
         <text x="620" y="150" {...label('graffiti')}>GRAFFITI WALL</text>

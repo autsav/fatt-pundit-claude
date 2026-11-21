@@ -313,3 +313,13 @@ Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors,
 - [x] Checks: astro check 0/0; gates; QA 419/419 (7 widths + calm, axe, interactions); menu rows; rhythm 21/22 (Dubai tickets' shadow); Lighthouse 97–99 on 8 routes, home 84–86
 - [ ] Home scroll dropped frames 2.5–3.3% (> 2%, was 2.8% before this pass): voyage overlay as a transform layer
 - [ ] Waiting on client: home changes (#52), photos (#35, #36, #46), quotes (#29), logo (#32), spaces/set price (#2, #47), allergen matrix (#48), story (#49), FAQ pages (#51), dish picks (#53), wording (#54)
+
+## Phase 8: calmer branch page (docs/redesign/phase8/plan.md, report.md), built 21 Nov
+- [x] 8.1 Structure: 9 sections → 5, no section numbers, menus/dietary/allergies merged into "What to eat", groups + other rooms + rating into "Visit and book"
+- [x] 8.2 Arrival: board name as the one bold thing, no badge/kicker/clock (London), one "Book a table", sample board hidden, phone facts above the fold
+- [x] 8.3 Facts strip: one-line address, status once
+- [x] 8.4 What to eat: ticket carries name/spices/price, aligned cards, plain diet words
+- [x] 8.5 The room: one stop at a time with buttons, 13px plan labels
+- [x] 8.6 Visit: one link style, tiger for Book only, Regular headings on ink
+- [x] 8.7 Verify: astro check 0/0; gates; QA 439/439; interactions 19/19; menu rows; rhythm 5/6 (Soho 1440 162px under a rule); Lighthouse 94–99; Soho 7,269 → 5,305px desktop, 8,824 → 5,949px phone
+- [ ] Client: sign-off on the restructure and wording (#55); Soho room photo for the hero (#35, #46)

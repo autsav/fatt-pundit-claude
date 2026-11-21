@@ -24,13 +24,17 @@ const menuRooms = [...open].sort((a, b) => Number(b.id === current?.id) - Number
 
 type Act = { href: string; label: string; short: string; external: boolean; book?: string; list?: boolean };
 const book: Act = current?.booking
-  ? { href: current.booking.url, label: `Book at ${current.shortName}`, short: 'Book a table', external: true, book: current.id }
+  ? { href: current.booking.url, label: onBranchHome ? 'Book a table' : `Book at ${current.shortName}`, short: 'Book a table', external: true, book: current.id }
   : current
     ? { href: onBranchHome ? '#waitlist' : `/${current.id}/#waitlist`, label: 'Join the list', short: 'Join the list', external: false, list: true }
     : { href: '/book/', label: 'Book a table', short: 'Book a table', external: false, book: '' };
 const bookAttrs = { 'data-book': book.book, 'data-focus-list': book.list ? '' : undefined, ...(book.external ? { target: '_blank', rel: 'noopener' } : {}) };
 const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
+// Phase 8: on a room's own page the hero holds the one Book; the header's Book and the phone dock
+// appear once the hero has scrolled away (data-hero, set below; without JavaScript they always show).
+const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-hero': '' } : {};
 ---
+{onBranchHome && current?.status === 'open' && <script is:inline>document.documentElement.dataset.hero = 'in';</script>}
 {import.meta.env.PUBLIC_LAUNCH !== 'true' && <p class="preview-flag"><span class="pf-long">Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed</span><span class="pf-short">Website preview, not the live site</span></p>}
 <header class="bar">
   <div class="wrap bar-in">
@@ -48,7 +52,7 @@ const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
         </ul>
       </details>
       <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
-      <a class="fp-btn fp-btn--primary fp-btn--sm nav-book" href={book.href} {...bookAttrs}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span></a>
+      <a class="fp-btn fp-btn--primary fp-btn--sm nav-book" href={book.href} {...bookAttrs} {...afterHero}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span></a>
     </nav>
     <a class="idx" href="#site-index" data-index-open aria-haspopup="dialog">Index</a>
   </div>
@@ -114,7 +118,7 @@ const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
   </ol>
 </dialog>
 
-<nav class={`dock${current && current.status !== 'open' ? ' dock-two' : ''}`} data-dock aria-label="Quick actions">
+<nav class={`dock${current && current.status !== 'open' ? ' dock-two' : ''}`} data-dock aria-label="Quick actions" {...afterHero}>
   {current?.status === 'open' ? (
     <>
       <a href={`/${current.id}/menu/`} aria-current={onMenu ? 'page' : undefined}>Menus</a>
@@ -156,6 +160,11 @@ const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
       field.focus({ preventScroll: true });
     }
   });
+  // Room pages: the header's Book and the dock wait until the hero (which has its own Book) is gone.
+  const hero = document.querySelector('section[data-room-hero]');
+  if (hero && document.querySelector('[data-after-hero]')) {
+    new IntersectionObserver(([e]) => { document.documentElement.dataset.hero = e.isIntersecting ? 'in' : 'out'; }, { rootMargin: '-68px 0px 0px 0px' }).observe(hero);
+  } else delete document.documentElement.dataset.hero;
   // The Menus dropdown: Escape closes it and returns focus to its button.
   pop?.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && pop.open) { pop.open = false; pop.querySelector('summary')?.focus(); }

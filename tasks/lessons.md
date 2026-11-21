@@ -9,6 +9,8 @@ Review at the start of every session. Add a line after any correction.
 - Never select by a data-attribute that is also set on <html> (data-arrival): querySelector('[data-arrival]') returned <html> and .remove() wiped the page. Use a unique overlay attribute.
 - CSS custom properties holding url() resolve against the stylesheet, not the page: put mask-image URLs directly in the inline style.
 - Demo export: Vite's preload helper prefixes "/"; scripts/export-demo.mjs rewrites it to page-relative. Host reserves "_" prefixes, so assets ship in assets/.
+- Layout checks that sample while scrolling inside one synchronous evaluate never let IntersectionObserver callbacks run: UI driven by them (the Phase 8 dock) is measured in its initial state. Measure page-body bands inside main only.
+- `.branch :global(p) { margin: 0 }` also beats single-class margin-top on a <p> (Dubai's Book in London sat flush): use padding, or a div.
 - SplitFlapText: a full-drum spin reads as noise; cap trips with maxFlips and fire follow-ups from onSettled, not timers.
 - anime.js draw: set strokeDasharray as an SVG attribute, never inline style (inline style wins and the draw never shows).
 - Calm mode must show the END state of a scrubbed scene, including moving parts (ship parked at London), not the start.
