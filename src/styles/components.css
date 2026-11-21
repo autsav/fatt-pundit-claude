@@ -143,7 +143,9 @@
   textarea.fp-input { min-height: 7.5rem; resize: vertical; line-height: var(--lh-body); }
   /* Hover thickens the edge inward (no layout shift); focus draws the surface ring outside. */
   .fp-input:where(:not(:disabled, [readonly])):is(:hover, [data-force~='hover']) { outline: 1px solid var(--fp-control); outline-offset: -3px; }
-  .fp-input:is(:focus-visible, [data-force~='focus']) { outline: var(--ring-width) solid var(--fp-ring); outline-offset: 2px; }
+  /* Date and time fields keep the ring on :focus-within: Chromium drops :focus-visible (and :focus) on the
+     host while Tab moves between their inner segments (day, month, year), so the ring vanished mid-field. */
+  .fp-input:is(:focus-visible, [data-force~='focus']), .fp-input:is([type='date'], [type='time'], [type='datetime-local']):focus-within { outline: var(--ring-width) solid var(--fp-ring); outline-offset: 2px; }
   .fp-input:disabled { opacity: var(--disabled-opacity); border-style: dashed; cursor: not-allowed; }
   .fp-input[readonly] { background: transparent; border-style: dotted; }
   /* Invalid: set aria-invalid from script, or let :user-invalid catch native checks after typing.

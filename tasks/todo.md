@@ -25,7 +25,8 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [ ] Not built: brand street map (needs OSM data), wall-lettering translations, pre-theatre clock, graffiti line drawing (needs Soho photos)
 
 ## Not yet tested
-- [ ] Real phones, Safari, Firefox, mid-range Android frame rate, screen readers
+- [ ] Real phones, Safari, Firefox, mid-range Android frame rate, screen readers (Phase 7 desk audit, Chromium only: docs/qa/phase7-responsive/REPORT.md)
+- [ ] Home menu book on phones: page type is 9–11px at 320–390px (cqw-scaled). The list menus carry the readable copy; decide whether the book needs a phone type floor
 
 ## Original 10-day plan leftovers (likely superseded by later phases; confirm, then drop)
 - [ ] Day 2 journey storyboard (docs/journey-storyboard.md) + client direction sign-off

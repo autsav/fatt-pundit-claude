@@ -139,10 +139,11 @@ function Item({ i }: { i: MenuItemLite }) {
 function SectionHead({ title, note, cont }: { title: string; note?: string; cont?: boolean }) {
   return (
     <div className="pb-[1.6cqw]">
-      <h4 className="m-0 text-[4.4cqw] font-bold uppercase tracking-[0.12em]">
+      {/* h3: the book sits under the chapter's h2 and has no heading of its own between. */}
+      <h3 className="m-0 text-[4.4cqw] font-bold uppercase tracking-[0.12em]">
         {title}
         {cont && <span className="font-note text-[3.2cqw] normal-case tracking-normal text-ink/60"> continued</span>}
-      </h4>
+      </h3>
       {note && <p className="m-0 pt-[1cqw] pb-[0.8cqw] font-note text-[3.3cqw] leading-[1.38] text-ink/80">{note}</p>}
     </div>
   );
@@ -480,7 +481,9 @@ export default function MenuBook({
               );
             })}
           </div>
-          <div className="relative mx-auto drop-shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[40svh]" style={{ maxWidth: 'min(1000px, calc((100svh - 340px) * 1.5))' }}>
+          {/* Sized from the viewport height so the open book fits one screen, with a floor: on a phone on its
+              side (390px tall) the height rule alone gave a 75px book with 2px type. Past the floor it scrolls. */}
+          <div className="relative mx-auto drop-shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))' }}>
             <PageFlip key={`${place?.id}-${menu.id}-${opened ? 'open' : 'shut'}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
           </div>
         </div>

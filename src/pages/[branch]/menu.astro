@@ -196,7 +196,8 @@ const ld = {
   .menu-jump a[aria-current='true'] { background: var(--color-ink); color: var(--color-sand); }
   .menu-search { display: grid; gap: var(--space-2); }
   .menu-diet { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
-  .menu-diet legend { float: left; margin-right: 4px; padding: 0; }
+  /* The floated legend may wrap (200% text zoom): nowrap pushed it past the page edge. */
+  .menu-diet legend { float: left; margin-right: 4px; padding: 0; max-width: 100%; white-space: normal; }
   .menu-tools > * { min-width: 0; }
   .tool-lab { flex: none; margin: 0 4px 0 0; font-size: var(--step-small); font-weight: 700; color: var(--fp-fg); white-space: nowrap; }
   .menu-count { margin: 0; font-size: var(--step-small); min-height: 1em; font-weight: 700; }

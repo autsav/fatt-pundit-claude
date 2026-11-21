@@ -161,11 +161,12 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                 </span>
                 <span className="@container absolute inset-0 flex flex-col items-center justify-center rounded-full border-[0.35em] border-[#23428f] bg-[#fbfaf6] p-[14%] text-center shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
                   {/* Sized so the longest word fits the plate and the name stays within three lines.
-                      Plates whose writing area is under 58px (phones) show only the price; the name is captioned below. */}
+                      Plates whose writing area is under 58px (phones) show only the price; the name is captioned below.
+                      Under 40px even the price would be ~5px type, so the plate back stays blank and the caption carries both. */}
                   <span className="font-bold uppercase leading-[1.1] text-ink @max-[58px]:hidden" style={{ fontSize: `${nameSize(d.name)}cqi` }}>
                     {d.name}
                   </span>
-                  {d.price && <span className="mt-[0.35em] text-[13cqi] font-bold text-tiger-deep @max-[58px]:mt-0 @max-[58px]:text-[30cqi]">{d.price}</span>}
+                  {d.price && <span className="mt-[0.35em] text-[13cqi] font-bold text-tiger-deep @max-[58px]:mt-0 @max-[58px]:text-[30cqi] @max-[40px]:hidden">{d.price}</span>}
                 </span>
               </span>
             </button>
