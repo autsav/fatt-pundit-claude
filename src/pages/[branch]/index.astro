@@ -29,7 +29,7 @@ import lightsOnClip from '../../assets/video/cg-lights-on.mp4';
 import lightsOffStill from '../../assets/video/cg-lights-on-off.jpg';
 import lightsLitStill from '../../assets/video/cg-lights-on-lit.jpg';
 import boothsLoop from '../../assets/video/cg-booths-glow.mp4';
-import { appleMapsUrl, BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, groupRules, hoursLines, preTheatreText, MENU_TABS, prettyPhone, priceOf, type Branch } from '../../lib/site-data';
+import { appleMapsUrl, BOOKING_NAMES, directionsUrl, dish, fullAddress, getBranches, groupRules, hoursLines, preTheatreText, MENU_TABS, priceOf, type Branch } from '../../lib/site-data';
 import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../../assets/images/brand/logo-stamp-distressed-right.png';
 import stampGoldArt from '../../assets/images/brand/stamp-gold.png';
@@ -122,6 +122,9 @@ const others = branches.filter((o) => o.id !== b.id);
 const words = open ? [b.shortName] : [b.shortName, 'The Hangout', 'Boarding soon'];
 const pill = { shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status };
 const hours = b.hours ? hoursLines(b.hours) : [];
+// The Visit heading says how often we're open, so it doesn't repeat the address from the strip.
+const daysOpen = b.hours ? (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const).filter((d) => (b.hours?.[d] ?? []).length > 0).length : 0;
+const openDays = daysOpen === 7 ? 'Open every day.' : daysOpen > 0 ? `Open ${['', 'one', 'two', 'three', 'four', 'five', 'six'][daysOpen]} days a week.` : 'Opening hours.';
 const rules = groupRules(b);
 // The Dubai list sends through a form-to-email service once the Dubai address is verified (CLIENT-INPUTS #5, #10).
 const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
@@ -198,7 +201,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         <h1 id="branch-title" class="sr-only">Fatt Pundit {b.shortName}</h1>
         <p class="arrival-brand" aria-hidden="true">Fatt Pundit</p>
         <div aria-hidden="true" class="board-slot"><BranchArrival client:idle words={words} branch={pill} /></div>
-        <p class="arrival-addr">{fullAddress(b)}</p>
         {b.geo && <p class="branch-clock" data-branch-clock data-tz={b.timezone} data-lat={b.geo.lat} data-lng={b.geo.lng} data-name={b.shortName}></p>}
         <div class="fp-cluster arrival-actions">
           {open && b.booking && <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>}
@@ -370,21 +372,11 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <div class="wrap">
         <header class="fp-section-head chapter-head">
           <p class="fp-section-label"><span class="fp-section-no">{no('visit')}</span> Visit</p>
-          <h2 id="visit-title" class="fp-h2"><span class="sr-only">Visit: </span>{b.address.street.split(',')[0]}</h2>
+          <h2 id="visit-title" class="fp-h2"><span class="sr-only">Visit: </span>{openDays}</h2>
         </header>
+        <!-- Address, stations and Call live once, in the strip under the hero (and the footer);
+             this chapter holds what the strip can't: the week's hours, map apps, email, delivery. -->
         <div class="chapter-body visit-grid">
-          <div class="fp-stack visit-where">
-            <p class="fp-body">{fullAddress(b)}<br /><span class="fp-muted">Nearest {p.stations.length > 1 ? 'stations' : 'station'}: {p.stations.join(', ')}</span></p>
-            {b.booking && <p><a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}</a></p>}
-            <div class="fp-cluster">
-              <a class="fp-btn" href={directionsUrl(b)} target="_blank" rel="noopener">Google Maps<span class="sr-only"> (opens in a new tab)</span></a>
-              <a class="fp-btn" href={appleMapsUrl(b)} target="_blank" rel="noopener">Apple Maps<span class="sr-only"> (opens in a new tab)</span></a>
-            </div>
-            <p class="fp-cluster visit-links">
-              {b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
-              {b.email && <a class="fp-link fp-link--strong" href={`mailto:${b.email}`}>Email us</a>}
-            </p>
-          </div>
           <div class="fp-stack visit-hours">
             {hours.length > 0 ? (
               <table class="fp-hours" data-hours-tz={b.timezone}>
@@ -396,7 +388,13 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             ) : (
               <p>Hours are announced with the opening date.</p>
             )}
-            {b.booking && <p class="fp-small fp-muted">Book online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>}
+          </div>
+          <div class="fp-stack visit-where">
+            <div class="fp-cluster">
+              <a class="fp-btn" href={directionsUrl(b)} target="_blank" rel="noopener">Google Maps<span class="sr-only"> (opens in a new tab)</span></a>
+              <a class="fp-btn" href={appleMapsUrl(b)} target="_blank" rel="noopener">Apple Maps<span class="sr-only"> (opens in a new tab)</span></a>
+            </div>
+            {b.email && <p><a class="fp-link fp-link--strong" href={`mailto:${b.email}`}>Email us</a></p>}
             {(b.delivery.length > 0 || b.clickAndCollectUrl) && (
               <p class="fp-small" id="at-home">
                 {b.clickAndCollectUrl && <>Collect it yourself: <a class="fp-link" href={b.clickAndCollectUrl} target="_blank" rel="noopener">order for pickup<span class="sr-only"> (opens in a new tab)</span></a>. </>}
@@ -461,7 +459,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     {open && b.booking ? (
       <NextStep
         title={`Hungry already? Book at ${b.shortName}.`}
-        line={b.address.street}
+        line={`Book online with ${BOOKING_NAMES[b.booking.provider]}, or call us.`}
         actions={[{ href: b.booking.url, label: `Book at ${b.shortName}`, primary: true, book: b.id, external: true }, { href: `/${b.id}/menu/`, label: 'See the menus' }]}
         photo={b.id === 'covent-garden' && photo('gallery-03') ? photo('gallery-03') : momosChutney}
       />
@@ -529,7 +527,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .arrival-brand { margin: 0; font-family: var(--font-label); font-size: 14px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: var(--color-sand); }
   /* Full column width so the name board can size itself to it (container units). */
   .board-slot { min-height: 1.2em; align-self: stretch; container-type: inline-size; }
-  .arrival-addr { font-family: var(--font-note); font-style: italic; font-size: 19px; line-height: 1.4; }
   .arrival-actions { margin-top: 4px; }
   .arrival-actions:empty { display: none; }
   .hero-list { display: grid; gap: var(--space-3); width: 100%; max-width: 34rem; margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-gold); --fp-fg: var(--color-sand); --fp-link: var(--color-gold); }
@@ -653,7 +650,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
   /* Visit (night): where and how on the left, the hours table on the right. */
   .visit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-7) var(--space-8); align-items: start; }
-  .visit-links { --cluster: 0 var(--space-5); }
   .visit-hours { --stack: var(--space-4); }
   .hours-today { font-weight: 400; }
 
