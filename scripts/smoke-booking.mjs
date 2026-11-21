@@ -51,6 +51,11 @@ for (const [view, viewport] of VIEWS) {
       await pg.waitForTimeout(800);
       // Phones book from the dock; wider screens from the Book in view (the header's, or on home the
       // hero's: home hides the header's Book while the hero's is on screen).
+      // Branch pages keep the dock out of the way until the guest scrolls past the hero (phase 8).
+      if (view === 'phone' && (await pg.locator('[data-dock][data-after-hero]').count())) {
+        await pg.mouse.wheel(0, 1200);
+        await pg.waitForTimeout(800);
+      }
       await pg.locator(view === 'phone' ? '[data-dock] [data-book]' : '[data-book]:visible').first().click();
       const dlg = pg.locator('[data-book-drawer]');
       await dlg.waitFor({ state: 'visible', timeout: 3000 });
