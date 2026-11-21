@@ -221,3 +221,13 @@ Gate for every item: before/after screenshots 390 + 1440, contrast 4.5:1, `npm r
 - [x] 9 Kept American Typewriter for copy: guidelines p.20–21 say titles AND copy, so "typewriter only for headlines" would break them. Licence backup instead: FONT_BACKUP=1 swaps to Kameron (OFL), checked 360–1440 with no overflow; buying steps in HANDOVER
 - [x] Arrival overlay goes aria-hidden + inert the moment the shutter starts (Lighthouse kept sampling the fade)
 - QA: no overflow 9 pages × 4 widths; focus ring 0/549, 0/523; a11y 100 on all 4 (home 100 ×2); budget met twice: home 88–92, dropped frames 0.8–1.5% (was 2.0–2.2), 970 KB; Dubai 100
+
+## The tale of Fatt & Pundit (21 Nov) — comic story, after endspeciesism.org
+Decisions (user): short version on home + full page; characters Fatt & Pundit (allegory from the name, client to approve); illustrator commissioned, storyboard placeholders until then.
+- [x] Script: 5 chapters, 13 panels, captions + speech bubbles (src/data/story.ts). Plot = guidelines menu back (p.27); name meaning = the restaurant's own (2019 launch press); founders are real people (Huzefa & Hamza Sajawal), so the characters stay an allegory
+- [x] Illustrator brief docs/STORY-BRIEF.md (generated panel table, palette p.17, assets p.22, no-stereotype rule, specs 2520×1080 / 1600×1200, drop-in folder src/assets/images/story/; start from the 2019 "Fatt Pundit himself" wall paintings)
+- [x] StoryComic.astro: art auto-picked by panel id, storyboard sketch fallback, live-text bubbles (under the panel on phones), reveal once in view + art fetched 1.5 screens early; calm / no-JS show everything
+- [x] /our-story/ (h1, 5 chapters, chapter rail, ending = Book at Soho / Covent Garden / Join the Dubai list); home: 5-panel strip replaces the voyage + "Read the whole story"; nav + footer + sitemap
+- [x] ChapterRail extracted to a component (home + story page)
+- QA: no overflow (10 pages × 4 widths); focus ring 0/582, 0/545; a11y 100 + bp 100 on both; story page 10 screens (reference 24); home 12.1 desktop / 12.5 phone, 970→612 KB, perf 90–94; dropped frames 1.5% vs 3% for the previous build on the same machine (story strip 0–3 slow frames vs the voyage's 8–15). One unexplained CLS 0.171 in 1 of 6 runs, not reproduced
+- Voyage.tsx kept in the repo, unused (restore = one line in index.astro)

@@ -5,5 +5,5 @@ export const INFO_PAGES = ['/private-dining/', '/allergens/', '/accessibility/',
 
 export async function publicPaths() {
   const branches = await getBranches();
-  return ['/', ...branches.flatMap((b) => [`/${b.id}/`, ...(b.status === 'open' ? [`/${b.id}/menu/`] : [])]), ...INFO_PAGES];
+  return ['/', '/our-story/', ...branches.flatMap((b) => [`/${b.id}/`, ...(b.status === 'open' ? [`/${b.id}/menu/`] : [])]), ...INFO_PAGES];
 }

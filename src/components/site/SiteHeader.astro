@@ -31,7 +31,7 @@ const bookAttr = current?.booking ? current.id : current ? undefined : '';
       {!current ? (
         <>
           <a href={at('#menu')}>Menus</a>
-          <a href={at('#story')}>Our story</a>
+          <a href="/our-story/" aria-current={Astro.url.pathname === '/our-story/' ? 'page' : undefined}>Our story</a>
           {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}
         </>
       ) : (

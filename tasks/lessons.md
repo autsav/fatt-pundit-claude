@@ -58,3 +58,6 @@ Review at the start of every session. Add a line after any correction.
 - Split-flap boards that step alphabetically can spell words mid-flight: animate through digits/signs, never letters.
 - Compare perf against the previous build in interleaved runs on the same machine before calling something a regression (a git worktree on another port does it).
 - `npm i` prunes hand-made symlinks in node_modules (playwright): re-link before perf:budget, or the budget silently can't run.
+- Run `astro check` after touching astro.config: the FONT_BACKUP switch built fine but carried a type error for two days.
+- A flex column with align-items:flex-start collapses an aspect-ratio child to zero width: stretch it (phone comic panels vanished).
+- When a perf budget moves, measure the previous build on the same machine the same day before blaming the change (today's machine was 2× noisier).

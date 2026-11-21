@@ -1,0 +1,204 @@
+---
+/**
+ * "The tale of Fatt & Pundit" as comic panels (data: src/data/story.ts).
+ *
+ * full:  every chapter with its heading (the /our-story/ page).
+ * short: only the ★ panels, no chapter headings (the home page): first wide, the rest in pairs.
+ *
+ * A panel shows its illustration when src/assets/images/story/<id>.* exists, otherwise a storyboard
+ * sketch (faint brand art + the scene description). Captions and speech bubbles are live text.
+ * Motion: panels rise in, then their bubbles pop, once, as they come into view (transform/opacity
+ * only). Without JS or with reduced motion everything is simply there.
+ */
+import { getImage } from 'astro:assets';
+import { chapters, type Panel, type Sketch } from '../../data/story';
+import ship from '../../assets/images/brand/ship.png';
+import mountains from '../../assets/images/brand/mountains-b.png';
+import tiger from '../../assets/images/brand/tiger-head-left.png';
+import compass from '../../assets/images/brand/compass.png';
+import map from '../../assets/images/brand/map.webp';
+import stamp from '../../assets/images/brand/stamp-gold.png';
+
+interface Props {
+  mode: 'full' | 'short';
+}
+const { mode } = Astro.props;
+
+// Illustrations, when the illustrator's files are in (named after the panel id).
+const art = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/*.{jpg,jpeg,png,webp,avif}', { eager: true });
+const artFor = (id: string) => Object.entries(art).find(([path]) => path.split('/').pop()!.replace(/\.\w+$/, '') === id)?.[1].default;
+
+const sketchSrc: Record<Sketch, ImageMetadata> = { ship, mountains, tiger, compass, map, stamp };
+const sketchUrl = Object.fromEntries(
+  await Promise.all(Object.entries(sketchSrc).map(async ([k, src]) => [k, (await getImage({ src, width: 420, format: 'webp', quality: 60 })).src])),
+) as Record<Sketch, string>;
+
+type Shown = Panel & { shownSize: Panel['size']; img?: { src: string; srcset: string; w: number; h: number } };
+const show = async (p: Panel, size: Panel['size']): Promise<Shown> => {
+  const file = artFor(p.id);
+  if (!file) return { ...p, shownSize: size };
+  const widths = size === 'wide' ? [720, 1240, 1800] : [480, 720, 1000];
+  const imgs = await Promise.all(widths.map((w) => getImage({ src: file, width: w, format: 'webp', quality: 78 })));
+  return {
+    ...p,
+    shownSize: size,
+    img: { src: imgs[1].src, srcset: imgs.map((m, i) => `${m.src} ${widths[i]}w`).join(', '), w: file.width, h: file.height },
+  };
+};
+
+const groups =
+  mode === 'full'
+    ? await Promise.all(chapters.map(async (c) => ({ ...c, panels: await Promise.all(c.panels.map((p) => show(p, p.size))) })))
+    : [{ id: 'story-short', label: '', title: '', panels: await Promise.all(chapters.flatMap((c) => c.panels).filter((p) => p.short).map((p, i) => show(p, i === 0 ? 'wide' : 'half'))) }];
+---
+
+<div class:list={['comic', `comic-${mode}`]} data-comic>
+  {groups.map((g, gi) => (
+    <section class="chapter" id={mode === 'full' ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
+      {mode === 'full' && (
+        <header class="ch-head">
+          <p class="ch-no">Chapter {['one', 'two', 'three', 'four', 'five', 'six'][gi]}</p>
+          <h2 id={`${g.id}-title`} class="ch-title">{g.title}</h2>
+        </header>
+      )}
+      <div class="panels">
+        {g.panels.map((p) => (
+          <figure class:list={['panel', `panel-${p.shownSize}`]} data-panel>
+            <figcaption class="cap">{p.caption}</figcaption>
+            <div class="stage">
+            <div class="frame">
+              {p.img ? (
+                <img
+                  class="art"
+                  src={p.img.src}
+                  srcset={p.img.srcset}
+                  sizes={p.shownSize === 'wide' ? '(min-width: 1300px) 1240px, 94vw' : '(min-width: 900px) 600px, 94vw'}
+                  width={p.img.w}
+                  height={p.img.h}
+                  alt={p.scene}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="sketch" role="img" aria-label={p.scene}>
+                  <img class="sketch-art" src={sketchUrl[p.sketch]} alt="" loading="lazy" decoding="async" />
+                  <p class="sketch-note" aria-hidden="true">{p.scene}</p>
+                </div>
+              )}
+              <svg class="edge" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M1.2 1.6 L35 0.8 L68 1.9 L98.9 1 L99.2 34 L98.6 67 L99 98.8 L64 99.3 L31 98.4 L0.9 99.1 L1.6 66 L0.8 33 Z" />
+              </svg>
+            </div>
+              {p.bubbles?.map((b, bi) => (
+                <p class:list={['bubble', `tail-${b.tail}`]} style={`--x:${b.x}%;--y:${b.y}%;--d:${0.35 + bi * 0.35}s`}>
+                  <span class="sr-only">{b.who} says: </span>{b.text}
+                </p>
+              ))}
+            </div>
+          </figure>
+        ))}
+      </div>
+    </section>
+  ))}
+</div>
+
+<style>
+  .comic { --gap: clamp(16px, 2.4vw, 28px); display: grid; gap: clamp(56px, 9vw, 120px); }
+  .comic-short { gap: 0; }
+  .ch-head { display: grid; gap: 6px; margin-bottom: clamp(20px, 3vw, 36px); text-align: center; }
+  .ch-no { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(18px, 1.6vw, 21px); color: var(--color-tiger-deep); }
+  .ch-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(32px, 4.6vw, 60px); line-height: 1; }
+
+  .panels { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
+  @media (min-width: 900px) {
+    .panels { grid-template-columns: 1fr 1fr; }
+    .panel-wide { grid-column: 1 / -1; }
+  }
+  .panel { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  /* Caption box: the narrator, typed on a strip of paper. */
+  .cap { align-self: flex-start; max-width: 62ch; margin: 0; padding: 10px 14px; background: var(--color-ink); color: var(--color-sand); font-size: clamp(15px, 1.25vw, 17px); line-height: 1.45; box-shadow: 4px 4px 0 var(--color-gold); }
+  .stage { position: relative; }
+  /* contain: each frame paints on its own, so a panel sliding in never repaints its neighbours. */
+  .frame { position: relative; overflow: hidden; background: var(--color-paper-light); contain: layout paint; }
+  .panel-wide .frame { aspect-ratio: 21 / 9; }
+  .panel-half .frame { aspect-ratio: 4 / 3; }
+  @media (max-width: 899px) { .panel-wide .frame { aspect-ratio: 4 / 3; } }
+  .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .edge { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .edge path { fill: none; stroke: var(--color-ink); stroke-width: 2.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+
+  /* Storyboard sketch until the illustration lands: faint brand art and the scene note in pencil. */
+  .sketch { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: flex-start; padding: 5%;
+    background:
+      radial-gradient(ellipse at 50% 42%, rgb(203 160 82 / 0.28), transparent 62%),
+      repeating-linear-gradient(-45deg, transparent 0 9px, rgb(44 41 37 / 0.05) 9px 10px),
+      var(--color-paper); }
+  .sketch-art { position: absolute; left: 50%; top: 44%; width: auto; height: 70%; max-width: 70%; object-fit: contain; translate: -50% -50%; opacity: 0.42; }
+  /* The pencilled note in the corner of a storyboard: what this panel will show. */
+  .sketch-note { position: relative; max-width: 40ch; margin: 0; padding: 8px 12px; border: 1.5px dashed rgb(44 41 37 / 0.45); background: rgb(250 246 239 / 0.85);
+    font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(13px, 1.1vw, 15px); line-height: 1.4; color: rgb(44 41 37 / 0.85); }
+  @media (max-width: 599px) { .sketch-note { font-size: 12.5px; padding: 6px 9px; } .sketch { padding: 4%; } }
+
+  /* Speech bubbles: paper, ink outline, a tail pointing at whoever speaks. */
+  .bubble { position: absolute; left: var(--x); top: var(--y); max-width: min(42%, 300px); margin: 0; padding: 12px 16px; background: var(--color-paper-light); color: var(--color-ink);
+    border: 2.5px solid var(--color-ink); border-radius: 22px; font-size: clamp(14px, 1.3vw, 18px); line-height: 1.3; font-weight: 700; box-shadow: 3px 3px 0 rgb(44 41 37 / 0.25); }
+  .panel-half .bubble { max-width: min(58%, 260px); }
+  .bubble::after { content: ''; position: absolute; bottom: -14px; width: 20px; height: 16px; background: inherit; border: inherit; border-top: 0; border-radius: 0 0 0 100%; }
+  .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
+  .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
+
+  /* Phones: bubbles sit under the picture (tail up at the scene) instead of covering a small panel. */
+  @media (max-width: 599px) {
+    .stage { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .frame { align-self: stretch; }
+    .bubble { position: relative; left: auto; top: auto; max-width: 88%; margin-top: 6px; }
+    .panel-half .bubble { max-width: 88%; }
+    .bubble.tail-right { align-self: flex-end; }
+    .bubble::after { bottom: auto; top: -14px; transform: scaleY(-1) skewX(18deg); }
+    .tail-right::after { transform: scaleY(-1) skewX(-18deg); }
+  }
+
+  /* Short version on home: a tight comic page. */
+  .comic-short .panels { gap: var(--gap); }
+
+  /* Motion: only once JS has said it will reveal them (no-JS and calm mode see everything). */
+  :global([data-comic-js]) .panel { opacity: 0; transform: translateY(36px); transition: opacity .6s ease, transform .7s cubic-bezier(.2, .9, .3, 1); }
+  :global([data-comic-js]) .panel.is-in { opacity: 1; transform: none; }
+  :global([data-comic-js]) .bubble { opacity: 0; transform: scale(0.7); transform-origin: 30% 100%; transition: opacity .25s ease var(--d), transform .45s cubic-bezier(.2, 1.6, .4, 1) var(--d); }
+  :global([data-comic-js]) .is-in .bubble { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-comic-js]) .panel, :global([data-comic-js]) .bubble { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+
+<script>
+  // Reveal panels once as they come into view. Start well before they arrive so art is decoded in
+  // time (the reference site showed blank frames to fast scrollers).
+  const comics = document.querySelectorAll<HTMLElement>('[data-comic]');
+  if (comics.length && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.setAttribute('data-comic-js', '');
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add('is-in');
+          io.unobserve(e.target);
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' },
+    );
+    comics.forEach((c) => c.querySelectorAll('[data-panel]').forEach((p) => io.observe(p)));
+    // Fetch the art a screen and a half ahead of the reveal.
+    const warm = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((i) => (i.loading = 'eager'));
+          warm.unobserve(e.target);
+        }
+      },
+      { rootMargin: '150% 0px 150% 0px' },
+    );
+    comics.forEach((c) => c.querySelectorAll('[data-panel]').forEach((p) => warm.observe(p)));
+  }
+</script>

@@ -47,7 +47,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl ?? h('#tables'
       ))}
     </div>
     <nav aria-label="Footer" class="foot-nav">
-      <a href={h('#menu')}>Menus</a><a href={h('#story')}>Our story</a><a href="/private-dining/">Groups and private dining</a><a href={vouchers}>Gift vouchers</a>
+      <a href={h('#menu')}>Menus</a><a href="/our-story/">Our story</a><a href="/private-dining/">Groups and private dining</a><a href={vouchers}>Gift vouchers</a>
     </nav>
     {newsletter && (
       <form class="news" action={newsletter} method="post" target="_blank">

@@ -1,0 +1,75 @@
+---
+// Our story: "The tale of Fatt & Pundit", the whole comic (data: src/data/story.ts).
+// The ending is the one thing the reference site lacked: somewhere real to go next.
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import ChapterRail from '../components/site/ChapterRail.astro';
+import StoryComic from '../components/story/StoryComic.astro';
+import { getBranches } from '../lib/site-data';
+import { chapters, STORY_TITLE, STORY_LEDE } from '../data/story';
+import { stampSrc } from '../lib/stamp';
+import stampTiger from '../assets/images/brand/logo-stamp-tiger.png';
+
+const branches = await getBranches();
+const open = branches.filter((b) => b.status === 'open');
+const soon = branches.filter((b) => b.status !== 'open');
+const stamp = await stampSrc(stampTiger, 240);
+---
+
+<Base
+  title={`${STORY_TITLE} · Our story · Fatt Pundit`}
+  description="How Indo-Chinese food began: a Hakka cook from Canton, a scholar in Kolkata's Chinatown, and the recipes that travelled on to Soho, Covent Garden and Dubai."
+  og="home"
+>
+  <SiteHeader branches={branches} />
+  <main>
+    <header class="story-hero">
+      <div class="wrap narrow stack center">
+        <img class="story-stamp" src={stamp} alt="" width="120" height="120" />
+        <p class="kicker">Our story</p>
+        <h1 class="story-h1">{STORY_TITLE}</h1>
+        <p class="story-lede">{STORY_LEDE}</p>
+        <p class="story-note">Fatt is a common Chinese surname. Pundit is the Indian word for a scholar. Put them together and you have our name, and the story of the food.</p>
+        <p class="story-cue" aria-hidden="true">Scroll to begin</p>
+      </div>
+    </header>
+
+    <div class="sec story-body">
+      <div class="wrap">
+        <StoryComic mode="full" />
+      </div>
+    </div>
+
+    <section id="end" class="sec gold-bg story-end" aria-labelledby="end-title">
+      <div class="wrap narrow stack center">
+        <p class="kicker">The end, or rather the start</p>
+        <h2 id="end-title" class="h2">Pull up a chair</h2>
+        <p>The story is best told by the food. Come and taste where it went.</p>
+        <div class="end-actions">
+          {open.map((b) => (
+            <a class="btn btn-ink" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book at {b.shortName}</a>
+          ))}
+          {soon.map((b) => (
+            <a class="btn btn-line" href={`/${b.id}/#waitlist`}>Join the {b.shortName} list</a>
+          ))}
+        </div>
+        <p class="small">Or <a href="/#menu">read the menus</a> first.</p>
+      </div>
+    </section>
+  </main>
+
+  <ChapterRail chapters={[...chapters.map((c) => [c.id, c.label] as [string, string]), ['end', 'Your table']]} after={0.6} />
+  <SiteFooter branches={branches} />
+</Base>
+
+<style>
+  .story-hero { padding: clamp(56px, 10vw, 120px) 0 clamp(32px, 6vw, 72px); background: var(--color-sand); text-align: center; }
+  .story-stamp { width: clamp(84px, 9vw, 120px); height: auto; margin: 0 auto 6px; }
+  .story-h1 { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(40px, 7vw, 96px); line-height: 0.95; text-wrap: balance; }
+  .story-lede { max-width: 40ch; margin: 0 auto; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(19px, 1.8vw, 23px); }
+  .story-note { max-width: 52ch; margin: 0 auto; }
+  .story-cue { margin: 8px 0 0; font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
+  .story-body { background: var(--color-sand); padding-top: 0; }
+  .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+</style>
