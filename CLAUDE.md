@@ -37,3 +37,5 @@ The main session plans, delegates and reviews. It does not do the work.
 5. Do it yourself only when: the step needs a design decision, spans many
    files that must change together, or an agent failed the same step twice.
 6. Never delegate a one-line change you already have open; just make it.
+7. Before committing src/ changes, run reviewer once on the diff. Fix real
+   gaps; ignore the rest.
