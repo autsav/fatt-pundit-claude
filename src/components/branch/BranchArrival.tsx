@@ -10,9 +10,11 @@ import OpenNowPill, { type PillBranch } from '@/components/scenes/OpenNowPill';
 interface Props {
   words: string[];
   branch: PillBranch;
+  /** Phase 8: the branch page shows today's status once, in the facts strip, so it turns the pill off. */
+  pill?: boolean;
 }
 
-export default function BranchArrival({ words, branch }: Props) {
+export default function BranchArrival({ words, branch, pill = true }: Props) {
   const length = Math.max(...words.map((w) => w.length));
   return (
     // --n = tiles per word; .arrival-flap (global.css) fits them to the hero column.
@@ -25,7 +27,7 @@ export default function BranchArrival({ words, branch }: Props) {
         tileClassName="bg-ink/90 text-gold"
         words={words}
       />
-      <OpenNowPill branches={[branch]} nameless />
+      {pill && <OpenNowPill branches={[branch]} nameless />}
     </div>
   );
 }

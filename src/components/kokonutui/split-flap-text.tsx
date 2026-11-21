@@ -241,7 +241,7 @@ function Tile({
         </>
       )}
       {/* The hinge. */}
-      <span className="pointer-events-none absolute inset-x-0 top-1/2 h-[0.04em] -translate-y-1/2 bg-black/70" />
+      <span data-hinge className="pointer-events-none absolute inset-x-0 top-1/2 h-[0.04em] -translate-y-1/2 bg-black/70" />
     </span>
   );
 }
