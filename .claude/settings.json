@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(/docs/redesign/**)",
+      "Read(/dist/**)",
+      "Read(/demo/**)"
+    ]
+  }
+}
