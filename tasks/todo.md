@@ -313,3 +313,11 @@ Gate per slice: astro check 0, build, no overflow 320/390/768/1440, 0 JS errors,
 - [x] Checks: astro check 0/0; gates; QA 419/419 (7 widths + calm, axe, interactions); menu rows; rhythm 21/22 (Dubai tickets' shadow); Lighthouse 97–99 on 8 routes, home 84–86
 - [ ] Home scroll dropped frames 2.5–3.3% (> 2%, was 2.8% before this pass): voyage overlay as a transform layer
 - [ ] Waiting on client: home changes (#52), photos (#35, #36, #46), quotes (#29), logo (#32), spaces/set price (#2, #47), allergen matrix (#48), story (#49), FAQ pages (#51), dish picks (#53), wording (#54)
+
+## Story comic on the new main (branch claude/story-on-main)
+- [x] Port "The tale of Fatt & Pundit" (story.ts, StoryComic, /our-story/, ChapterRail, brief) from claude/story-comic
+- [x] Wording matches the approved home: Guangdong and Calcutta (not Canton/Kolkata)
+- [x] Home keeps the approved Voyage; one "Read the whole story" link after it; header + footer "Our story" → /our-story/
+- [x] Buttons use fp-btn; sitemap has /our-story/
+- [x] Checks: astro check 0 errors; build 19 pages; no overflow 1440/390; Lighthouse a11y 100, BP 100; /our-story/ perf 99, 295 KB; home same as main (interleaved 86–91, jank 1.8–3.2% vs 2.5–2.8%)
+- [ ] Client: approve characters + panel script (#49), then commission the illustrator (docs/STORY-BRIEF.md)

@@ -151,6 +151,8 @@ const orgLd = {
     <!-- 3 · The voyage -->
     <!-- D2: hydrates a screen before it's reached, not during page load (it was the 0.9s long task on a slow phone). -->
     <Voyage client:visible={{ rootMargin: '100% 0px' }} art={voyageArt} />
+    <!-- The full tale of Fatt & Pundit lives on its own page -->
+    <div class="bg-ink story-more"><a class="fp-btn" href="/our-story/">Read the whole story</a></div>
 
 
     <!-- 5 · The menu book -->
@@ -272,6 +274,7 @@ const orgLd = {
 </script>
 
 <style>
+  .story-more { display: flex; justify-content: center; padding: clamp(28px, 5vw, 56px) 20px; }
   p { margin: 0; }
 
   /* Bar */

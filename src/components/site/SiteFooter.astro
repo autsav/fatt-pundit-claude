@@ -7,7 +7,6 @@ interface Props {
   home?: boolean;
 }
 const { branches, home = false } = Astro.props;
-const h = (hash: string) => (home ? hash : `/${hash}`);
 // Newsletter: shows once the client's email tool is set (its form POST URL,
 // e.g. Mailchimp/Klaviyo embed action) in PUBLIC_NEWSLETTER_ACTION.
 const newsletter = import.meta.env.PUBLIC_NEWSLETTER_ACTION as string | undefined;
@@ -49,7 +48,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
       ))}
     </div>
     <nav aria-label="Footer" class="foot-nav" id="site-index">
-      {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}<a href={h('#story')}>Our story</a><a href="/private-dining/">Groups and private dining</a><a href="/book/">Book a table</a>{vouchers && <a href={vouchers} target="_blank" rel="noopener">Gift vouchers<span class="sr-only"> (opens in a new tab)</span></a>}
+      {branches.map((b) => <a href={`/${b.id}/`}>{b.shortName}</a>)}<a href="/our-story/">Our story</a><a href="/private-dining/">Groups and private dining</a><a href="/book/">Book a table</a>{vouchers && <a href={vouchers} target="_blank" rel="noopener">Gift vouchers<span class="sr-only"> (opens in a new tab)</span></a>}
     </nav>
     {newsletter && (
       <form class="news" action={newsletter} method="post" target="_blank">

@@ -72,3 +72,4 @@ Review at the start of every session. Add a line after any correction.
 - A hydration that Lighthouse charges at load (client:idle) can be moved to `client:visible` with a rootMargin of a screen: TBT 490 → 110 ms on home. Measure the scroll test before and after; it can move the cost into the scroll.
 - "Empty band" and "surface change" checks must count only edge-to-edge backgrounds and split gaps at a change of surface, or cards, fields and two chapters' padding read as failures.
 - Re-validating a field on blur moves the form (its message disappears) just as the guest taps the next control, and the tap misses. Clear errors on input.
+- Two sessions (claude.ai and Claude Code) worked on the same repo and main was replaced with new history. Fetch and compare with origin/main before starting work, and port onto the newest main in a branch; never force-push.
