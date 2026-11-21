@@ -24,3 +24,16 @@
 - Do not read tasks/archive or docs/redesign unless asked.
 - Compact instructions: keep code changes and failing check output.
 - Use a subagent only for full test runs, log reading or wide searches.
+
+## Orchestration
+The main session plans, delegates and reviews. It does not do the work.
+1. Break the task into steps. For each, pick the cheapest agent that fits:
+   finder (locate) → editor (small specified edit) → builder (real
+   building) → runner (checks).
+2. Give each agent a complete brief: exact files, the change, the pattern
+   file, what to reply. Agents start with no memory of this conversation.
+3. Run independent steps in parallel; dependent steps in order.
+4. Review the agents' diff with `git diff`, not by re-reading whole files.
+5. Do it yourself only when: the step needs a design decision, spans many
+   files that must change together, or an agent failed the same step twice.
+6. Never delegate a one-line change you already have open; just make it.
