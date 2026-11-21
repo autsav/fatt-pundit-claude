@@ -109,7 +109,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
   .foot-tag { font-size: 17px; color: rgb(218 199 181 / 0.85); max-width: 26ch; }
   /* Plain glyphs, no boxes (Phase 7 §3.8); each keeps a 44px target. */
   .social { display: flex; gap: 4px; margin: 10px 0 0 -10px; }
-  .social a { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-sand); transition: color .2s; }
+  .social a { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-sand); transition: color var(--dur-fast) var(--curve-out); }
   .social a:hover { color: var(--color-gold); }
   .social svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .foot-branch { font-size: 16px; line-height: 1.5; }

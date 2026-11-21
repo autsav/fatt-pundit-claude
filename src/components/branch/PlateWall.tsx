@@ -153,7 +153,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                 className="relative block size-full rounded-full [transform-style:preserve-3d]"
                 style={{
                   transform: `rotateY(${on ? 180 : 0}deg)`,
-                  transition: calm ? 'none' : 'transform 0.7s cubic-bezier(0.34, 1.45, 0.5, 1)',
+                  transition: calm ? 'none' : 'transform var(--dur-story) var(--curve-stamp)',
                 }}
               >
                 <span className="absolute inset-0 rounded-full shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden]">

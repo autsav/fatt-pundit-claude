@@ -162,9 +162,10 @@ const groups =
   .comic-short .panels { gap: var(--gap); }
 
   /* Motion: only once JS has said it will reveal them (no-JS and calm mode see everything). */
-  :global([data-comic-js]) .panel { opacity: 0; transform: translateY(36px); transition: opacity .6s ease, transform .7s cubic-bezier(.2, .9, .3, 1); }
+  :global([data-comic-js]) .panel { opacity: 0; transform: translateY(var(--rise)); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-story) var(--curve-out); }
   :global([data-comic-js]) .panel.is-in { opacity: 1; transform: none; }
-  :global([data-comic-js]) .bubble { opacity: 0; transform: scale(0.7); transform-origin: 30% 100%; transition: opacity .25s ease var(--d), transform .45s cubic-bezier(.2, 1.6, .4, 1) var(--d); }
+  /* Speech lands like a stamp, each bubble a beat after the last (--d is set per bubble). */
+  :global([data-comic-js]) .bubble { opacity: 0; transform: scale(0.7); transform-origin: 30% 100%; transition: opacity var(--dur-fast) var(--curve-out) var(--d), transform var(--dur-panel) var(--curve-stamp) var(--d); }
   :global([data-comic-js]) .is-in .bubble { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) {
     :global([data-comic-js]) .panel, :global([data-comic-js]) .bubble { opacity: 1; transform: none; transition: none; }

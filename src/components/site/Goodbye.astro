@@ -88,7 +88,7 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   /* Two panels side by side when open: the cover's inside (left) and the pocket with the receipt (right).
      Closed, the cover sits over the pocket and the folder is centred. */
   /* Two panels of --p must fit a 320px phone with its 16px gutters, or the page scrolls sideways. */
-  .bill { --p: clamp(min(160px, 50vw - 24px), 20vw, 240px); position: relative; width: calc(var(--p) * 2); margin-inline: auto; perspective: 1600px; transition: translate .9s cubic-bezier(.2, .8, .2, 1); }
+  .bill { --p: clamp(min(160px, 50vw - 24px), 20vw, 240px); position: relative; width: calc(var(--p) * 2); margin-inline: auto; perspective: 1600px; transition: translate var(--dur-story) var(--curve-panel); }
   .bill.is-closed { translate: calc(var(--p) * -0.5) 0; }
   .bill-pocket { position: relative; margin-left: var(--p); width: var(--p); min-height: calc(var(--p) * 1.9); padding: 26px 12px 18px; border-radius: 3px; box-sizing: border-box;
     background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgb(0 0 0 / 0.3) 0 1px, transparent 1px 3px), #141210;
@@ -101,7 +101,8 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
     -webkit-mask: linear-gradient(#000, #000) top / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at 50% 0, #000 90deg, transparent 0) bottom / 10px 6px repeat-x;
     mask: linear-gradient(#000, #000) top / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at 50% 0, #000 90deg, transparent 0) bottom / 10px 6px repeat-x; }
   .bill.is-closed .receipt { translate: 0 -105%; }
-  .bill.is-open .receipt { translate: 0 0; transition: translate 1.5s steps(12, end) .45s; }
+  /* Prints in steps, like a till, once the cover is on its way. */
+  .bill.is-open .receipt { translate: 0 0; transition: translate var(--dur-story-long) steps(12, end) var(--dur-panel); }
   .receipt p, .receipt dl { margin: 0; }
   .r-c { text-align: center; }
   .r-big { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
@@ -116,7 +117,7 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   .r-bars { display: block; width: 100%; height: 22px; margin-top: 10px; fill: var(--ink); }
 
   /* The cover: front has the foil; turning it shows the lining. Hinge on its left edge. */
-  .bill-cover { position: absolute; top: 0; bottom: 0; left: var(--p); width: var(--p); transform-origin: 0 50%; transform-style: preserve-3d; transition: transform 1s cubic-bezier(.3, .7, .2, 1); }
+  .bill-cover { position: absolute; top: 0; bottom: 0; left: var(--p); width: var(--p); transform-origin: 0 50%; transform-style: preserve-3d; transition: transform var(--dur-story) var(--curve-panel); }
   .bill.is-open .bill-cover { transform: rotateY(-178deg); }
   .bill-face { position: absolute; inset: 0; border-radius: 3px; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgb(0 0 0 / 0.3) 0 1px, transparent 1px 3px), #1b1916;
@@ -127,7 +128,4 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   .foil-thanks { font-family: var(--font-note); font-style: italic; font-size: clamp(18px, 2vw, 24px); background: linear-gradient(135deg, #b88e42, #f3dca6 50%, #a8803a); -webkit-background-clip: text; background-clip: text; color: transparent; rotate: -6deg; }
   .lining { padding: 18px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 15px; color: rgb(203 160 82 / 0.75); }
 
-  @media (prefers-reduced-motion: reduce) {
-    .bill, .bill-cover, .bill.is-open .receipt { transition: none; }
-  }
 </style>

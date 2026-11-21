@@ -69,17 +69,20 @@
     --lift-2: 6px 6px 0 rgb(26 23 20 / 0.35);
     --lift-3: 8px 8px 0 rgb(0 0 0 / 0.45);
 
-    /* ---- Motion (mirrors src/lib/motion-tokens.ts) ---- */
+    /* ---- Motion (mirrors src/lib/motion-tokens.ts; the language is written up in docs/MOTION.md) ----
+       Two speeds: fast is feedback (hover, press, a stamp landing), story is a reveal. Nothing in between. */
     --dur-press: 60ms;          /* press down */
     --dur-fast: 200ms;          /* hover, focus, state change */
-    --dur-panel: 260ms;         /* a drawer or sheet travelling in */
+    --dur-panel: 260ms;         /* a drawer or sheet travelling in; a stamp or bubble landing; a page change */
     --dur-story: 900ms;         /* a reveal in a scene */
-    --dur-story-long: 1200ms;
-    --stagger: 60ms;            /* between siblings; at most 6 in a sequence */
-    --curve-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --curve-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-    --curve-stamp: cubic-bezier(0.2, 1.4, 0.4, 1);   /* a little overshoot: things with weight */
-    --curve-panel: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur-story-long: 1200ms;   /* a long mechanism (a receipt printing, a line being drawn) */
+    --stagger: 60ms;            /* between siblings; at most 6 in a sequence (big objects may use 2x) */
+    --rise: 24px;               /* how far a revealed block rises into place */
+    --curve-out: cubic-bezier(0.23, 1, 0.32, 1);     /* default: arrives fast, settles */
+    --curve-in: cubic-bezier(0.5, 0, 0.75, 0);       /* leaving or falling: gathers speed */
+    --curve-in-out: cubic-bezier(0.65, 0, 0.35, 1);  /* scroll-linked and long mechanisms */
+    --curve-stamp: cubic-bezier(0.2, 1.4, 0.4, 1);   /* a little overshoot: things with weight landing */
+    --curve-panel: cubic-bezier(0.2, 0.8, 0.2, 1);   /* a drawer, a sheet, a cover swinging */
 
     /* ---- Layers. Dialogs use the browser's top layer, so they need none. ---- */
     --z-raised: 10;

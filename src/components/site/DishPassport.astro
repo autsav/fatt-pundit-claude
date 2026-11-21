@@ -32,9 +32,8 @@ const { branch, name } = Astro.props;
   .pp { position: fixed; z-index: 30; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); }
   .pp-open { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-gold); color: var(--color-ink-deep); font: inherit; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 14px; cursor: pointer; box-shadow: 4px 4px 0 var(--color-ink); }
   .pp-n { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 50%; background: var(--color-ink); color: var(--color-sand); font-size: 13px; }
-  .pp-open.is-bump { animation: pp-bump .35s ease; }
+  .pp-open.is-bump { animation: pp-bump var(--dur-panel) var(--curve-stamp); }
   @keyframes pp-bump { 40% { transform: scale(1.12) rotate(-3deg); } }
-  @media (prefers-reduced-motion: reduce) { .pp-open.is-bump { animation: none; } }
   .pp-dlg { margin: auto; border: 0; padding: 0; max-width: min(520px, calc(100vw - 24px)); width: 100%; background: transparent; }
   .pp-dlg::backdrop { background: rgb(26 23 20 / 0.6); }
   .pp-sheet { background: var(--color-paper-light); color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-ink); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
@@ -46,7 +45,7 @@ const { branch, name } = Astro.props;
   .pp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
   /* The stamp button the script adds to each dish row. */
   :global(.pp-stamp) { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin: -8px 0 -8px 4px; border: 0; background: none; cursor: pointer; color: var(--fp-fg-muted); }
-  :global(.pp-stamp svg) { width: 30px; height: 30px; transition: transform .2s ease, color .2s ease; }
+  :global(.pp-stamp svg) { width: 30px; height: 30px; transition: transform var(--dur-fast) var(--curve-stamp), color var(--dur-fast) var(--curve-out); }
   :global(.pp-stamp[aria-pressed='true']) { color: var(--color-tiger-deep); }
   :global(.pp-stamp[aria-pressed='true'] svg) { transform: rotate(-12deg) scale(1.08); }
   :global(.pp-stamp:focus-visible) { outline: 3px solid var(--fp-ring); outline-offset: 0; }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { openStatus, statusLine, type Hours } from '@/lib/hours';
+import { isPaused } from '@/lib/motion-tokens';
 
 export interface PillBranch {
   shortName: string;
@@ -26,7 +27,8 @@ export default function OpenNowPill({ branches, nameless = false }: { branches: 
       );
     compute();
     const tick = window.setInterval(compute, 60_000);
-    const cycle = window.setInterval(() => setI((n) => n + 1), 3400);
+    // Auto-updating content (WCAG 2.2.2): the footer's Pause motion holds the line that is showing.
+    const cycle = window.setInterval(() => { if (!isPaused()) setI((n) => n + 1); }, 3400);
     return () => {
       window.clearInterval(tick);
       window.clearInterval(cycle);

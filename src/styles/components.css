@@ -279,6 +279,12 @@
     .fp-dialog--side[open] { animation-name: fp-in-up; }
   }
 
+  /* ---------------------------------------------------------------- Reveal
+     A block that rises into place once, as it comes on screen (src/lib/reveal.ts adds .is-in).
+     Hidden only once the script has said it will reveal them: no-JS and calm mode see everything. */
+  :root[data-reveal] .fp-reveal { opacity: 0; transform: translateY(var(--rise)); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-story) var(--curve-out); }
+  :root[data-reveal] .fp-reveal.is-in { opacity: 1; transform: none; }
+
   @media (prefers-reduced-motion: reduce) {
     .fp-btn:is(:hover, :active), .fp-choice:active > span, a.fp-postcard:is(:hover, :active) { transform: none; }
     .fp-dialog[open] { animation: none; }

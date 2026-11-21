@@ -38,6 +38,7 @@ const { branches, rainSrc, rainPoster } = Astro.props;
 
 <script>
   import { animate, stagger, splitText } from 'animejs';
+  import { EASE, MS, STAGGER_MS } from '@/lib/motion-tokens';
 
   // One Book in view: the header's Book steps aside while the hero's Book is on screen, and comes
   // back (stamped in) once the guest scrolls past it.
@@ -64,12 +65,13 @@ const { branches, rainSrc, rainPoster } = Astro.props;
         const split = splitText(el, { chars: { wrap: 'clip' } });
         for (const c of split.chars) (c as HTMLElement).style.transform = 'translateY(110%)';
         el.classList.add('is-rising');
+        // Ten letters are one word, so they take a tighter stagger than the six-sibling rule allows.
         animate(split.chars, {
           y: ['110%', '0%'],
           rotate: { from: 8, to: 0 },
-          duration: 900,
-          ease: 'outExpo',
-          delay: stagger(45),
+          duration: MS.story,
+          ease: EASE.animeOut,
+          delay: stagger(STAGGER_MS * 0.75),
           onComplete: () => {
             split.revert();
             el.style.textShadow = '';
@@ -101,7 +103,7 @@ const { branches, rainSrc, rainPoster } = Astro.props;
 
   /* Header Book waits while the hero's is in view (≥640; on phones the dock holds Book). */
   :global(html[data-hero-book='in'] .bar .nav-book) { visibility: hidden; }
-  :global(html[data-hero-book='out'] .bar .nav-book) { animation: hero-book-in var(--dur-fast, 200ms) cubic-bezier(.2, 1.6, .4, 1); }
+  :global(html[data-hero-book='out'] .bar .nav-book) { animation: hero-book-in var(--dur-fast) var(--curve-stamp); }
   @keyframes hero-book-in { from { transform: translateY(-8px) scale(1.06); } to { transform: none; } }
 
   /* Phones: the dock carries Book, so the hero doesn't repeat it (one tiger action per view). */

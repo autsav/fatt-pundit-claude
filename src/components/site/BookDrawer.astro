@@ -99,14 +99,12 @@ const data = branches.map((b) => ({
 <style>
   .book { padding: 0; border: 0; margin: auto 0 0 auto; width: min(460px, 100vw); max-width: none; height: 100dvh; max-height: 100dvh; background: transparent; color: var(--color-ink); overflow-y: auto; overscroll-behavior: contain; }
   .book::backdrop { background: rgb(26 23 20 / 0.6); }
-  .book[open] { animation: book-in 260ms cubic-bezier(.2,.8,.2,1); }
-  @keyframes book-in { from { transform: translateX(100%); } }
+  /* Travels in like the system's side dialog (keyframes in components.css); a bottom sheet on phones. */
+  .book[open] { animation: fp-in-right var(--dur-panel) var(--curve-panel); }
   @media (max-width: 640px) {
     .book { width: 100vw; height: auto; max-height: 92dvh; margin: auto 0 0; }
-    .book[open] { animation-name: book-up; }
-    @keyframes book-up { from { transform: translateY(100%); } }
+    .book[open] { animation-name: fp-in-up; }
   }
-  @media (prefers-reduced-motion: reduce) { .book[open] { animation: none; } }
   .book-sheet { box-sizing: border-box; min-height: 100%; background: var(--color-sand); padding: 24px clamp(18px, 4vw, 32px) 28px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; border-left: 3px solid var(--color-ink); }
   @media (max-width: 640px) { .book-sheet { border-left: 0; border-top: 3px solid var(--color-ink); } }
   .book-head { position: relative; padding-right: 48px; }

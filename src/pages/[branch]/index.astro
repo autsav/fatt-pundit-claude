@@ -574,13 +574,12 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     .order-dish { scroll-snap-align: start; scroll-margin-inline: clamp(16px, 4vw, 40px); }
   }
   .order-photo { display: block; aspect-ratio: 1; overflow: hidden; border: 2px solid var(--color-ink); background: var(--color-ink); }
-  .order-photo :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease-out, ease); }
+  .order-photo :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-fast) var(--curve-out); }
   .order-link:hover .order-photo :global(img) { transform: scale(1.03); }
   .order-name { padding-top: var(--space-3); font-size: var(--step-h4); font-weight: 700; line-height: 1.25; }
   .order-link:hover .order-name { text-decoration: underline; text-underline-offset: 5px; }
   .order-price { font-weight: 700; }
   .order-desc { padding-bottom: var(--space-5); font-family: var(--font-note); font-style: italic; font-size: var(--step-small); line-height: var(--lh-small); color: var(--fp-fg-muted); }
-  @media (prefers-reduced-motion: reduce) { .order-photo :global(img) { transition: none; } }
 
   .eat-tonight { margin-top: var(--section-gap); max-width: 40rem; }
 

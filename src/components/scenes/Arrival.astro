@@ -83,6 +83,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       // not when the last frame lands (a fading label is not content).
       root.setAttribute('aria-hidden', 'true');
       root.inert = true;
+      // A choreographed intro with its own beats (a documented exception in docs/MOTION.md).
       const tl = createTimeline({
         onComplete: () => { document.body.style.overflow = ''; finish(); },
       });

@@ -27,7 +27,7 @@ Astro 7 + React islands + Tailwind 4, TypeScript strict. Copy the named pattern 
 ## src/lib
 - Pure TS helpers. Copy `format.ts` for a small helper, `hours.ts` for anything with tests (tested by `scripts/test-hours.ts`).
 - `site-data.ts`: the only way pages read branches/dishes/menus/prices/hours. Add accessors here.
-- `booking.ts` (drawer + desk), `motion-tokens.ts`, `contrast.ts`, `dialog.ts`, `clock.ts`, `specials.ts`.
+- `booking.ts` (drawer + desk), `motion-tokens.ts` + `reveal.ts` (motion language: `docs/MOTION.md`), `contrast.ts`, `dialog.ts`, `clock.ts`, `specials.ts`.
 
 ## src/data
 - `branches.json`, `dishes.json`, `menus.json`, `specials.json`, `world-route.json` (generated), `story.ts`.
