@@ -70,11 +70,13 @@ const TYPE = [
 const SPACE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => [n, [4, 8, 12, 16, 24, 32, 48, 64, 96, 128][n - 1]] as const);
 const MOTION = [
   ['--dur-press', '60 ms', '--curve-out', 'Press down (stamp)'],
-  ['--dur-fast', '200 ms', '--curve-stamp / --curve-out', 'Hover lift, focus, colour change'],
-  ['--dur-panel', '260 ms', '--curve-panel', 'Drawer or sheet travelling in'],
-  ['--dur-story', '900 ms', '--curve-out', 'A reveal in a scene (strip slides up)'],
-  ['--dur-story-long', '1200 ms', '--curve-in-out', 'Long reveal (flip board, receipt)'],
-  ['--stagger', '60 ms', '', 'Between siblings; at most 6'],
+  ['--dur-fast', '200 ms', '--curve-out', 'Focus, colour change, image zoom'],
+  ['--dur-panel', '260 ms', '--curve-panel / --curve-in', 'Drawer, sheet or list arriving and leaving; a page change'],
+  ['--dur-spring', '460 ms', '--curve-spring', 'Things with weight landing: a stamp, a hover lift, a bubble, the rail dot (transform only)'],
+  ['--dur-story', '900 ms', '--curve-out', 'A reveal in a scene (a block rises, a pass drops)'],
+  ['--dur-story-long', '1200 ms', '--curve-in-out', 'A long mechanism (receipt printing, a line drawn)'],
+  ['--stagger', '60 ms', '', 'Between siblings; at most 6 (big objects 2×)'],
+  ['--rise', '24 px', '--curve-out', 'How far a revealed block rises (.fp-reveal)'],
 ] as const;
 const STATES = [['Default', ''], ['Hover', 'hover'], ['Focus', 'focus'], ['Active', 'active']] as const;
 ---
@@ -414,7 +416,7 @@ const STATES = [['Default', ''], ['Hover', 'hover'], ['Focus', 'focus'], ['Activ
         <div class="fp-section-head">
           <p class="fp-section-label"><span class="fp-section-no">10</span> Motion</p>
           <h2 class="fp-h2">Things stamp, slide and flip</h2>
-          <p class="fp-body sg-measure">Physical motion only: no fades or drifting glows. Transform and opacity only. Calm mode (reduced motion) sets every duration token to 0 and shows end states. Your setting right now: <b data-motion-mode>…</b>.</p>
+          <p class="fp-body sg-measure">Physical motion only: no fades or drifting glows. Transform and opacity only. Two speeds: fast for feedback, story for reveals, nothing in between. Calm mode (reduced motion) sets every duration token to 0 and shows end states; the footer's Pause motion stops the loops. The full language is in <code>docs/MOTION.md</code>. Your setting right now: <b data-motion-mode>…</b>.</p>
         </div>
         <ol class="fp-ledger" role="list">
           {MOTION.map(([tok, ms, curve, use]) => <li class="fp-ledger-row"><span><span class="fp-ledger-name"><code>{tok}</code></span><span class="fp-ledger-note">{use}{curve && ` · ${curve}`}</span></span><span class="fp-ledger-meta">{ms}</span></li>)}

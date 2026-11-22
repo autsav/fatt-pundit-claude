@@ -35,7 +35,7 @@ const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
 const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-hero': '' } : {};
 ---
 {onBranchHome && current?.status === 'open' && <script is:inline>document.documentElement.dataset.hero = 'in';</script>}
-{import.meta.env.PUBLIC_LAUNCH !== 'true' && <p class="preview-flag"><span class="pf-long">Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed</span><span class="pf-short">Website preview, not the live site</span></p>}
+{import.meta.env.PUBLIC_LAUNCH !== 'true' && <aside class="preview-flag" aria-label="Preview notice"><span class="pf-long">Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed</span><span class="pf-short">Website preview, not the live site</span></aside>}
 <header class="bar">
   <div class="wrap bar-in">
     <a class="brand" href={path === '/' ? '#top' : '/'}>FATT PUNDIT</a>

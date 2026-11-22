@@ -14,6 +14,7 @@ import Base from '../layouts/Base.astro';
 import { getBranches, dish, priceOf, menuBooks, groupRules, onlineSummary } from '../lib/site-data';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
+import ChapterRail from '../components/site/ChapterRail.astro';
 
 import tigerHead from '../assets/images/brand/tiger-head-left.png';
 import stampLeft from '../assets/images/brand/logo-stamp-distressed-left.png';
@@ -67,14 +68,17 @@ const ROOM: [ImageMetadata, string][] = [
   [g6, 'Pink leather banquette against a green painted wall'],
   [g1, 'Pink booths and bentwood chairs under shelves of lamps and pots, against a green plaster wall'],
 ];
-const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), full: await webp(src, 1600), alt })));
+// Thumbs: 360/480w for the phone's two-up strip at 2x, 640w for the four-up (the sheet's own `sizes`).
+const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640].map(async (w) => `${await webp(src, w)} ${w}w`))).join(', ');
+const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), thumbSet: await thumbSet(src), full: await webp(src, 1600), alt })));
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 const rainPoster = (await getImage({ src: inside, width: 640, format: 'webp', quality: 60 })).src;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
-  map: await img(map, 1295),
+  // The postcard is at most 460 px wide (2x: 920): 900 is enough; 1295 cost 170 KB.
+  map: await img(map, 900),
   // A picture, not the SVG: the browser re-rasterised the vector chart (a
   // 16-megapixel draw) whenever the camera zoomed, stalling scroll frames.
   sea: (await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 })).src,
@@ -165,12 +169,12 @@ const orgLd = {
     <section id="room" class="chapter room-halftone" aria-labelledby="room-title">
       <div class="wrap stack-lg">
         <div class="room-words">
-          <header class="room-head reveal">
+          <header class="room-head fp-reveal">
             <p class="fp-section-label"><span class="fp-section-no">04</span> The room</p>
             <h2 id="room-title" class="fp-h2"><span class="sr-only">The room: </span>Pull up a chair</h2>
             <p class="chapter-intro">Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
           </header>
-          <p class="rating reveal">
+          <p class="rating fp-reveal">
             <span class="rating-n fp-num">4.8<span class="rating-of"> / 5</span></span>
             <span class="rating-src">on Google at both restaurants: 20,030 reviews for Covent Garden and 16,000+ for Soho (November 2026)</span>
           </p>
@@ -182,95 +186,31 @@ const orgLd = {
     <!-- 8 · Your boarding pass -->
     <section id="tables" class="chapter gold-bg" aria-labelledby="tables-title">
       <div class="wrap">
-        <header class="fp-section-head chapter-head reveal">
+        <header class="fp-section-head chapter-head fp-reveal">
           <p class="fp-section-label"><span class="fp-section-no">05</span> Your table</p>
           <h2 id="tables-title" class="fp-h2"><span class="sr-only">Your table: </span>Choose your gate</h2>
           <p class="chapter-intro">Three passes, one for each room. Tear off a stub to book.</p>
         </header>
         <BoardingPasses branches={branches} stamps={stamps} />
-        <p class="tables-note reveal">{onlineSummary(branches)}. {groupRules(branches[0])?.depositShort} {groupRules(branches[0])?.setMenu} <a href="/private-dining/">Plan a group</a>.</p>
+        <p class="tables-note fp-reveal">{onlineSummary(branches)}. {groupRules(branches[0])?.depositShort} {groupRules(branches[0])?.setMenu} <a href="/private-dining/">Plan a group</a>.</p>
       </div>
     </section>
   </main>
 
   <!-- Story rail: where you are in the visit. Lights up as you scroll, tap a stop to jump. Wide screens only;
        phones get the thin progress line under the header instead. -->
-  <nav class="rail" aria-label="Chapters" data-rail hidden>
-    {[['top', 'The window'], ['story', 'Our story'], ['menu', 'The menus'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']].map(([id, label]) => (
-      <a href={`#${id}`} data-ch={id}><span class="rail-dot" aria-hidden="true"></span><span class="rail-lbl">{label}</span></a>
-    ))}
-  </nav>
+  <ChapterRail chapters={[['top', 'The window'], ['story', 'Our story'], ['menu', 'The menus'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']]} />
 
   <SiteFooter branches={branches} home />
 </Base>
 
 <script>
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // The Dubai list on its boarding pass (rendered only once PUBLIC_DUBAI_LIST_ENDPOINT is set).
   import { bindWaitlists } from '../lib/waitlist';
+  import { bindReveals } from '../lib/reveal';
   bindWaitlists();
-  // Story rail + reading line. Only transform/opacity change per frame.
-  const rail = document.querySelector<HTMLElement>('[data-rail]');
-  const bar = document.querySelector<HTMLElement>('.bar');
-  if (rail && bar) {
-    rail.hidden = false;
-    const line = document.createElement('div');
-    line.className = 'read-line';
-    line.setAttribute('aria-hidden', 'true');
-    bar.append(line);
-    const links = new Map([...rail.querySelectorAll<HTMLAnchorElement>('[data-ch]')].map((a) => [a.dataset.ch!, a]));
-    const order = [...links.keys()];
-    const targets = order.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
-    // Positions are measured only when the page changes size (a ResizeObserver runs after layout, so
-    // measuring there is free). The scroll tick reads scrollY and nothing else: measuring sections on
-    // every frame, after the voyage had moved its map, forced a full style and layout pass per frame
-    // (about 1 s of forced layout across the voyage at 4x CPU).
-    let tops: number[] = [];
-    let max = 0;
-    let vh = innerHeight;
-    const measure = () => {
-      vh = innerHeight;
-      tops = targets.map((el) => el.getBoundingClientRect().top + window.scrollY);
-      max = document.documentElement.scrollHeight - vh;
-    };
-    let raf = 0;
-    let cur = -1;
-    let on: boolean | null = null;
-    // scrollY is read in the scroll event (before any frame callback writes), not inside the frame,
-    // where reading it after another scene's writes would also force layout.
-    let y = scrollY;
-    const tick = () => {
-      raf = 0;
-      // The current chapter: the last one whose top has passed the middle of the screen.
-      let now = 0;
-      tops.forEach((t, i) => { if (t - y <= vh * 0.5) now = i; });
-      line.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
-      const show = y > vh * 0.8;
-      if (show !== on) { on = show; rail.classList.toggle('is-on', show); }
-      if (now === cur) return;
-      cur = now;
-      order.forEach((id, i) => {
-        const a = links.get(id)!;
-        a.classList.toggle('is-past', i < cur);
-        a.classList.toggle('is-here', i === cur);
-        if (i === cur) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current');
-      });
-    };
-    const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
-    new ResizeObserver(() => { y = scrollY; measure(); queue(); }).observe(document.body);
-    addEventListener('scroll', () => { y = scrollY; queue(); }, { passive: true });
-    addEventListener('resize', () => { measure(); queue(); });
-    measure();
-    tick();
-  }
-
-  // Reveal sections.
-  const io = new IntersectionObserver(
-    (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
-    { threshold: 0.18 },
-  );
-  document.querySelectorAll('.reveal').forEach((el) => (reduce ? el.classList.add('is-in') : io.observe(el)));
-
+  // Chapter heads rise into place as they come on screen (.fp-reveal).
+  bindReveals();
 </script>
 
 <style>
@@ -294,35 +234,4 @@ const orgLd = {
   .rating-of { font-size: 0.45em; letter-spacing: 0; }
   .rating-src { font-size: var(--step-small); line-height: var(--lh-small); }
   .tables-note { margin: var(--space-7) 0 0; max-width: 46em; font-size: var(--step-small); line-height: var(--lh-small); }
-
-  /* Reveal */
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
-  .reveal.is-in { opacity: 1; transform: none; }
-
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; }
-  }
-  /* Story rail */
-  .rail { position: fixed; z-index: 30; right: 18px; top: 50%; translate: 0 -50%; display: none; flex-direction: column; gap: 2px; padding: 10px 8px;
-    background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
-  /* Only where the margin beside the 1240 column can hold it: from 1100px it sat on the content
-     (the bar's prices, the passes) until about 1310px. */
-  @media (min-width: 1320px) { .rail { display: flex; } }
-  .rail.is-on { opacity: 1; pointer-events: auto; }
-  /* 44px targets (were 28px); the dashed line joins one dot to the next. */
-  .rail a { position: relative; display: grid; place-items: center; width: 44px; height: 44px; text-decoration: none; }
-  .rail a::before { content: ''; position: absolute; left: 50%; top: -17px; height: 34px; border-left: 1px dashed rgb(203 160 82 / 0.5); }
-  .rail a:first-child::before { display: none; }
-  .rail-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--color-gold); transition: background-color .25s, transform .25s cubic-bezier(.2, 1.6, .4, 1); }
-  .rail a.is-past .rail-dot { background: var(--color-gold); border-style: solid; }
-  .rail a.is-here .rail-dot { background: var(--color-tiger); border: 1.5px solid var(--color-tiger); transform: scale(1.3); }
-  .rail-lbl { position: absolute; right: calc(100% + 14px); white-space: nowrap; padding: 4px 10px; background: var(--color-ink); border: 1px solid rgb(203 160 82 / 0.45); color: var(--color-sand);
-    font-family: var(--font-note); font-style: italic; font-size: 15px; opacity: 0; translate: 6px 0; transition: opacity .2s, translate .2s; pointer-events: none; }
-  .rail a:hover .rail-lbl, .rail a:focus-visible .rail-lbl { opacity: 1; translate: 0 0; }
-  /* Wide screens: the chapter you're in is always named (the margin is wide enough not to cover content). */
-  @media (min-width: 1600px) { .rail a.is-here .rail-lbl { opacity: 1; translate: 0 0; } }
-  .rail { padding: 6px; }
-  .rail a:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 1px; }
-  :global(.read-line) { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
 </style>

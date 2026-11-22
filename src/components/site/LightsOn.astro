@@ -10,19 +10,21 @@ interface Props {
   src: string;
   off: string;
   lit: string;
+  /** Smaller cuts of `lit` ("url 800w, url 1024w, url 1280w"); the frame is at most 980 px wide. */
+  litSet?: string;
   label: string;
   lamps: { x: number; y: number; size?: number }[];
   ratio: number;
   place: string;
 }
-const { src, off, lit, label, lamps, ratio, place } = Astro.props;
+const { src, off, lit, litSet, label, lamps, ratio, place } = Astro.props;
 ---
 <figure class="lights" data-lights data-glow="off" style={`--ratio: ${ratio}; --dusk: 0;`}>
   <div class="frame">
     <video class="shot" muted playsinline preload="none" data-poster={off} aria-label={label} disablepictureinpicture>
       <source src={src} type="video/mp4" />
     </video>
-    <img class="shot lit" src={lit} alt="" loading="lazy" decoding="async" />
+    <img class="shot lit" src={lit} srcset={litSet} sizes={litSet ? '(min-width: 1024px) 980px, 100vw' : undefined} alt="" loading="lazy" decoding="async" />
     <div class="dusk" aria-hidden="true"></div>
     <LampHalos lamps={lamps} ratio={ratio} />
   </div>
@@ -35,6 +37,7 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
 </figure>
 
 <script>
+  import { MS } from '@/lib/motion-tokens';
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   for (const fig of document.querySelectorAll<HTMLElement>('[data-lights]')) {
     const video = fig.querySelector('video')!;
@@ -81,13 +84,16 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
     video.addEventListener('ended', () => set('lit'));
 
     // Dusk follows the scroll: 0 as the photo enters, 1 when its middle is 65% down the screen.
+    // Where CSS can drive it from the frame's position (animation-timeline: view()), it does, off the
+    // main thread; this script then only decides when the lamps come on.
+    const cssDusk = CSS.supports('animation-timeline: view()');
     let raf = 0;
     const update = () => {
       raf = 0;
       const r = frame.getBoundingClientRect();
       const vh = window.innerHeight;
       const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.35 + r.height * 0.5)));
-      fig.style.setProperty('--dusk', p.toFixed(3));
+      if (!cssDusk) fig.style.setProperty('--dusk', p.toFixed(3));
       if (p >= 1 && state === 'off') on();
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
@@ -97,12 +103,14 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
     }).observe(fig);
 
     pull.addEventListener('click', () => {
+      // A short pull, then the chain springs back while the room goes dark.
       fig.dataset.pulled = 'true';
-      window.setTimeout(() => delete fig.dataset.pulled, 260);
+      window.setTimeout(() => delete fig.dataset.pulled, MS.fast);
       video.pause();
       delete fig.dataset.still;
       set('off');
       fig.style.setProperty('--dusk', '1');
+      // A breath in the dark (a wait, not a movement) before the clip replays.
       window.setTimeout(on, 650);
     });
   }
@@ -112,24 +120,27 @@ const { src, off, lit, label, lamps, ratio, place } = Astro.props;
   .lights { margin: 0; display: flex; flex-direction: column; gap: 12px; max-width: 980px; width: 100%; margin-inline: auto; }
   .frame { position: relative; aspect-ratio: var(--ratio); overflow: hidden; border: 2px solid var(--color-gold); background: #2c2925; }
   .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .lit { opacity: 0; transition: opacity 2.6s ease; }
+  /* The lamps warm up: two long beats, the one slow fade on the site (light, not an object). */
+  .lit { opacity: 0; transition: opacity calc(var(--dur-story-long) * 2) var(--curve-in-out); }
   [data-still] .lit { opacity: 1; }
   /* Evening: a deep blue-ink multiply that grows with scroll, darker at the edges. */
   .dusk { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: calc(var(--dusk) * 0.55);
     background: radial-gradient(120% 90% at 40% 30%, #8a7f96, #3a3348 70%, #241f2c); }
+  /* The same dusk on a CSS view timeline is in global.css ("Lights on"): the scoped-style pipeline drops
+     animation-timeline declarations written here. */
 
   figcaption { display: flex; align-items: center; gap: 14px; min-height: 64px; }
   .cue { font-family: var(--font-note); font-style: italic; font-size: 18px; }
   [data-glow='on'] .cue, [data-glow='lit'] .cue { color: var(--color-tiger-deep); }
 
-  /* Brass pull-switch: a bead chain and a knob. Pulling drops it a few pixels. */
+  /* Brass pull-switch: a bead chain and a knob. The pull is quick (out-curve), the chain springs back up
+     on its own weight. Transform only, so nothing lays out. */
   .pull { position: relative; flex: none; width: 44px; height: 64px; border: 0; padding: 0; background: none; cursor: pointer; }
   .pull:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
-  .chain { position: absolute; left: 50%; top: 0; height: 40px; width: 3px; translate: -50% 0;
-    background: repeating-linear-gradient(180deg, var(--color-gold) 0 3px, transparent 3px 5px); transition: height 0.18s ease; }
+  .chain { position: absolute; left: 50%; top: 0; height: 40px; width: 3px; translate: -50% 0; transform-origin: 50% 0;
+    background: repeating-linear-gradient(180deg, var(--color-gold) 0 3px, transparent 3px 5px); transition: transform var(--dur-spring) var(--curve-spring); }
   .knob { position: absolute; left: 50%; top: 38px; width: 18px; height: 22px; translate: -50% 0; border-radius: 45% 45% 50% 50% / 35% 35% 65% 65%;
-    background: radial-gradient(circle at 35% 30%, #f3dca6, var(--color-gold) 45%, #8a6a2c); box-shadow: 0 2px 4px rgb(44 41 37 / 0.35); transition: top 0.18s ease; }
-  [data-pulled] .chain { height: 50px; }
-  [data-pulled] .knob { top: 48px; }
-  @media (prefers-reduced-motion: reduce) { .lit { transition: none; } }
+    background: radial-gradient(circle at 35% 30%, #f3dca6, var(--color-gold) 45%, #8a6a2c); box-shadow: 0 2px 4px rgb(44 41 37 / 0.35); transition: transform var(--dur-spring) var(--curve-spring); }
+  [data-pulled] .chain { transform: scaleY(1.25); transition-duration: var(--dur-fast); transition-timing-function: var(--curve-out); }
+  [data-pulled] .knob { transform: translateY(10px); transition-duration: var(--dur-fast); transition-timing-function: var(--curve-out); }
 </style>

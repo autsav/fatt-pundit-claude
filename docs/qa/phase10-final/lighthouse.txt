@@ -1,0 +1,94 @@
+
+/: largest-contentful-paint=0.83 (2.8 s), speed-index=0.81 (4.0 s), max-potential-fid=0.74 (180 ms), interactive=0.84 (4.4 s), mainthread-work-breakdown=0 (4.1 s), unused-javascript=0.5 (Est savings of 31 KiB), is-crawlable=0, forced-reflow-insight=0, image-delivery-insight=0 (Est savings of 144 KiB), network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 330 ms)
+  unused-javascript: Est savings of 31 KiB
+     {"url":"http://127.0.0.1:4321/_astro/client.BrDikjgA.js","totalBytes":65904,"wastedBytes":31836,"wastedPercent":48.307122860417486}
+  image-delivery-insight: Est savings of 144 KiB
+     {"node":{"type":"node","lhId":"page-0-IMG","path":"1,HTML,1,BODY,11,MAIN,16,ASTRO-ISLAND,0,SECTION,1,DIV,5,OL,1,LI,0,ARTICLE,1,IMG","selector":"ol.m-0 > li.voyage-card > article.voyage-postcard > img.
+     {"node":{"type":"node","lhId":"page-1-IMG","path":"2,DIV,3,IMG","selector":"div.arrival > div.center > img.stamp","boundingRect":{"top":0,"bottom":0,"left":0,"right":0,"width":0,"height":0},"snippet":
+     {"node":{"type":"node","lhId":"page-2-IMG","path":"1,HTML,1,BODY,11,MAIN,16,ASTRO-ISLAND,0,SECTION,1,DIV,5,OL,2,LI,0,ARTICLE,1,DIV,1,FIGURE,0,IMG","selector":"article.voyage-postcard > div.flex > figu
+     {"node":{"type":"node","lhId":"page-3-IMG","path":"1,HTML,1,BODY,11,MAIN,16,ASTRO-ISLAND,0,SECTION,1,DIV,5,OL,2,LI,0,ARTICLE,1,DIV,0,FIGURE,0,IMG","selector":"article.voyage-postcard > div.flex > figu
+     {"node":{"type":"node","lhId":"page-4-IMG","path":"1,HTML,1,BODY,11,MAIN,11,SECTION,0,DIV,0,DIV,0,IMG","selector":"section.doors > div.stage > div.camera > img.room","boundingRect":{"top":1093,"bottom
+  render-blocking-insight: Est savings of 330 ms
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":461}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":311}
+     {"url":"http://127.0.0.1:4321/_astro/index.BdG5kRWU.css","totalBytes":5009,"wastedMs":161}
+  layout-shifts: 1 layout shift found
+     {"node":{"type":"node","lhId":"page-5-DIV","path":"1,HTML,1,BODY,11,MAIN,8,SECTION,1,DIV","selector":"body > main > section#top > div.hero-words","boundingRect":{"top":169,"bottom":859,"left":0,"right
+
+/soho/: total-blocking-time=0.75 (330 ms), max-potential-fid=0.27 (340 ms), unused-javascript=0.5 (Est savings of 40 KiB), is-crawlable=0, image-delivery-insight=0.5 (Est savings of 9 KiB), network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 210 ms)
+  unused-javascript: Est savings of 40 KiB
+     {"url":"http://127.0.0.1:4321/_astro/client.BrDikjgA.js","totalBytes":65904,"wastedBytes":40778,"wastedPercent":61.87550495086711}
+  image-delivery-insight: Est savings of 9 KiB
+     {"node":{"type":"node","lhId":"page-1-IMG","path":"1,HTML,1,BODY,12,MAIN,6,SECTION,0,DIV,1,DIV,0,DIV,0,DIV,4,IMG","selector":"div.chapter-body > div.sig > div.sig-ticket > img.sig-stamp","boundingRect
+  render-blocking-insight: Est savings of 210 ms
+     {"url":"http://127.0.0.1:4321/_astro/index.Coedq4eI.css","totalBytes":4620,"wastedMs":312}
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":312}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":312}
+
+/covent-garden/: largest-contentful-paint=0.81 (2.9 s), unused-javascript=0.5 (Est savings of 40 KiB), is-crawlable=0, image-delivery-insight=0.5 (Est savings of 145 KiB), network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 160 ms)
+  unused-javascript: Est savings of 40 KiB
+     {"url":"http://127.0.0.1:4321/_astro/client.BrDikjgA.js","totalBytes":65904,"wastedBytes":40778,"wastedPercent":61.87550495086711}
+  image-delivery-insight: Est savings of 145 KiB
+     {"node":{"type":"node","lhId":"page-2-IMG","path":"1,HTML,1,BODY,12,MAIN,8,SECTION,0,DIV,1,DIV,5,DIV,0,ASTRO-ISLAND,0,DIV,0,OL,4,LI,1,BUTTON,0,IMG","selector":"ol.room-strip > li.room-frame > button.r
+     {"node":{"type":"node","lhId":"page-3-IMG","path":"1,HTML,1,BODY,12,MAIN,8,SECTION,0,DIV,1,DIV,5,DIV,0,ASTRO-ISLAND,0,DIV,0,OL,2,LI,1,BUTTON,0,IMG","selector":"ol.room-strip > li.room-frame > button.r
+     {"node":{"type":"node","lhId":"page-4-IMG","path":"1,HTML,1,BODY,12,MAIN,8,SECTION,0,DIV,1,DIV,5,DIV,0,ASTRO-ISLAND,0,DIV,0,OL,3,LI,1,BUTTON,0,IMG","selector":"ol.room-strip > li.room-frame > button.r
+     {"node":{"type":"node","lhId":"page-5-IMG","path":"1,HTML,1,BODY,12,MAIN,8,SECTION,0,DIV,1,DIV,5,DIV,0,ASTRO-ISLAND,0,DIV,0,OL,0,LI,1,BUTTON,0,IMG","selector":"ol.room-strip > li.room-frame > button.r
+     {"node":{"type":"node","lhId":"page-6-IMG","path":"1,HTML,1,BODY,12,MAIN,8,SECTION,0,DIV,1,DIV,5,DIV,0,ASTRO-ISLAND,0,DIV,0,OL,1,LI,1,BUTTON,0,IMG","selector":"ol.room-strip > li.room-frame > button.r
+  render-blocking-insight: Est savings of 160 ms
+     {"url":"http://127.0.0.1:4321/_astro/index.Coedq4eI.css","totalBytes":4620,"wastedMs":315}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":315}
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":315}
+  layout-shifts: 1 layout shift found
+     {"node":{"type":"node","lhId":"page-1-SPAN","path":"1,HTML,1,BODY,12,MAIN,3,DIV,0,DIV,0,DL,1,DIV,2,DD,1,SPAN","selector":"dl.fp-facts > div > dd > span.vs-nowrap","boundingRect":{"top":617,"bottom":63
+
+/soho/menu/: unused-css-rules=0 (Est savings of 10 KiB), is-crawlable=0, network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 370 ms)
+  unused-css-rules: Est savings of 10 KiB
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","wastedBytes":10570,"wastedPercent":57.71489588894821,"totalBytes":18314}
+  render-blocking-insight: Est savings of 370 ms
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":463}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":313}
+     {"url":"http://127.0.0.1:4321/_astro/menu.B9Ugwc0u.css","totalBytes":3233,"wastedMs":163}
+
+/book/: unused-css-rules=0.5 (Est savings of 10 KiB), is-crawlable=0, forced-reflow-insight=0, image-delivery-insight=0.5 (Est savings of 53 KiB), network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 190 ms)
+  unused-css-rules: Est savings of 10 KiB
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","wastedBytes":10547,"wastedPercent":57.58722347315397,"totalBytes":18314}
+  image-delivery-insight: Est savings of 53 KiB
+     {"node":{"type":"node","lhId":"page-4-IMG","path":"1,HTML,1,BODY,10,MAIN,1,SECTION,0,DIV,0,DIV,0,IMG","selector":"section.fp-next > div.wrap > div.fp-next-photo > img","boundingRect":{"top":1848,"bott
+  render-blocking-insight: Est savings of 190 ms
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":310}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":310}
+  layout-shifts: 1 layout shift found
+     {"node":{"type":"node","lhId":"page-1-P","path":"1,HTML,1,BODY,10,MAIN,0,DIV,1,DIV,1,DIV,2,OL,0,LI,1,DIV,2,P","selector":"ol.fp-ledger > li#book-soho > div.desk-main > p.desk-addr","boundingRect":{"to
+
+/private-dining/: unused-css-rules=0.5 (Est savings of 10 KiB), is-crawlable=0, forced-reflow-insight=0, image-delivery-insight=0.5 (Est savings of 53 KiB), lcp-discovery-insight=0, network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 160 ms)
+  unused-css-rules: Est savings of 10 KiB
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","wastedBytes":10576,"wastedPercent":57.75087629703568,"totalBytes":18314}
+  image-delivery-insight: Est savings of 53 KiB
+     {"node":{"type":"node","lhId":"page-1-IMG","path":"1,HTML,1,BODY,10,MAIN,1,SECTION,0,DIV,0,DIV,0,IMG","selector":"section.fp-next > div.wrap > div.fp-next-photo > img","boundingRect":{"top":2972,"bott
+  render-blocking-insight: Est savings of 160 ms
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":308}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":308}
+
+/our-story/: unused-css-rules=0.5 (Est savings of 10 KiB), is-crawlable=0, forced-reflow-insight=0, image-delivery-insight=0.5 (Est savings of 108 KiB), network-dependency-tree-insight=0, render-blocking-insight=0 (Est savings of 170 ms)
+  unused-css-rules: Est savings of 10 KiB
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","wastedBytes":10576,"wastedPercent":57.74739432205948,"totalBytes":18314}
+  image-delivery-insight: Est savings of 108 KiB
+     {"node":{"type":"node","lhId":"page-2-IMG","path":"1,HTML,1,BODY,10,MAIN,1,DIV,0,DIV,0,DIV,2,SECTION,1,DIV,0,FIGURE,1,DIV,0,DIV,0,DIV,0,IMG","selector":"div.stage > div.frame > div.sketch > img.sketch
+     {"node":{"type":"node","lhId":"page-1-IMG","path":"1,HTML,1,BODY,10,MAIN,0,HEADER,0,DIV,0,IMG","selector":"main#content > header.story-hero > div.wrap > img.story-stamp","boundingRect":{"top":158,"bot
+  render-blocking-insight: Est savings of 170 ms
+     {"url":"http://127.0.0.1:4321/_astro/logo-stamp-distressed-left.kOqHntdW.css","totalBytes":18609,"wastedMs":310}
+     {"url":"http://127.0.0.1:4321/_astro/SiteFooter.OpcKWxEN.css","totalBytes":5141,"wastedMs":310}
+     {"url":"http://127.0.0.1:4321/_astro/our-story.Bxl4jjzq.css","totalBytes":2012,"wastedMs":310}
+  layout-shifts: 1 layout shift found
+     {"node":{"type":"node","lhId":"page-0-P","path":"1,HTML,1,BODY,10,MAIN,0,HEADER,0,DIV,4,P","selector":"main#content > header.story-hero > div.wrap > p.story-note","boundingRect":{"top":556,"bottom":66
+┌─────────┬────────────────────┬──────┬─────┬─────┬──────┬──────────┬──────────┬───────┬───────┬───────┬──────────┐
+│ (index) │ page               │ perf │ seo │ bp  │ a11y │ labLcpMs │ obsLcpMs │ fcpMs │ tbtMs │ cls   │ weightKB │
+├─────────┼────────────────────┼──────┼─────┼─────┼──────┼──────────┼──────────┼───────┼───────┼───────┼──────────┤
+│ 0       │ '/'                │ 92   │ 69  │ 100 │ 100  │ 2808     │ 229      │ 1222  │ 142   │ 0.04  │ 940      │
+│ 1       │ '/soho/'           │ 91   │ 69  │ 100 │ 100  │ 2298     │ 385      │ 1074  │ 334   │ 0     │ 409      │
+│ 2       │ '/covent-garden/'  │ 95   │ 69  │ 100 │ 100  │ 2895     │ 349      │ 1230  │ 56    │ 0     │ 813      │
+│ 3       │ '/soho/menu/'      │ 99   │ 69  │ 100 │ 100  │ 2126     │ 279      │ 1226  │ 48    │ 0     │ 196      │
+│ 4       │ '/book/'           │ 100  │ 69  │ 100 │ 100  │ 919      │ 167      │ 919   │ 0     │ 0.001 │ 266      │
+│ 5       │ '/private-dining/' │ 99   │ 69  │ 100 │ 100  │ 2208     │ 195      │ 916   │ 0     │ 0     │ 293      │
+│ 6       │ '/our-story/'      │ 100  │ 69  │ 100 │ 100  │ 919      │ 139      │ 919   │ 0     │ 0.003 │ 295      │
+└─────────┴────────────────────┴──────┴─────┴─────┴──────┴──────────┴──────────┴───────┴───────┴───────┴──────────┘

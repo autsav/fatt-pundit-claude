@@ -2,7 +2,7 @@
 /**
  * "The tale of Fatt & Pundit" as comic panels (data: src/data/story.ts).
  *
- * full:  every chapter with its heading (the /our-story/ page).
+ * full:  every chapter with its heading, or one chapter with `only` (the /our-story/ page).
  * short: only the ★ panels, no chapter headings (the home page): first wide, the rest in pairs.
  *
  * A panel shows its illustration when src/assets/images/story/<id>.* exists, otherwise a storyboard
@@ -21,8 +21,11 @@ import stamp from '../../assets/images/brand/stamp-gold.png';
 
 interface Props {
   mode: 'full' | 'short';
+  /** full mode, one chapter only: /our-story/ renders chapter by chapter, and the page's wrapper
+   *  around each chapter carries its anchor id (it holds the scenes and this comic version). */
+  only?: string;
 }
-const { mode } = Astro.props;
+const { mode, only } = Astro.props;
 
 // Illustrations, when the illustrator's files are in (named after the panel id).
 const art = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/*.{jpg,jpeg,png,webp,avif}', { eager: true });
@@ -48,16 +51,16 @@ const show = async (p: Panel, size: Panel['size']): Promise<Shown> => {
 
 const groups =
   mode === 'full'
-    ? await Promise.all(chapters.map(async (c) => ({ ...c, panels: await Promise.all(c.panels.map((p) => show(p, p.size))) })))
-    : [{ id: 'story-short', label: '', title: '', panels: await Promise.all(chapters.flatMap((c) => c.panels).filter((p) => p.short).map((p, i) => show(p, i === 0 ? 'wide' : 'half'))) }];
+    ? await Promise.all(chapters.map((c, n) => ({ c, n })).filter(({ c }) => !only || c.id === only).map(async ({ c, n }) => ({ ...c, n, panels: await Promise.all(c.panels.map((p) => show(p, p.size))) })))
+    : [{ id: 'story-short', label: '', title: '', n: 0, panels: await Promise.all(chapters.flatMap((c) => c.panels).filter((p) => p.short).map((p, i) => show(p, i === 0 ? 'wide' : 'half'))) }];
 ---
 
 <div class:list={['comic', `comic-${mode}`]} data-comic>
-  {groups.map((g, gi) => (
-    <section class="chapter" id={mode === 'full' ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
+  {groups.map((g) => (
+    <section class="chapter" id={mode === 'full' && !only ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
       {mode === 'full' && (
         <header class="ch-head">
-          <p class="ch-no">Chapter {['one', 'two', 'three', 'four', 'five', 'six'][gi]}</p>
+          <p class="ch-no">Chapter {['one', 'two', 'three', 'four', 'five', 'six'][g.n]}</p>
           <h2 id={`${g.id}-title`} class="ch-title">{g.title}</h2>
         </header>
       )}
@@ -105,9 +108,7 @@ const groups =
 <style>
   .comic { --gap: clamp(16px, 2.4vw, 28px); display: grid; gap: clamp(56px, 9vw, 120px); }
   .comic-short { gap: 0; }
-  .ch-head { display: grid; gap: 6px; margin-bottom: clamp(20px, 3vw, 36px); text-align: center; }
-  .ch-no { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(18px, 1.6vw, 21px); color: var(--color-tiger-deep); }
-  .ch-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(32px, 4.6vw, 60px); line-height: 1; }
+  /* Chapter heads, captions and speech bubbles look the same in StoryScenes: global.css "Story type". */
 
   .panels { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
   @media (min-width: 900px) {
@@ -115,8 +116,6 @@ const groups =
     .panel-wide { grid-column: 1 / -1; }
   }
   .panel { margin: 0; display: flex; flex-direction: column; gap: 10px; }
-  /* Caption box: the narrator, typed on a strip of paper. */
-  .cap { align-self: flex-start; max-width: 62ch; margin: 0; padding: 10px 14px; background: var(--color-ink); color: var(--color-sand); font-size: clamp(15px, 1.25vw, 17px); line-height: 1.45; box-shadow: 4px 4px 0 var(--color-gold); }
   .stage { position: relative; }
   /* contain: each frame paints on its own, so a panel sliding in never repaints its neighbours. */
   .frame { position: relative; overflow: hidden; background: var(--color-paper-light); contain: layout paint; }
@@ -139,13 +138,9 @@ const groups =
     font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(13px, 1.1vw, 15px); line-height: 1.4; color: rgb(44 41 37 / 0.85); }
   @media (max-width: 599px) { .sketch-note { font-size: 12.5px; padding: 6px 9px; } .sketch { padding: 4%; } }
 
-  /* Speech bubbles: paper, ink outline, a tail pointing at whoever speaks. */
-  .bubble { position: absolute; left: var(--x); top: var(--y); max-width: min(42%, 300px); margin: 0; padding: 12px 16px; background: var(--color-paper-light); color: var(--color-ink);
-    border: 2.5px solid var(--color-ink); border-radius: 22px; font-size: clamp(14px, 1.3vw, 18px); line-height: 1.3; font-weight: 700; box-shadow: 3px 3px 0 rgb(44 41 37 / 0.25); }
+  /* Speech bubbles placed on the picture at the panel's --x/--y (their look is shared, see above). */
+  .bubble { left: var(--x); top: var(--y); }
   .panel-half .bubble { max-width: min(58%, 260px); }
-  .bubble::after { content: ''; position: absolute; bottom: -14px; width: 20px; height: 16px; background: inherit; border: inherit; border-top: 0; border-radius: 0 0 0 100%; }
-  .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
-  .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
 
   /* Phones: bubbles sit under the picture (tail up at the scene) instead of covering a small panel. */
   @media (max-width: 599px) {
@@ -161,10 +156,13 @@ const groups =
   /* Short version on home: a tight comic page. */
   .comic-short .panels { gap: var(--gap); }
 
-  /* Motion: only once JS has said it will reveal them (no-JS and calm mode see everything). */
-  :global([data-comic-js]) .panel { opacity: 0; transform: translateY(36px); transition: opacity .6s ease, transform .7s cubic-bezier(.2, .9, .3, 1); }
+  /* Motion: only once JS has said it will reveal them (no-JS and calm mode see everything). Where the
+     browser has view timelines, the rise follows the scroll instead: global.css "Story panels" (the
+     scoped-style pipeline drops animation-timeline declarations written here). */
+  :global([data-comic-js]) .panel { opacity: 0; transform: translateY(var(--rise)); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-story) var(--curve-out); }
   :global([data-comic-js]) .panel.is-in { opacity: 1; transform: none; }
-  :global([data-comic-js]) .bubble { opacity: 0; transform: scale(0.7); transform-origin: 30% 100%; transition: opacity .25s ease var(--d), transform .45s cubic-bezier(.2, 1.6, .4, 1) var(--d); }
+  /* Speech lands like a stamp, each bubble a beat after the last (--d is set per bubble). */
+  :global([data-comic-js]) .bubble { opacity: 0; transform: scale(0.7); transform-origin: 30% 100%; transition: opacity var(--dur-fast) var(--curve-out) var(--d), transform var(--dur-spring) var(--curve-spring) var(--d); }
   :global([data-comic-js]) .is-in .bubble { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) {
     :global([data-comic-js]) .panel, :global([data-comic-js]) .bubble { opacity: 1; transform: none; transition: none; }

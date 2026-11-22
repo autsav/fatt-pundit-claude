@@ -116,16 +116,140 @@
   .lift-2 { box-shadow: var(--lift-2); }
 }
 
-@keyframes fp-pill-in { from { transform: translateY(16px); opacity: 0; filter: blur(4px); } to { transform: none; opacity: 1; filter: none; } }
+/* The reading line under the header (ChapterRail.astro appends it). It follows the page's scroll in
+   CSS where the browser has scroll timelines (one property, one element: no script per frame). Off in
+   calm mode, where the reduced-motion safety net below would shorten the timeline; the script writes
+   the transform then, and in browsers without the feature. */
+.read-line { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .read-line { animation-name: read-line; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root block); }
+  }
+}
+@keyframes read-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* "Lights on" (LightsOn.astro): the dusk over the photo follows the frame's own scroll position in CSS,
+   from the frame entering the screen to its middle about 65% down (cover 42% of its travel). The timeline
+   is named on the frame because the frame clips (overflow: hidden) and would otherwise be the dusk's
+   scroller. Calm mode keeps the script's still dusk. Here, not in the component: see .read-line. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-lights] .frame { view-timeline-name: --lights-frame; view-timeline-axis: block; }
+    [data-lights] .dusk { animation-name: lights-dusk; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --lights-frame; animation-range: entry 0% cover 42%; }
+  }
+}
+@keyframes lights-dusk { from { opacity: 0; } to { opacity: 0.55; } }
+
+/* Story panels (StoryComic.astro, M3 of docs/MOTION-ROADMAP.md): each panel rises with the scroll, from
+   the moment it enters the screen to 60% of its own height in, instead of on an observer tick. The
+   bubbles still stamp on `.is-in` (that is a beat, not a scroll position). Without view timelines or
+   in calm mode the component's own transition (or nothing) applies. Here, not in the component: see
+   .read-line. The animation beats the component's `.panel.is-in` declarations, as every animation does. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-comic-js] .panel { animation-name: panel-rise; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(block); animation-range: entry 0% entry 60%; }
+  }
+}
+@keyframes panel-rise { from { opacity: 0; transform: translateY(var(--rise)); } to { opacity: 1; transform: none; } }
+
+/* Story type: chapter heads, the narrator's caption box and speech bubbles, shared by the comic
+   (StoryComic.astro) and the scenes (StoryScenes.astro). :where() keeps these at one class, so each
+   component's own scoped sizes and phone rules still win whatever the CSS order. */
+:where(.comic, .story-scenes) .ch-head { display: grid; gap: 6px; margin-bottom: clamp(20px, 3vw, 36px); text-align: center; }
+:where(.comic, .story-scenes) .ch-no { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(18px, 1.6vw, 21px); color: var(--color-tiger-deep); }
+:where(.comic, .story-scenes) .ch-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(32px, 4.6vw, 60px); line-height: 1; }
+/* Caption box: the narrator, typed on a strip of paper. */
+:where(.comic, .story-scenes) .cap { align-self: flex-start; max-width: 62ch; margin: 0; padding: 10px 14px; background: var(--color-ink); color: var(--color-sand); font-size: clamp(15px, 1.25vw, 17px); line-height: 1.45; box-shadow: 4px 4px 0 var(--color-gold); }
+/* Speech bubbles: paper, ink outline, a tail pointing at whoever speaks. */
+:where(.comic, .story-scenes) .bubble { position: absolute; max-width: min(42%, 300px); margin: 0; padding: 12px 16px; background: var(--color-paper-light); color: var(--color-ink);
+  border: 2.5px solid var(--color-ink); border-radius: 22px; font-size: clamp(14px, 1.3vw, 18px); line-height: 1.3; font-weight: 700; box-shadow: 3px 3px 0 rgb(44 41 37 / 0.25); }
+:where(.comic, .story-scenes) .bubble::after { content: ''; position: absolute; bottom: -14px; width: 20px; height: 16px; background: inherit; border: inherit; border-top: 0; border-radius: 0 0 0 100%; }
+:where(.comic, .story-scenes) .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
+:where(.comic, .story-scenes) .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
+
+/* Story scenes: the paper puppet theatre (StoryScene.astro, SceneArt.astro, story/scenes/*.astro).
+   docs/STORY-MOTION-PLAN.md. Every scene is a tall track (.story-scene) that names the view timeline
+   --scene; a layer resolves it from its own track, so the name repeats freely. On a track taller than the
+   screen its `contain` range is exactly the stretch where the sticky stage is pinned, so
+   `contain 20% contain 40%` reads as "20-40% of the track".
+
+   A moving layer carries `.fx` and says what it does with custom properties, in its chapter component:
+     --from / --to           its range, in % of the track (default 0% / 100%)
+     --x0 --y0 --r0 --s0 --o0   where it starts: translate, rotate, scale, opacity
+     --x1 --y1 --r1 --s1 --o1   where it ends (defaults: no move, opacity 1)
+   Presets fill in the usual starts (.fx-fade-up, .fx-pop, .fx-fade). `.fx-then-out` adds a fade-out over
+   --out-from / --out-to; its keyframes give only `to`, so before that range it keeps the value underneath.
+   `.fx-draw` draws a path (pathLength 1) by its dashoffset. Linear, fill both, transform and opacity only.
+
+   Gate: view timelines + no reduced-motion + not switched to the comic (html[data-story="comic"], set by
+   the "Read as a comic" button). Otherwise no scene shows and each chapter's comic tells it. Here, not in
+   the components: see .read-line. */
+.story-scenes { display: none; }
+.fx-fade-up { --o0: 0; --y0: var(--rise); }
+.fx-pop { --o0: 0; --s0: 0.7; }
+.fx-fade { --o0: 0; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-story='comic']) .story-scenes { display: block; }
+    :root:not([data-story='comic']) .story-chapter[data-scenes] .comic { display: none; }
+    .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
+    .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
+    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-draw { animation-name: fx-draw; }
+  }
+}
+@keyframes fx-move {
+  from { transform: translate(var(--x0, 0), var(--y0, 0)) rotate(var(--r0, 0deg)) scale(var(--s0, 1)); opacity: var(--o0, 1); }
+  to { transform: translate(var(--x1, 0), var(--y1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); opacity: var(--o1, 1); }
+}
+@keyframes fx-out { to { opacity: 0; } }
+@keyframes fx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* Scene layout shared by every chapter. :where() keeps it at one class so each chapter's own placement
+   wins. --floor is what the phone dock (site.css .dock, 640px and below) covers at the stage's foot. */
+:where(.story-scenes) { --gutter: clamp(16px, 4vw, 48px); --top: 96px; --ship-w: min(26vw, 300px); --sea-h: 26%; --floor: 0px;
+  --sea-top: calc(var(--floor) + var(--sea-h)); background: var(--color-sand); }
+:where(.story-scenes) .ch-head { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; }
+:where(.story-scene) { position: relative; height: var(--h, 220vh); }
+:where(.story-scene) .scene-stage { position: sticky; top: 0; height: 100svh; overflow: clip; contain: paint; background: var(--color-paper); }
+:where(.story-scenes) .layer { position: absolute; }
+:where(.story-scenes) .scene-sea { left: 0; right: 0; bottom: 0; width: 100%; height: var(--sea-top); max-width: none; }
+:where(.story-scenes) .scene-ship { width: var(--ship-w); height: auto; max-width: none; }
+/* The narrator top-left under the sticky header: one caption slot, captions take turns in it. */
+:where(.story-scenes) .scene-text { position: absolute; top: var(--top); left: var(--gutter); right: var(--gutter); display: grid; justify-items: start; z-index: 2; }
+:where(.story-scenes) .scene-text .cap { grid-area: 1 / 1; max-width: min(46ch, 100%); }
+:where(.story-scenes) .scene-bubble { z-index: 2; transform-origin: 18% 100%; max-width: min(34vw, 300px); }
+/* A place name on a chart or a photo: sand on an ink halo, readable on dark and light. */
+:where(.story-scenes) .scene-place { position: absolute; z-index: 1; margin: 0; display: flex; align-items: center; gap: 8px; translate: -9px -50%;
+  font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(20px, 2.2vw, 30px); color: var(--color-sand);
+  text-shadow: 0 0 2px var(--color-ink), 0 0 6px var(--color-ink), 0 1px 0 var(--color-ink); }
+:where(.story-scenes) .scene-place::before { content: ''; width: 14px; height: 14px; flex: none; border-radius: 50%; background: var(--color-tiger); box-shadow: 0 0 0 3px rgb(237 229 216 / 0.6); }
+/* A storyboard card where an illustration layer has not arrived yet (SceneArt.astro). */
+:where(.story-scenes) .scene-card { display: grid; place-items: end start; padding: 12px; border: 1.5px dashed rgb(44 41 37 / 0.45);
+  background: repeating-linear-gradient(-45deg, transparent 0 9px, rgb(44 41 37 / 0.05) 9px 10px), rgb(250 246 239 / 0.7); }
+:where(.story-scenes) .scene-card p { margin: 0; max-width: 34ch; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(12.5px, 1.1vw, 15px); line-height: 1.4; color: rgb(44 41 37 / 0.85); }
+/* A credit line a photo's licence asks for (CC BY-SA). */
+:where(.story-scenes) .scene-credit { position: absolute; right: var(--gutter); bottom: calc(var(--floor) + 8px); z-index: 2; margin: 0; padding: 2px 8px; background: rgb(44 41 37 / 0.8); color: var(--color-sand); font-size: 12px; }
+:where(.story-scenes) .scene-credit a { color: inherit; }
+@media (max-width: 640px) { :where(.story-scenes) { --floor: calc(60px + env(safe-area-inset-bottom)); } }
+@media (max-width: 599px) {
+  :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }
+  :where(.story-scene) { height: var(--h-phone, var(--h, 180vh)); }
+  :where(.story-scenes) .scene-bubble { max-width: 60vw; }
+}
+
+/* Something new landing in place (a pill's next line, the lightbox photo): transform and opacity only. */
+@keyframes fp-pill-in { from { transform: translateY(calc(var(--rise) / 2)); opacity: 0; } to { transform: none; opacity: 1; } }
 .voyage-paper { background: radial-gradient(rgb(44 41 37 / 0.07) 1px, transparent 1.2px) 0 0 / 7px 7px, radial-gradient(120% 90% at 30% 40%, rgb(255 255 255 / 0.18), transparent 60%); }
 @keyframes fp-pulse { 50% { transform: scale(1.7); opacity: 0.45; } }
 .voyage-pulse { transform-box: fill-box; transform-origin: center; animation: fp-pulse 1.6s ease-in-out infinite; }
 .voyage-place { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: 34px; fill: var(--color-ink); paint-order: stroke; stroke: #fff; stroke-width: 8px; }
-.voyage-stamp { opacity: 0; transform: scale(2.2) rotate(-10deg); transition: opacity .35s ease, transform .55s cubic-bezier(.2, 1.5, .4, 1); }
+.voyage-stamp { opacity: 0; transform: scale(2.2) rotate(-10deg); transition: opacity var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 .voyage-stamp.is-in { opacity: 1; transform: none; }
 
 /* Voyage, "follow the ship" (home scene 3). --u = map units per screen pixel, set by the camera. */
-.voyage-sea { will-change: transform; }
+/* The chart's own layer only while the scene is pinned (Voyage.tsx sets data-pinned on the section). */
+.voyage[data-pinned] .voyage-sea { will-change: transform; }
 .voyage-ink { --u: 1; }
 .voyage-course { fill: none; stroke: var(--color-gold); stroke-opacity: 0.75; stroke-linecap: round; stroke-width: calc(var(--u) * 3px); stroke-dasharray: calc(var(--u) * 0.1px) calc(var(--u) * 10px); }
 .voyage-sailed { fill: none; stroke: var(--color-tiger); stroke-linecap: round; stroke-linejoin: round; stroke-width: calc(var(--u) * 5px); }
@@ -140,25 +264,27 @@
 .voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 600; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
 .voyage-port.is-reached .voyage-name { fill: var(--color-paper-light); }
 .voyage-compass { opacity: 0.9; }
-.voyage-badge { fill: var(--color-tiger); stroke: var(--color-sand); stroke-width: 3; filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.5)); }
-.voyage-hull { filter: brightness(0) invert(1); }
+/* The ship moves every frame: no filters on it (a hard offset shadow, the hull masked from the art's alpha). */
+.voyage-badge-shadow { fill: rgb(0 0 0 / 0.45); }
+.voyage-badge { fill: var(--color-tiger); stroke: var(--color-sand); stroke-width: 3; }
+.voyage-hull { fill: var(--color-sand); }
 .voyage-vignette { background: radial-gradient(130% 100% at 55% 45%, transparent 50%, rgb(20 18 16 / 0.6)); }
 
 .voyage-ticket { box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
   -webkit-mask: radial-gradient(circle 8px at 0 50%, transparent 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 8px at 100% 50%, transparent 97%, #000) right / 51% 100% no-repeat;
   mask: radial-gradient(circle 8px at 0 50%, transparent 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 8px at 100% 50%, transparent 97%, #000) right / 51% 100% no-repeat; }
-.voyage-punch { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed var(--color-ink); transition: background-color .3s, transform .3s cubic-bezier(.2, 1.6, .4, 1); }
+.voyage-punch { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed var(--color-ink); transition: background-color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 .voyage-hole.is-punched .voyage-punch { background: var(--color-ink); border-style: solid; transform: scale(1.1); }
 .voyage-hole.is-here { color: var(--color-tiger-deep); }
 .voyage-hole.is-here .voyage-punch { background: var(--color-tiger); border-color: var(--color-tiger); }
 .voyage-hole:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
-.voyage-sea-note { opacity: 0; transition: opacity .5s ease; width: fit-content; max-width: calc(100% - 24px); margin-inline: auto; padding: 4px 14px; background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.5); }
+.voyage-sea-note { opacity: 0; transition: opacity var(--dur-panel) var(--curve-out); width: fit-content; max-width: calc(100% - 24px); margin-inline: auto; padding: 4px 14px; background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.5); }
 .voyage-sea-note.is-on { opacity: 1; }
 
-.voyage-card { position: absolute; z-index: 10; left: 12px; right: 12px; bottom: 12px; max-height: 46%; opacity: 0; transform: translateY(20px) rotate(-1deg); transition: opacity .45s ease, transform .6s cubic-bezier(.2, 1, .3, 1); pointer-events: none; }
+.voyage-card { position: absolute; z-index: 10; left: 12px; right: 12px; bottom: 12px; max-height: 46%; opacity: 0; transform: translateY(var(--rise)) rotate(-1deg); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-story) var(--curve-out); pointer-events: none; }
 .voyage-card.is-on { opacity: 1; transform: rotate(-1deg); pointer-events: auto; }
 @media (min-width: 1024px) {
-  .voyage-card { left: 40px; right: auto; bottom: auto; top: 54%; width: min(430px, 34vw); max-height: 78%; transform: translateY(calc(-50% + 20px)) rotate(-1.5deg); }
+  .voyage-card { left: 40px; right: auto; bottom: auto; top: 54%; width: min(430px, 34vw); max-height: 78%; transform: translateY(calc(-50% + var(--rise))) rotate(-1.5deg); }
   .voyage-card.is-on { transform: translateY(-50%) rotate(-1.5deg); }
 }
 .voyage-card.is-static { position: relative; inset: auto; width: auto; max-height: none; transform: none; }
@@ -172,7 +298,7 @@
 .voyage-pic { display: block; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: 62% 58%; border: 1px solid rgb(44 41 37 / 0.3); }
 @media (max-width: 1023px) { .voyage-pic { aspect-ratio: 16 / 5; } }
 .voyage-boarding { display: inline-block; margin-left: 4px; padding: 1px 8px; border: 2px solid var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; rotate: -4deg; }
-.fp-pill-swap { display: inline-block; animation: fp-pill-in 0.35s cubic-bezier(0.23, 1, 0.32, 1) both; }
+.fp-pill-swap { display: inline-block; animation: fp-pill-in var(--dur-panel) var(--curve-out) both; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -183,10 +309,12 @@
   }
 }
 
-/* Branch pages: clicking a room morphs its card into that page's arrival (cross-document
-   View Transitions; browsers without them just load the page). Off in calm mode. */
+/* Page changes (cross-document View Transitions; browsers without them just load the page):
+   the page itself crossfades at feedback speed, so a link never feels held back; a room's card
+   morphs into its page's arrival at panel speed (the named branch-* groups). Off in calm mode. */
 @view-transition { navigation: auto; }
-::view-transition-group(*) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+::view-transition-group(*) { animation-duration: var(--dur-panel); animation-timing-function: var(--curve-out); }
+::view-transition-group(root) { animation-duration: var(--dur-fast); }
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
 }
@@ -277,16 +405,21 @@
 .room-edge { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--color-gold); line-height: 1; }
 .room-edge-n { color: var(--color-sand); }
 .room-shot { display: block; padding: 0; border: 0; background: #000; cursor: zoom-in; aspect-ratio: 3 / 2; overflow: hidden; }
-.room-shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2, 1, .3, 1); }
+.room-shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-fast) var(--curve-out); }
 .room-shot:hover img, .room-shot:focus-visible img { transform: scale(1.04); }
 .room-shot:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
 .room-pick { position: absolute; inset: 4px -6px; width: calc(100% + 12px); height: calc(100% - 8px); overflow: visible; pointer-events: none; }
 .room-pick path { fill: none; stroke: var(--color-gold); stroke-width: 5; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 0.5px #8a6a2c); }
-[data-drawn] .room-pick path { stroke-dashoffset: 0; transition: stroke-dashoffset 1.1s cubic-bezier(.6, 0, .3, 1) .2s; }
+[data-drawn] .room-pick path { stroke-dashoffset: 0; transition: stroke-dashoffset var(--dur-story-long) var(--curve-in-out) var(--dur-fast); }
 .room-lightbox { width: 100vw; height: 100svh; max-width: none; max-height: none; margin: 0; padding: 56px 64px 24px; border: 0; background: rgb(23 21 19 / 0.97); color: var(--color-sand); overscroll-behavior: contain; touch-action: pan-y; }
+/* The dark room fades up at feedback speed and (Chromium, see components.css "Dialogs") fades out the same way. */
+.room-lightbox, .room-lightbox::backdrop { opacity: 0; transition: opacity var(--dur-fast) var(--curve-out); }
+.room-lightbox[open], .room-lightbox[open]::backdrop { opacity: 1; }
+@starting-style { .room-lightbox[open], .room-lightbox[open]::backdrop { opacity: 0; } }
+@supports (overlay: auto) { .room-lightbox, .room-lightbox::backdrop { transition-property: opacity, overlay, display; transition-behavior: allow-discrete; } }
 .room-lightbox::backdrop { background: rgb(0 0 0 / 0.6); }
 @media (max-width: 760px) { .room-lightbox { padding: 56px 8px 16px; } }
-.room-lightbox-img { max-width: min(1100px, 100%); max-height: calc(100svh - 160px); object-fit: contain; border: 8px solid var(--color-paper); animation: fp-pill-in .35s cubic-bezier(.23, 1, .32, 1) both; }
+.room-lightbox-img { max-width: min(1100px, 100%); max-height: calc(100svh - 160px); object-fit: contain; border: 8px solid var(--color-paper); animation: fp-pill-in var(--dur-panel) var(--curve-out) both; }
 .room-lb-btn { position: absolute; display: grid; place-items: center; width: 48px; height: 48px; border: 2px solid var(--color-sand); background: rgb(23 21 19 / 0.8); color: var(--color-sand); font-size: 20px; cursor: pointer; }
 .room-lb-prev, .room-lb-next { top: 50%; translate: 0 -50%; }
 .room-lb-prev { left: 12px; }
@@ -298,9 +431,9 @@
 /* Menu by location: the restaurant choice, as the system's option chips (sentence case; chosen = ink, not tiger,
    which is kept for actions). */
 .menu-tag { position: relative; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink);
-  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color .2s, color .2s, transform .2s; }
+  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 .menu-tag:hover { transform: translateY(-2px); }
-.menu-tag:active { transform: translateY(1px) scale(0.98); transition-duration: .06s; }
+.menu-tag:active { transform: translateY(1px) scale(0.98); transition-duration: var(--dur-press); }
 .menu-tag.is-on { background: var(--color-ink); color: var(--color-sand); }
 .menu-tag:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 3px; }
 .menu-soon { padding: clamp(22px, 3vw, 32px); background: var(--color-paper); border: 2px solid var(--color-ink); box-shadow: 0 18px 40px rgb(44 41 37 / 0.2); }

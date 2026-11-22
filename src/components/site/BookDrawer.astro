@@ -71,9 +71,11 @@ const data = branches.map((b) => ({
     </fieldset>
 
     <div class="book-group" data-book-group hidden>
-      <p data-book-group-text></p>
-      <a class="fp-btn fp-btn--primary book-go" data-book-enquire href="/private-dining/">Send a group enquiry</a>
-      <p class="book-small">Ask about space for your group: call <a data-book-tel href="#"></a>.</p>
+      <div class="book-group-in">
+        <p data-book-group-text></p>
+        <a class="fp-btn fp-btn--primary book-go" data-book-enquire href="/private-dining/">Send a group enquiry</a>
+        <p class="book-small">Ask about space for your group: call <a data-book-tel href="#"></a>.</p>
+      </div>
     </div>
 
     <div class="book-go-wrap" data-book-go-wrap>
@@ -98,15 +100,18 @@ const data = branches.map((b) => ({
 
 <style>
   .book { padding: 0; border: 0; margin: auto 0 0 auto; width: min(460px, 100vw); max-width: none; height: 100dvh; max-height: 100dvh; background: transparent; color: var(--color-ink); overflow-y: auto; overscroll-behavior: contain; }
-  .book::backdrop { background: rgb(26 23 20 / 0.6); }
-  .book[open] { animation: book-in 260ms cubic-bezier(.2,.8,.2,1); }
-  @keyframes book-in { from { transform: translateX(100%); } }
+  /* Travels in like the system's side dialog and leaves the same way where the browser can hold a closed
+     dialog in the top layer (keyframes and the pattern in components.css "Dialogs"); a bottom sheet on phones. */
+  .book { transform: translateX(100%); transition: transform var(--dur-panel) var(--curve-in); }
+  .book[open] { transform: none; animation: fp-in-right var(--dur-panel) var(--curve-panel); }
+  .book::backdrop { background: rgb(26 23 20 / 0.6); opacity: 0; transition: opacity var(--dur-panel) var(--curve-out); }
+  .book[open]::backdrop { opacity: 1; }
+  @starting-style { .book[open]::backdrop { opacity: 0; } }
+  @supports (overlay: auto) { .book, .book::backdrop { transition-property: transform, opacity, overlay, display; transition-behavior: allow-discrete; } }
   @media (max-width: 640px) {
-    .book { width: 100vw; height: auto; max-height: 92dvh; margin: auto 0 0; }
-    .book[open] { animation-name: book-up; }
-    @keyframes book-up { from { transform: translateY(100%); } }
+    .book { width: 100vw; height: auto; max-height: 92dvh; margin: auto 0 0; transform: translateY(100%); }
+    .book[open] { animation-name: fp-in-up; }
   }
-  @media (prefers-reduced-motion: reduce) { .book[open] { animation: none; } }
   .book-sheet { box-sizing: border-box; min-height: 100%; background: var(--color-sand); padding: 24px clamp(18px, 4vw, 32px) 28px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; border-left: 3px solid var(--color-ink); }
   @media (max-width: 640px) { .book-sheet { border-left: 0; border-top: 3px solid var(--color-ink); } }
   .book-head { position: relative; padding-right: 48px; }
@@ -120,6 +125,13 @@ const data = branches.map((b) => ({
   .book-chip input { position: absolute; opacity: 0; pointer-events: none; }
   .book-chip span, .book :global(.book-time), .book :global(.book-day) { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-paper-light); font: inherit; font-weight: 700; color: var(--color-ink); cursor: pointer; }
   .book-chip input:checked + span, .book :global(.book-time[aria-checked='true']), .book :global(.book-day[aria-checked='true']) { background: var(--color-ink); color: var(--color-sand); }
+  /* Chips and the +/− have weight: a press (one press beat), then the spring settles them; the chosen chip stamps in. */
+  .book :global(.book-time), .book :global(.book-day), .book-pm { transition: transform var(--dur-spring) var(--curve-spring); }
+  .book :global(.book-time:active), .book :global(.book-day:active), .book-pm:active:not(:disabled) { transform: scale(0.92); transition-duration: var(--dur-press); transition-timing-function: var(--curve-out); }
+  .book :global(.book-time[aria-checked='true']), .book :global(.book-day[aria-checked='true']) { animation: book-stamp var(--dur-spring) var(--curve-spring); }
+  @keyframes book-stamp { from { transform: scale(1.1); } }
+  .book-size.is-bump { animation: book-bump var(--dur-spring) var(--curve-spring); }
+  @keyframes book-bump { 40% { transform: scale(1.14); } }
   .book-chip input:focus-visible + span, .book :global(.book-time:focus-visible), .book :global(.book-day:focus-visible), .book-pm:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
   .book-step { display: inline-flex; align-items: center; border: 2px solid var(--color-ink); background: var(--color-paper-light); }
   .book-pm { width: 52px; height: 48px; font-size: 26px; background: none; border: 0; color: var(--color-ink); cursor: pointer; }
@@ -128,8 +140,15 @@ const data = branches.map((b) => ({
   .book-size::-webkit-inner-spin-button, .book-size::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .book-size:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
   .book-note { margin: 8px 0 0; font-size: 15px; }
-  .book-group { display: grid; gap: 12px; }
-  .book-group > p:first-child { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 18px; }
+  /* The group route unfolds to its own height and folds back: a grid row from 0fr to 1fr (every browser;
+     `height: auto` does not interpolate for a flex item, which this is in the sheet's column). The inner
+     box clips its content while the row grows; its 8px of transparent padding keeps focus rings whole.
+     Where the browser transitions `display`, the fold-back plays before the box is hidden. */
+  .book-group { display: grid; grid-template-rows: 0fr; transition-property: grid-template-rows, display; transition-duration: var(--dur-panel); transition-timing-function: var(--curve-in); transition-behavior: allow-discrete; }
+  .book-group:not([hidden]) { grid-template-rows: 1fr; transition-timing-function: var(--curve-panel); }
+  @starting-style { .book-group:not([hidden]) { grid-template-rows: 0fr; } }
+  .book-group-in { display: grid; gap: 12px; min-height: 0; overflow: clip; padding: 8px; margin: -8px; }
+  .book-group-in > p:first-child { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 18px; }
   .book-done-what { margin: 0; font-size: 18px; }
   .book-link { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-tiger-deep); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
   .book-done[hidden], .book-sheet[hidden] { display: none; }
@@ -246,6 +265,9 @@ const data = branches.map((b) => ({
 
     const link = () => providerLink(b, day, time, size);
 
+    /** Which room and day the chips were last drawn for ("soho@2026-11-22"). */
+    let drawn = '';
+    const savedId = () => { try { return localStorage.getItem('fp-menu-at'); } catch { return null; } };
     const pick = (id: string) => {
       b = all.find((x) => x.id === id) ?? b;
       const r = dlg.querySelector<HTMLInputElement>(`input[name="where"][value="${b.id}"]`);
@@ -253,10 +275,16 @@ const data = branches.map((b) => ({
       day = local(b.tz).ymd;
       if (!slots(day).length) for (let i = 1; i < 8 && !slots(day).length; i++) day = addDays(local(b.tz).ymd, i);
       draw();
+      drawn = `${b.id}@${local(b.tz).ymd}`;
     };
 
     dlg.querySelectorAll<HTMLInputElement>('input[name="where"]').forEach((r) => r.addEventListener('change', () => pick(r.value)));
-    dlg.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => btn.addEventListener('click', () => { size = Math.min(20, Math.max(1, size + Number(btn.dataset.step))); update(); }));
+    dlg.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => btn.addEventListener('click', () => {
+      size = Math.min(20, Math.max(1, size + Number(btn.dataset.step)));
+      update();
+      // The number lands with the spring (restarted by a reflow, so quick presses each bump).
+      sizeIn.classList.remove('is-bump'); void sizeIn.offsetWidth; sizeIn.classList.add('is-bump');
+    }));
     form.addEventListener('submit', (e) => {
       const submitter = (e as SubmitEvent).submitter as HTMLButtonElement | null;
       if (submitter?.value !== 'go') return;
@@ -291,11 +319,17 @@ const data = branches.map((b) => ({
       e.preventDefault();
       opener = t;
       $<HTMLElement>('[data-book-where]').hidden = Boolean(id) || all.length < 2;
-      let saved: string | null = null;
-      try { saved = localStorage.getItem('fp-menu-at'); } catch {}
-      pick(id || saved || all[0].id);
+      const want = id || savedId() || all[0].id;
+      // Drawn ahead at idle (below); redrawn only for another room or a new day.
+      if (drawn !== `${want}@${local(b.tz).ymd}`) pick(want);
       showForm();
       dlg.showModal();
     });
+    // Drawing the 21 day chips and the times on the tap cost 250 ms at 4x CPU (scripts/tap-timing.mjs);
+    // draw the likely room (this page's, else the last picked) once the page is idle instead.
+    const first = document.querySelector<HTMLElement>('[data-book]:not([data-book=""])')?.dataset.book;
+    const preDraw = () => { if (!dlg.open && !drawn) pick((first && all.some((x) => x.id === first) ? first : null) || savedId() || all[0].id); };
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(preDraw, { timeout: 3000 });
+    else window.setTimeout(preDraw, 1000);
   }
 </script>

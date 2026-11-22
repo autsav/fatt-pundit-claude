@@ -25,6 +25,7 @@ Rules
 | soho/ | hero.jpg, gallery-01.jpg ... gallery-09.jpg | /soho/ | **Needed** |
 | covent-garden/ | hero.jpg, gallery-01.jpg ... gallery-09.jpg | /covent-garden/ | **Needed** |
 | dubai/ | hero.jpg (render or site photo) | /dubai/ | **Needed** |
+| unsorted/ | Photos not yet matched to a dish or room (unlabelled-dessert.jpg) | Nothing | Name it after its dish id and move it to dishes/ once the client confirms what it is. Kept out of dishes/ because that folder is globbed, and an unused file there is still copied into the build (563 KB). |
 
 Signature dish ids: momo-kid-goat, crackling-spinach, popcorn-cauliflower, hakka-chilly-paneer-lettuce-cups,
 bombay-chilly-prawns, malabar-monkfish-curry.

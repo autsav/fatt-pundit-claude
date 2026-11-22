@@ -1,0 +1,59 @@
+---
+/**
+ * An art slot in a story scene. Shows, in order of preference:
+ *  1. the illustrator's layer, src/assets/images/story/layers/<name>.(png|webp), when it exists;
+ *  2. the fallback art we already own (a brand cut-out or a photo);
+ *  3. a storyboard card with the pencilled note of what will be drawn there.
+ * So a scene can be built and approved before its illustration arrives; dropping the file in is enough.
+ * Always decorative (alt=""): what the stage shows is said once by StoryScene's sr-only sentence.
+ */
+import { getImage } from 'astro:assets';
+
+interface Props {
+  name: string;
+  fallback?: ImageMetadata;
+  note?: string;
+  /** Candidate widths; capped at the file's own width (brand cut-outs are small). */
+  widths?: number[];
+  sizes: string;
+  class?: string;
+  /** For layers that start off-screen sideways, where lazy loading never fires: StoryScene fetches
+   *  these as their scene comes near, and only where the scenes can play (never in calm or comic mode). */
+  warm?: boolean;
+  quality?: number;
+}
+// rest carries the parent's scope attribute, so the chapter component's styles reach this element.
+const { name, fallback, note, widths = [480, 960, 1600, 2400], sizes, class: cls, warm = false, quality = 72, ...rest } = Astro.props;
+
+const layers = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/layers/*.{png,webp}', { eager: true });
+const drawn = Object.entries(layers).find(([path]) => path.split('/').pop()!.replace(/\.\w+$/, '') === name)?.[1].default;
+const src = drawn ?? fallback;
+
+let img: { src: string; srcset: string; w: number; h: number } | undefined;
+if (src) {
+  const ws = [...new Set([...widths.filter((w) => w < src.width), src.width])];
+  const out = await Promise.all(ws.map((w) => getImage({ src, width: w, format: 'webp', quality })));
+  img = { src: out[out.length - 1].src, srcset: out.map((m, i) => `${m.src} ${ws[i]}w`).join(', '), w: src.width, h: src.height };
+}
+---
+
+{img ? (
+  <img
+    {...rest}
+    class={cls}
+    src={img.src}
+    srcset={img.srcset}
+    sizes={sizes}
+    width={img.w}
+    height={img.h}
+    alt=""
+    loading="lazy"
+    data-warm={warm ? '' : undefined}
+    decoding="async"
+    data-art={drawn ? 'drawn' : 'fallback'}
+  />
+) : (
+  <div {...rest} class:list={[cls, 'scene-card']} aria-hidden="true" data-art="storyboard">
+    <p>{note ?? name}</p>
+  </div>
+)}

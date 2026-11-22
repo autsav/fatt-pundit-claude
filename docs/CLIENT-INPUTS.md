@@ -82,6 +82,11 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 54 | Phase 7 wording (new): "Start with these." (What to order); rating line "4.8 / 5 on Google, from … reviews of Fatt Pundit … (November 2026)"; page-end lines "Hungry already? Book at Soho." / "Hungry before Dubai opens? Both London rooms are open tonight." / "Ready? Book at …" / "Read the menus first." / "Two rooms in London. Long banquettes at Covent Garden, the bar and the kitchen at Soho." / "Hungry yet? Two rooms in London, open tonight."; Dubai hero "Be first through the door. The list opens soon…"; booking desk "Choose a day, a time and how many of you…"; groups photo caption "Covent Garden, set for dinner."; menu tip button "Got it"; footer "Open until …" per room | Branch pages, Dubai, menus, booking desk, groups, info pages, footer | M |
 | 55 | Phase 8 branch page (built, in the preview; docs/redesign/phase8/report.md): OK with 9 sections cut to 5? "Good to know" is gone (its facts moved into the menus and booking sections); the other rooms and the Google rating sit next to Book; sample "Tonight" lines no longer show; no section numbers, badge or London clock in the hero; Soho's hero is the momo photo with the Berwick Street sign until a Soho room photo arrives (#35, #46). New wording: "What to eat at Soho." / "What to eat at Covent Garden.", "Our other rooms", "Pre-theatre: seated 5–5.45pm.", "Dairy free and halal.", Soho story shortened to "On Berwick Street since 2019, folded by hand.", Dubai "Before then, in London. Two rooms in London while you wait." | Branch pages (Soho, Covent Garden, Dubai) | H |
 
+### Story motion (plan: `docs/STORY-MOTION-PLAN.md`)
+| # | Need | Why / where it's used | Pri |
+| --- | --- | --- | --- |
+| 57 | Is the tiger head (`tiger-head-left/right.png`) part of the logo, so it must never move? | Story scenes; not used until answered | M |
+
 ## Answered
 | Date | Answer | Used in |
 | --- | --- | --- |
@@ -100,3 +105,4 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 20 Nov 2026 | Home page wording approved: chapter names "01 Our story · 02 The menus · 03 The bar · 04 The room · 05 Your table"; menus labels "Open the book for" / "Or read them as a list"; closes #44 | Home (Phase 5) |
 | 20 Nov 2026 | Printed menus (photos in `docs/reference/menu-2026-11/`): every à la carte price matches the site; drinks list updated to match (Scholar and the Priest, Birds Eye Margarita, Lunch Box, Gavi, saffron masala tea added; Desi Dragon and Akluj removed; Chin Chin Choo £13.50 rum recipe; Negroni £14; Hakka Garden Cuban rum). Closes #13 and #19 | `dishes.json`, `menus.json`, home bar card |
 | 20 Nov 2026 | "Lollipop chicken" spelling; E900 on the à la carte allergen line (both as printed) | `dishes.json`, `menus.json` |
+| 22 Nov 2026 | Story motion (project owner): build chapters 2-5 as scenes now, before the illustrations; re-brief the illustrator for layered cut-outs (was #56); add a "Read as a comic" switch (was #58); for the Soho front use a photo found online until the client's own arrives (#35 stays open) | `docs/STORY-MOTION-PLAN.md`, `docs/STORY-BRIEF.md`, `/our-story/` |

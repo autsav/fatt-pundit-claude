@@ -28,7 +28,8 @@ const { lamps, ratio, cover = false, class: className } = Astro.props;
     border-radius: 50%; mix-blend-mode: screen;
     background: radial-gradient(circle, rgb(255 244 220) 0 3%, rgb(255 214 150 / 0.9) 8%, rgb(248 176 90 / 0.5) 20%, rgb(241 140 60 / 0.18) 38%, transparent 64%);
     opacity: var(--glow, 0);
-    transition: opacity 2.6s cubic-bezier(0.3, 0, 0.2, 1) calc(0.2s + var(--i) * 0.25s);
+    /* Each bulb warms over two long beats, one panel beat after the last (light, not an object). */
+    transition: opacity calc(var(--dur-story-long) * 2) var(--curve-in-out) calc(var(--dur-fast) + var(--i) * var(--dur-panel));
   }
   /* A narrow cone of light thrown down the wall under each lamp. */
   .halo::after {

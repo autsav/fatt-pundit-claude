@@ -13,7 +13,9 @@
     "test": "node scripts/test-hours.ts",
     "test:contrast": "node scripts/check-contrast.ts --all",
     "test:smoke": "node scripts/smoke-booking.mjs",
-    "perf:budget": "node scripts/perf-budget.mjs"
+    "perf:budget": "node scripts/perf-budget.mjs",
+    "perf:taps": "node scripts/tap-timing.mjs",
+    "verify": "bash scripts/verify.sh"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.9",

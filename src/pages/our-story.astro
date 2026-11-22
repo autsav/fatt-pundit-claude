@@ -1,11 +1,13 @@
 ---
-// Our story: "The tale of Fatt & Pundit", the whole comic (data: src/data/story.ts).
+// Our story: "The tale of Fatt & Pundit" (data: src/data/story.ts). Each chapter plays as scroll scenes
+// where it has them and the browser can (docs/STORY-MOTION-PLAN.md), and is otherwise told as the comic.
 // The ending is the one thing the reference site lacked: somewhere real to go next.
 import Base from '../layouts/Base.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 import ChapterRail from '../components/site/ChapterRail.astro';
 import StoryComic from '../components/story/StoryComic.astro';
+import ChapterCanton from '../components/story/scenes/ChapterCanton.astro';
 import { getBranches } from '../lib/site-data';
 import { chapters, STORY_TITLE, STORY_LEDE } from '../data/story';
 import { stampSrc } from '../lib/stamp';
@@ -15,6 +17,8 @@ const branches = await getBranches();
 const open = branches.filter((b) => b.status === 'open');
 const soon = branches.filter((b) => b.status !== 'open');
 const stamp = await stampSrc(stampTiger, 240);
+// Chapters that play as scenes; the rest are the comic only, for now.
+const scenesFor: Partial<Record<string, typeof ChapterCanton>> = { canton: ChapterCanton };
 ---
 
 <Base
@@ -22,8 +26,11 @@ const stamp = await stampSrc(stampTiger, 240);
   description="How Indo-Chinese food began: a Hakka cook from Guangdong, a scholar in Calcutta's Chinatown, and the recipes that travelled on to Soho, Covent Garden and Dubai."
   og="home"
 >
+  <a class="skip" href="#content">Skip to the story</a>
+  <!-- Before the scenes paint: a reader who chose the comic gets it straight away (global.css "Story scenes"). -->
+  <script is:inline>try { if (localStorage.getItem('fp-story') === 'comic') document.documentElement.dataset.story = 'comic'; } catch {}</script>
   <SiteHeader branches={branches} />
-  <main>
+  <main id="content">
     <header class="story-hero">
       <div class="wrap narrow stack center">
         <img class="story-stamp" src={stamp} alt="" width="120" height="120" />
@@ -32,13 +39,22 @@ const stamp = await stampSrc(stampTiger, 240);
         <p class="story-lede">{STORY_LEDE}</p>
         <p class="story-note">Fatt is a common Chinese surname. Pundit is the Indian word for a scholar. Put them together and you have our name, and the story of the food.</p>
         <p class="story-cue" aria-hidden="true">Scroll to begin</p>
+        <p class="story-mode" data-story-mode hidden><button type="button" aria-pressed="false" data-story-toggle>Read as a comic</button></p>
       </div>
     </header>
 
     <div class="sec story-body">
-      <div class="wrap">
-        <StoryComic mode="full" />
-      </div>
+      {chapters.map((c) => {
+        const Scenes = scenesFor[c.id];
+        return (
+          <div class="story-chapter" id={c.id} data-scenes={Scenes ? '' : undefined}>
+            {Scenes && <Scenes />}
+            <div class="wrap">
+              <StoryComic mode="full" only={c.id} />
+            </div>
+          </div>
+        );
+      })}
     </div>
 
     <section id="end" class="sec gold-bg story-end" aria-labelledby="end-title">
@@ -71,5 +87,33 @@ const stamp = await stampSrc(stampTiger, 240);
   .story-note { max-width: 52ch; margin: 0 auto; }
   .story-cue { margin: 8px 0 0; font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
   .story-body { background: var(--color-sand); padding-top: 0; }
+  .story-chapter + .story-chapter { margin-top: clamp(56px, 9vw, 120px); }
+  .story-mode { margin: 4px 0 0; }
+  .story-mode button { padding: 6px 4px; border: 0; background: none; color: var(--color-ink); font-family: var(--font-note); font-style: italic; font-size: 16px;
+    text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+  .story-mode button[aria-pressed='true'] { text-decoration-style: solid; font-weight: 600; }
+  .story-mode button:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
   .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
 </style>
+
+<script>
+  // "Read as a comic": only offered where the scenes can play. Swaps them for the comic and remembers it.
+  const wrap = document.querySelector<HTMLElement>('[data-story-mode]');
+  const btn = document.querySelector<HTMLButtonElement>('[data-story-toggle]');
+  if (wrap && btn && CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const root = document.documentElement;
+    const sync = () => btn.setAttribute('aria-pressed', String(root.dataset.story === 'comic'));
+    btn.addEventListener('click', () => {
+      const comic = root.dataset.story !== 'comic';
+      if (comic) root.dataset.story = 'comic';
+      else delete root.dataset.story;
+      try {
+        if (comic) localStorage.setItem('fp-story', 'comic');
+        else localStorage.removeItem('fp-story');
+      } catch {}
+      sync();
+    });
+    sync();
+    wrap.hidden = false;
+  }
+</script>

@@ -43,7 +43,7 @@ Group and deposit rules (online limit, set menu from, deposit, refund hours) and
 
 ## Keeping it fast
 
-`npm run perf:budget` (with `npx astro preview` running) checks every page against the budgets and fails if one slips: Lighthouse mobile ≥ 90, TBT ≤ 200 ms, CLS ≤ 0.05, page weight ≤ 1.1 MB, dropped scroll frames ≤ 2 %.
+`npm run perf:budget` (with `npx astro preview` running) checks every page against the budgets and fails if one slips: Lighthouse mobile ≥ 85, observed LCP ≤ 1.5 s, TBT ≤ 200 ms, CLS ≤ 0.05, page weight ≤ 1.1 MB, dropped scroll frames ≤ 2 %. These are lab numbers (simulated slow 4G, 4× slower CPU); the real-user figures come from the "Vitals" events once `PUBLIC_PLAUSIBLE_DOMAIN` is set, and those are the ones to judge the Core Web Vitals targets (LCP 2.5 s, INP 200 ms, CLS 0.1 at the 75th percentile) against. `docs/qa/phase9-optimisation/REPORT.md` has the last measurements. `npm run perf:taps` (same preview) is the lab stand-in for INP: the five taps that matter (Book from the dock, a plate, a page turn, a menu chip, a passport stamp) must paint within 200 ms at 4× CPU, median of three.
 
 Rules that keep scrolling smooth (details in `tasks/lessons.md`):
 - Scroll scenes only move `transform` and `opacity`. No `filter`, big blurred shadows, width or height.

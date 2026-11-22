@@ -69,17 +69,26 @@
     --lift-2: 6px 6px 0 rgb(26 23 20 / 0.35);
     --lift-3: 8px 8px 0 rgb(0 0 0 / 0.45);
 
-    /* ---- Motion (mirrors src/lib/motion-tokens.ts) ---- */
+    /* ---- Motion (mirrors src/lib/motion-tokens.ts; the language is written up in docs/MOTION.md) ----
+       Two speeds: fast is feedback (hover, press, a stamp landing), story is a reveal. Nothing in between. */
     --dur-press: 60ms;          /* press down */
     --dur-fast: 200ms;          /* hover, focus, state change */
-    --dur-panel: 260ms;         /* a drawer or sheet travelling in */
+    --dur-panel: 260ms;         /* a drawer or sheet travelling in; a stamp or bubble landing; a page change */
     --dur-story: 900ms;         /* a reveal in a scene */
-    --dur-story-long: 1200ms;
-    --stagger: 60ms;            /* between siblings; at most 6 in a sequence */
-    --curve-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --curve-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-    --curve-stamp: cubic-bezier(0.2, 1.4, 0.4, 1);   /* a little overshoot: things with weight */
-    --curve-panel: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --dur-story-long: 1200ms;   /* a long mechanism (a receipt printing, a line being drawn) */
+    --stagger: 60ms;            /* between siblings; at most 6 in a sequence (big objects may use 2x) */
+    --rise: 24px;               /* how far a revealed block rises into place */
+    --curve-out: cubic-bezier(0.23, 1, 0.32, 1);     /* default: arrives fast, settles */
+    --curve-in: cubic-bezier(0.5, 0, 0.75, 0);       /* leaving or falling: gathers speed */
+    --curve-in-out: cubic-bezier(0.65, 0, 0.35, 1);  /* scroll-linked and long mechanisms */
+    --curve-stamp: cubic-bezier(0.2, 1.4, 0.4, 1);   /* a little overshoot: things with weight landing */
+    --curve-panel: cubic-bezier(0.2, 0.8, 0.2, 1);   /* a drawer, a sheet, a cover swinging */
+    /* The spring (SPRING.stamp in motion-tokens.ts: stiffness 420, damping 22, mass 1.1) sampled as a
+       CSS curve, so a stamp lands the same whether CSS or Motion moves it. It peaks at 15% over at
+       187 ms and is still by --dur-spring; always the pair --dur-spring + --curve-spring, and only on
+       transform (an overshoot on colour or opacity is a flicker). Older browsers get the bezier. */
+    --dur-spring: 460ms;
+    --curve-spring: var(--curve-stamp);
 
     /* ---- Layers. Dialogs use the browser's top layer, so they need none. ---- */
     --z-raised: 10;
@@ -87,9 +96,14 @@
     --z-skip: 50;
   }
 
+  /* The sampled spring (scripts: 41 points of the damped solution, 0 to 460 ms). */
+  @supports (transition-timing-function: linear(0, 1)) {
+    :root { --curve-spring: linear(0, 0.023, 0.086, 0.177, 0.286, 0.405, 0.526, 0.644, 0.753, 0.851, 0.936, 1.006, 1.061, 1.103, 1.131, 1.147, 1.154, 1.152, 1.144, 1.131, 1.114, 1.096, 1.078, 1.059, 1.042, 1.027, 1.013, 1.002, 0.993, 0.986, 0.981, 0.978, 0.976, 0.976, 0.977, 0.979, 0.982, 0.984, 0.987, 0.99, 1); }
+  }
+
   /* Calm mode: every token-driven transition and animation becomes instant (end state shown). */
   @media (prefers-reduced-motion: reduce) {
-    :root { --dur-press: 0ms; --dur-fast: 0ms; --dur-panel: 0ms; --dur-story: 0ms; --dur-story-long: 0ms; --stagger: 0ms; }
+    :root { --dur-press: 0ms; --dur-fast: 0ms; --dur-panel: 0ms; --dur-spring: 0ms; --dur-story: 0ms; --dur-story-long: 0ms; --stagger: 0ms; }
   }
 
   /* ---- Surfaces → semantic colour tokens -------------------------------------------------------

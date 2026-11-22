@@ -1,0 +1,140 @@
+[
+  {
+    "page": "/",
+    "view": "390",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 791,
+      "long": 17,
+      "worst": 200
+    },
+    "loops": [
+      "voyage-ping"
+    ],
+    "unknownLoops": [],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "turn": {
+        "before": "Soho À la carte menu, page 1 of 10",
+        "after": "Soho À la carte menu, page 1 of 10",
+        "flap": false,
+        "ok": true
+      }
+    },
+    "tearToOpenMs": 35,
+    "focusDuringDrop": "pass-stub"
+  },
+  {
+    "page": "/",
+    "view": "390",
+    "motion": "reduce",
+    "errors": [],
+    "animating": [],
+    "revealGate": false,
+    "arrival": false,
+    "hidden": 0
+  },
+  {
+    "page": "/",
+    "view": "1440",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 606,
+      "long": 38,
+      "worst": 117
+    },
+    "loops": [
+      "voyage-ping"
+    ],
+    "unknownLoops": [],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "turn": {
+        "before": "Soho À la carte menu, page 2–3 of 10",
+        "after": "Soho À la carte menu, page 2–3 of 10",
+        "flap": false,
+        "ok": true
+      }
+    },
+    "tearToOpenMs": 51,
+    "focusDuringDrop": "pass-stub"
+  },
+  {
+    "page": "/",
+    "view": "1440",
+    "motion": "reduce",
+    "errors": [],
+    "animating": [],
+    "revealGate": false,
+    "arrival": false,
+    "hidden": 0
+  }
+]

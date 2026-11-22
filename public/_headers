@@ -7,6 +7,9 @@
   Cache-Control: public, max-age=86400
 
 /*
+  # The site is HTTPS only on every host: browsers that have seen this never try plain HTTP again
+  # (two years, this host only). Vercel sends the same header itself; vercel.json repeats it for parity.
+  Strict-Transport-Security: max-age=63072000
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
