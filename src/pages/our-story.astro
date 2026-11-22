@@ -6,6 +6,7 @@ import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 import ChapterRail from '../components/site/ChapterRail.astro';
 import StoryComic from '../components/story/StoryComic.astro';
+import StoryScenes from '../components/story/StoryScenes.astro';
 import { getBranches } from '../lib/site-data';
 import { chapters, STORY_TITLE, STORY_LEDE } from '../data/story';
 import { stampSrc } from '../lib/stamp';
@@ -36,9 +37,11 @@ const stamp = await stampSrc(stampTiger, 240);
       </div>
     </header>
 
+    <StoryScenes />
+
     <div class="sec story-body">
       <div class="wrap">
-        <StoryComic mode="full" />
+        <StoryComic mode="full" anchorless={chapters[0].id} />
       </div>
     </div>
 

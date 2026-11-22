@@ -21,8 +21,10 @@ import stamp from '../../assets/images/brand/stamp-gold.png';
 
 interface Props {
   mode: 'full' | 'short';
+  /** A chapter whose section renders without its id: StoryScenes carries that anchor (/our-story/). */
+  anchorless?: string;
 }
-const { mode } = Astro.props;
+const { mode, anchorless } = Astro.props;
 
 // Illustrations, when the illustrator's files are in (named after the panel id).
 const art = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/*.{jpg,jpeg,png,webp,avif}', { eager: true });
@@ -54,7 +56,7 @@ const groups =
 
 <div class:list={['comic', `comic-${mode}`]} data-comic>
   {groups.map((g, gi) => (
-    <section class="chapter" id={mode === 'full' ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
+    <section class="chapter" id={mode === 'full' && g.id !== anchorless ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
       {mode === 'full' && (
         <header class="ch-head">
           <p class="ch-no">Chapter {['one', 'two', 'three', 'four', 'five', 'six'][gi]}</p>
@@ -105,9 +107,7 @@ const groups =
 <style>
   .comic { --gap: clamp(16px, 2.4vw, 28px); display: grid; gap: clamp(56px, 9vw, 120px); }
   .comic-short { gap: 0; }
-  .ch-head { display: grid; gap: 6px; margin-bottom: clamp(20px, 3vw, 36px); text-align: center; }
-  .ch-no { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(18px, 1.6vw, 21px); color: var(--color-tiger-deep); }
-  .ch-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(32px, 4.6vw, 60px); line-height: 1; }
+  /* Chapter heads, captions and speech bubbles look the same in StoryScenes: global.css "Story type". */
 
   .panels { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
   @media (min-width: 900px) {
@@ -115,8 +115,6 @@ const groups =
     .panel-wide { grid-column: 1 / -1; }
   }
   .panel { margin: 0; display: flex; flex-direction: column; gap: 10px; }
-  /* Caption box: the narrator, typed on a strip of paper. */
-  .cap { align-self: flex-start; max-width: 62ch; margin: 0; padding: 10px 14px; background: var(--color-ink); color: var(--color-sand); font-size: clamp(15px, 1.25vw, 17px); line-height: 1.45; box-shadow: 4px 4px 0 var(--color-gold); }
   .stage { position: relative; }
   /* contain: each frame paints on its own, so a panel sliding in never repaints its neighbours. */
   .frame { position: relative; overflow: hidden; background: var(--color-paper-light); contain: layout paint; }
@@ -139,13 +137,9 @@ const groups =
     font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(13px, 1.1vw, 15px); line-height: 1.4; color: rgb(44 41 37 / 0.85); }
   @media (max-width: 599px) { .sketch-note { font-size: 12.5px; padding: 6px 9px; } .sketch { padding: 4%; } }
 
-  /* Speech bubbles: paper, ink outline, a tail pointing at whoever speaks. */
-  .bubble { position: absolute; left: var(--x); top: var(--y); max-width: min(42%, 300px); margin: 0; padding: 12px 16px; background: var(--color-paper-light); color: var(--color-ink);
-    border: 2.5px solid var(--color-ink); border-radius: 22px; font-size: clamp(14px, 1.3vw, 18px); line-height: 1.3; font-weight: 700; box-shadow: 3px 3px 0 rgb(44 41 37 / 0.25); }
+  /* Speech bubbles placed on the picture at the panel's --x/--y (their look is shared, see above). */
+  .bubble { left: var(--x); top: var(--y); }
   .panel-half .bubble { max-width: min(58%, 260px); }
-  .bubble::after { content: ''; position: absolute; bottom: -14px; width: 20px; height: 16px; background: inherit; border: inherit; border-top: 0; border-radius: 0 0 0 100%; }
-  .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
-  .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
 
   /* Phones: bubbles sit under the picture (tail up at the scene) instead of covering a small panel. */
   @media (max-width: 599px) {

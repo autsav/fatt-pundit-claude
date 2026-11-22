@@ -152,6 +152,72 @@
 }
 @keyframes panel-rise { from { opacity: 0; transform: translateY(var(--rise)); } to { opacity: 1; transform: none; } }
 
+/* Story type: chapter heads, the narrator's caption box and speech bubbles, shared by the comic
+   (StoryComic.astro) and the scenes (StoryScenes.astro). :where() keeps these at one class, so each
+   component's own scoped sizes and phone rules still win whatever the CSS order. */
+:where(.comic, .story-scenes) .ch-head { display: grid; gap: 6px; margin-bottom: clamp(20px, 3vw, 36px); text-align: center; }
+:where(.comic, .story-scenes) .ch-no { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(18px, 1.6vw, 21px); color: var(--color-tiger-deep); }
+:where(.comic, .story-scenes) .ch-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(32px, 4.6vw, 60px); line-height: 1; }
+/* Caption box: the narrator, typed on a strip of paper. */
+:where(.comic, .story-scenes) .cap { align-self: flex-start; max-width: 62ch; margin: 0; padding: 10px 14px; background: var(--color-ink); color: var(--color-sand); font-size: clamp(15px, 1.25vw, 17px); line-height: 1.45; box-shadow: 4px 4px 0 var(--color-gold); }
+/* Speech bubbles: paper, ink outline, a tail pointing at whoever speaks. */
+:where(.comic, .story-scenes) .bubble { position: absolute; max-width: min(42%, 300px); margin: 0; padding: 12px 16px; background: var(--color-paper-light); color: var(--color-ink);
+  border: 2.5px solid var(--color-ink); border-radius: 22px; font-size: clamp(14px, 1.3vw, 18px); line-height: 1.3; font-weight: 700; box-shadow: 3px 3px 0 rgb(44 41 37 / 0.25); }
+:where(.comic, .story-scenes) .bubble::after { content: ''; position: absolute; bottom: -14px; width: 20px; height: 16px; background: inherit; border: inherit; border-top: 0; border-radius: 0 0 0 100%; }
+:where(.comic, .story-scenes) .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
+:where(.comic, .story-scenes) .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
+
+/* Story scenes (StoryScenes.astro): chapter one as a paper puppet theatre. Each scene's track names a
+   view timeline; on a track taller than the screen its `contain` range is exactly the stretch where the
+   sticky stage is pinned, so `contain 20% contain 40%` reads as "20-40% of the track". Linear, fill both,
+   transform and opacity only (plus the route mask's dashoffset). An element that comes in and later goes
+   out has a second animation whose keyframes give only `to`, so before its range it holds the value
+   underneath (the fade-in's) instead of its own start. Without view timelines, or in calm mode, the
+   scenes are not shown at all and the comic's chapter 1 tells the same story. Here, not in the
+   component: see .read-line. */
+.story-scenes { display: none; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .story-scenes { display: block; }
+    .comic-full > .chapter:first-child { display: none; }
+    .story-scenes .scene-harbour { view-timeline-name: --harbour; view-timeline-axis: block; }
+    .story-scenes .scene-sea-night { view-timeline-name: --sea; view-timeline-axis: block; }
+    .story-scenes .scene-harbour :is(.sh-sun, .sh-mtn-c, .sh-mtn-b, .sh-ship, .sh-compass, .sh-cap1, .sh-cap2, .sh-bubble) { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --harbour; }
+    .story-scenes .scene-sea-night :is(.ss-night, .ss-route-draw, .ss-ship-track, .ss-compass, .ss-cap, .ss-bubble, .ss-place) { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --sea; }
+
+    /* Scene 1, the harbour: sun up, hills drift (far ones slower), the ship comes in, then the words. */
+    .story-scenes .sh-sun { animation-name: scene-sun; animation-range: contain 0% contain 100%; }
+    .story-scenes .sh-mtn-c { animation-name: scene-drift-slow; animation-range: contain 0% contain 100%; }
+    .story-scenes .sh-mtn-b { animation-name: scene-drift-fast; animation-range: contain 0% contain 100%; }
+    .story-scenes .sh-ship { animation-name: scene-ship-in; animation-range: contain 0% contain 45%; }
+    .story-scenes .sh-cap1 { animation-name: scene-cap-in, scene-out; animation-range: contain 20% contain 40%, contain 64% contain 70%; }
+    .story-scenes .sh-bubble { animation-name: scene-pop, scene-out; animation-range: contain 45% contain 60%, contain 64% contain 70%; }
+    .story-scenes .sh-compass { animation-name: scene-compass-in; animation-range: contain 70% contain 90%; }
+    .story-scenes .sh-cap2 { animation-name: scene-cap-in; animation-range: contain 70% contain 90%; }
+
+    /* Scene 2, at sea: night falls, the course draws from Guangdong to Calcutta, the ship crosses. */
+    .story-scenes .ss-night { animation-name: scene-night; animation-range: contain 0% contain 30%; }
+    .story-scenes .ss-route-draw { animation-name: scene-route; animation-range: contain 10% contain 85%; }
+    .story-scenes .ss-ship-track { animation-name: scene-ship-cross; animation-range: contain 0% contain 100%; }
+    .story-scenes .ss-compass { animation-name: scene-compass-turn; animation-range: contain 0% contain 100%; }
+    .story-scenes .ss-cap { animation-name: scene-cap-in; animation-range: contain 15% contain 35%; }
+    .story-scenes .ss-bubble { animation-name: scene-pop, scene-out; animation-range: contain 40% contain 55%, contain 70% contain 78%; }
+    .story-scenes .ss-place { animation-name: scene-cap-in; animation-range: contain 85% contain 100%; }
+  }
+}
+@keyframes scene-sun { from { transform: translateY(45%); } to { transform: translateY(-25%); } }
+@keyframes scene-drift-slow { from { transform: none; } to { transform: translateX(-3vw); } }
+@keyframes scene-drift-fast { from { transform: none; } to { transform: translateX(-8vw); } }
+@keyframes scene-ship-in { from { transform: translateX(60vw); } to { transform: none; } }
+@keyframes scene-cap-in { from { opacity: 0; transform: translateY(var(--rise)); } to { opacity: 1; transform: none; } }
+@keyframes scene-pop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
+@keyframes scene-out { to { opacity: 0; } }
+@keyframes scene-compass-in { from { opacity: 0; transform: translateX(-30vw); } to { opacity: 1; transform: none; } }
+@keyframes scene-night { from { opacity: 0; } to { opacity: 0.9; } }
+@keyframes scene-route { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes scene-ship-cross { from { transform: none; } to { transform: translateX(calc(100% + var(--ship-w))); } }
+@keyframes scene-compass-turn { from { transform: none; } to { transform: rotate(180deg); } }
+
 /* Something new landing in place (a pill's next line, the lightbox photo): transform and opacity only. */
 @keyframes fp-pill-in { from { transform: translateY(calc(var(--rise) / 2)); opacity: 0; } to { transform: none; opacity: 1; } }
 .voyage-paper { background: radial-gradient(rgb(44 41 37 / 0.07) 1px, transparent 1.2px) 0 0 / 7px 7px, radial-gradient(120% 90% at 30% 40%, rgb(255 255 255 / 0.18), transparent 60%); }

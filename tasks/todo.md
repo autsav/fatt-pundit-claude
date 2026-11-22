@@ -42,3 +42,12 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 ## Original 10-day plan leftovers (likely superseded by later phases; confirm, then drop)
 - [ ] Day 2 journey storyboard (docs/journey-storyboard.md) + client direction sign-off
 - [ ] Day 3 design; Day 4 BaseLayout/header/footer, <OpeningHours>, <Price> per branch currency
+
+## Story motion, step 1 (branch story-motion)
+- [x] Chapter 1 of /our-story/ as two scroll-driven scenes, "Harbour" and "At sea" (src/components/story/StoryScenes.astro; timelines in global.css "Story scenes"). CSS view timelines only, gated on support and no reduced-motion; otherwise the comic's chapter 1 shows as before
+- [x] Captions and bubbles read from src/data/story.ts; caption, bubble and chapter-head styles shared with the comic (global.css "Story type")
+- [x] Checks: astro check 0 errors, build, perf budget on /our-story/ (median of 3: perf 100, CLS 0.003, 338 KB, 1.5% dropped frames); 1440 and 390 screenshots, no horizontal scroll, reduced motion shows the comic
+- [ ] Illustrator's cut-outs: Fatt and the crew as separate layers (no people drawn yet); larger mountain and ship art (the brand files are 196-355px wide and upscale soft)
+- [ ] Decide the sea layer: voyage-sea.svg is the whole world chart (293 KB raw), cropped to open ocean with an SVG view fragment; a purpose-made water strip would be lighter
+- [ ] Real Safari 26 / Firefox 159 check of the scenes (Chromium only so far)
+- [ ] Chapters 2-5 as scenes, once step 1 is approved
