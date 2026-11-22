@@ -51,4 +51,8 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [ ] Decide the sea layer: voyage-sea.svg is the whole world chart (293 KB raw), cropped to open ocean with an SVG view fragment; a purpose-made water strip would be lighter
 - [ ] Real Safari 26 / Firefox 159 check of the scenes (Chromium only so far)
 - [x] Step 2: reusable scene engine (StoryScene, SceneArt, fx presets), chapter-by-chapter page, "Read as a comic" switch, QA script docs/qa/story-motion/check.mjs
-- [ ] Steps 3-8 in docs/STORY-MOTION-PLAN.md: chapters 2-5 as scenes, illustrator layers, release check (client #57 open)
+- [x] Steps 3a-6 (plan "Revision: the whole story on one screen"): chapters 2-5 as one pinned stage each (scenes/ChapterTangra, ChapterSomethingNew, ChapterLondon, ChapterNextStop), title cards, steam/rain/flame/photo layers, stages joined, gold hand-over to #end. 22 Nov 2026: verify green, check.mjs all passed (6 stages × 2 widths), perf on /our-story/ dropped frames 1.3-1.7% (median ~1.6), score 92-100
+- [ ] Perf: TBT on /our-story/ swings 7-392 ms between runs (median 79); watch it on the deployed page
+- [ ] Storyboard cards still stand in for: Tangra lane, Pundit, spice sacks, wok scene, queue, friends' table, Dubai travellers, laid table (illustrator, step 7). Dubai skyline is a plain SVG silhouette for now
+- [ ] Safari 26: confirm var() inside animation-range works (owner's Mac), else range classes
+- [ ] Steps 7-8 in docs/STORY-MOTION-PLAN.md: illustrator layers, release check (client #57 open)

@@ -1,0 +1,116 @@
+---
+/**
+ * The last chapter, "Next stop", as one scene on one pinned stage: Dubai at dusk, then your table.
+ * Layers and their motion; the engine is global.css "Story scenes" (docs/STORY-MOTION-PLAN.md).
+ * Each moving layer's score (range and start/end) is in the style block below. It ends on a gold wash
+ * so the last frame matches the gold booking section (#end) that follows.
+ */
+import StoryScene from '../StoryScene.astro';
+import SceneArt from '../SceneArt.astro';
+import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
+import worldUrl from '../../../assets/images/brand/world-land.svg?url';
+import momos from '../../../assets/images/journey/04-momos-chutney.jpg';
+
+const { chapter, index } = chapterOf('next-stop');
+const dubai = panelOf(chapter, 'p12-dubai');
+const table = panelOf(chapter, 'p13-your-table');
+// London upper-left to Dubai right-middle, in the 100 x 100 chart box.
+const route = 'M16 30 C 34 8, 54 74, 72 56';
+---
+
+<div class="story-scenes">
+  <StoryScene label={chapter.label} sr={firstSentence(dubai.scene)} h="350vh" hPhone="280vh">
+    <div class="layer fx scene-title ns-title">
+      <header class="ch-head">
+        <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+      </header>
+    </div>
+    <div class="layer fx fx-fade fx-then-out ns-sky" aria-hidden="true"></div>
+    <img class="layer fx fx-fade fx-then-out ns-chart" src={worldUrl} alt="" loading="lazy" decoding="async" />
+    <svg class="layer fx fx-fade fx-then-out ns-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <defs>
+        <mask id="scene-route-dubai" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+          <path class="fx fx-draw ns-draw" d={route} pathLength="1" />
+        </mask>
+      </defs>
+      <path class="ns-line" d={route} mask="url(#scene-route-dubai)" />
+    </svg>
+    <p class="scene-place fx fx-fade-up fx-then-out ns-london" aria-hidden="true">London</p>
+    <p class="scene-place fx fx-fade fx-then-out ns-dubai" aria-hidden="true">Dubai</p>
+    <!-- A plain skyline silhouette (no landmark drawn in detail) until the illustrator's dubai-skyline layer arrives. -->
+    <svg class="layer fx fx-fade fx-then-out ns-skyline" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+      <path d="M0 300V236h38v-30h26v44h30v-70h22v-16h20v86h34v-52h40v66h28V164h18v-30h12v30h18v84h30v-40h36v58h24v-96h14l10-20 10 20h14v120h32v-66h28v40h26V120h10V70h6V26l4-26 4 26v44h6v50h10v130h30v-74h34v54h30v-110h20v-14h20v124h30v-46h36v62h26v-88h40v74h30v-40h26v62H1000v14z" />
+    </svg>
+    <SceneArt name="dubai-travellers" note="Fatt and Pundit with stamped suitcases, looking out" sizes="(max-width: 599px) 44vw, 24vw" class="layer fx fx-fade fx-then-out ns-travellers" warm />
+
+    <div class="layer fx fx-fade ns-gold" aria-hidden="true"></div>
+    <SceneArt name="your-table" note="A laid table, an empty chair turned to the reader" sizes="100vw" class="layer fx fx-fade ns-table" />
+    <SceneArt name="table-momos" fallback={momos} widths={[480, 960, 1400]} sizes="(max-width: 599px) 78vw, 560px" class="layer fx fx-fade-up scene-photo ns-photo" />
+    <div class="layer fx fx-fade ns-steam" aria-hidden="true">
+      <span class="puff fx ns-puff ns-puff1"></span>
+      <span class="puff fx ns-puff ns-puff2"></span>
+      <span class="puff fx ns-puff ns-puff3"></span>
+      <span class="puff fx ns-puff ns-puff4"></span>
+    </div>
+
+    <div class="scene-text">
+      <p class="cap fx fx-fade-up fx-then-out ns-cap1">{dubai.caption}</p>
+      <p class="cap fx fx-fade-up ns-cap2">{table.caption}</p>
+    </div>
+    {dubai.bubbles?.slice(0, 1).map((b) => (
+      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out ns-bubble1"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+    ))}
+    {table.bubbles?.slice(0, 1).map((b) => (
+      <p class="bubble tail-left scene-bubble fx fx-pop ns-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+    ))}
+  </StoryScene>
+</div>
+
+<style>
+  /* 0-12 the title lifts. 5-54 Dubai at dusk: chart and route (out 30-36), skyline rises, travellers slide in. */
+  .ns-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
+  .ns-sky { inset: 0; background: linear-gradient(180deg, var(--color-ink) 0%, var(--color-ink) 30%, var(--color-tiger) 80%, var(--color-gold) 100%);
+    --from: 4%; --to: 9%; --out-from: 48%; --out-to: 54%; }
+  .ns-chart { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; --o1: 0.22; --from: 5%; --to: 10%; --out-from: 30%; --out-to: 36%; }
+  .ns-route { inset: 0; width: 100%; height: 100%; overflow: visible; --from: 5%; --to: 8%; --out-from: 30%; --out-to: 36%; }
+  .ns-line { fill: none; stroke: var(--color-gold); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 10; vector-effect: non-scaling-stroke; }
+  .ns-draw { fill: none; stroke: #fff; stroke-width: 14; stroke-dasharray: 1 2; stroke-dashoffset: 1; --from: 8%; --to: 28%; }
+  .ns-london { left: 16%; top: 30%; --from: 5%; --to: 10%; --out-from: 30%; --out-to: 36%; }
+  .ns-dubai { left: 72%; top: 56%; --from: 26%; --to: 30%; --out-from: 30%; --out-to: 36%; }
+  .ns-skyline { left: 0; right: 0; bottom: var(--floor); width: 100%; height: 52%; fill: var(--color-ink); --y0: 50vh; --from: 28%; --to: 42%; --out-from: 48%; --out-to: 54%; }
+  .ns-travellers { right: 6%; bottom: calc(var(--floor) + 4%); width: clamp(150px, 24vw, 340px); height: auto; aspect-ratio: 4 / 3;
+    --x0: 40vw; --from: 34%; --to: 44%; --out-from: 48%; --out-to: 54%; }
+  .ns-cap1 { --from: 30%; --to: 40%; --out-from: 46%; --out-to: 50%; }
+  .ns-bubble1 { left: 56%; top: 30%; --from: 38%; --to: 44%; --out-from: 46%; --out-to: 50%; }
+
+  /* 50-90 your table, on paper again; 88-100 the stage turns gold, as the end section is. */
+  .ns-gold { inset: 0; background: var(--color-gold); z-index: 1; --from: 88%; --to: 100%; }
+  .ns-table { left: var(--gutter); right: var(--gutter); top: 20%; bottom: calc(var(--floor) + 6%); height: auto; --from: 52%; --to: 60%; }
+  .ns-photo { left: 50%; top: 36%; translate: -50% 0; rotate: -2deg; width: min(52vw, 560px); height: auto; aspect-ratio: 4 / 3; --y0: 40vh; --from: 54%; --to: 66%; }
+  .ns-steam { inset: 0; pointer-events: none; --from: 58%; --to: 62%; }
+  .ns-puff { position: absolute; top: 30%; --y1: -22vh; --o1: 0; }
+  .ns-puff1 { left: 42%; --from: 60%; --to: 72%; }
+  .ns-puff2 { left: 48%; --from: 65%; --to: 77%; }
+  .ns-puff3 { left: 54%; --from: 70%; --to: 82%; }
+  .ns-puff4 { left: 45%; --from: 74%; --to: 86%; }
+  .ns-cap2 { --from: 64%; --to: 74%; }
+  .ns-bubble2 { left: 62%; top: 22%; --from: 72%; --to: 80%; }
+
+  @media (max-width: 599px) {
+    .ns-route { --from: 5%; }
+    .ns-london { left: 12%; top: 34%; }
+    .ns-dubai { left: 62%; top: 52%; }
+    .ns-skyline { height: 44%; }
+    .ns-travellers { right: 4%; width: 44vw; }
+    .ns-bubble1 { left: 30%; top: 34%; }
+    .ns-table { top: 26%; }
+    .ns-photo { top: 40%; width: 78vw; }
+    .ns-puff { top: 34%; }
+    .ns-puff1 { left: 30%; }
+    .ns-puff2 { left: 42%; }
+    .ns-puff3 { left: 54%; }
+    .ns-puff4 { left: 36%; }
+    .ns-bubble2 { left: 34%; top: 30%; }
+  }
+</style>

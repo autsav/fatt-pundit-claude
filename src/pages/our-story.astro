@@ -8,6 +8,10 @@ import SiteFooter from '../components/site/SiteFooter.astro';
 import ChapterRail from '../components/site/ChapterRail.astro';
 import StoryComic from '../components/story/StoryComic.astro';
 import ChapterCanton from '../components/story/scenes/ChapterCanton.astro';
+import ChapterTangra from '../components/story/scenes/ChapterTangra.astro';
+import ChapterSomethingNew from '../components/story/scenes/ChapterSomethingNew.astro';
+import ChapterLondon from '../components/story/scenes/ChapterLondon.astro';
+import ChapterNextStop from '../components/story/scenes/ChapterNextStop.astro';
 import { getBranches } from '../lib/site-data';
 import { chapters, STORY_TITLE, STORY_LEDE } from '../data/story';
 import { stampSrc } from '../lib/stamp';
@@ -17,8 +21,14 @@ const branches = await getBranches();
 const open = branches.filter((b) => b.status === 'open');
 const soon = branches.filter((b) => b.status !== 'open');
 const stamp = await stampSrc(stampTiger, 240);
-// Chapters that play as scenes; the rest are the comic only, for now.
-const scenesFor: Partial<Record<string, typeof ChapterCanton>> = { canton: ChapterCanton };
+// Every chapter plays as scenes, one pinned stage each; the comic is the calm and "Read as a comic" telling.
+const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
+  canton: ChapterCanton,
+  tangra: ChapterTangra,
+  'something-new': ChapterSomethingNew,
+  london: ChapterLondon,
+  'next-stop': ChapterNextStop,
+};
 ---
 
 <Base

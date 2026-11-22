@@ -1,0 +1,98 @@
+---
+/**
+ * Chapter two, "Tangra", as one scene: the chart zooms in on Calcutta, the lane and Fatt's stall rise, the Pundit
+ * tastes and doubts, then the spice market drops in. Layers and their motion; the engine is global.css "Story scenes"
+ * (docs/STORY-MOTION-PLAN.md). Each moving layer's score (range and start/end) is in the style block below.
+ */
+import StoryScene from '../StoryScene.astro';
+import SceneArt from '../SceneArt.astro';
+import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
+import worldUrl from '../../../assets/images/brand/world-land.svg?url';
+
+const { chapter, index } = chapterOf('tangra');
+const tangra = panelOf(chapter, 'p04-tangra');
+const taste = panelOf(chapter, 'p05-first-taste');
+const market = panelOf(chapter, 'p06-spice-market');
+// Steam puffs: [left offset, from%, to%]. Chillies: [left, from%, to%, spin, colour].
+const puffs = [['-3vw', 28, 44], ['2vw', 34, 50], ['-1vw', 40, 56], ['4vw', 46, 60]] as const;
+const chillies = [['24%', 66, 76, '-40deg', 'red'], ['33%', 69, 80, '30deg', 'green'], ['42%', 67, 84, '-25deg', 'red'], ['52%', 72, 86, '50deg', 'green'], ['61%', 68, 82, '-55deg', 'red'], ['70%', 71, 88, '35deg', 'green']] as const;
+---
+
+<div class="story-scenes">
+  <StoryScene label={chapter.label} sr={firstSentence(tangra.scene)} h="400vh" hPhone="320vh">
+    <img class="layer fx fx-then-out tg-chart" src={worldUrl} alt="" loading="lazy" decoding="async" />
+    <p class="scene-place fx fx-fade fx-then-out tg-place" aria-hidden="true">Calcutta</p>
+    <SceneArt name="tangra-lane-far" note="Tangra lane, far: shop fronts with signs in Chinese and Bengali" sizes="100vw" class="layer fx fx-fade fx-then-out tg-far" />
+    <SceneArt name="tangra-lane-near" note="Rickshaws and passers-by in the lane" sizes="100vw" class="layer fx fx-fade fx-then-out tg-near" />
+    <SceneArt name="tangra-stall" note="Fatt's roadside stall, wok and flame" sizes="100vw" class="layer fx fx-fade fx-then-out tg-stall" />
+    <div class="layer fx fx-fade fx-then-out tg-steam" aria-hidden="true">
+      {puffs.map(([x, from, to]) => <span class="layer puff fx" style={`left:${x};--from:${from}%;--to:${to}%`}></span>)}
+    </div>
+    <SceneArt name="tangra-pundit" note="Pundit tastes from a bowl, doubtful" sizes="100vw" class="layer fx fx-fade fx-then-out tg-pundit" warm />
+    <SceneArt name="spice-sacks" note="Sacks of red and green chillies, ginger, garlic, cumin" sizes="100vw" class="layer fx fx-fade tg-sacks" />
+    {chillies.map(([x, from, to, spin, colour]) => (
+      <span class={`layer fx fx-fade tg-chilli ${colour}`} style={`left:${x};--from:${from}%;--to:${to}%;--r0:${spin};--r1:0deg`} aria-hidden="true"></span>
+    ))}
+    <div class="layer fx scene-title tg-title">
+      <header class="ch-head">
+        <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+      </header>
+    </div>
+    <div class="scene-text">
+      <p class="cap fx fx-fade-up fx-then-out tg-cap1">{tangra.caption}</p>
+      <p class="cap fx fx-fade-up fx-then-out tg-cap2">{taste.caption}</p>
+      <p class="cap fx fx-fade-up tg-cap3">{market.caption}</p>
+    </div>
+    {taste.bubbles?.slice(0, 1).map((b) => (
+      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out tg-bubble1"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+    ))}
+    {market.bubbles?.slice(0, 1).map((b) => (
+      <p class="bubble tail-left scene-bubble fx fx-pop tg-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+    ))}
+  </StoryScene>
+</div>
+
+<style>
+  /* 0-12 the title lifts. 5-32 the chart zooms toward Calcutta (its point stays put under the scale) and goes. */
+  .tg-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
+  /* The same world chart and Calcutta point as chapter 4 (ChapterLondon .lo-chart / .lo-calcutta), zoomed in on it. */
+  /* will-change: drawn once and scaled as a bitmap; re-rastering the SVG every frame dropped 1 frame in 6. */
+  .tg-chart { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; will-change: transform; transform-origin: 78% 52%; --o0: 0.25; --o1: 0.45; --s0: 1; --s1: 2.6; --from: 5%; --to: 26%; --out-from: 26%; --out-to: 32%; }
+  .tg-place { left: 78%; top: 52%; --from: 8%; --to: 18%; --out-from: 24%; --out-to: 30%; }
+
+  /* 22-40 the lane rises, the far shops less than the near rickshaws; steam climbs from the wok 28-60. */
+  .tg-far { left: 0; right: 0; top: 24%; height: 44%; --y0: 30vh; --from: 22%; --to: 38%; --out-from: 60%; --out-to: 66%; }
+  .tg-near { left: 0; right: 36%; bottom: var(--floor); height: 38%; --y0: 70vh; --from: 24%; --to: 40%; --out-from: 60%; --out-to: 66%; }
+  .tg-stall { right: 5%; bottom: calc(var(--floor) + 4%); width: min(36vw, 440px); height: 34%; --y0: 80vh; --from: 24%; --to: 40%; --out-from: 60%; --out-to: 66%; }
+  .tg-steam { right: calc(5% + 14vw); bottom: calc(var(--floor) + 38%); width: 0; height: 0; --from: 26%; --to: 30%; --out-from: 60%; --out-to: 66%; }
+  .tg-steam .puff { bottom: 0; --y0: 0; --y1: -40vh; --o0: 0.9; --o1: 0; }
+  .tg-cap1 { --from: 26%; --to: 36%; --out-from: 44%; --out-to: 48%; }
+
+  /* 40-66 the Pundit slides in from the left, tastes, doubts. */
+  .tg-pundit { left: var(--gutter); bottom: calc(var(--floor) + 4%); width: min(32vw, 380px); height: 46%; --x0: -40vw; --from: 40%; --to: 52%; --out-from: 60%; --out-to: 66%; }
+  .tg-cap2 { --from: 48%; --to: 56%; --out-from: 62%; --out-to: 66%; }
+  .tg-bubble1 { left: calc(var(--gutter) + min(20vw, 240px)); bottom: calc(var(--floor) + 48%); --from: 52%; --to: 58%; --out-from: 62%; --out-to: 66%; }
+
+  /* 60-95 the spice market: sacks rise, chillies drop and spin onto them, Fatt answers. */
+  .tg-sacks { left: 12%; right: 12%; bottom: var(--floor); height: 38%; --y0: 60vh; --from: 62%; --to: 78%; }
+  .tg-chilli { top: 0; width: 16px; height: 52px; border-radius: 50% 50% 50% 50% / 14% 14% 86% 86%; --y0: -30vh; --y1: 38vh; }
+  .tg-chilli.red { background: var(--color-tiger); }
+  .tg-chilli.green { background: #5b8a3c; }
+  .tg-cap3 { --from: 70%; --to: 80%; }
+  .tg-bubble2 { left: 52%; bottom: calc(var(--floor) + 48%); --from: 80%; --to: 88%; }
+
+  @media (max-width: 599px) {
+    .tg-chart { transform-origin: 64% 52%; }
+    .tg-place { left: 64%; }
+    .tg-far { top: 28%; height: 34%; }
+    .tg-near { right: 30%; height: 32%; }
+    .tg-stall { right: 3%; width: 50vw; height: 28%; }
+    .tg-steam { right: calc(3% + 22vw); bottom: calc(var(--floor) + 32%); }
+    .tg-pundit { width: 52vw; height: 36%; }
+    .tg-bubble1 { left: 30%; bottom: calc(var(--floor) + 42%); }
+    .tg-sacks { left: 4%; right: 4%; height: 32%; }
+    .tg-chilli { --y1: 52vh; }
+    .tg-bubble2 { left: 24%; bottom: calc(var(--floor) + 40%); }
+  }
+</style>

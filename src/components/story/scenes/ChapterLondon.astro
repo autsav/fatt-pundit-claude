@@ -1,0 +1,102 @@
+---
+/**
+ * Chapter three, "London calling", as one scene on one pinned stage: another sea (the route to London),
+ * Soho at dusk, then Covent Garden's postcards.
+ * Layers and their motion; the engine is global.css "Story scenes" (docs/STORY-MOTION-PLAN.md).
+ * Each moving layer's score (range and start/end) is in the style block below, in % of the track.
+ */
+import StoryScene from '../StoryScene.astro';
+import SceneArt from '../SceneArt.astro';
+import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
+import worldUrl from '../../../assets/images/brand/world-land.svg?url';
+import soho from '../../../assets/images/story/photos/soho-front-77-berwick-street.jpg';
+import cg1 from '../../../assets/images/covent-garden/gallery-01.jpg';
+import cg3 from '../../../assets/images/covent-garden/gallery-03.jpg';
+import cg5 from '../../../assets/images/covent-garden/gallery-05.jpg';
+
+const { chapter, index } = chapterOf('london');
+const sohoPanel = panelOf(chapter, 'p10-soho');
+const garden = panelOf(chapter, 'p11-covent-garden');
+const postcardSizes = '(max-width: 599px) 70vw, min(34vw, 420px)';
+const route = 'M78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26';
+---
+
+<div class="story-scenes">
+  <StoryScene label={chapter.label} sr={firstSentence(sohoPanel.scene)} h="350vh" hPhone="280vh">
+    <div class="layer fx scene-title lo-title">
+      <header class="ch-head">
+        <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+      </header>
+    </div>
+
+    <img class="layer fx fx-then-out lo-chart" src={worldUrl} alt="" loading="lazy" decoding="async" />
+    <svg class="layer fx fx-then-out lo-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <defs>
+        <mask id="scene-route-london" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+          <path class="fx fx-draw route-draw lo-route-draw" d={route} pathLength="1" />
+        </mask>
+      </defs>
+      <path class="route-line" d={route} mask="url(#scene-route-london)" />
+    </svg>
+    <p class="scene-place fx fx-fade-up fx-then-out lo-calcutta" aria-hidden="true">Calcutta</p>
+    <p class="scene-place fx fx-fade-up fx-then-out lo-london" aria-hidden="true">London</p>
+
+    <SceneArt name="soho-front" fallback={soho} widths={[800, 1280]} sizes="100vw" class="layer fx fx-fade fx-then-out lo-soho" />
+    <div class="layer fx fx-then-out lo-dusk" aria-hidden="true"></div>
+    <div class="layer fx fx-fade fx-then-out lo-rain-wrap" aria-hidden="true"><div class="layer fx scene-rain lo-rain"></div></div>
+    <p class="scene-credit fx fx-fade fx-then-out lo-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:77_Berwick_Street,_Soho,_May_2023.jpg">“77 Berwick Street, Soho, May 2023”</a> by No Swan So Fine, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
+
+    <SceneArt name="garden-1" fallback={cg1} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-a" />
+    <SceneArt name="garden-2" fallback={cg3} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-b" warm />
+    <SceneArt name="garden-3" fallback={cg5} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-c" />
+
+    <div class="scene-text">
+      <p class="cap fx fx-fade-up fx-then-out lo-cap1">{sohoPanel.caption}</p>
+      <p class="cap fx fx-fade-up lo-cap2">{garden.caption}</p>
+    </div>
+    {sohoPanel.bubbles?.slice(0, 1).map((b) => (
+      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out lo-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+    ))}
+  </StoryScene>
+</div>
+
+<style>
+  /* 0-12: the title lifts away. */
+  .lo-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
+
+  /* 5-38, another sea: a faint chart, the course draws from Calcutta to London, all gone by 38. */
+  .lo-chart { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; --o0: 0.2; --o1: 0.2; --out-from: 32%; --out-to: 38%; }
+  .lo-route { inset: 0; width: 100%; height: 100%; overflow: visible; --out-from: 32%; --out-to: 38%; }
+  .route-line { fill: none; stroke: var(--color-gold); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 10; vector-effect: non-scaling-stroke; }
+  .route-draw { fill: none; stroke: #fff; stroke-width: 14; stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+  .lo-route-draw { --from: 8%; --to: 30%; }
+  .lo-calcutta { left: 78%; top: 52%; --from: 5%; --to: 10%; --out-from: 32%; --out-to: 38%; }
+  .lo-london { left: 22%; top: 26%; --from: 28%; --to: 32%; --out-from: 32%; --out-to: 38%; }
+
+  /* 32-72, Soho at dusk: the photo comes up, the light goes blue, rain falls, then all fades for Covent Garden. */
+  .lo-soho { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; --from: 32%; --to: 38%; --out-from: 66%; --out-to: 72%; }
+  .lo-dusk { inset: 0; background: linear-gradient(180deg, var(--color-ink), #14233f); --o0: 0; --o1: 0.55; --from: 36%; --to: 50%; --out-from: 66%; --out-to: 72%; }
+  .lo-rain-wrap { inset: 0; overflow: clip; --from: 40%; --to: 46%; --out-from: 66%; --out-to: 72%; }
+  .lo-rain { --y1: 50%; --from: 40%; --to: 68%; }
+  .lo-credit { --from: 32%; --to: 38%; --out-from: 66%; --out-to: 72%; }
+  .lo-cap1 { --from: 42%; --to: 50%; --out-from: 62%; --out-to: 66%; }
+  .lo-bubble { right: var(--gutter); top: 42%; --from: 50%; --to: 56%; --out-from: 62%; --out-to: 66%; }
+
+  /* 66-95, Covent Garden: three postcards slide in, each with its own tilt. */
+  .lo-card { width: min(34vw, 420px); height: auto; aspect-ratio: 4 / 3; }
+  .lo-card-a { left: var(--gutter); bottom: 14%; rotate: -4deg; --y0: 60%; --from: 68%; --to: 76%; }
+  .lo-card-b { left: 34%; top: 30%; rotate: 3deg; --x0: 60vw; --from: 72%; --to: 81%; }
+  .lo-card-c { right: 4%; bottom: 12%; rotate: -1deg; --y0: 60%; --from: 78%; --to: 86%; }
+  .lo-cap2 { --from: 78%; --to: 90%; }
+
+  @media (max-width: 599px) {
+    .lo-calcutta { left: 70%; }
+    .lo-london { left: 18%; }
+    .lo-bubble { right: auto; left: 22%; top: 46%; }
+    .lo-card { width: 70vw; }
+    .lo-card-a { left: 3%; top: 30%; bottom: auto; }
+    .lo-card-b { left: auto; right: 3%; top: 46%; }
+    .lo-card-c { left: 12%; right: auto; top: 62%; bottom: auto; }
+  }
+</style>
