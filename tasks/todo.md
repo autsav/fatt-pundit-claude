@@ -56,3 +56,4 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [ ] Storyboard cards still stand in for: Tangra lane, Pundit, spice sacks, wok scene, queue, friends' table, Dubai travellers, laid table (illustrator, step 7). Dubai skyline is a plain SVG silhouette for now
 - [ ] Safari 26: confirm var() inside animation-range works (owner's Mac), else range classes
 - [ ] Steps 7-8 in docs/STORY-MOTION-PLAN.md: illustrator layers, release check (client #57 open)
+- [ ] Award plan docs/STORY-AWARD-PLAN.md (draft, awaiting owner review): A1-A7 stagecraft, B1 Higgsfield backgrounds/props/textures (style frame first), B2 characters (illustrator, #49), C release + entry
