@@ -1,0 +1,45 @@
+---
+/**
+ * One scene of the story's puppet theatre: a tall track with a sticky, screen-high stage inside.
+ * The track names the view timeline (--scene) its layers move on; layout and motion live in
+ * global.css "Story scenes". Put the layers in the slot, back to front.
+ */
+interface Props {
+  /** Accessible name of the scene (a region). */
+  label: string;
+  /** One sentence for screen readers saying what the stage shows. */
+  sr: string;
+  /** Track height on wider screens, then under 600px (each about one screen per 100vh). */
+  h: `${number}vh`;
+  hPhone: `${number}vh`;
+}
+const { label, sr, h, hPhone } = Astro.props;
+---
+
+<section class="story-scene" aria-label={label} style={`--h:${h};--h-phone:${hPhone}`}>
+  <div class="scene-stage">
+    <p class="sr-only">{sr}</p>
+    <slot />
+  </div>
+</section>
+
+<script>
+  // Fetch a scene's off-screen layers (SceneArt warm) a screen and a half before the scene arrives, as
+  // StoryComic does for its art. Only where the scenes play: hidden scenes download nothing.
+  const scenes = document.querySelectorAll<HTMLElement>('.story-scene');
+  const plays = () => CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches && document.documentElement.dataset.story !== 'comic';
+  if (scenes.length && 'IntersectionObserver' in window) {
+    const warm = new IntersectionObserver(
+      (entries) => {
+        if (!plays()) return;
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.querySelectorAll<HTMLImageElement>('img[data-warm]').forEach((i) => (i.loading = 'eager'));
+          warm.unobserve(e.target);
+        }
+      },
+      { rootMargin: '150% 0px 150% 0px' },
+    );
+    scenes.forEach((s) => warm.observe(s));
+  }
+</script>

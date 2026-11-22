@@ -50,4 +50,5 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [ ] Illustrator's cut-outs: Fatt and the crew as separate layers (no people drawn yet); larger mountain and ship art (the brand files are 196-355px wide and upscale soft)
 - [ ] Decide the sea layer: voyage-sea.svg is the whole world chart (293 KB raw), cropped to open ocean with an SVG view fragment; a purpose-made water strip would be lighter
 - [ ] Real Safari 26 / Firefox 159 check of the scenes (Chromium only so far)
-- [ ] Chapters 2-5 as scenes, once step 1 is approved
+- [x] Step 2: reusable scene engine (StoryScene, SceneArt, fx presets), chapter-by-chapter page, "Read as a comic" switch, QA script docs/qa/story-motion/check.mjs
+- [ ] Steps 3-8 in docs/STORY-MOTION-PLAN.md: chapters 2-5 as scenes, illustrator layers, release check (client #57 open)

@@ -167,56 +167,76 @@
 :where(.comic, .story-scenes) .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
 :where(.comic, .story-scenes) .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
 
-/* Story scenes (StoryScenes.astro): chapter one as a paper puppet theatre. Each scene's track names a
-   view timeline; on a track taller than the screen its `contain` range is exactly the stretch where the
-   sticky stage is pinned, so `contain 20% contain 40%` reads as "20-40% of the track". Linear, fill both,
-   transform and opacity only (plus the route mask's dashoffset). An element that comes in and later goes
-   out has a second animation whose keyframes give only `to`, so before its range it holds the value
-   underneath (the fade-in's) instead of its own start. Without view timelines, or in calm mode, the
-   scenes are not shown at all and the comic's chapter 1 tells the same story. Here, not in the
-   component: see .read-line. */
+/* Story scenes: the paper puppet theatre (StoryScene.astro, SceneArt.astro, story/scenes/*.astro).
+   docs/STORY-MOTION-PLAN.md. Every scene is a tall track (.story-scene) that names the view timeline
+   --scene; a layer resolves it from its own track, so the name repeats freely. On a track taller than the
+   screen its `contain` range is exactly the stretch where the sticky stage is pinned, so
+   `contain 20% contain 40%` reads as "20-40% of the track".
+
+   A moving layer carries `.fx` and says what it does with custom properties, in its chapter component:
+     --from / --to           its range, in % of the track (default 0% / 100%)
+     --x0 --y0 --r0 --s0 --o0   where it starts: translate, rotate, scale, opacity
+     --x1 --y1 --r1 --s1 --o1   where it ends (defaults: no move, opacity 1)
+   Presets fill in the usual starts (.fx-fade-up, .fx-pop, .fx-fade). `.fx-then-out` adds a fade-out over
+   --out-from / --out-to; its keyframes give only `to`, so before that range it keeps the value underneath.
+   `.fx-draw` draws a path (pathLength 1) by its dashoffset. Linear, fill both, transform and opacity only.
+
+   Gate: view timelines + no reduced-motion + not switched to the comic (html[data-story="comic"], set by
+   the "Read as a comic" button). Otherwise no scene shows and each chapter's comic tells it. Here, not in
+   the components: see .read-line. */
 .story-scenes { display: none; }
+.fx-fade-up { --o0: 0; --y0: var(--rise); }
+.fx-pop { --o0: 0; --s0: 0.7; }
+.fx-fade { --o0: 0; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .story-scenes { display: block; }
-    .comic-full > .chapter:first-child { display: none; }
-    .story-scenes .scene-harbour { view-timeline-name: --harbour; view-timeline-axis: block; }
-    .story-scenes .scene-sea-night { view-timeline-name: --sea; view-timeline-axis: block; }
-    .story-scenes .scene-harbour :is(.sh-sun, .sh-mtn-c, .sh-mtn-b, .sh-ship, .sh-compass, .sh-cap1, .sh-cap2, .sh-bubble) { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --harbour; }
-    .story-scenes .scene-sea-night :is(.ss-night, .ss-route-draw, .ss-ship-track, .ss-compass, .ss-cap, .ss-bubble, .ss-place) { animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --sea; }
-
-    /* Scene 1, the harbour: sun up, hills drift (far ones slower), the ship comes in, then the words. */
-    .story-scenes .sh-sun { animation-name: scene-sun; animation-range: contain 0% contain 100%; }
-    .story-scenes .sh-mtn-c { animation-name: scene-drift-slow; animation-range: contain 0% contain 100%; }
-    .story-scenes .sh-mtn-b { animation-name: scene-drift-fast; animation-range: contain 0% contain 100%; }
-    .story-scenes .sh-ship { animation-name: scene-ship-in; animation-range: contain 0% contain 45%; }
-    .story-scenes .sh-cap1 { animation-name: scene-cap-in, scene-out; animation-range: contain 20% contain 40%, contain 64% contain 70%; }
-    .story-scenes .sh-bubble { animation-name: scene-pop, scene-out; animation-range: contain 45% contain 60%, contain 64% contain 70%; }
-    .story-scenes .sh-compass { animation-name: scene-compass-in; animation-range: contain 70% contain 90%; }
-    .story-scenes .sh-cap2 { animation-name: scene-cap-in; animation-range: contain 70% contain 90%; }
-
-    /* Scene 2, at sea: night falls, the course draws from Guangdong to Calcutta, the ship crosses. */
-    .story-scenes .ss-night { animation-name: scene-night; animation-range: contain 0% contain 30%; }
-    .story-scenes .ss-route-draw { animation-name: scene-route; animation-range: contain 10% contain 85%; }
-    .story-scenes .ss-ship-track { animation-name: scene-ship-cross; animation-range: contain 0% contain 100%; }
-    .story-scenes .ss-compass { animation-name: scene-compass-turn; animation-range: contain 0% contain 100%; }
-    .story-scenes .ss-cap { animation-name: scene-cap-in; animation-range: contain 15% contain 35%; }
-    .story-scenes .ss-bubble { animation-name: scene-pop, scene-out; animation-range: contain 40% contain 55%, contain 70% contain 78%; }
-    .story-scenes .ss-place { animation-name: scene-cap-in; animation-range: contain 85% contain 100%; }
+    :root:not([data-story='comic']) .story-scenes { display: block; }
+    :root:not([data-story='comic']) .story-chapter[data-scenes] .comic { display: none; }
+    .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
+    .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
+    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-draw { animation-name: fx-draw; }
   }
 }
-@keyframes scene-sun { from { transform: translateY(45%); } to { transform: translateY(-25%); } }
-@keyframes scene-drift-slow { from { transform: none; } to { transform: translateX(-3vw); } }
-@keyframes scene-drift-fast { from { transform: none; } to { transform: translateX(-8vw); } }
-@keyframes scene-ship-in { from { transform: translateX(60vw); } to { transform: none; } }
-@keyframes scene-cap-in { from { opacity: 0; transform: translateY(var(--rise)); } to { opacity: 1; transform: none; } }
-@keyframes scene-pop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
-@keyframes scene-out { to { opacity: 0; } }
-@keyframes scene-compass-in { from { opacity: 0; transform: translateX(-30vw); } to { opacity: 1; transform: none; } }
-@keyframes scene-night { from { opacity: 0; } to { opacity: 0.9; } }
-@keyframes scene-route { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-@keyframes scene-ship-cross { from { transform: none; } to { transform: translateX(calc(100% + var(--ship-w))); } }
-@keyframes scene-compass-turn { from { transform: none; } to { transform: rotate(180deg); } }
+@keyframes fx-move {
+  from { transform: translate(var(--x0, 0), var(--y0, 0)) rotate(var(--r0, 0deg)) scale(var(--s0, 1)); opacity: var(--o0, 1); }
+  to { transform: translate(var(--x1, 0), var(--y1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); opacity: var(--o1, 1); }
+}
+@keyframes fx-out { to { opacity: 0; } }
+@keyframes fx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* Scene layout shared by every chapter. :where() keeps it at one class so each chapter's own placement
+   wins. --floor is what the phone dock (site.css .dock, 640px and below) covers at the stage's foot. */
+:where(.story-scenes) { --gutter: clamp(16px, 4vw, 48px); --top: 96px; --ship-w: min(26vw, 300px); --sea-h: 26%; --floor: 0px;
+  --sea-top: calc(var(--floor) + var(--sea-h)); background: var(--color-sand); }
+:where(.story-scenes) .ch-head { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; }
+:where(.story-scene) { position: relative; height: var(--h, 220vh); }
+:where(.story-scene) .scene-stage { position: sticky; top: 0; height: 100svh; overflow: clip; contain: paint; background: var(--color-paper); }
+:where(.story-scenes) .layer { position: absolute; }
+:where(.story-scenes) .scene-sea { left: 0; right: 0; bottom: 0; width: 100%; height: var(--sea-top); max-width: none; }
+:where(.story-scenes) .scene-ship { width: var(--ship-w); height: auto; max-width: none; }
+/* The narrator top-left under the sticky header: one caption slot, captions take turns in it. */
+:where(.story-scenes) .scene-text { position: absolute; top: var(--top); left: var(--gutter); right: var(--gutter); display: grid; justify-items: start; z-index: 2; }
+:where(.story-scenes) .scene-text .cap { grid-area: 1 / 1; max-width: min(46ch, 100%); }
+:where(.story-scenes) .scene-bubble { z-index: 2; transform-origin: 18% 100%; max-width: min(34vw, 300px); }
+/* A place name on a chart or a photo: sand on an ink halo, readable on dark and light. */
+:where(.story-scenes) .scene-place { position: absolute; z-index: 1; margin: 0; display: flex; align-items: center; gap: 8px; translate: -9px -50%;
+  font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(20px, 2.2vw, 30px); color: var(--color-sand);
+  text-shadow: 0 0 2px var(--color-ink), 0 0 6px var(--color-ink), 0 1px 0 var(--color-ink); }
+:where(.story-scenes) .scene-place::before { content: ''; width: 14px; height: 14px; flex: none; border-radius: 50%; background: var(--color-tiger); box-shadow: 0 0 0 3px rgb(237 229 216 / 0.6); }
+/* A storyboard card where an illustration layer has not arrived yet (SceneArt.astro). */
+:where(.story-scenes) .scene-card { display: grid; place-items: end start; padding: 12px; border: 1.5px dashed rgb(44 41 37 / 0.45);
+  background: repeating-linear-gradient(-45deg, transparent 0 9px, rgb(44 41 37 / 0.05) 9px 10px), rgb(250 246 239 / 0.7); }
+:where(.story-scenes) .scene-card p { margin: 0; max-width: 34ch; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(12.5px, 1.1vw, 15px); line-height: 1.4; color: rgb(44 41 37 / 0.85); }
+/* A credit line a photo's licence asks for (CC BY-SA). */
+:where(.story-scenes) .scene-credit { position: absolute; right: var(--gutter); bottom: calc(var(--floor) + 8px); z-index: 2; margin: 0; padding: 2px 8px; background: rgb(44 41 37 / 0.8); color: var(--color-sand); font-size: 12px; }
+:where(.story-scenes) .scene-credit a { color: inherit; }
+@media (max-width: 640px) { :where(.story-scenes) { --floor: calc(60px + env(safe-area-inset-bottom)); } }
+@media (max-width: 599px) {
+  :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }
+  :where(.story-scene) { height: var(--h-phone, var(--h, 180vh)); }
+  :where(.story-scenes) .scene-bubble { max-width: 60vw; }
+}
 
 /* Something new landing in place (a pill's next line, the lightbox photo): transform and opacity only. */
 @keyframes fp-pill-in { from { transform: translateY(calc(var(--rise) / 2)); opacity: 0; } to { transform: none; opacity: 1; } }

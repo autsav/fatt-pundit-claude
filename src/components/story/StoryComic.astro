@@ -2,7 +2,7 @@
 /**
  * "The tale of Fatt & Pundit" as comic panels (data: src/data/story.ts).
  *
- * full:  every chapter with its heading (the /our-story/ page).
+ * full:  every chapter with its heading, or one chapter with `only` (the /our-story/ page).
  * short: only the ★ panels, no chapter headings (the home page): first wide, the rest in pairs.
  *
  * A panel shows its illustration when src/assets/images/story/<id>.* exists, otherwise a storyboard
@@ -21,10 +21,11 @@ import stamp from '../../assets/images/brand/stamp-gold.png';
 
 interface Props {
   mode: 'full' | 'short';
-  /** A chapter whose section renders without its id: StoryScenes carries that anchor (/our-story/). */
-  anchorless?: string;
+  /** full mode, one chapter only: /our-story/ renders chapter by chapter, and the page's wrapper
+   *  around each chapter carries its anchor id (it holds the scenes and this comic version). */
+  only?: string;
 }
-const { mode, anchorless } = Astro.props;
+const { mode, only } = Astro.props;
 
 // Illustrations, when the illustrator's files are in (named after the panel id).
 const art = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/*.{jpg,jpeg,png,webp,avif}', { eager: true });
@@ -50,16 +51,16 @@ const show = async (p: Panel, size: Panel['size']): Promise<Shown> => {
 
 const groups =
   mode === 'full'
-    ? await Promise.all(chapters.map(async (c) => ({ ...c, panels: await Promise.all(c.panels.map((p) => show(p, p.size))) })))
-    : [{ id: 'story-short', label: '', title: '', panels: await Promise.all(chapters.flatMap((c) => c.panels).filter((p) => p.short).map((p, i) => show(p, i === 0 ? 'wide' : 'half'))) }];
+    ? await Promise.all(chapters.map((c, n) => ({ c, n })).filter(({ c }) => !only || c.id === only).map(async ({ c, n }) => ({ ...c, n, panels: await Promise.all(c.panels.map((p) => show(p, p.size))) })))
+    : [{ id: 'story-short', label: '', title: '', n: 0, panels: await Promise.all(chapters.flatMap((c) => c.panels).filter((p) => p.short).map((p, i) => show(p, i === 0 ? 'wide' : 'half'))) }];
 ---
 
 <div class:list={['comic', `comic-${mode}`]} data-comic>
-  {groups.map((g, gi) => (
-    <section class="chapter" id={mode === 'full' && g.id !== anchorless ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
+  {groups.map((g) => (
+    <section class="chapter" id={mode === 'full' && !only ? g.id : undefined} aria-labelledby={mode === 'full' ? `${g.id}-title` : undefined}>
       {mode === 'full' && (
         <header class="ch-head">
-          <p class="ch-no">Chapter {['one', 'two', 'three', 'four', 'five', 'six'][gi]}</p>
+          <p class="ch-no">Chapter {['one', 'two', 'three', 'four', 'five', 'six'][g.n]}</p>
           <h2 id={`${g.id}-title`} class="ch-title">{g.title}</h2>
         </header>
       )}

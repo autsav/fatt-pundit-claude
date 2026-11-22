@@ -28,6 +28,27 @@ A Hakka cook leaves Guangdong for Calcutta, meets a scholar who lives to eat, an
 
 ## Delivery
 
+**Changed 22 Nov 2026: the story now plays as a paper puppet theatre.** On the website each scene is
+built from cut-out layers that slide, rise and drift as the reader scrolls (see
+`docs/STORY-MOTION-PLAN.md`, "The scenes", for what moves in each one). So each scene comes as separate
+layers, not one flat picture:
+
+- **One transparent PNG per layer**, sRGB, trimmed to the artwork. Typical layers: sky or wall at the
+  back, two or three depth layers of scenery, each character on its own, and every part that moves on its
+  own (a rickshaw, a steamer lid, a chair, a flame, a pot's steam).
+- **Size:** at least twice the largest size the layer shows on screen. As a guide, full-width backdrops
+  are 2880 px wide, characters about 1600 px tall, and small props about 800 px.
+- **Extend backdrops about 10% past each side.** They drift sideways as the reader scrolls, and an
+  edge must never show.
+- **Names:** `<scene>-<layer>.png`, for example `tangra-lane-rickshaw.png`, in
+  `src/assets/images/story/layers/`. Each layer replaces its storyboard card on the site, and nothing
+  else changes.
+- The flat panels below are still wanted. They tell the story wherever motion is off (reduced-motion
+  settings, older browsers, the "Read as a comic" switch). The layers and the panel can come from the same
+  source file.
+
+Flat panels:
+
 - Wide panels: 2520 × 1080 px (21:9). Half panels: 1600 × 1200 px (4:3). Keep important action out of the outer 6% (it can crop on phones).
 - Flat PNG or high-quality JPG, sRGB. Name each file after its panel id, e.g. `p05-first-taste.jpg`.
 - Drop them into `src/assets/images/story/`. The site picks each one up and replaces that panel's storyboard sketch; nothing else changes. The site makes the web-sized copies itself.
