@@ -34,7 +34,9 @@ const { label, sr, h, hPhone } = Astro.props;
         if (!plays()) return;
         for (const e of entries) {
           if (!e.isIntersecting) continue;
-          e.target.querySelectorAll<HTMLImageElement>('img[data-warm]').forEach((i) => (i.loading = 'eager'));
+          // Every layer, not only data-warm ones: layers parked off-screen by their start transform (below
+          // or beside the stage) never meet native lazy loading's threshold.
+          e.target.querySelectorAll<HTMLImageElement>('img').forEach((i) => (i.loading = 'eager'));
           warm.unobserve(e.target);
         }
       },

@@ -254,7 +254,7 @@
 :where(.story-scenes) .scene-credit a { color: inherit; }
 /* A chapter's title card: the first thing on its stage, lifting away as the scene builds behind it
    (give it .fx and an out range, e.g. --o1: 0; --y1: -8%; --from: 6%; --to: 12%). */
-:where(.story-scenes) .scene-title { inset: 0; z-index: 3; pointer-events: none; display: grid; place-content: center; gap: 6px; padding: 0 var(--gutter); text-align: center; background: var(--color-sand); }
+:where(.story-scenes) .scene-title { inset: 0; z-index: 3; pointer-events: none; display: grid; place-content: center; gap: 6px; padding: 0 var(--gutter); text-align: center; background: url("../assets/images/story/paper-crumpled.webp") 0 0 / 512px 512px, var(--color-sand); }
 :where(.story-scenes) .scene-title .ch-head { margin: 0; padding: 0; }
 /* Colour arc: each chapter sets --sky and --ground (the stage's backdrop, top to foot) and --glow (its light:
    sun, fire, neon) on its .story-scenes root; layers read them. Captions and bubbles keep their own colours. */
@@ -268,7 +268,7 @@
 /* Torn-paper wipe: a sheet of sand paper that slides up over the foot of a stage. Its torn top edge is an SVG
    (class .scene-tear-edge, hung above the sheet, so it rides in on the sheet). Start it below the stage by its
    own edge: --y0: calc(100% + var(--tear-h)); --y1: 0. .tear-flip mirrors the edge; each chapter draws its own. */
-:where(.story-scenes) .scene-tear { --tear-h: clamp(34px, 6vw, 80px); position: absolute; inset: 0; z-index: 5; pointer-events: none; background: radial-gradient(rgb(44 41 37 / 0.07) 1px, transparent 1.2px) 0 0 / 7px 7px, var(--color-sand); --y0: calc(100% + var(--tear-h)); --y1: 0%; --from: 88%; --to: 100%; }
+:where(.story-scenes) .scene-tear { --tear-h: clamp(34px, 6vw, 80px); position: absolute; inset: 0; z-index: 5; pointer-events: none; background: url("../assets/images/story/paper-crumpled.webp") 0 0 / 512px 512px, var(--color-sand); --y0: calc(100% + var(--tear-h)); --y1: 0%; --from: 88%; --to: 100%; }
 :where(.story-scenes) .scene-tear-edge { position: absolute; left: 0; bottom: 100%; width: 100%; height: var(--tear-h); fill: var(--color-sand); margin-bottom: -1px; }
 :where(.story-scenes) .tear-flip .scene-tear-edge { scale: -1 1; }
 /* Frame break: a panel with a hand-drawn jagged outline behind a key layer; the steam, flame or sound word

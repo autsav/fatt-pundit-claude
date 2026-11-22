@@ -35,7 +35,9 @@ const words = STORY_TITLE.split(' ').map((word) =>
   <StoryScene label="The tale begins" sr="A harbour at dawn, with the title of the story on a torn piece of paper." h="170vh" hPhone="150vh">
     <div class="layer op-sky" aria-hidden="true"></div>
     <!-- The approved style frame (docs/STORY-AWARD-PLAN.md B1) as one painted backdrop, slowly pushing in. -->
-    <SceneArt name="opening-harbour" widths={[800, 1344]} sizes="100vw" class="layer fx op-harbour" />
+    <SceneArt name="opening-harbour" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer fx op-harbour" />
+    <!-- The first screen's picture (LCP): fetch it at once, but only where the scenes play (calm and comic readers never see it). -->
+    <script is:inline>(function(){var i=document.currentScript.previousElementSibling;try{if(CSS.supports("animation-timeline: view()")&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&document.documentElement.dataset.story!=="comic"&&i&&i.tagName==="IMG"){i.loading="eager";i.fetchPriority="high";}}catch(e){}})();</script>
     <div class="layer op-wrap" aria-hidden="true">
       <div class="op-card fx">
         <p class="op-title">

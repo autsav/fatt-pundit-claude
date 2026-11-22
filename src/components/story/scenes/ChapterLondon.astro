@@ -1,7 +1,7 @@
 ---
 /**
  * Chapter three, "London calling", as one scene on one pinned stage: another sea (the route to London),
- * Soho at dusk, then Covent Garden's postcards.
+ * Soho at night, then Covent Garden's postcards.
  * Layers and their motion; the engine is global.css "Story scenes" (docs/STORY-MOTION-PLAN.md).
  * Each moving layer's score (range and start/end) is in the style block below, in % of the track.
  */
@@ -9,7 +9,6 @@ import StoryScene from '../StoryScene.astro';
 import SceneArt from '../SceneArt.astro';
 import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
 import worldUrl from '../../../assets/images/brand/world-land.svg?url';
-import soho from '../../../assets/images/story/photos/soho-front-77-berwick-street.jpg';
 import cg1 from '../../../assets/images/covent-garden/gallery-01.jpg';
 import cg3 from '../../../assets/images/covent-garden/gallery-03.jpg';
 import cg5 from '../../../assets/images/covent-garden/gallery-05.jpg';
@@ -46,12 +45,11 @@ const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L16
     <p class="scene-place fx fx-fade-up fx-then-out lo-calcutta" aria-hidden="true">Calcutta</p>
     <p class="scene-place fx fx-fade-up fx-then-out lo-london" aria-hidden="true">London</p>
 
-    <SceneArt name="soho-front" fallback={soho} widths={[800, 1280]} sizes="100vw" class="layer fx fx-fade fx-then-out lo-soho" />
+    <SceneArt name="soho-night" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer fx fx-fade fx-then-out lo-soho" />
     <div class="layer fx fx-then-out lo-dusk" aria-hidden="true"></div>
     <div class="layer fx fx-then-out lo-neon" aria-hidden="true"></div>
     <div class="layer fx fx-fade fx-then-out lo-rain-wrap" aria-hidden="true"><div class="layer fx scene-rain lo-rain"></div></div>
     <p class="scene-sfx fx fx-pop fx-then-out lo-sfx" aria-hidden="true">Pitter pat</p>
-    <p class="scene-credit fx fx-fade fx-then-out lo-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:77_Berwick_Street,_Soho,_May_2023.jpg">“77 Berwick Street, Soho, May 2023”</a> by No Swan So Fine, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
 
     <SceneArt name="garden-1" fallback={cg1} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-a" />
     <SceneArt name="garden-2" fallback={cg3} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-b" warm />
@@ -86,17 +84,16 @@ const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L16
   .lo-calcutta { left: 78%; top: 52%; --from: 5%; --to: 10%; --out-from: 32%; --out-to: 38%; }
   .lo-london { left: 22%; top: 26%; --from: 28%; --to: 32%; --out-from: 32%; --out-to: 38%; }
 
-  /* 32-72, Soho at dusk: the photo comes up, the light goes blue, rain falls, then all fades for Covent Garden. */
+  /* 32-72, Soho at dusk: the night street comes up (already dark, so the dusk is only a light shade), rain falls, then all fades for Covent Garden. */
   .lo-soho { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; --from: 32%; --to: 38%; --out-from: 66%; --out-to: 72%; }
-  .lo-dusk { inset: 0; background: linear-gradient(180deg, var(--color-ink), #26323d); --o0: 0; --o1: 0.55; --from: 36%; --to: 50%; --out-from: 66%; --out-to: 72%; }
+  .lo-dusk { inset: 0; background: linear-gradient(180deg, var(--color-ink), #26323d); --o0: 0; --o1: 0.14; --from: 36%; --to: 50%; --out-from: 66%; --out-to: 72%; }
   /* Neon: two pink pools of light, low on each side, as if from signs out of frame. */
   .lo-neon { inset: 0; background: radial-gradient(55% 40% at 82% 78%, color-mix(in srgb, var(--glow) 42%, transparent), transparent 72%), radial-gradient(40% 32% at 12% 64%, color-mix(in srgb, var(--glow) 26%, transparent), transparent 72%);
     --o0: 0; --o1: 1; --from: 42%; --to: 54%; --out-from: 66%; --out-to: 72%; }
-  /* The rain's patter, bottom left under the photo's dark; the caption is top left, the bubble right. */
+  /* The rain's patter, bottom left in the street's dark; the caption is top left, the bubble right. */
   .lo-sfx { left: var(--gutter); bottom: calc(var(--floor) + 8%); rotate: -4deg; font-size: clamp(36px, 6.5vw, 92px); --from: 44%; --to: 50%; --out-from: 58%; --out-to: 64%; }
   .lo-rain-wrap { inset: 0; overflow: clip; --from: 40%; --to: 46%; --out-from: 66%; --out-to: 72%; }
   .lo-rain { --y1: 50%; --from: 40%; --to: 68%; }
-  .lo-credit { --from: 32%; --to: 38%; --out-from: 66%; --out-to: 72%; }
   .lo-cap1 { --from: 42%; --to: 50%; --out-from: 62%; --out-to: 66%; }
   .lo-bubble { right: var(--gutter); top: 42%; --from: 50%; --to: 56%; --out-from: 62%; --out-to: 66%; }
 

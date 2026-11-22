@@ -18,3 +18,19 @@ trimmed and converted to WebP. No person or character appears in any of them.
 | harbour-hills-near.webp | nearer mountains, pines and a small village, transparent | near range plus village only |
 | harbour-water.webp | torn blue-grey paper sea with wave crests, transparent above | water band only |
 | harbour-ship.webp | junk with orange batten sails, bow left, transparent | one junk, side view, no crew |
+| tangra-lane-far.webp | Calcutta Chinatown facades, lanterns, blank signboards | facades only, no writing |
+| tangra-lane-near.webp | empty rickshaw, crates, pots, tea-stall corner | foreground only, no people |
+| tangra-stall.webp | street-food cart, awning, wok on a stove | empty stall |
+| spice-sacks.webp | six sacks: chillies, turmeric, cumin, ginger, garlic | no labels |
+| chilli-red.webp, chilli-green.webp | one chilli each | single prop |
+| wok-street-night.webp | Calcutta street at night, lanterns, fire glow (opaque) | empty street |
+| wok.webp | wok with noodles and chillies flying up | no hands |
+| steamer-lid.webp | woven bamboo steamer lid | lid only |
+| soho-night.webp | Soho street in the rain, red shopfront with a blank sign (opaque) | no people, no lettering |
+| dubai-skyline.webp | dusk skyline with a tall spire | no logos |
+| dubai-dunes.webp | dunes, low buildings, palms | no people |
+| dubai-suitcases.webp | two stickered suitcases with a wok tied on | stickers without writing |
+| your-table.webp | laid table, steamer basket, lantern, empty chair turned to the reader | no people |
+| ../paper-crumpled.webp | tileable crumpled sand paper (title cards, wipes) | texture, no reference image |
+
+The 2K re-render of opening-harbour.webp also used style frame A as its reference.

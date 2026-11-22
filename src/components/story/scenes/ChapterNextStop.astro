@@ -40,10 +40,9 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     </svg>
     <p class="scene-place fx fx-fade-up fx-then-out ns-london" aria-hidden="true">London</p>
     <p class="scene-place fx fx-fade fx-then-out ns-dubai" aria-hidden="true">Dubai</p>
-    <!-- A plain skyline silhouette (no landmark drawn in detail) until the illustrator's dubai-skyline layer arrives. -->
-    <svg class="layer fx fx-fade fx-then-out ns-skyline" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-      <path d="M0 300V236h38v-30h26v44h30v-70h22v-16h20v86h34v-52h40v66h28V164h18v-30h12v30h18v84h30v-40h36v58h24v-96h14l10-20 10 20h14v120h32v-66h28v40h26V120h10V70h6V26l4-26 4 26v44h6v50h10v130h30v-74h34v54h30v-110h20v-14h20v124h30v-46h36v62h26v-88h40v74h30v-40h26v62H1000v14z" />
-    </svg>
+    <SceneArt name="dubai-skyline" note="Dubai skyline at dusk, a tall spire" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 100vw" class="layer fx fx-fade fx-then-out ns-skyline" />
+    <SceneArt name="dubai-dunes" note="Gold dunes, low buildings, palms" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 170vw, 100vw" class="layer fx fx-fade fx-then-out ns-dunes" />
+    <SceneArt name="dubai-suitcases" note="Two stamped suitcases, a wok tied on top" widths={[480, 800, 1025]} sizes="(max-width: 599px) 38vw, 19vw" class="layer fx fx-fade fx-then-out ns-cases" warm />
     <SceneArt name="dubai-travellers" note="Fatt and Pundit with stamped suitcases, looking out" sizes="(max-width: 599px) 44vw, 24vw" class="layer fx fx-fade fx-then-out ns-travellers" warm />
 
     <div class="layer fx fx-fade ns-gold" aria-hidden="true"></div>
@@ -72,7 +71,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
 
 <style>
   /* Colour: desert gold. The dusk sky burns from ink down through the glow to gold; the table's stage is warm sand-gold. */
-  .story-scenes { --sky: #f1dca5; --ground: #e8c26a; --glow: #e8892b; }
+  .story-scenes { --sky: #f1dca5; --ground: #e8c26a; --glow: #e8892b; --tw: min(70vw, 96svh); --tb: calc(var(--floor) + 4%); }
 
   /* 0-12 the title lifts. 5-54 Dubai at dusk: chart and route (out 30-36), skyline rises, travellers slide in. */
   .ns-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
@@ -84,22 +83,30 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .ns-draw { fill: none; stroke: #fff; stroke-width: 14; stroke-dasharray: 1 2; stroke-dashoffset: 1; --from: 8%; --to: 28%; }
   .ns-london { left: 16%; top: 30%; --from: 5%; --to: 10%; --out-from: 30%; --out-to: 36%; }
   .ns-dubai { left: 72%; top: 56%; --from: 26%; --to: 30%; --out-from: 30%; --out-to: 36%; }
-  .ns-skyline { left: 0; right: 0; bottom: var(--floor); width: 100%; height: 52%; fill: var(--color-ink); --y0: 50vh; --from: 28%; --to: 42%; --out-from: 48%; --out-to: 54%; }
-  .ns-travellers { right: 6%; bottom: calc(var(--floor) + 4%); width: clamp(150px, 24vw, 340px); height: auto; aspect-ratio: 4 / 3;
-    --x0: 40vw; --from: 34%; --to: 44%; --out-from: 48%; --out-to: 54%; }
+  /* Paper-cut panoramas, bottom-aligned, full width; the dunes are nearer so they rise a little faster (bigger --y0, same score). */
+  .ns-skyline { left: 0; bottom: calc(var(--floor) + 8vw); width: 100%; height: auto; max-width: none; --y0: 50vh; --from: 28%; --to: 42%; --out-from: 48%; --out-to: 54%; }
+  .ns-dunes { left: 0; bottom: var(--floor); width: 100%; height: auto; max-width: none; --y0: 64vh; --from: 28%; --to: 42%; --out-from: 48%; --out-to: 54%; }
+  /* The travellers card stays a quiet placeholder; the suitcases slide in beside it, on the same score. */
+  .ns-travellers { right: 5%; bottom: calc(var(--floor) + 3%); width: clamp(110px, 15vw, 220px); height: auto; aspect-ratio: 4 / 3;
+    --o1: 0.7; --x0: 40vw; --from: 34%; --to: 44%; --out-from: 48%; --out-to: 54%; }
+  .ns-cases { right: 22%; bottom: calc(var(--floor) + 3%); width: clamp(130px, 19vw, 280px); height: auto; max-width: none;
+    --x0: 46vw; --from: 34%; --to: 44%; --out-from: 48%; --out-to: 54%; }
   .ns-cap1 { --from: 30%; --to: 40%; --out-from: 46%; --out-to: 50%; }
   .ns-bubble1 { left: 56%; top: 30%; --from: 38%; --to: 44%; --out-from: 46%; --out-to: 50%; }
 
   /* 50-90 your table, on paper again; 88-100 the stage turns gold, as the end section is. */
   .ns-gold { inset: 0; background: var(--color-gold); z-index: 1; --from: 88%; --to: 100%; }
-  .ns-table { left: var(--gutter); right: var(--gutter); top: 20%; bottom: calc(var(--floor) + 6%); height: auto; --from: 52%; --to: 60%; }
-  .ns-photo { left: 50%; top: 36%; translate: -50% 0; rotate: -2deg; width: min(52vw, 560px); height: auto; aspect-ratio: 4 / 3; --y0: 40vh; --from: 54%; --to: 66%; }
+  /* The table (1980 x 1508, transparent) is the hero, centred and bottom-aligned; --tw is its width, --tb its bottom offset.
+     In the picture the steamer sits 37% across and from 34% down, the cloth's front drape is 60-82% down, the top right is empty. */
+  .ns-table { left: 50%; bottom: var(--tb); translate: -50% 0; width: var(--tw); height: auto; max-width: none; --y0: 6%; --from: 52%; --to: 60%; }
+  /* The momo photo is a small print lying on the cloth's front drape. */
+  .ns-photo { left: calc(50% - var(--tw) * 0.12); top: calc(100% - var(--tb) - var(--tw) * 0.305); translate: -50% 0; rotate: -3deg; width: calc(var(--tw) * 0.22); height: auto; aspect-ratio: 4 / 3; --y0: 40vh; --from: 54%; --to: 66%; }
   .ns-steam { inset: 0; pointer-events: none; --from: 58%; --to: 62%; }
-  .ns-puff { position: absolute; top: 30%; --y1: -22vh; --o1: 0; }
-  .ns-puff1 { left: 42%; --from: 60%; --to: 72%; }
-  .ns-puff2 { left: 48%; --from: 65%; --to: 77%; }
-  .ns-puff3 { left: 54%; --from: 70%; --to: 82%; }
-  .ns-puff4 { left: 45%; --from: 74%; --to: 86%; }
+  .ns-puff { position: absolute; top: calc(100% - var(--tb) - var(--tw) * 0.5); --y1: -18vh; --o1: 0; }
+  .ns-puff1 { left: calc(50% - var(--tw) * 0.16); --from: 60%; --to: 72%; }
+  .ns-puff2 { left: calc(50% - var(--tw) * 0.13); --from: 65%; --to: 77%; }
+  .ns-puff3 { left: calc(50% - var(--tw) * 0.10); --from: 70%; --to: 82%; }
+  .ns-puff4 { left: calc(50% - var(--tw) * 0.145); --from: 74%; --to: 86%; }
   .ns-cap2 { --from: 64%; --to: 74%; }
   .ns-bubble2 { left: 62%; top: 22%; --from: 72%; --to: 80%; }
   /* The bell as "Your table is ready." lands: below the bubble, right of the photo, clear of the caption (top left). */
@@ -109,17 +116,14 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     .ns-route { --from: 5%; }
     .ns-london { left: 12%; top: 34%; }
     .ns-dubai { left: 62%; top: 52%; }
-    .ns-skyline { height: 44%; }
-    .ns-travellers { right: 4%; width: 44vw; }
+    .ns-skyline { left: -45vw; width: 190vw; bottom: calc(var(--floor) + 20vw); }
+    .ns-dunes { left: -35vw; width: 170vw; }
+    .ns-travellers { right: 3%; width: 30vw; }
+    .ns-cases { right: 34%; width: 38vw; }
     .ns-bubble1 { left: 30%; top: 34%; }
-    .ns-table { top: 26%; }
-    .ns-photo { top: 40%; width: 78vw; }
-    .ns-puff { top: 34%; }
-    .ns-puff1 { left: 30%; }
-    .ns-puff2 { left: 42%; }
-    .ns-puff3 { left: 54%; }
-    .ns-puff4 { left: 36%; }
+    .story-scenes { --tw: 98vw; --tb: calc(var(--floor) + 10%); }
+    .ns-puff { top: calc(100% - var(--tb) - var(--tw) * 0.5); }
     .ns-bubble2 { left: 34%; top: 30%; }
-    .ns-ding { right: 6%; top: auto; bottom: calc(var(--floor) + 6%); }
+    .ns-ding { right: 6%; top: 46%; }
   }
 </style>
