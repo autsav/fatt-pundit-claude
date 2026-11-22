@@ -201,6 +201,9 @@
 @property --r1 { syntax: '*'; inherits: false; }
 @property --s1 { syntax: '*'; inherits: false; }
 @property --o1 { syntax: '*'; inherits: false; }
+@property --rock-from { syntax: '*'; inherits: false; }
+@property --rock-to { syntax: '*'; inherits: false; }
+@property --rock-a { syntax: '*'; inherits: false; }
 .fx-fade-up { --o0: 0; --y0: var(--rise); }
 .fx-pop { --o0: 0; --s0: 0.7; }
 .fx-fade { --o0: 0; }
@@ -216,7 +219,34 @@
     .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
     .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
     .story-scene .fx.fx-draw { animation-name: fx-draw; }
+    /* Easing by role. Scroll-coupled motion (camera, parallax, the route, the ship) stays linear: the scroll is the
+       clock. What arrives lands softly (ease-out-quart), what pops overshoots and settles like a stamp, and what
+       leaves accelerates away (ease-in). With fx-then-out the second curve is the exit's. */
+    .story-scene .fx:is(.fx-fade-up, .fx-fade) { animation-timing-function: var(--ease-land); }
+    .story-scene .fx.fx-pop { animation-timing-function: var(--ease-stamp); }
+    .story-scene .fx.fx-then-out:is(.fx-fade-up, .fx-fade) { animation-timing-function: var(--ease-land), var(--ease-leave); }
+    .story-scene .fx.fx-then-out.fx-pop { animation-timing-function: var(--ease-stamp), var(--ease-leave); }
+    /* Rod puppets: a character cut-out rocks from its feet as the scene plays (--rock-from/--rock-to, % of the track;
+       --rock-a scales the swing). `rotate`, so it composes with the engine's transform. */
+    .story-scene .fx.fx-puppet { transform-origin: 50% 100%; animation-name: fx-move, fx-rock; animation-timing-function: var(--ease-land), ease-in-out;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
+    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
+    /* Between stages: each stage overlaps the last by its torn top edge, so a scene change reads as a fresh sheet of
+       paper laid over the last one: no ruler-straight seam, no screen of blank paper. The edge hides under the
+       header while the stage is pinned. The wrappers lose their sand fill so the overlap shows the scene beneath. */
+    :root:not([data-story='comic']) .story-scenes { background: none; }
+    .story-scene .scene-stage { -webkit-mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat;
+      mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat; }
+    :root:not([data-story='comic']) :is(.story-scene + .story-scene, .story-chapter[data-scenes] + .story-chapter[data-scenes] .story-scene:first-child, .story-body > .story-chapter[data-scenes]:first-child .story-scene:first-child) { margin-top: calc(-1 * var(--edge-h)); }
   }
+}
+@keyframes fx-rock {
+  0% { rotate: calc(var(--rock-a, 1) * -3deg); }
+  22% { rotate: calc(var(--rock-a, 1) * 4deg); }
+  46% { rotate: calc(var(--rock-a, 1) * -2.5deg); }
+  72% { rotate: calc(var(--rock-a, 1) * 3deg); }
+  100% { rotate: 0deg; }
 }
 @keyframes fx-move {
   from { transform: translate(var(--x0, 0), var(--y0, 0)) rotate(var(--r0, 0deg)) scale(var(--s0, 1)); opacity: var(--o0, 1); }
@@ -227,7 +257,10 @@
 
 /* Scene layout shared by every chapter. :where() keeps it at one class so each chapter's own placement
    wins. --floor is what the phone dock (site.css .dock, 640px and below) covers at the stage's foot. */
-:where(.story-scenes) { --gutter: clamp(16px, 4vw, 48px); --top: 96px; --ship-w: min(26vw, 300px); --sea-h: 26%; --floor: 0px;
+/* The torn paper edge stages (and the finale map) overlap each other with; see "Between stages" below. */
+:root { --edge-h: clamp(24px, 4vw, 56px); --torn-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 60' preserveAspectRatio='none'%3E%3Cpath d='M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L168 36 L190 25 L214 33 L236 10 L262 24 L281 30 L309 18 L333 35 L360 21 L384 29 L402 8 L431 26 L455 19 L478 34 L506 24 L529 31 L552 12 L580 27 L601 33 L627 17 L652 30 L679 22 L702 37 L726 15 L749 28 L775 20 L798 33 L826 9 L850 25 L873 32 L901 19 L925 30 L951 14 L976 28 L1000 22 L1000 60 Z'/%3E%3C/svg%3E"); }
+:where(.story-scenes) { --ease-land: cubic-bezier(.165, .84, .44, 1); --ease-stamp: linear(0, .62 22%, 1.07 48%, .98 72%, 1); --ease-leave: cubic-bezier(.55, .055, .675, .19);
+  --gutter: clamp(16px, 4vw, 48px); --top: 96px; --ship-w: min(26vw, 300px); --sea-h: 26%; --floor: 0px;
   --sea-top: calc(var(--floor) + var(--sea-h)); background: var(--color-sand); }
 :where(.story-scenes) .ch-head { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; }
 :where(.story-scene) { position: relative; height: var(--h, 220vh); }
@@ -236,9 +269,12 @@
 /* will-change: the sea chart is a heavy SVG; as its own layer it is drawn once, not re-tiled as the stage moves. */
 :where(.story-scenes) .scene-sea { left: 0; right: 0; bottom: 0; width: 100%; height: var(--sea-top); max-width: none; object-fit: cover; object-position: 50% 0; will-change: transform; }
 :where(.story-scenes) .scene-ship { width: var(--ship-w); height: auto; max-width: none; }
-/* The narrator top-left under the sticky header: one caption slot, captions take turns in it. */
-:where(.story-scenes) .scene-text { position: absolute; top: var(--top); left: var(--gutter); right: var(--gutter); display: grid; justify-items: start; z-index: 2; }
-:where(.story-scenes) .scene-text .cap { grid-area: 1 / 1; max-width: min(46ch, 100%); }
+/* The narrator as film subtitles (docs/STORY-DIRECTOR-PLAN.md section 6): lower third, centred, 42 characters a line,
+   2 lines, sand on an ink plate. Above the phone dock (--floor), under the sticky header. Captions take turns in one grid cell. */
+/* Narrator captions sit centred at the top of the frame, above the cast (owner's rule: a caption never covers a
+   character; film subtitles may sit top or bottom). One at a time: they stack in one grid cell. */
+:where(.story-scenes) .scene-text { position: absolute; top: calc(var(--top) - 6px); left: var(--gutter); right: var(--gutter); display: grid; justify-items: center; z-index: 2; pointer-events: none; }
+:where(.story-scenes) .scene-text .cap { grid-area: 1 / 1; align-self: start; max-width: min(42ch, 100%); text-align: center; font-size: clamp(18px, 2vw, 26px); line-height: 1.35; background: rgb(44 41 37 / 0.9); }
 :where(.story-scenes) .scene-bubble { z-index: 2; transform-origin: 18% 100%; max-width: min(34vw, 300px); }
 /* A place name on a chart or a photo: sand on an ink halo, readable on dark and light. */
 :where(.story-scenes) .scene-place { position: absolute; z-index: 1; margin: 0; display: flex; align-items: center; gap: 8px; translate: -9px -50%;
@@ -254,23 +290,18 @@
 :where(.story-scenes) .scene-credit a { color: inherit; }
 /* A chapter's title card: the first thing on its stage, lifting away as the scene builds behind it
    (give it .fx and an out range, e.g. --o1: 0; --y1: -8%; --from: 6%; --to: 12%). */
-:where(.story-scenes) .scene-title { inset: 0; z-index: 3; pointer-events: none; display: grid; place-content: center; gap: 6px; padding: 0 var(--gutter); text-align: center; background: url("../assets/images/story/paper-crumpled.webp") 0 0 / 512px 512px, var(--color-sand); }
-:where(.story-scenes) .scene-title .ch-head { margin: 0; padding: 0; }
+:where(.story-scenes) .scene-title { inset: 0; z-index: 3; pointer-events: none; display: grid; place-content: center; gap: 6px; padding: 0 var(--gutter); text-align: center; }
+/* The card is the paper, not the stage: the chapter's first backdrop (animating from 0% of its track) shows around it, so a chapter change never lands on empty paper. */
+:where(.story-scenes) .scene-title .ch-head { margin: 0; padding: clamp(24px, 4vw, 48px) clamp(28px, 6vw, 80px); justify-self: center; rotate: -1deg; background: url("../assets/images/story/paper-crumpled.webp") 0 0 / 512px 512px, var(--color-sand); box-shadow: 6px 6px 0 rgb(44 41 37 / 0.3); }
 /* Colour arc: each chapter sets --sky and --ground (the stage's backdrop, top to foot) and --glow (its light:
    sun, fire, neon) on its .story-scenes root; layers read them. Captions and bubbles keep their own colours. */
 /* Kinetic title: the h2 holds a sr-only copy plus aria-hidden letters. Each letter is an .fx that scatters
    over the title's lift (--x1 --y1 --r1 are set per letter in the component). */
 :where(.story-scenes) .tl-word { display: inline-block; white-space: nowrap; }
-:where(.story-scenes) .tl { display: inline-block; --from: 4%; --to: 12%; }
+:where(.story-scenes) .tl { display: inline-block; --from: 1%; --to: 8%; }
 /* Sound word: lettering on the stage, aria-hidden. Tiger with an ink outline; tilt it with `rotate`, pop it with .fx fx-pop. */
 :where(.story-scenes) .scene-sfx { position: absolute; z-index: 2; margin: 0; pointer-events: none; white-space: nowrap; font-family: var(--font-display); font-weight: 700; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase;
   font-size: clamp(40px, 8vw, 110px); color: var(--color-tiger); -webkit-text-stroke: 3px var(--color-ink); paint-order: stroke fill; text-shadow: 4px 4px 0 var(--color-ink), 0 0 18px rgb(203 160 82 / 0.5); }
-/* Torn-paper wipe: a sheet of sand paper that slides up over the foot of a stage. Its torn top edge is an SVG
-   (class .scene-tear-edge, hung above the sheet, so it rides in on the sheet). Start it below the stage by its
-   own edge: --y0: calc(100% + var(--tear-h)); --y1: 0. .tear-flip mirrors the edge; each chapter draws its own. */
-:where(.story-scenes) .scene-tear { --tear-h: clamp(34px, 6vw, 80px); position: absolute; inset: 0; z-index: 5; pointer-events: none; background: url("../assets/images/story/paper-crumpled.webp") 0 0 / 512px 512px, var(--color-sand); --y0: calc(100% + var(--tear-h)); --y1: 0%; --from: 88%; --to: 100%; }
-:where(.story-scenes) .scene-tear-edge { position: absolute; left: 0; bottom: 100%; width: 100%; height: var(--tear-h); fill: var(--color-sand); margin-bottom: -1px; }
-:where(.story-scenes) .tear-flip .scene-tear-edge { scale: -1 1; }
 /* Frame break: a panel with a hand-drawn jagged outline behind a key layer; the steam, flame or sound word
    above it spills over the edge. Size and place it per use; the SVG fills the box. */
 :where(.story-scenes) .scene-frame { position: absolute; pointer-events: none; --frame-line: #fff; --frame-fill: rgb(255 255 255 / 0.1); }
@@ -295,7 +326,6 @@
   :where(.story-scene) { height: var(--h-phone, var(--h, 180vh)); }
   :where(.story-scenes) .scene-bubble { max-width: 60vw; }
   :where(.story-scenes) .scene-sfx { font-size: clamp(34px, 12vw, 56px); -webkit-text-stroke-width: 2px; text-shadow: 3px 3px 0 var(--color-ink); }
-  :where(.story-scenes) .scene-tear { --tear-h: 34px; }
 }
 
 /* Something new landing in place (a pill's next line, the lightbox photo): transform and opacity only. */

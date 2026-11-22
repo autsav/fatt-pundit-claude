@@ -5,6 +5,7 @@
  * Dubai's stub tears to the waitlist instead. Calm mode / no JS: plain links, nothing hidden.
  */
 import { Image } from 'astro:assets';
+import { listCta } from '@/lib/waitlist';
 import { BOOKING_NAMES, hoursLines, prettyPhone, type Branch } from '@/lib/site-data';
 
 interface Props {
@@ -45,7 +46,7 @@ function byDay(b: Branch) {
     const via = b.booking ? BOOKING_NAMES[b.booking.provider as keyof typeof BOOKING_NAMES] : '';
     return (
       <article class={`pass pass-${b.page.lead}`} data-pass style={`--i: ${i}; view-transition-name: branch-${b.id}`} aria-labelledby={`pass-${b.id}`}>
-        <div class="pass-main">
+        <div class="pass-main surface-paper">
           <header class="pass-head">
             <span>Fatt Pundit</span>
             <span>Boarding pass</span>
@@ -95,12 +96,12 @@ function byDay(b: Branch) {
         <a
           class="pass-stub"
           data-tear
-          href={open ? b.booking!.url : listEndpoint ? `#wl-${b.id}` : `/${b.id}/#waitlist`}
+          href={open ? b.booking!.url : listEndpoint ? `#wl-${b.id}` : listCta(b).href}
           {...(open ? { target: '_blank', rel: 'noopener' } : {})}
         >
           {stamps[b.id] ? <Image src={stamps[b.id]} alt="" width={120} class="stub-stamp" /> : <span class="stub-stamp stub-gate" aria-hidden="true">{CODES[b.id]}</span>}
           <span class="stub-text">
-            <span class="stub-cta">{open ? `Book at ${b.shortName}` : 'Join the list'}</span>
+            <span class="stub-cta">{open ? `Book at ${b.shortName}` : listCta(b).short}</span>
             <span class="stub-via">{open ? `Tear the stub: ${via}` : 'Bookings open soon'}</span>
             {open && <span class="sr-only">(opens in a new tab)</span>}
           </span>
@@ -222,11 +223,11 @@ function byDay(b: Branch) {
 
 <style>
   .passes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(20px, 3vw, 36px); align-items: start; }
-  .pass { --band: var(--color-tiger); position: relative; display: flex; flex-direction: column; color: var(--color-ink); filter: drop-shadow(0 18px 30px rgb(44 41 37 / 0.35)); transition: transform var(--dur-spring) var(--curve-spring); }
+  .pass { --band: var(--color-tiger); --band-text: var(--color-tiger-deep); position: relative; display: flex; flex-direction: column; color: var(--color-ink); filter: drop-shadow(0 18px 30px rgb(44 41 37 / 0.35)); transition: transform var(--dur-spring) var(--curve-spring); }
   /* The pass you point at lifts off the counter a little. */
   @media (hover: hover) and (prefers-reduced-motion: no-preference) { .pass:hover { transform: translateY(-6px) rotate(-0.4deg); } }
-  .pass-gold { --band: var(--color-gold); }
-  .pass-slate { --band: var(--color-slate); }
+  .pass-gold { --band: var(--color-gold); --band-text: var(--color-gold-deep); }
+  .pass-slate { --band: var(--color-slate); --band-text: var(--color-slate-deep); }
   .pass.is-waiting { opacity: 0; }
 
   .pass-main { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 0 22px 22px; background: var(--color-paper);
@@ -235,10 +236,9 @@ function byDay(b: Branch) {
   .pass-route { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 12px; }
   .pass-end { display: flex; flex-direction: column; gap: 2px; }
   .pass-to { text-align: right; }
-  .pass-lbl, .pass-fields dt { font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgb(44 41 37 / 0.6); }
+  .pass-lbl, .pass-fields dt { font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fp-fg-muted); }
   .pass-code { font-size: clamp(34px, 3.4vw, 46px); font-weight: 700; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; }
-  .pass-to .pass-code { color: var(--band); }
-  .pass-gold .pass-to .pass-code { color: var(--color-gold-deep); }
+  .pass-to .pass-code { color: var(--band-text); }
   .pass-line { position: relative; height: 2px; margin-bottom: 14px; background: repeating-linear-gradient(90deg, var(--color-ink) 0 6px, transparent 6px 11px); }
   .pass-line::after { content: '✈'; position: absolute; right: -2px; top: 50%; translate: 0 -54%; font-size: 15px; line-height: 1; color: var(--color-ink); }
   .pass-name { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(26px, 2.4vw, 32px); text-transform: none; letter-spacing: 0; }
@@ -249,8 +249,7 @@ function byDay(b: Branch) {
   .pass-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin: 0; font-size: 14px; }
   .pass-links a { display: inline-flex; align-items: center; min-height: 32px; color: inherit; font-weight: 700; text-underline-offset: 4px; }
   .pass-links .pass-more { text-transform: uppercase; letter-spacing: 0.08em; }
-  .pass-boarding { position: absolute; right: 16px; top: 112px; padding: 2px 10px; border: 3px double var(--band); color: var(--band); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -10deg; opacity: 0.9; pointer-events: none; }
-  .pass-gold .pass-boarding { color: var(--color-gold-deep); border-color: var(--color-gold-deep); }
+  .pass-boarding { position: absolute; right: 16px; top: 112px; padding: 2px 10px; border: 3px double var(--band-text); color: var(--band-text); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -10deg; pointer-events: none; }
   /* The spring curve at the panel beat: the page leaves at 260 ms, by which the stamp has landed. */
   .pass.is-stamped .pass-boarding { animation: pass-thud var(--dur-panel) var(--curve-spring); }
   @keyframes pass-thud { 0% { scale: 1.6; } 100% { scale: 1; } }
@@ -274,8 +273,7 @@ function byDay(b: Branch) {
   .stub-gate { display: grid; place-items: center; width: 58px; aspect-ratio: 0.8; border: 2px dashed var(--band); color: var(--color-slate-deep); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; }
   .stub-text { display: flex; flex-direction: column; gap: 2px; }
   .stub-cta { font-size: 19px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink); }
-  .pass-stub:hover .stub-cta { color: var(--band); }
-  .pass-gold .pass-stub:hover .stub-cta { color: var(--color-gold-deep); }
+  .pass-stub:hover .stub-cta { color: var(--band-text); }
   .stub-via { font-family: var(--font-note); font-style: italic; font-size: 15px; color: rgb(44 41 37 / 0.7); }
   .stub-bars { width: 100%; height: 26px; fill: var(--color-ink); opacity: 0.85; }
   .pass.is-torn .pass-stub { animation: stub-tear var(--dur-story) var(--curve-in) forwards; pointer-events: none; }

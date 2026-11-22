@@ -10,7 +10,7 @@ import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const BASE = process.env.BASE ?? 'http://localhost:4321';
-const IDS = ['home', 'soho', 'covent-garden', 'dubai'];
+const IDS = ['home', 'soho', 'covent-garden', 'dubai', 'fatt', 'pundit'];
 const { chromium } = await import(process.env.PLAYWRIGHT ?? 'playwright');
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/usr/bin/google-chrome' });
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });

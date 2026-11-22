@@ -8,6 +8,8 @@ import type { GetStaticPaths } from 'astro';
 import { Font } from 'astro:assets';
 import { stampSrc } from '../../lib/stamp';
 import { getBranches } from '../../lib/site-data';
+import { Image } from 'astro:assets';
+import { TIGERS } from '../../components/story/tigers';
 import stampLeft from '../../assets/images/brand/logo-stamp-distressed-left.png';
 import stampRight from '../../assets/images/brand/logo-stamp-distressed-right.png';
 import '../../styles/global.css';
@@ -16,6 +18,10 @@ export const getStaticPaths = (async () => {
   const branches = await getBranches();
   return [
     { params: { id: 'home' }, props: { gate: 'LDN', place: 'Fatt Pundit', line: 'Soho · Covent Garden · Dubai', note: 'Hakka cooking from Tangra, Calcutta', mark: 'left' as const } },
+    ...Object.values(TIGERS).map((t) => ({
+      params: { id: t.id },
+      props: { gate: t.trait, place: t.name, line: `“${t.line}”`, note: 'Are you a Fatt or a Pundit?', mark: t.id === 'fatt' ? ('right' as const) : ('left' as const), tiger: t.id },
+    })),
     ...branches.map((b) => ({
       params: { id: b.id },
       props: {
@@ -28,7 +34,7 @@ export const getStaticPaths = (async () => {
   ];
 }) satisfies GetStaticPaths;
 
-const { gate, place, line, mark, note = 'Guangdong · Calcutta · London · Dubai' } = Astro.props as { gate: string; place: string; line: string; mark: 'left' | 'right'; note?: string };
+const { gate, place, line, mark, tiger, note = 'Guangdong · Calcutta · London · Dubai' } = Astro.props as { gate: string; place: string; line: string; mark: 'left' | 'right'; note?: string; tiger?: keyof typeof TIGERS };
 const stamp = await stampSrc(mark === 'right' ? stampRight : stampLeft, 520);
 ---
 <html lang="en-GB">
@@ -48,9 +54,11 @@ const stamp = await stampSrc(mark === 'right' ? stampRight : stampLeft, 520);
         <p class="note">{note}</p>
       </div>
       <div class="stub">
-        <span class="gate-label">Gate</span>
+        <span class="gate-label">{tiger ? 'Your tiger' : 'Gate'}</span>
         <span class="gate">{gate}</span>
-        <span class="stamp" style={`-webkit-mask-image:url(${stamp});mask-image:url(${stamp})`}></span>
+        {tiger
+          ? <Image class="tiger" src={TIGERS[tiger].image} alt="" width={300} loading="eager" />
+          : <span class="stamp" style={`-webkit-mask-image:url(${stamp});mask-image:url(${stamp})`}></span>}
       </div>
     </div>
   </body>
@@ -68,4 +76,5 @@ const stamp = await stampSrc(mark === 'right' ? stampRight : stampLeft, 520);
   .gate-label { font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: 0.3em; text-transform: uppercase; }
   .gate { font-family: var(--font-typewriter); font-weight: 700; font-size: 76px; letter-spacing: 0.04em; line-height: 1; text-align: center; padding: 0 12px; }
   .stamp { width: 200px; aspect-ratio: 1046 / 1369; margin-top: 18px; background: var(--color-ink); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; transform: rotate(-6deg); }
+  .tiger { width: auto; height: 300px; margin-top: 12px; }
 </style>

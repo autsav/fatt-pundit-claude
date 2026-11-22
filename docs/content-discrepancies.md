@@ -55,8 +55,8 @@ The journey's bar scene names The Scholar and the Priest, which is only on the P
 ## Other questions
 
 1. **Set menu price**: neither source gives a price per person.
-2. **Bing bread** is described as "buttery" but appears on the vegan and dairy-free menus. Which is right?
-3. **Stir fry Szechuan noodles** appear on the vegan menu; vegan tag currently applies to the veg option only.
+2. **Bing bread** is described as "buttery" but appears on the vegan and dairy-free menus. Which is right? (Site now tags it V H only and drops it from those menus until confirmed; CLIENT-INPUTS #15.)
+3. **Stir fry Szechuan noodles** appear on the vegan menu; now two rows: veg (V VG DF H) and chicken or beef (DF H); vegan menu keeps the veg row only (CLIENT-INPUTS #16).
 4. **Covent Garden menus**: the live Covent Garden page lists menu names but no dishes. Same as Soho? Same prices?
 5. **Spelling**: "Lollypop" (à la carte) vs "Lollipop" (pre-theatre); "chilly" vs "chilli" across dishes. Pick one style.
 6. **Map label**: the guidelines map says "Kalkata". Kolkata or Calcutta for the website version?

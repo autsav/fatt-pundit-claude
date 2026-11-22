@@ -1,0 +1,41 @@
+---
+// Share page for "Choose your tiger" (/our-story/fatt/, /our-story/pundit/). Not in the sitemap (src/lib/pages.ts
+// lists pages by hand) and noindex; its og:image is the per-tiger card public/og/<id>.png.
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/site/SiteHeader.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import { TIGERS, TIGER_IDS } from '../../components/story/tigers';
+import { getBranches } from '../../lib/site-data';
+
+export const getStaticPaths = (() => TIGER_IDS.map((id) => ({ params: { tiger: id } }))) satisfies GetStaticPaths;
+
+const t = TIGERS[Astro.params.tiger as keyof typeof TIGERS];
+const branches = await getBranches();
+---
+<Base title={`You're a ${t.name} · Fatt Pundit`} description={`${t.name}: ${t.trait.toLowerCase()}. “${t.line}” Are you a Fatt or a Pundit?`} og={t.id} noindex>
+  <SiteHeader branches={branches} />
+  <main id="content">
+    <section class="sec gold-bg">
+      <div class="wrap narrow stack center">
+        <Image src={t.image} alt={t.alt} width={200} densities={[1, 2]} class="pick-img" />
+        <p class="kicker">Are you a Fatt or a Pundit?</p>
+        <h1 class="pick-h1">You’re a {t.name}</h1>
+        <p class="pick-line">{t.trait}. “{t.line}”</p>
+        <div class="pick-actions">
+          <a class="fp-btn fp-btn--primary" href="/book/" data-book="">Book a table</a>
+          <a class="fp-btn" href="/our-story/">Read the story</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <SiteFooter branches={branches} />
+</Base>
+
+<style>
+  .pick-img { width: clamp(120px, 24vw, 200px); height: auto; }
+  .pick-h1 { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(40px, 7vw, 80px); line-height: 0.95; text-wrap: balance; }
+  .pick-line { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(19px, 1.8vw, 23px); }
+  .pick-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+</style>

@@ -2,6 +2,7 @@
 // Our story: "The tale of Fatt & Pundit" (data: src/data/story.ts). Each chapter plays as scroll scenes
 // where it has them and the browser can (docs/STORY-MOTION-PLAN.md), and is otherwise told as the comic.
 // The ending is the one thing the reference site lacked: somewhere real to go next.
+import { listCta } from '../lib/waitlist';
 import Base from '../layouts/Base.astro';
 import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
@@ -9,6 +10,8 @@ import ChapterRail from '../components/site/ChapterRail.astro';
 import StoryComic from '../components/story/StoryComic.astro';
 import StoryOpening from '../components/story/StoryOpening.astro';
 import StoryMap from '../components/story/StoryMap.astro';
+import ChooseTiger from '../components/story/ChooseTiger.astro';
+import TastingStrip from '../components/story/TastingStrip.astro';
 import ChapterCanton from '../components/story/scenes/ChapterCanton.astro';
 import ChapterTangra from '../components/story/scenes/ChapterTangra.astro';
 import ChapterSomethingNew from '../components/story/scenes/ChapterSomethingNew.astro';
@@ -77,12 +80,14 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
         <p class="kicker">The end, or rather the start</p>
         <h2 id="end-title" class="h2">Come and taste the rest</h2>
         <p>The story is best told by the food. Come and taste where it went.</p>
+        <TastingStrip />
+        <ChooseTiger />
         <div class="end-actions">
           {open.map((b) => (
             <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book at {b.shortName}</a>
           ))}
           {soon.map((b) => (
-            <a class="fp-btn" href={`/${b.id}/#waitlist`}>Join the {b.shortName} list</a>
+            <a class="fp-btn" href={listCta(b).href}>{listCta(b).label}</a>
           ))}
         </div>
         <p class="small">Or <a href="/#menu">read the menus</a> first.</p>
@@ -126,6 +131,27 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
 </style>
 
 <script>
+  // Smooth wheel scrolling (Lenis) while the scenes play: the wheel's steps are eased into a glide, so the scroll-driven
+  // scenes move evenly instead of in notches. It drives the page's real scroll, so sticky stages and the CSS scroll
+  // timelines are untouched. Touch and keyboard stay native. Off for reduced motion and in comic mode.
+  import Lenis from 'lenis';
+  import 'lenis/dist/lenis.css';
+  const scenesPlay = () => CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches && document.documentElement.dataset.story !== 'comic';
+  let lenis: Lenis | null = null;
+  const syncLenis = () => {
+    if (scenesPlay() && !lenis) {
+      lenis = new Lenis({ autoRaf: true, lerp: 0.09, smoothWheel: true, syncTouch: false, anchors: true, stopInertiaOnNavigate: true, allowNestedScroll: true });
+      (window as unknown as { fpLenis?: Lenis }).fpLenis = lenis;
+    } else if (!scenesPlay() && lenis) {
+      lenis.destroy();
+      lenis = null;
+      (window as unknown as { fpLenis?: Lenis }).fpLenis = undefined;
+    }
+  };
+  syncLenis();
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', syncLenis);
+  new MutationObserver(syncLenis).observe(document.documentElement, { attributes: true, attributeFilter: ['data-story'] });
+
   // "Read as a comic": only offered where the scenes can play. Swaps them for the comic and remembers it.
   const wrap = document.querySelector<HTMLElement>('[data-story-mode]');
   const btn = document.querySelector<HTMLButtonElement>('[data-story-toggle]');

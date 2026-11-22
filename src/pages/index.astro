@@ -44,6 +44,7 @@ import g5 from '../assets/images/covent-garden/gallery-05.jpg';
 import g6 from '../assets/images/covent-garden/gallery-06.jpg';
 import g7 from '../assets/images/covent-garden/gallery-07.jpg';
 import g8 from '../assets/images/covent-garden/gallery-08.jpg';
+import { listCta } from '../lib/waitlist';
 
 const branches = await getBranches();
 const DRINK_IDS = ['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'the-scholar-and-the-priest'];
@@ -118,7 +119,7 @@ const menuPlaces = await Promise.all(
     street: b.address.street,
     menus: b.menus,
     book: b.status === 'open' && b.booking ? { href: b.booking.url, label: `Book at ${b.shortName}` } : undefined,
-    soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: `/${b.id}/#waitlist` },
+    soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: listCta(b).href, label: listCta(b).short },
   })),
 );
 const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };

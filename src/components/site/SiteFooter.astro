@@ -1,5 +1,6 @@
 ---
 import { prettyPhone, type Branch } from '@/lib/site-data';
+import { listCta } from '@/lib/waitlist';
 import Goodbye from './Goodbye.astro';
 
 interface Props {
@@ -43,7 +44,7 @@ const vouchers = branches.find((b) => b.vouchersUrl)?.vouchersUrl;
           {b.status === 'open' && <a class="foot-menus" href={`/${b.id}/menu/`}>{b.shortName} menus</a>}
           {b.status === 'open' && b.booking
             ? <a class="foot-cta" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book at {b.shortName}</a>
-            : <a class="foot-cta" href={`/${b.id}/#waitlist`} data-focus-list>Join the list</a>}
+            : <a class="foot-cta" href={listCta(b).href} data-focus-list>{listCta(b).short}</a>}
         </div>
       ))}
     </div>

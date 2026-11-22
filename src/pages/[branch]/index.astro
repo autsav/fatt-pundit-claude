@@ -160,12 +160,12 @@ const ld = {
     : {}),
 };
 const title = open ? `Fatt Pundit ${b.shortName} · Indo-Chinese Hakka restaurant · ${b.address.street}` : `Fatt Pundit ${b.shortName} · Opening soon at ${b.address.street}`;
-const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : 'Join the list for opening news.'}`;
+const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : (listEndpoint ? 'Join the list for opening news.' : 'Follow us on Instagram for the opening date.')}`;
 ---
 <Base title={title} description={description} og={b.id}>
   {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="(min-width: 1024px) 62vw, 100vw" fetchpriority="high" />}
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <a class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
+  <a class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : listEndpoint ? 'Skip to the waiting list' : 'Skip to the opening news'}</a>
   <SiteHeader branches={branches} current={b} />
 
   <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
