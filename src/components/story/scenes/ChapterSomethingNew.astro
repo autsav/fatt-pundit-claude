@@ -16,31 +16,41 @@ const wok = panelOf(chapter, 'p07-the-wok');
 const momos = panelOf(chapter, 'p08-momos');
 const friends = panelOf(chapter, 'p09-friends');
 const photoSizes = '(max-width: 599px) 60vw, min(34vw, 480px)';
+// The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
+const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
+// The torn top edge of the wipe (a 1000 x 60 box, stretched).
+const tear = 'M0 60 L0 30 L22 22 L41 35 L66 18 L88 31 L113 12 L139 28 L158 36 L185 20 L209 29 L238 9 L260 25 L289 33 L311 15 L338 30 L362 23 L391 37 L414 11 L440 26 L469 32 L491 17 L519 34 L546 21 L571 29 L598 8 L624 27 L651 35 L677 16 L702 31 L729 24 L756 38 L781 13 L808 28 L833 22 L861 34 L887 10 L912 26 L939 33 L963 18 L988 29 L1000 24 L1000 60 Z';
+// A jagged hand-drawn panel outline, in a 100 x 100 box.
+const panel = '2,3 22,1 41,4 63,1 84,3 98,2 99,24 97,47 100,71 98,97 76,99 55,96 34,99 12,97 1,99 3,74 0,52 3,28';
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(wok.scene)} h="400vh" hPhone="320vh">
+  <StoryScene label={chapter.label} sr={firstSentence(wok.scene)} h="340vh" hPhone="270vh">
     <div class="layer fx scene-title sn-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
-        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
       </header>
     </div>
     <div class="layer fx sn-wok-out">
       <div class="layer fx fx-fade sn-evening" aria-hidden="true"></div>
       <SceneArt name="wok-fatt" note="Fatt tossing a roaring wok" widths={[480, 960]} sizes="(max-width: 599px) 44vw, 26vw" class="layer fx fx-fade sn-fatt" />
+      <div class="layer fx fx-fade scene-frame sn-frame-wok" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><polygon points={panel} /></svg></div>
       <div class="layer fx scene-flame sn-flame" aria-hidden="true"></div>
+      <p class="scene-sfx fx fx-pop fx-then-out sn-sizzle" aria-hidden="true">Sizzle!</p>
       <SceneArt name="wok-pundit" note="Pundit throwing in chillies" widths={[480, 960]} sizes="(max-width: 599px) 44vw, 24vw" class="layer fx fx-fade sn-pundit" />
       <SceneArt name="wok-queue" note="A long queue of hungry neighbours" widths={[480, 960, 1400]} sizes="(max-width: 599px) 70vw, 31vw" class="layer fx sn-queue" warm />
     </div>
     <div class="layer fx sn-photos">
       <div class="layer fx fx-fade sn-steam-set">
+        <div class="layer scene-frame scene-frame-ink sn-frame-steamer" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><polygon points={panel} /></svg></div>
         <SceneArt name="momos-steamer" fallback={momo} widths={[480, 960, 1400]} sizes={photoSizes} class="layer scene-photo sn-steamer" />
         <div class="layer fx sn-lid" aria-hidden="true"></div>
         <span class="layer fx puff sn-puff sn-puff1" aria-hidden="true"></span>
         <span class="layer fx puff sn-puff sn-puff2" aria-hidden="true"></span>
         <span class="layer fx puff sn-puff sn-puff3" aria-hidden="true"></span>
         <span class="layer fx puff sn-puff sn-puff4" aria-hidden="true"></span>
+        <p class="scene-sfx fx fx-pop fx-then-out sn-psshh" aria-hidden="true">Psshh</p>
       </div>
       <SceneArt name="plate-spinach" fallback={spinach} widths={[480, 960, 1400]} sizes={photoSizes} class="layer fx scene-photo sn-plate sn-plate-l" warm />
       <SceneArt name="plate-okra" fallback={okra} widths={[480, 960, 1400]} sizes={photoSizes} class="layer fx scene-photo sn-plate sn-plate-r" warm />
@@ -49,20 +59,30 @@ const photoSizes = '(max-width: 599px) 60vw, min(34vw, 480px)';
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out sn-cap1">{wok.caption}</p>
       <p class="cap fx fx-fade-up fx-then-out sn-cap2">{momos.caption}</p>
-      <p class="cap fx fx-fade-up sn-cap3">{friends.caption}</p>
+      <p class="cap fx fx-fade-up fx-then-out sn-cap3">{friends.caption}</p>
     </div>
     {wok.bubbles?.slice(0, 2).map((b, i) => (
       <p class:list={['bubble scene-bubble fx fx-pop fx-then-out', `tail-${b.tail}`, i === 0 ? 'sn-bub1' : 'sn-bub2']}><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
+    <div class="layer fx scene-tear sn-tear" aria-hidden="true">
+      <svg class="scene-tear-edge" viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><path d={tear} /></svg>
+    </div>
   </StoryScene>
 </div>
 
 <style>
+  /* Colour: wok-fire amber. The wok scene is a dark evening lit from below by the glow; the steamers and table sit on warm amber. */
+  .story-scenes { --sky: #f6dfb0; --ground: #ecb15a; --glow: #e8811f; }
+
   /* The title lifts away, then the wok scene builds behind it. */
   .sn-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
   /* Everything of the wok fades out together at 40-46, handing over to the momos. */
   .sn-wok-out { inset: 0; --o0: 1; --o1: 0; --from: 40%; --to: 46%; }
-  .sn-evening { inset: 0; background: linear-gradient(to top, var(--color-tiger), rgb(44 41 37 / 0.85) 38%, var(--color-ink)); --from: 8%; --to: 14%; }
+  .sn-evening { inset: 0; background: linear-gradient(to top, var(--glow), rgb(44 41 37 / 0.85) 38%, var(--color-ink)); --from: 8%; --to: 14%; }
+  /* Frame break: a small jagged panel behind the flame, shorter than the flame grows, so it burns over the top edge. */
+  .sn-frame-wok { left: 28%; bottom: calc(var(--floor) + 5%); width: 13vw; height: 22%; --from: 8%; --to: 14%; }
+  /* The hiss as the flame flares (11-16), gone before the bubbles arrive (20): over Fatt and the pan, clear of caption and bubbles. */
+  .sn-sizzle { left: 22%; top: 40%; rotate: -6deg; --from: 11%; --to: 15%; --out-from: 18%; --out-to: 22%; }
   .sn-fatt { left: 4%; bottom: calc(var(--floor) + 8%); width: min(26vw, 380px); aspect-ratio: 1; height: auto; --from: 10%; --to: 16%; }
   .sn-flame { left: 31%; bottom: calc(var(--floor) + 8%); width: clamp(60px, 9vw, 130px); --s0: 0.4; --s1: 1.25; --from: 10%; --to: 38%; }
   .sn-pundit { left: 40%; bottom: calc(var(--floor) + 8%); width: min(24vw, 340px); aspect-ratio: 1; height: auto; --from: 10%; --to: 16%; }
@@ -74,6 +94,10 @@ const photoSizes = '(max-width: 599px) 60vw, min(34vw, 480px)';
   /* Momos: the photo arrives, the steel lid lifts off, steam rises, two more plates slide in from the sides. */
   .sn-photos { inset: 0; --o0: 1; --o1: 0.6; --s1: 0.9; --from: 70%; --to: 95%; }
   .sn-steam-set { inset: 0; --from: 40%; --to: 46%; }
+  /* Frame break: the panel is bigger than the photo and the lid and steam rise out through its top edge. */
+  .sn-frame-steamer { left: 50%; top: 44%; translate: -50% -50%; width: min(42vw, 580px); aspect-ratio: 4 / 3; }
+  /* The lid's hiss (50-56), top right of the steam; the caption is top left. */
+  .sn-psshh { right: 8%; top: 12%; rotate: 5deg; --from: 49%; --to: 55%; --out-from: 60%; --out-to: 66%; }
   .sn-steamer { left: 50%; top: 44%; translate: -50% -50%; width: min(36vw, 500px); aspect-ratio: 4 / 3; height: auto; }
   .sn-lid { left: 50%; top: 44%; translate: -50% -50%; width: min(36vw, 500px); aspect-ratio: 4 / 3; border-radius: 50%;
     background: radial-gradient(ellipse at 38% 30%, #e6e8ea, #a3a8ad 45%, #5f656b); box-shadow: 0 8px 24px rgb(44 41 37 / 0.4); --y1: -45vh; --r1: -8deg; --from: 46%; --to: 56%; }
@@ -89,7 +113,9 @@ const photoSizes = '(max-width: 599px) 60vw, min(34vw, 480px)';
 
   /* After service: the photos settle and dim (.sn-photos), the friends sit at their table. */
   .sn-table { left: 50%; bottom: calc(var(--floor) + 4%); translate: -50% 0; width: min(46vw, 560px); aspect-ratio: 16 / 9; height: auto; --from: 72%; --to: 82%; }
-  .sn-cap3 { --from: 76%; --to: 86%; }
+  .sn-cap3 { --from: 72%; --to: 80%; --out-from: 82%; --out-to: 86%; }
+  /* 88-100 the paper wipe over the stage. */
+  .sn-tear { --from: 88%; --to: 100%; }
 
   @media (max-width: 599px) {
     .sn-fatt { left: 2%; bottom: calc(var(--floor) + 22%); width: 44vw; }
@@ -98,6 +124,10 @@ const photoSizes = '(max-width: 599px) 60vw, min(34vw, 480px)';
     .sn-queue { right: 2%; bottom: calc(var(--floor) + 3%); width: 70vw; aspect-ratio: 3 / 1; }
     .sn-bub1 { left: 36%; top: 42%; }
     .sn-bub2 { left: 4%; top: 32%; }
+    .sn-frame-wok { left: 41%; bottom: calc(var(--floor) + 20%); width: 22vw; height: 9%; }
+    .sn-sizzle { left: 4%; top: 36%; }
+    .sn-frame-steamer { top: 40%; width: 70vw; }
+    .sn-psshh { right: 6%; top: auto; bottom: calc(var(--floor) + 5%); }
     .sn-steamer, .sn-lid { top: 40%; width: 62vw; }
     .sn-puff { top: 28%; }
     .sn-plate { top: 66%; width: 38vw; }

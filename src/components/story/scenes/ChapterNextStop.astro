@@ -16,14 +16,16 @@ const dubai = panelOf(chapter, 'p12-dubai');
 const table = panelOf(chapter, 'p13-your-table');
 // London upper-left to Dubai right-middle, in the 100 x 100 chart box.
 const route = 'M16 30 C 34 8, 54 74, 72 56';
+// The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
+const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(dubai.scene)} h="350vh" hPhone="280vh">
+  <StoryScene label={chapter.label} sr={firstSentence(dubai.scene)} h="300vh" hPhone="240vh">
     <div class="layer fx scene-title ns-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
-        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
       </header>
     </div>
     <div class="layer fx fx-fade fx-then-out ns-sky" aria-hidden="true"></div>
@@ -54,6 +56,7 @@ const route = 'M16 30 C 34 8, 54 74, 72 56';
       <span class="puff fx ns-puff ns-puff4"></span>
     </div>
 
+    <p class="scene-sfx fx fx-pop fx-then-out ns-ding" aria-hidden="true">Ding!</p>
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out ns-cap1">{dubai.caption}</p>
       <p class="cap fx fx-fade-up ns-cap2">{table.caption}</p>
@@ -68,9 +71,12 @@ const route = 'M16 30 C 34 8, 54 74, 72 56';
 </div>
 
 <style>
+  /* Colour: desert gold. The dusk sky burns from ink down through the glow to gold; the table's stage is warm sand-gold. */
+  .story-scenes { --sky: #f1dca5; --ground: #e8c26a; --glow: #e8892b; }
+
   /* 0-12 the title lifts. 5-54 Dubai at dusk: chart and route (out 30-36), skyline rises, travellers slide in. */
   .ns-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
-  .ns-sky { inset: 0; background: linear-gradient(180deg, var(--color-ink) 0%, var(--color-ink) 30%, var(--color-tiger) 80%, var(--color-gold) 100%);
+  .ns-sky { inset: 0; background: linear-gradient(180deg, var(--color-ink) 0%, var(--color-ink) 30%, var(--glow) 80%, var(--ground) 100%);
     --from: 4%; --to: 9%; --out-from: 48%; --out-to: 54%; }
   .ns-chart { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; --o1: 0.22; --from: 5%; --to: 10%; --out-from: 30%; --out-to: 36%; }
   .ns-route { inset: 0; width: 100%; height: 100%; overflow: visible; --from: 5%; --to: 8%; --out-from: 30%; --out-to: 36%; }
@@ -96,6 +102,8 @@ const route = 'M16 30 C 34 8, 54 74, 72 56';
   .ns-puff4 { left: 45%; --from: 74%; --to: 86%; }
   .ns-cap2 { --from: 64%; --to: 74%; }
   .ns-bubble2 { left: 62%; top: 22%; --from: 72%; --to: 80%; }
+  /* The bell as "Your table is ready." lands: below the bubble, right of the photo, clear of the caption (top left). */
+  .ns-ding { right: 4%; top: 40%; rotate: 7deg; --from: 74%; --to: 80%; --out-from: 90%; --out-to: 96%; }
 
   @media (max-width: 599px) {
     .ns-route { --from: 5%; }
@@ -112,5 +120,6 @@ const route = 'M16 30 C 34 8, 54 74, 72 56';
     .ns-puff3 { left: 54%; }
     .ns-puff4 { left: 36%; }
     .ns-bubble2 { left: 34%; top: 30%; }
+    .ns-ding { right: 6%; top: auto; bottom: calc(var(--floor) + 6%); }
   }
 </style>

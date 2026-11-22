@@ -7,6 +7,8 @@ import SiteHeader from '../components/site/SiteHeader.astro';
 import SiteFooter from '../components/site/SiteFooter.astro';
 import ChapterRail from '../components/site/ChapterRail.astro';
 import StoryComic from '../components/story/StoryComic.astro';
+import StoryOpening from '../components/story/StoryOpening.astro';
+import StoryMap from '../components/story/StoryMap.astro';
 import ChapterCanton from '../components/story/scenes/ChapterCanton.astro';
 import ChapterTangra from '../components/story/scenes/ChapterTangra.astro';
 import ChapterSomethingNew from '../components/story/scenes/ChapterSomethingNew.astro';
@@ -52,6 +54,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
         <p class="story-mode" data-story-mode hidden><button type="button" aria-pressed="false" data-story-toggle>Read as a comic</button></p>
       </div>
     </header>
+    <StoryOpening />
 
     <div class="sec story-body">
       {chapters.map((c) => {
@@ -66,6 +69,8 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
         );
       })}
     </div>
+
+    <StoryMap branches={branches} />
 
     <section id="end" class="sec gold-bg story-end" aria-labelledby="end-title">
       <div class="wrap narrow stack center">
@@ -96,6 +101,20 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   .story-lede { max-width: 40ch; margin: 0 auto; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(19px, 1.8vw, 23px); }
   .story-note { max-width: 52ch; margin: 0 auto; }
   .story-cue { margin: 8px 0 0; font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
+  /* Where the scenes play, the opening stage replaces the hero's look: the h1, lede and note stay in the page as
+     real text, clipped out of sight (the stage shows the same words, aria-hidden), and only the "Read as a comic"
+     switch stays visible, floating at the stage's top right. The gate repeats global.css "Story scenes";
+     plain display and position rules survive @supports here (animation-timeline would not). */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      :global(:root:not([data-story='comic'])) .story-hero { position: relative; z-index: 5; height: 0; padding: 0; background: none; }
+      :global(:root:not([data-story='comic'])) .story-hero .wrap { position: static; }
+      :global(:root:not([data-story='comic'])) .story-hero :is(.story-stamp, .kicker, .story-h1, .story-lede, .story-note, .story-cue) {
+        position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      :global(:root:not([data-story='comic'])) .story-mode { position: absolute; top: 12px; right: clamp(12px, 3vw, 40px); margin: 0; }
+      :global(:root:not([data-story='comic'])) .story-mode button { min-height: 44px; padding: 6px 12px; background: rgb(250 246 239 / 0.85); }
+    }
+  }
   .story-body { background: var(--color-sand); padding-top: 0; }
   .story-chapter + .story-chapter { margin-top: clamp(56px, 9vw, 120px); }
   .story-mode { margin: 4px 0 0; }

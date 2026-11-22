@@ -116,7 +116,11 @@ for (const [w, h] of [[1440, 900], [390, 844]]) {
   if (await cp.locator('[data-story-toggle]').isVisible()) bad(`${w} calm: switch shown`);
   await cp.evaluate(() => scrollTo(0, document.body.scrollHeight));
   await cp.waitForTimeout(800);
-  const fetched = await cp.evaluate(() => [...document.querySelectorAll('.story-scene img')].filter((i) => i.currentSrc).map((i) => i.className));
+  // Scene-only: an image the page also shows outside the scenes (the world chart on the map) is fetched anyway.
+  const fetched = await cp.evaluate(() => {
+    const shared = new Set([...document.querySelectorAll('img')].filter((i) => !i.closest('.story-scene')).map((i) => i.getAttribute('src')));
+    return [...document.querySelectorAll('.story-scene img')].filter((i) => i.currentSrc && !shared.has(i.getAttribute('src'))).map((i) => i.className);
+  });
   if (fetched.length) bad(`${w} calm: scene-only art fetched ${fetched}`);
   await calm.close();
 }

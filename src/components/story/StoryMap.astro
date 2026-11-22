@@ -1,0 +1,146 @@
+---
+/**
+ * "Where the recipes went": a static world chart that closes the story and leads into the gold #end.
+ * It reuses world-land.svg and the same left/top % system as the scenes (ChapterLondon: Calcutta 78/52,
+ * London about 22/26), so the pins line up with the charts the reader has already seen.
+ *
+ * - A dashed gold route runs Guangdong > Calcutta > London > Dubai (inline SVG, decorative).
+ * - Guangdong and Calcutta are plain labels (the history). Each branch is a pin: a native
+ *   <details><summary> (keyboard and screen-reader friendly, one open at a time through `name`),
+ *   whose card holds the same booking / waitlist link the #end section builds.
+ * - Works with no JS and no motion. The only script closes an open card on Esc and returns focus to
+ *   its pin. The only motion is a CSS fade, off under prefers-reduced-motion.
+ *
+ * Props: branches, the array from getBranches(), passed by the page. Place it just before #end.
+ */
+import type { Branch } from '../../lib/site-data';
+import worldUrl from '../../assets/images/brand/world-land.svg?url';
+
+interface Props {
+  branches: Branch[];
+}
+const { branches } = Astro.props;
+
+// Where each branch pins (% of the chart; x/y desktop, mx/my phone, where the pins need more room).
+// Unknown ids fall back to London so a new branch still appears.
+const SPOTS: Record<string, { x: number; y: number; mx?: number; my?: number }> = {
+  soho: { x: 17, y: 34, mx: 13, my: 42 },
+  'covent-garden': { x: 27, y: 20, mx: 32, my: 16 },
+  dubai: { x: 62, y: 50, mx: 60, my: 56 },
+};
+const spot = (id: string) => SPOTS[id] ?? { x: 22, y: 26 };
+const route = 'M90 48 C 86 50, 82 52, 78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26 S 44 42, 62 50';
+---
+
+<section class="story-map" aria-labelledby="story-map-title">
+  <div class="sm-wrap">
+    <h2 id="story-map-title" class="sm-title">Where the recipes went</h2>
+    <p class="sm-lede">From a kitchen in Guangdong, by way of Calcutta, to London and now Dubai. Choose a branch to book or join its list.</p>
+
+    <div class="sm-chart">
+      <img class="sm-land" src={worldUrl} alt="" loading="lazy" decoding="async" />
+      <svg class="sm-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d={route} />
+      </svg>
+
+      <p class="sm-place sm-history sm-flip" style="--x: 90%; --y: 46%; --mx: 90%; --my: 36%">Guangdong</p>
+      <p class="sm-place sm-history" style="--x: 78%; --y: 52%; --mx: 76%; --my: 56%">Calcutta</p>
+
+      {branches.map((b) => {
+        const s = spot(b.id);
+        const isOpen = b.status === 'open';
+        return (
+          <details class="sm-pin" name="story-map" data-pin={b.id}>
+            <summary style={`--x: ${s.x}%; --y: ${s.y}%; --mx: ${s.mx ?? s.x}%; --my: ${s.my ?? s.y}%`}>
+              <span class="sm-dot" aria-hidden="true"></span>
+              <span class="sm-label">{b.shortName}</span>
+              <span class="sr-only">, {isOpen ? 'open' : 'opening soon'}. Show details</span>
+            </summary>
+            <div class="sm-card">
+              <h3 class="sm-card-title">{b.name}</h3>
+              <p class="sm-card-line">{b.address.street}, {b.address.locality}</p>
+              <p class="sm-card-line sm-card-note">{isOpen ? (b.page.opened ? `Open since ${b.page.opened}` : 'Open now') : 'Opening soon'}</p>
+              {isOpen ? (
+                <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book at {b.shortName}</a>
+              ) : (
+                <a class="fp-btn" href={`/${b.id}/#waitlist`}>Join the {b.shortName} list</a>
+              )}
+            </div>
+          </details>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Esc closes the open card and puts focus back on its pin.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = document.querySelector<HTMLDetailsElement>('.story-map details[open]');
+    if (!open) return;
+    open.open = false;
+    open.querySelector('summary')?.focus();
+  });
+</script>
+
+<style>
+  .story-map {
+    padding: clamp(48px, 8vw, 96px) var(--gutter) clamp(72px, 12vw, 140px);
+    background: linear-gradient(180deg, var(--color-sand) 0, var(--color-sand) 72%, var(--color-gold) 100%);
+    color: var(--color-ink);
+    --fp-ring: var(--color-ink);
+  }
+  .sm-wrap { max-width: 1100px; margin-inline: auto; }
+  .sm-title { margin: 0; font-family: var(--font-display); font-size: clamp(28px, 4.5vw, 52px); line-height: 1.05; text-align: center; }
+  .sm-lede { margin: 12px auto clamp(20px, 3vw, 36px); max-width: 52ch; text-align: center; }
+
+  .sm-chart { position: relative; overflow-x: clip; aspect-ratio: 16 / 9; border: 1.5px solid rgb(44 41 37 / 0.25); background: rgb(250 246 239 / 0.6); }
+  .sm-land { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; opacity: 0.35; }
+  .sm-route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .sm-route path { fill: none; stroke: var(--color-gold); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 10; vector-effect: non-scaling-stroke; }
+
+  .sm-place, .sm-pin summary { position: absolute; left: var(--x); top: var(--y); margin: 0; }
+  .sm-place { display: flex; align-items: center; gap: 8px; translate: -9px -50%; pointer-events: none;
+    font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(14px, 2vw, 26px); }
+  .sm-place::before, .sm-dot { content: ''; width: 14px; height: 14px; flex: none; border-radius: 50%; background: var(--color-tiger); box-shadow: 0 0 0 3px rgb(237 229 216 / 0.8); }
+  .sm-history::before { background: var(--color-ink); }
+  /* Near the right edge the label sits left of its dot, so it never runs off the chart. */
+  .sm-flip { flex-direction: row-reverse; translate: calc(-100% + 9px) -50%; }
+
+  /* A branch pin: the whole summary is the 44px target. */
+  .sm-pin summary { display: flex; align-items: center; gap: 8px; min-width: 44px; min-height: 44px; padding-right: 10px; translate: -15px -50%;
+    list-style: none; cursor: pointer; font-family: var(--font-note); font-style: italic; font-weight: 600; font-size: clamp(14px, 2vw, 26px); }
+  .sm-pin summary::-webkit-details-marker { display: none; }
+  .sm-pin summary:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
+  .sm-label { text-shadow: 0 0 3px var(--color-sand), 0 0 6px var(--color-sand); }
+  .sm-pin .sm-dot { width: 18px; height: 18px; background: var(--color-tiger); transition: scale var(--dur-fast) var(--curve-out); }
+  .sm-pin summary:hover .sm-dot, .sm-pin[open] .sm-dot { scale: 1.25; }
+  /* Above its own card, so the open pin can always be clicked again to close it. */
+  .sm-pin[open] summary { z-index: 4; }
+
+  /* The card sits under the pins at the bottom of the chart (below it on phones). */
+  .sm-card { position: absolute; z-index: 3; left: 50%; bottom: 4%; translate: -50% 0; width: min(340px, calc(100% - 2 * var(--gutter)));
+    display: grid; gap: 6px; justify-items: start; padding: 16px 18px; background: var(--color-sand); color: var(--color-ink);
+    border: 2px solid var(--color-ink); box-shadow: 4px 4px 0 var(--color-ink); }
+  .sm-card-title { margin: 0; font-family: var(--font-display); font-size: 22px; line-height: 1.1; }
+  .sm-card-line { margin: 0; }
+  .sm-card-note { font-family: var(--font-note); font-style: italic; }
+  .sm-card .fp-btn { margin-top: 6px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sm-card { animation: sm-in var(--dur-panel) var(--curve-panel); }
+    @keyframes sm-in { from { opacity: 0; translate: -50% var(--rise); } }
+  }
+
+  @media (max-width: 599px) {
+    .sm-place, .sm-pin summary { left: var(--mx); top: var(--my); }
+    .sm-place { font-size: 13px; gap: 5px; }
+    .sm-place::before { width: 10px; height: 10px; }
+    .sm-pin summary { flex-direction: column; gap: 0; justify-content: center; padding: 0; translate: -50% -50%; font-size: 12px; }
+    .sm-label { white-space: nowrap; }
+    /* The card drops below the chart instead of covering it; make room only while one is open. */
+    .sm-card { top: calc(100% + 12px); bottom: auto; }
+    .sm-chart:has(details[open]) { margin-bottom: 230px; }
+  }
+</style>

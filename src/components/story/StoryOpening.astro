@@ -1,0 +1,83 @@
+---
+/**
+ * Stage 0 of the story: the title on a torn-paper card over the harbour at dawn. Scrolling on, the
+ * letters lift away, the card fades and the sun climbs, handing over to chapter one. Engine and range
+ * vocabulary: global.css "Story scenes"; the gate (supports view(), no reduced motion, not the comic) is
+ * there too, so this stage exists only where the scenes play.
+ *
+ * Semantics: the page's one h1 stays in the hero header (our-story.astro), real text in every mode; in
+ * motion mode that header is hidden visually and this stage shows the same words as decoration (aria-hidden).
+ * Nothing here starts transparent, so the title paints with the first frame.
+ */
+import StoryScene from './StoryScene.astro';
+import SceneArt from './SceneArt.astro';
+import { STORY_TITLE, STORY_LEDE } from '../../data/story';
+
+// Each letter lifts on its own course. Offsets come from the letter's index (no randomness), so every build is the same.
+let n = 0;
+const words = STORY_TITLE.split(' ').map((word) =>
+  [...word].map((ch) => {
+    const i = n++;
+    const style = [
+      `--from:${4 + ((i * 7) % 12)}%`,
+      `--to:${34 + ((i * 11) % 22)}%`,
+      `--y1:-${22 + ((i * 37) % 40)}vh`,
+      `--x1:${((i * 29) % 21) - 10}vw`,
+      `--r1:${((i * 41) % 61) - 30}deg`,
+      '--o1:0',
+    ].join(';');
+    return { ch, style };
+  }),
+);
+---
+
+<div class="story-scenes">
+  <StoryScene label="The tale begins" sr="A harbour at dawn, with the title of the story on a torn piece of paper." h="170vh" hPhone="150vh">
+    <div class="layer op-sky" aria-hidden="true"></div>
+    <!-- The approved style frame (docs/STORY-AWARD-PLAN.md B1) as one painted backdrop, slowly pushing in. -->
+    <SceneArt name="opening-harbour" widths={[800, 1344]} sizes="100vw" class="layer fx op-harbour" />
+    <div class="layer op-wrap" aria-hidden="true">
+      <div class="op-card fx">
+        <p class="op-title">
+          {words.map((w, wi) => (
+            <>
+              {wi > 0 && ' '}
+              <span class="op-word">{w.map((l) => <span class="op-letter fx" style={l.style}>{l.ch}</span>)}</span>
+            </>
+          ))}
+        </p>
+        <p class="op-lede">{STORY_LEDE}</p>
+      </div>
+    </div>
+    <p class="layer fx op-cue" aria-hidden="true">Scroll to begin</p>
+  </StoryScene>
+</div>
+
+<style>
+  /* Dawn: sand sky warming to gold at the horizon. Static; the sun, hills and paper move. */
+  .op-sky { inset: 0; background: linear-gradient(180deg, var(--color-sand) 0%, color-mix(in srgb, var(--color-gold) 40%, var(--color-sand)) 62%, var(--color-gold) 100%); }
+  /* A slow push-in toward the harbour; will-change keeps the bitmap scaling cheap. */
+  .op-harbour { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 60% 50%; transform-origin: 60% 60%; will-change: transform;
+    --s1: 1.14; --y1: -2%; }
+
+  /* The title card: torn paper (a static jagged clip), tilted with `rotate` because the animation owns `transform`. */
+  .op-wrap { inset: 0; z-index: 3; display: grid; place-content: center; padding: 0 var(--gutter); pointer-events: none; }
+  .op-card { width: min(92vw, 980px); padding: clamp(28px, 5vw, 64px) clamp(22px, 5vw, 72px) clamp(32px, 5.5vw, 70px); rotate: -1deg; text-align: center;
+    background: var(--color-paper-light); color: var(--color-ink); border-top: 3px solid var(--color-gold);
+    clip-path: polygon(0 3%, 5% 0, 11% 2.5%, 18% 0.5%, 26% 3%, 34% 0, 43% 2%, 52% 0, 61% 3%, 70% 0.5%, 79% 2.5%, 88% 0, 95% 2%, 100% 0.5%,
+      100% 96%, 94% 99%, 87% 96.5%, 78% 100%, 69% 97%, 60% 99.5%, 51% 96.5%, 42% 100%, 33% 97%, 24% 99%, 15% 96.5%, 7% 100%, 0 97%);
+    --o1: 0; --y1: -6%; --from: 30%; --to: 60%; }
+  .op-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title);
+    font-size: clamp(34px, 7vw, 92px); line-height: 1; text-wrap: balance; }
+  .op-word { display: inline-block; white-space: nowrap; }
+  .op-letter { display: inline-block; }
+  .op-lede { margin: clamp(10px, 1.6vw, 20px) auto 0; max-width: 40ch; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(17px, 1.8vw, 23px); }
+
+  /* The cue sits above the sticky bar's overhang at load (the stage starts under the bar) and above the phone dock. */
+  .op-cue { left: 0; right: 0; bottom: calc(var(--floor) + 88px); margin: 0; text-align: center; z-index: 4; font-family: var(--font-note); font-style: italic; font-size: 18px;
+    color: var(--color-ink); --o1: 0; --to: 10%; }
+
+  @media (max-width: 599px) {
+    .op-harbour { object-position: 72% 50%; }
+  }
+</style>
