@@ -8,6 +8,9 @@ import StoryScene from '../StoryScene.astro';
 import SceneArt from '../SceneArt.astro';
 import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
 import worldUrl from '../../../assets/images/brand/world-land.svg?url';
+import { getImage } from 'astro:assets';
+import chilliRed from '../../../assets/images/story/layers/chilli-red.webp';
+import chilliGreen from '../../../assets/images/story/layers/chilli-green.webp';
 
 const { chapter, index } = chapterOf('tangra');
 const tangra = panelOf(chapter, 'p04-tangra');
@@ -16,44 +19,56 @@ const market = panelOf(chapter, 'p06-spice-market');
 // Steam puffs: [left offset, from%, to%]. Chillies: [left, from%, to%, spin, colour].
 const puffs = [['-3vw', 28, 44], ['2vw', 34, 50], ['-1vw', 40, 56], ['4vw', 46, 60]] as const;
 const chillies = [['24%', 66, 76, '-40deg', 'red'], ['33%', 69, 80, '30deg', 'green'], ['42%', 67, 84, '-25deg', 'red'], ['52%', 72, 86, '50deg', 'green'], ['61%', 68, 82, '-55deg', 'red'], ['70%', 71, 88, '35deg', 'green']] as const;
+const chilliImg = { red: await getImage({ src: chilliRed, width: 120, format: 'webp' }), green: await getImage({ src: chilliGreen, width: 120, format: 'webp' }) };
+// The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
+const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
+// The torn top edge of the wipe (a 1000 x 60 box, stretched).
+const tear = 'M0 60 L0 24 L27 33 L49 17 L77 29 L98 36 L127 12 L151 26 L176 21 L204 35 L229 28 L255 9 L279 24 L308 31 L331 16 L359 33 L384 25 L411 38 L437 14 L463 27 L488 22 L517 34 L541 11 L566 25 L593 30 L619 19 L646 36 L671 23 L697 29 L724 8 L748 26 L774 32 L799 18 L827 34 L852 24 L879 13 L905 28 L931 35 L956 20 L982 31 L1000 26 L1000 60 Z';
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(tangra.scene)} h="400vh" hPhone="320vh">
+  <StoryScene label={chapter.label} sr={firstSentence(tangra.scene)} h="340vh" hPhone="270vh">
     <img class="layer fx fx-then-out tg-chart" src={worldUrl} alt="" loading="lazy" decoding="async" />
     <p class="scene-place fx fx-fade fx-then-out tg-place" aria-hidden="true">Calcutta</p>
-    <SceneArt name="tangra-lane-far" note="Tangra lane, far: shop fronts with signs in Chinese and Bengali" sizes="100vw" class="layer fx fx-fade fx-then-out tg-far" />
-    <SceneArt name="tangra-lane-near" note="Rickshaws and passers-by in the lane" sizes="100vw" class="layer fx fx-fade fx-then-out tg-near" />
-    <SceneArt name="tangra-stall" note="Fatt's roadside stall, wok and flame" sizes="100vw" class="layer fx fx-fade fx-then-out tg-stall" />
+    <SceneArt name="tangra-lane-far" note="Tangra lane, far: shop fronts with signs in Chinese and Bengali" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 112vw" class="layer fx fx-fade fx-then-out tg-far" />
+    <SceneArt name="tangra-lane-near" note="Rickshaws and passers-by in the lane" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 108vw" class="layer fx fx-fade fx-then-out tg-near" />
+    <SceneArt name="tangra-stall" note="Fatt's roadside stall, wok and flame" widths={[480, 800, 1121]} sizes="(max-width: 599px) 56vw, min(36vw, 440px)" class="layer fx fx-fade fx-then-out tg-stall" />
     <div class="layer fx fx-fade fx-then-out tg-steam" aria-hidden="true">
       {puffs.map(([x, from, to]) => <span class="layer puff fx" style={`left:${x};--from:${from}%;--to:${to}%`}></span>)}
     </div>
     <SceneArt name="tangra-pundit" note="Pundit tastes from a bowl, doubtful" sizes="100vw" class="layer fx fx-fade fx-then-out tg-pundit" warm />
-    <SceneArt name="spice-sacks" note="Sacks of red and green chillies, ginger, garlic, cumin" sizes="100vw" class="layer fx fx-fade tg-sacks" />
+    <SceneArt name="spice-sacks" note="Sacks of red and green chillies, ginger, garlic, cumin" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 180vw, 104vw" class="layer fx fx-fade tg-sacks" />
     {chillies.map(([x, from, to, spin, colour]) => (
-      <span class={`layer fx fx-fade tg-chilli ${colour}`} style={`left:${x};--from:${from}%;--to:${to}%;--r0:${spin};--r1:0deg`} aria-hidden="true"></span>
+      <img class={`layer fx fx-fade tg-chilli ${colour}`} src={chilliImg[colour].src} width={chilliImg[colour].attributes.width} height={chilliImg[colour].attributes.height} alt="" loading="lazy" decoding="async" data-warm style={`left:${x};--from:${from}%;--to:${to}%;--r0:${spin};--r1:0deg`} />
     ))}
     <div class="layer fx scene-title tg-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
-        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
       </header>
     </div>
+    <p class="scene-sfx fx fx-pop fx-then-out tg-sfx" aria-hidden="true">Tssss!</p>
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out tg-cap1">{tangra.caption}</p>
       <p class="cap fx fx-fade-up fx-then-out tg-cap2">{taste.caption}</p>
-      <p class="cap fx fx-fade-up tg-cap3">{market.caption}</p>
+      <p class="cap fx fx-fade-up fx-then-out tg-cap3">{market.caption}</p>
     </div>
     {taste.bubbles?.slice(0, 1).map((b) => (
       <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out tg-bubble1"><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
     {market.bubbles?.slice(0, 1).map((b) => (
-      <p class="bubble tail-left scene-bubble fx fx-pop tg-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out tg-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
+    <div class="layer fx scene-tear tear-flip tg-tear" aria-hidden="true">
+      <svg class="scene-tear-edge" viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><path d={tear} /></svg>
+    </div>
   </StoryScene>
 </div>
 
 <style>
+  /* Colour: monsoon ochre, a wet golden light; the glow warms the stall's steam. */
+  .story-scenes { --sky: #ecc98a; --ground: #cf9a4e; --glow: #f2b84b; }
+
   /* 0-12 the title lifts. 5-32 the chart zooms toward Calcutta (its point stays put under the scale) and goes. */
   .tg-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
   /* The same world chart and Calcutta point as chapter 4 (ChapterLondon .lo-chart / .lo-calcutta), zoomed in on it. */
@@ -62,12 +77,18 @@ const chillies = [['24%', 66, 76, '-40deg', 'red'], ['33%', 69, 80, '30deg', 'gr
   .tg-place { left: 78%; top: 52%; --from: 8%; --to: 18%; --out-from: 24%; --out-to: 30%; }
 
   /* 22-40 the lane rises, the far shops less than the near rickshaws; steam climbs from the wok 28-60. */
-  .tg-far { left: 0; right: 0; top: 24%; height: 44%; --y0: 30vh; --from: 22%; --to: 38%; --out-from: 60%; --out-to: 66%; }
-  .tg-near { left: 0; right: 36%; bottom: var(--floor); height: 38%; --y0: 70vh; --from: 24%; --to: 40%; --out-from: 60%; --out-to: 66%; }
-  .tg-stall { right: 5%; bottom: calc(var(--floor) + 4%); width: min(36vw, 440px); height: 34%; --y0: 80vh; --from: 24%; --to: 40%; --out-from: 60%; --out-to: 66%; }
-  .tg-steam { right: calc(5% + 14vw); bottom: calc(var(--floor) + 38%); width: 0; height: 0; --from: 26%; --to: 30%; --out-from: 60%; --out-to: 66%; }
+  /* Paper-cut panoramas, wider than the screen so the rise never shows an edge; bottom-aligned, height from the aspect. */
+  .tg-far, .tg-near, .tg-sacks { height: auto; max-width: none; }
+  .tg-far { left: -6vw; width: 112vw; bottom: calc(var(--floor) + 14%); --y0: 30vh; --from: 22%; --to: 38%; --out-from: 60%; --out-to: 66%; }
+  .tg-near { left: -4vw; width: 108vw; bottom: var(--floor); --y0: 70vh; --from: 24%; --to: 40%; --out-from: 60%; --out-to: 66%; }
+  /* The stall stands in front of the lane, centre-left; the steam rises from its wok (about the stall's middle, 60% up). */
+  .story-scenes { --tg-stall-w: min(36vw, 440px); }
+  .tg-stall { left: 26%; bottom: calc(var(--floor) + 4%); width: var(--tg-stall-w); height: auto; max-width: none; --y0: 80vh; --from: 24%; --to: 40%; --out-from: 60%; --out-to: 66%; }
+  .tg-steam { left: calc(26% + var(--tg-stall-w) * 0.5); bottom: calc(var(--floor) + 4% + var(--tg-stall-w) * 0.5); width: 0; height: 0; --from: 26%; --to: 30%; --out-from: 60%; --out-to: 66%; }
   .tg-steam .puff { bottom: 0; --y0: 0; --y1: -40vh; --o0: 0.9; --o1: 0; }
   .tg-cap1 { --from: 26%; --to: 36%; --out-from: 44%; --out-to: 48%; }
+  /* The hiss of the steam, top right above the stall; the caption is top left. */
+  .tg-sfx { right: 6%; top: 17%; rotate: -5deg; --from: 30%; --to: 36%; --out-from: 46%; --out-to: 52%; }
 
   /* 40-66 the Pundit slides in from the left, tastes, doubts. */
   .tg-pundit { left: var(--gutter); bottom: calc(var(--floor) + 4%); width: min(32vw, 380px); height: 46%; --x0: -40vw; --from: 40%; --to: 52%; --out-from: 60%; --out-to: 66%; }
@@ -75,23 +96,25 @@ const chillies = [['24%', 66, 76, '-40deg', 'red'], ['33%', 69, 80, '30deg', 'gr
   .tg-bubble1 { left: calc(var(--gutter) + min(20vw, 240px)); bottom: calc(var(--floor) + 48%); --from: 52%; --to: 58%; --out-from: 62%; --out-to: 66%; }
 
   /* 60-95 the spice market: sacks rise, chillies drop and spin onto them, Fatt answers. */
-  .tg-sacks { left: 12%; right: 12%; bottom: var(--floor); height: 38%; --y0: 60vh; --from: 62%; --to: 78%; }
-  .tg-chilli { top: 0; width: 16px; height: 52px; border-radius: 50% 50% 50% 50% / 14% 14% 86% 86%; --y0: -30vh; --y1: 38vh; }
-  .tg-chilli.red { background: var(--color-tiger); }
-  .tg-chilli.green { background: #5b8a3c; }
-  .tg-cap3 { --from: 70%; --to: 80%; }
-  .tg-bubble2 { left: 52%; bottom: calc(var(--floor) + 48%); --from: 80%; --to: 88%; }
+  .tg-sacks { left: -2vw; width: 104vw; bottom: var(--floor); --y0: 60vh; --from: 62%; --to: 78%; }
+  .tg-chilli { top: 0; width: clamp(40px, 5vw, 72px); height: auto; --y0: -30vh; --y1: 38vh; }
+  .tg-cap3 { --from: 66%; --to: 74%; --out-from: 80%; --out-to: 86%; }
+  .tg-bubble2 { left: 52%; bottom: calc(var(--floor) + 48%); --from: 74%; --to: 80%; --out-from: 82%; --out-to: 86%; }
+  /* 88-100 the paper wipe over the stage, edge mirrored from chapter 1's. */
+  .tg-tear { --from: 88%; --to: 100%; }
 
   @media (max-width: 599px) {
     .tg-chart { transform-origin: 64% 52%; }
+    .tg-sfx { right: 3%; top: 30%; }
     .tg-place { left: 64%; }
-    .tg-far { top: 28%; height: 34%; }
-    .tg-near { right: 30%; height: 32%; }
-    .tg-stall { right: 3%; width: 50vw; height: 28%; }
-    .tg-steam { right: calc(3% + 22vw); bottom: calc(var(--floor) + 32%); }
+    .story-scenes { --tg-stall-w: 56vw; }
+    .tg-far { left: -70vw; width: 190vw; bottom: calc(var(--floor) + 16%); }
+    .tg-near { left: -62vw; width: 190vw; }
+    .tg-stall { left: 22%; }
+    .tg-steam { left: calc(22% + var(--tg-stall-w) * 0.5); }
     .tg-pundit { width: 52vw; height: 36%; }
     .tg-bubble1 { left: 30%; bottom: calc(var(--floor) + 42%); }
-    .tg-sacks { left: 4%; right: 4%; height: 32%; }
+    .tg-sacks { left: -40vw; width: 180vw; }
     .tg-chilli { --y1: 52vh; }
     .tg-bubble2 { left: 24%; bottom: calc(var(--floor) + 40%); }
   }

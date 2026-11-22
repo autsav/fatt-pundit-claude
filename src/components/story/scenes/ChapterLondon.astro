@@ -1,7 +1,7 @@
 ---
 /**
  * Chapter three, "London calling", as one scene on one pinned stage: another sea (the route to London),
- * Soho at dusk, then Covent Garden's postcards.
+ * Soho at night, then Covent Garden's postcards.
  * Layers and their motion; the engine is global.css "Story scenes" (docs/STORY-MOTION-PLAN.md).
  * Each moving layer's score (range and start/end) is in the style block below, in % of the track.
  */
@@ -9,7 +9,6 @@ import StoryScene from '../StoryScene.astro';
 import SceneArt from '../SceneArt.astro';
 import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
 import worldUrl from '../../../assets/images/brand/world-land.svg?url';
-import soho from '../../../assets/images/story/photos/soho-front-77-berwick-street.jpg';
 import cg1 from '../../../assets/images/covent-garden/gallery-01.jpg';
 import cg3 from '../../../assets/images/covent-garden/gallery-03.jpg';
 import cg5 from '../../../assets/images/covent-garden/gallery-05.jpg';
@@ -19,14 +18,18 @@ const sohoPanel = panelOf(chapter, 'p10-soho');
 const garden = panelOf(chapter, 'p11-covent-garden');
 const postcardSizes = '(max-width: 599px) 70vw, min(34vw, 420px)';
 const route = 'M78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26';
+// The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
+const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
+// The torn top edge of the wipe (a 1000 x 60 box, stretched); chapter 1's edge, mirrored in CSS.
+const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L168 36 L190 25 L214 33 L236 10 L262 24 L281 30 L309 18 L333 35 L360 21 L384 29 L402 8 L431 26 L455 19 L478 34 L506 24 L529 31 L552 12 L580 27 L601 33 L627 17 L652 30 L679 22 L702 37 L726 15 L749 28 L775 20 L798 33 L826 9 L850 25 L873 32 L901 19 L925 30 L951 14 L976 28 L1000 22 L1000 60 Z';
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(sohoPanel.scene)} h="350vh" hPhone="280vh">
+  <StoryScene label={chapter.label} sr={firstSentence(sohoPanel.scene)} h="300vh" hPhone="240vh">
     <div class="layer fx scene-title lo-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
-        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
       </header>
     </div>
 
@@ -42,10 +45,11 @@ const route = 'M78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26';
     <p class="scene-place fx fx-fade-up fx-then-out lo-calcutta" aria-hidden="true">Calcutta</p>
     <p class="scene-place fx fx-fade-up fx-then-out lo-london" aria-hidden="true">London</p>
 
-    <SceneArt name="soho-front" fallback={soho} widths={[800, 1280]} sizes="100vw" class="layer fx fx-fade fx-then-out lo-soho" />
+    <SceneArt name="soho-night" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer fx fx-fade fx-then-out lo-soho" />
     <div class="layer fx fx-then-out lo-dusk" aria-hidden="true"></div>
+    <div class="layer fx fx-then-out lo-neon" aria-hidden="true"></div>
     <div class="layer fx fx-fade fx-then-out lo-rain-wrap" aria-hidden="true"><div class="layer fx scene-rain lo-rain"></div></div>
-    <p class="scene-credit fx fx-fade fx-then-out lo-credit">Photo: <a href="https://commons.wikimedia.org/wiki/File:77_Berwick_Street,_Soho,_May_2023.jpg">“77 Berwick Street, Soho, May 2023”</a> by No Swan So Fine, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
+    <p class="scene-sfx fx fx-pop fx-then-out lo-sfx" aria-hidden="true">Pitter pat</p>
 
     <SceneArt name="garden-1" fallback={cg1} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-a" />
     <SceneArt name="garden-2" fallback={cg3} widths={[480, 840]} sizes={postcardSizes} class="layer fx fx-fade scene-photo lo-card lo-card-b" warm />
@@ -53,15 +57,21 @@ const route = 'M78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26';
 
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out lo-cap1">{sohoPanel.caption}</p>
-      <p class="cap fx fx-fade-up lo-cap2">{garden.caption}</p>
+      <p class="cap fx fx-fade-up fx-then-out lo-cap2">{garden.caption}</p>
     </div>
     {sohoPanel.bubbles?.slice(0, 1).map((b) => (
       <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out lo-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
+    <div class="layer fx scene-tear tear-flip lo-tear" aria-hidden="true">
+      <svg class="scene-tear-edge" viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><path d={tear} /></svg>
+    </div>
   </StoryScene>
 </div>
 
 <style>
+  /* Colour: wet slate, with a neon pink glow that comes up with the dusk over Soho. */
+  .story-scenes { --sky: #aebbc5; --ground: #7f93a2; --glow: #ff3d8b; }
+
   /* 0-12: the title lifts away. */
   .lo-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
 
@@ -74,12 +84,16 @@ const route = 'M78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26';
   .lo-calcutta { left: 78%; top: 52%; --from: 5%; --to: 10%; --out-from: 32%; --out-to: 38%; }
   .lo-london { left: 22%; top: 26%; --from: 28%; --to: 32%; --out-from: 32%; --out-to: 38%; }
 
-  /* 32-72, Soho at dusk: the photo comes up, the light goes blue, rain falls, then all fades for Covent Garden. */
+  /* 32-72, Soho at dusk: the night street comes up (already dark, so the dusk is only a light shade), rain falls, then all fades for Covent Garden. */
   .lo-soho { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; --from: 32%; --to: 38%; --out-from: 66%; --out-to: 72%; }
-  .lo-dusk { inset: 0; background: linear-gradient(180deg, var(--color-ink), #14233f); --o0: 0; --o1: 0.55; --from: 36%; --to: 50%; --out-from: 66%; --out-to: 72%; }
+  .lo-dusk { inset: 0; background: linear-gradient(180deg, var(--color-ink), #26323d); --o0: 0; --o1: 0.14; --from: 36%; --to: 50%; --out-from: 66%; --out-to: 72%; }
+  /* Neon: two pink pools of light, low on each side, as if from signs out of frame. */
+  .lo-neon { inset: 0; background: radial-gradient(55% 40% at 82% 78%, color-mix(in srgb, var(--glow) 42%, transparent), transparent 72%), radial-gradient(40% 32% at 12% 64%, color-mix(in srgb, var(--glow) 26%, transparent), transparent 72%);
+    --o0: 0; --o1: 1; --from: 42%; --to: 54%; --out-from: 66%; --out-to: 72%; }
+  /* The rain's patter, bottom left in the street's dark; the caption is top left, the bubble right. */
+  .lo-sfx { left: var(--gutter); bottom: calc(var(--floor) + 8%); rotate: -4deg; font-size: clamp(36px, 6.5vw, 92px); --from: 44%; --to: 50%; --out-from: 58%; --out-to: 64%; }
   .lo-rain-wrap { inset: 0; overflow: clip; --from: 40%; --to: 46%; --out-from: 66%; --out-to: 72%; }
   .lo-rain { --y1: 50%; --from: 40%; --to: 68%; }
-  .lo-credit { --from: 32%; --to: 38%; --out-from: 66%; --out-to: 72%; }
   .lo-cap1 { --from: 42%; --to: 50%; --out-from: 62%; --out-to: 66%; }
   .lo-bubble { right: var(--gutter); top: 42%; --from: 50%; --to: 56%; --out-from: 62%; --out-to: 66%; }
 
@@ -88,12 +102,15 @@ const route = 'M78 52 C 66 62, 54 38, 42 42 S 28 30, 22 26';
   .lo-card-a { left: var(--gutter); bottom: 14%; rotate: -4deg; --y0: 60%; --from: 68%; --to: 76%; }
   .lo-card-b { left: 34%; top: 30%; rotate: 3deg; --x0: 60vw; --from: 72%; --to: 81%; }
   .lo-card-c { right: 4%; bottom: 12%; rotate: -1deg; --y0: 60%; --from: 78%; --to: 86%; }
-  .lo-cap2 { --from: 78%; --to: 90%; }
+  .lo-cap2 { --from: 72%; --to: 80%; --out-from: 82%; --out-to: 86%; }
+  /* 88-100 the paper wipe over the stage, chapter 1's edge mirrored. */
+  .lo-tear { --from: 88%; --to: 100%; }
 
   @media (max-width: 599px) {
     .lo-calcutta { left: 70%; }
     .lo-london { left: 18%; }
     .lo-bubble { right: auto; left: 22%; top: 46%; }
+    .lo-sfx { left: 5%; font-size: clamp(32px, 11vw, 52px); }
     .lo-card { width: 70vw; }
     .lo-card-a { left: 3%; top: 30%; bottom: auto; }
     .lo-card-b { left: auto; right: 3%; top: 46%; }

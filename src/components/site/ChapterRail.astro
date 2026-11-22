@@ -1,7 +1,7 @@
 ---
 /**
  * Chapter rail: where you are on a long page. Dots light up as you scroll, tap one to jump.
- * Wide screens only (1320px+, where the margin beside the 1240 column can hold it); every width
+ * From 1024px (narrow and tucked to the edge until 1320px, where the margin beside the 1240 column can hold the full rail); every width
  * also gets a thin reading line under the header.
  * Used by the home page (chapters of the visit) and /our-story/ (chapters of the comic).
  */
@@ -85,12 +85,14 @@ const { chapters, after = 0.8 } = Astro.props;
   /* Story rail */
   .rail { position: fixed; z-index: 30; right: 18px; top: 50%; translate: 0 -50%; display: none; flex-direction: column; gap: 2px; padding: 6px;
     background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity var(--dur-panel) var(--curve-out); }
-  /* Only where the margin beside the 1240 column can hold it: from 1100px it sat on the content
-     (the bar's prices, the passes) until about 1310px. */
-  @media (min-width: 1320px) { .rail { display: flex; } }
+  /* From 1024px, tucked to the edge and narrow (28px targets inside the 41px+ page gutter, so it never sits
+     on content); from 1320px, where the margin beside the 1240 column can hold it, the roomy 44px rail. */
+  @media (min-width: 1024px) { .rail { display: flex; right: 0; padding: 4px 2px; } }
+  @media (min-width: 1320px) { .rail { right: 18px; padding: 6px; } }
   .rail.is-on { opacity: 1; pointer-events: auto; }
-  /* 44px targets; the dashed line joins one dot to the next. */
-  .rail a { position: relative; display: grid; place-items: center; width: 44px; height: 44px; text-decoration: none; }
+  /* 28x44 targets (44 square from 1320px); the dashed line joins one dot to the next. */
+  .rail a { position: relative; display: grid; place-items: center; width: 28px; height: 44px; text-decoration: none; }
+  @media (min-width: 1320px) { .rail a { width: 44px; } }
   .rail a::before { content: ''; position: absolute; left: 50%; top: -17px; height: 34px; border-left: 1px dashed rgb(203 160 82 / 0.5); }
   .rail a:first-child::before { display: none; }
   .rail-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--color-gold); transition: background-color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }

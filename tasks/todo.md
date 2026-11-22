@@ -56,3 +56,7 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [ ] Storyboard cards still stand in for: Tangra lane, Pundit, spice sacks, wok scene, queue, friends' table, Dubai travellers, laid table (illustrator, step 7). Dubai skyline is a plain SVG silhouette for now
 - [ ] Safari 26: confirm var() inside animation-range works (owner's Mac), else range classes
 - [ ] Steps 7-8 in docs/STORY-MOTION-PLAN.md: illustrator layers, release check (client #57 open)
+- [x] Award plan A1-A7 (docs/STORY-AWARD-PLAN.md): torn-paper wipes, colour arc, kinetic titles + sound words, frame breaks, opening stage, "Where the recipes went" map, pacing (~20 screens), rail from 1024px. 22 Nov 2026: verify green, check.mjs all passed, dropped frames 1.7-2.0%
+- [x] B1 style frame A approved; harbour layers generated (hills far/near, water, junk) and the opening backdrop; voyage-sea.svg no longer used by the story
+- [x] B1 rest (22 Nov 2026): Tangra lane far/near, stall, spice sacks, chillies, wok street at night, wok, steamer lid, Soho at night (replaces the CC photo), Dubai skyline + dunes, suitcases, laid table, crumpled paper; opening re-rendered at 2K. Perf medians: score 96, TBT 179 ms, LCP 2.2 s, dropped frames 1.8%, 522 KB
+- [ ] B2 characters (illustrator, #49); C release check + award entry
