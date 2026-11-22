@@ -342,8 +342,6 @@
     },
     "tags": [
       "V",
-      "VG",
-      "DF",
       "H"
     ],
     "kind": "food"
@@ -410,26 +408,27 @@
   },
   {
     "id": "stir-fry-szechuan-noodles",
-    "name": "Stir fry Szechuan noodles",
+    "name": "Stir fry Szechuan noodles, veg",
     "section": "rice",
-    "options": [
-      {
-        "label": "Veg",
-        "price": {
-          "GBP": 13
-        }
-      },
-      {
-        "label": "Chicken or beef",
-        "price": {
-          "GBP": 15
-        }
-      }
-    ],
-    "tagNote": "Vegan, vegetarian and dairy-free tags apply to the veg option only.",
+    "price": {
+      "GBP": 13
+    },
     "tags": [
       "V",
       "VG",
+      "DF",
+      "H"
+    ],
+    "kind": "food"
+  },
+  {
+    "id": "stir-fry-szechuan-noodles-chicken-beef",
+    "name": "Stir fry Szechuan noodles, chicken or beef",
+    "section": "rice",
+    "price": {
+      "GBP": 15
+    },
+    "tags": [
       "DF",
       "H"
     ],

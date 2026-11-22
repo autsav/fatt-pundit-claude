@@ -11,22 +11,19 @@ import ship from '../../../assets/images/brand/ship.png';
 import mountainsB from '../../../assets/images/brand/mountains-b.png';
 import mountainsC from '../../../assets/images/brand/mountains-c.png';
 import compass from '../../../assets/images/brand/compass.png';
-import map from '../../../assets/images/brand/map.webp';
+import RouteChart from '../RouteChart.astro';
 
 const { chapter, index } = chapterOf('canton');
 const harbour = panelOf(chapter, 'p01-harbour');
 const packing = panelOf(chapter, 'p02-packing');
 const atSea = panelOf(chapter, 'p03-at-sea');
-const shipSizes = '(max-width: 599px) 46vw, min(26vw, 300px)';
-const route = 'M88 30 C 72 14, 56 42, 40 30 S 22 26, 16 34';
+const shipSizes = '(max-width: 599px) 86vw, min(44vw, 620px)';
 // The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
 const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
-// The torn top edge of the wipe (a 1000 x 60 box, stretched).
-const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L168 36 L190 25 L214 33 L236 10 L262 24 L281 30 L309 18 L333 35 L360 21 L384 29 L402 8 L431 26 L455 19 L478 34 L506 24 L529 31 L552 12 L580 27 L601 33 L627 17 L652 30 L679 22 L702 37 L726 15 L749 28 L775 20 L798 33 L826 9 L850 25 L873 32 L901 19 L925 30 L951 14 L976 28 L1000 22 L1000 60 Z';
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(harbour.scene)} h="220vh" hPhone="180vh">
+  <StoryScene label={chapter.label} sr={firstSentence(harbour.scene)} h="260vh" hPhone="220vh">
     <div class="layer fx scene-title sh-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
@@ -37,46 +34,36 @@ const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L16
     <SceneArt name="harbour-hills-far" fallback={mountainsC} widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 170vw, 112vw" class="layer fx sh-hills sh-mtn-c" />
     <SceneArt name="harbour-hills-near" fallback={mountainsB} widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 180vw, 108vw" class="layer fx sh-hills sh-mtn-b" />
     <SceneArt name="harbour-water" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer scene-sea" />
-    <SceneArt name="harbour-ship" fallback={ship} widths={[320, 640, 1078]} sizes={shipSizes} class="layer fx scene-ship sh-ship" warm />
+    <!-- The junk sails in with Fatt on its foredeck, facing the way it sails; one moving group, so he rides with it. -->
+    <div class="layer fx scene-ship sh-ship">
+      <SceneArt name="harbour-ship" fallback={ship} widths={[320, 640, 1078]} sizes={shipSizes} class="sh-ship-art" warm />
+      <SceneArt name="harbour-fatt" note="Fatt on deck, his wok strapped to his bundle" widths={[400, 700, 1000]} sizes="(max-width: 599px) 20vw, min(10vw, 150px)" class="layer fx fx-fade-up fx-puppet sh-fatt" />
+    </div>
     <SceneArt name="harbour-compass" fallback={compass} widths={[90]} sizes="110px" class="layer fx sh-compass" warm />
     <p class="scene-sfx fx fx-pop fx-then-out sh-sfx" aria-hidden="true">Hooonk!</p>
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out sh-cap1">{harbour.caption}</p>
-      <p class="cap fx fx-fade-up sh-cap2">{packing.caption}</p>
+      <p class="cap fx fx-fade-up fx-then-out sh-cap2">{packing.caption}</p>
     </div>
     {harbour.bubbles?.slice(0, 1).map((b) => (
       <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out sh-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
   </StoryScene>
 
-  <StoryScene label="At sea" sr={firstSentence(atSea.scene)} h="240vh" hPhone="190vh">
-    <div class="layer ss-base" aria-hidden="true"></div>
-    <SceneArt name="at-sea-chart" fallback={map} widths={[800, 1400, 2000]} sizes="100vw" class="layer ss-map" />
+  <StoryScene label="At sea" sr={firstSentence(atSea.scene)} h="240vh" hPhone="205vh">
+    <!-- Leg 1 on the night chart, framed above the harbour-water strip: the noodle draws Guangdong to Calcutta. -->
+    <RouteChart id="canton" legs={[{ lane: 'leg1', from: 12, to: 80 }]}
+      places={[{ at: 'canton', name: 'Guangdong', lands: 12, side: 'right', sidePhone: 'left' }, { at: 'kolkata', name: 'Calcutta', lands: 84, side: 'left' }]}
+      focus={[1000, 855]} zoom={1.7} zoomMaxH={2.72} y={48} zoomPhone={3.453} yPhone={46} focusPhone={[1020, 855]} />
     <SceneArt name="harbour-water" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer scene-sea" />
     <div class="layer fx fx-fade ss-night" aria-hidden="true"></div>
-    <svg class="layer ss-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-      <defs>
-        <mask id="scene-route-canton" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
-          <path class="fx fx-draw route-draw ss-route-draw" d={route} pathLength="1" />
-        </mask>
-      </defs>
-      <path class="route-line" d={route} mask="url(#scene-route-canton)" />
-    </svg>
-    <p class="scene-place fx fx-fade-up ss-place" aria-hidden="true">Calcutta</p>
     <SceneArt name="at-sea-compass" fallback={compass} widths={[90]} sizes="96px" class="layer fx ss-compass" warm />
-    <div class="layer fx ss-ship-track" aria-hidden="true">
-      <!-- The same junk as the harbour until the illustrator draws an at-sea-ship (with the crew). -->
-      <SceneArt name="harbour-ship" fallback={ship} widths={[320, 640, 1078]} sizes={shipSizes} class="scene-ship ss-ship" warm />
-    </div>
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out ss-cap">{atSea.caption}</p>
     </div>
     {atSea.bubbles?.slice(0, 1).map((b) => (
       <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out ss-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
-    <div class="layer fx scene-tear ss-tear" aria-hidden="true">
-      <svg class="scene-tear-edge" viewBox="0 0 1000 60" preserveAspectRatio="none" focusable="false"><path d={tear} /></svg>
-    </div>
   </StoryScene>
 </div>
 
@@ -85,7 +72,7 @@ const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L16
   .story-scenes { --sky: #dcebe2; --ground: #a9cdbd; --glow: var(--color-gold); }
 
   /* Scene 1, the harbour at dawn: the title lifts, sun up, hills drift (far ones slower), the ship comes in, then the words. */
-  .sh-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
+  .sh-title { --o1: 0; --y1: -8%; --from: 1%; --to: 8%; }
   .sh-sun { left: 60%; top: 26%; width: clamp(110px, 16vw, 230px); aspect-ratio: 1; border-radius: 50%;
     background: radial-gradient(circle at 40% 38%, rgb(255 255 255 / 0.25), transparent 55%), var(--glow); box-shadow: 0 0 60px 18px color-mix(in srgb, var(--glow) 35%, transparent);
     --y0: 45%; --y1: -25%; }
@@ -94,42 +81,41 @@ const tear = 'M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L16
   /* Its faintness is in the animation's values: a moving layer's opacity is the animation's. */
   .sh-mtn-c { left: -4vw; width: 112vw; --o0: 0.85; --o1: 0.85; --x1: -3vw; }
   .sh-mtn-b { left: 0; width: 108vw; --x1: -7vw; }
-  .sh-ship { left: 50%; bottom: calc(var(--sea-top) - var(--ship-w) * 0.22); translate: -50% 0; --x0: 60vw; --to: 45%; }
-  .sh-compass { left: var(--gutter); bottom: calc(var(--sea-top) + 16px); width: clamp(64px, 7vw, 110px); height: auto; --o0: 0; --x0: -30vw; --from: 70%; --to: 90%; }
-  .sh-cap1 { --from: 20%; --to: 40%; --out-from: 64%; --out-to: 70%; }
-  .sh-cap2 { --from: 70%; --to: 90%; }
+  /* A bigger junk here, so the cast on deck reads. The group is the ship's box (1078 x 821); Fatt stands at the bow, in front
+     of the sails, his feet on the foredeck (the quay plank he was drawn on is clipped off), mirrored to face the way it sails. */
+  .story-scenes { --ship-w: min(44vw, 620px); }
+  .sh-ship { left: 50%; bottom: calc(var(--sea-top) - var(--ship-w) * 0.22); translate: -50% 0; aspect-ratio: 1078 / 821; height: auto; --x0: 60vw; --to: 40%; }
+  .sh-ship-art { position: relative; display: block; width: 100%; height: auto; max-width: none; }
+  .sh-compass { left: var(--gutter); bottom: calc(var(--sea-top) + 16px); width: clamp(64px, 7vw, 110px); height: auto; --o0: 0; --x0: -30vw; --from: 62%; --to: 80%; }
+  /* Captions: in over 3%, each holds until the next replaces it; the last holds to the end of the track. */
+  .sh-cap1 { --from: 9%; --to: 12%; --out-from: 52%; --out-to: 55%; }
+  .sh-cap2 { --from: 52%; --to: 55%; --out-from: 97%; --out-to: 100%; }
   /* Speech above the ship's mast, tail down-left at it. */
-  .sh-bubble { left: calc(50% + 1vw); bottom: calc(var(--sea-top) + var(--ship-w) * 0.82); --from: 45%; --to: 60%; --out-from: 64%; --out-to: 70%; }
+  /* Fatt on the quay at the water's edge, looking out at the ship; his line sits by his head. */
+  .sh-fatt { left: 3%; bottom: 22%; width: 22%; height: auto; aspect-ratio: 1411 / 2017; max-width: none; scale: -1 1; clip-path: inset(0 0 9% 0); --from: 10%; --to: 18%; --rock-from: 18%; --rock-to: 100%; --rock-a: 0.6; }
+  .sh-bubble { left: calc(50% - var(--ship-w) * 0.36); bottom: calc(var(--sea-top) + var(--ship-w) * 0.36); --from: 40%; --to: 43%; --out-from: 56%; --out-to: 59%; }
 
   /* The ship's horn as the ship arrives (45%), just right of the sun, clear of the caption and the bubble. */
-  .sh-sfx { right: var(--gutter); top: 14%; rotate: 6deg; --from: 40%; --to: 46%; --out-from: 56%; --out-to: 62%; }
+  .sh-sfx { right: var(--gutter); top: 25%; rotate: 6deg; --from: 36%; --to: 41%; --out-from: 50%; --out-to: 53%; }
 
-  /* Scene 2, at sea: night falls, the course draws from Guangdong to Calcutta, the ship crosses. */
-  .ss-base { inset: 0; background: linear-gradient(180deg, #1d3a35, var(--color-ink)); }
-  .ss-map { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; opacity: 0.18; }
-  .ss-night { inset: 0; background: var(--color-ink); --o1: 0.9; --to: 30%; }
-  .ss-route { inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .route-line { fill: none; stroke: var(--color-gold); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 10; vector-effect: non-scaling-stroke; }
-  .route-draw { fill: none; stroke: #fff; stroke-width: 14; stroke-dasharray: 1 2; stroke-dashoffset: 1; }
-  .ss-route-draw { --from: 10%; --to: 85%; }
-  .ss-place { left: 16%; top: 34%; --from: 72%; --to: 80%; --out-from: 82%; --out-to: 86%; }
+  /* Scene 2, at sea: night falls, the noodle draws leg 1 from Guangdong to Calcutta (12-80) with the small ship at its head, and Calcutta's stamp lands at 84. */
+  /* The chart (RouteChart, leg 1) is the night; only the harbour-water strip below it needs darkening as night falls. */
+  .ss-night { left: 0; right: 0; bottom: 0; height: var(--sea-top); background: var(--color-ink); --o1: 0.9; --to: 30%; }
   .ss-compass { right: var(--gutter); top: calc(var(--top) + 8px); width: clamp(56px, 6vw, 96px); height: auto; --r1: 180deg; }
-  .ss-ship-track { left: 0; right: 0; bottom: calc(var(--sea-top) - var(--ship-w) * 0.22); height: auto; --x1: calc(100% + var(--ship-w)); }
-  /* The ship crosses left to right here, so it faces that way. */
-  .ss-ship { display: block; translate: -100% 0; scale: -1 1; }
-  .ss-cap { --from: 15%; --to: 35%; --out-from: 80%; --out-to: 86%; }
-  /* 88-100 the paper wipe: a torn sheet rises over the stage, sand, as the next chapter's title card is. */
-  .ss-tear { --from: 88%; --to: 100%; }
-  .ss-bubble { left: 44%; bottom: calc(var(--sea-top) + var(--ship-w) * 0.82); --from: 40%; --to: 55%; --out-from: 70%; --out-to: 78%; }
+  /* Caption: in over 3%, holds to the end of the track. */
+  .ss-cap { --from: 4%; --to: 7%; --out-from: 97%; --out-to: 100%; }
+  /* No big junk any more (see RouteChart): the crew's shout comes from the water, low left, clear of the chart. */
+  .ss-bubble { left: var(--gutter); bottom: calc(var(--sea-top) + 14px); --from: 30%; --to: 33%; --out-from: 46%; --out-to: 49%; }
 
   @media (max-width: 599px) {
-    .sh-bubble { left: 22%; }
-    .ss-bubble { left: 30%; }
+    /* Phones: the caption plate is taller, so Fatt stands up on the shoreline, clear of it. */
+    .story-scenes { --ship-w: 86vw; }
+    .sh-bubble { left: calc(50% - var(--ship-w) * 0.42); }
     .sh-sun { left: 58%; top: 34%; }
     .sh-sfx { right: 4%; top: 30%; }
+    /* Phones: the compass sits below the top caption band. */
+    .ss-compass { top: calc(var(--top) + 150px); }
     .sh-mtn-c { left: -30vw; width: 170vw; }
     .sh-mtn-b { left: -70vw; width: 180vw; }
-    .ss-place { left: 14%; }
-    .ss-compass { top: auto; bottom: calc(var(--floor) + 4%); }
   }
 </style>

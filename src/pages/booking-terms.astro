@@ -8,7 +8,7 @@ const rules = groupRules(open[0]);
 <InfoPage title="Booking terms" description="Booking a table at Fatt Pundit Soho or Covent Garden: groups, deposits, changes and lateness." kicker="Your table" heading="Booking terms"
   summary={rules ? [rules.deposit, rules.setMenu, 'Plans change? Tell us as early as you can, using your confirmation or by phone.'] : undefined}
   questions={{ related: [{ href: '/book/', label: 'Book a table' }, { href: '/private-dining/', label: 'Plan a group' }] }}>
-  <p>Book online, by phone, or just walk in: we keep some tables free for guests without a booking.</p>
+  <p>Book online or by phone.</p>
   {open.map((b) => {
     const r = groupRules(b);
     return (

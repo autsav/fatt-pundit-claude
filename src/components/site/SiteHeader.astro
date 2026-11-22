@@ -7,6 +7,7 @@
  */
 import type { Branch } from '@/lib/site-data';
 import { onlineSummary } from '@/lib/site-data';
+import { listCta } from '@/lib/waitlist';
 import BookDrawer from './BookDrawer.astro';
 
 interface Props {
@@ -26,7 +27,7 @@ type Act = { href: string; label: string; short: string; external: boolean; book
 const book: Act = current?.booking
   ? { href: current.booking.url, label: onBranchHome ? 'Book a table' : `Book at ${current.shortName}`, short: 'Book a table', external: true, book: current.id }
   : current
-    ? { href: onBranchHome ? '#waitlist' : `/${current.id}/#waitlist`, label: 'Join the list', short: 'Join the list', external: false, list: true }
+    ? { href: onBranchHome ? '#waitlist' : listCta(current).href, label: listCta(current).short, short: listCta(current).short, external: false, list: true }
     : { href: '/book/', label: 'Book a table', short: 'Book a table', external: false, book: '' };
 const bookAttrs = { 'data-book': book.book, 'data-focus-list': book.list ? '' : undefined, ...(book.external ? { target: '_blank', rel: 'noopener' } : {}) };
 const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
@@ -79,7 +80,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
               <a href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book<span class="sr-only"> at {b.shortName}</span></a>
             </>
           ) : (
-            <a href={`/${b.id}/#waitlist`} data-focus-list>Join the list<span class="sr-only"> for {b.shortName}</span></a>
+            <a href={listCta(b).href} data-focus-list>{listCta(b).short}<span class="sr-only"> for {b.shortName}</span></a>
           )}
         </span>
       </li>
@@ -132,7 +133,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
       <a href="#site-index" data-index-open aria-haspopup="dialog">Rooms</a>
     </>
   )}
-  <a class="dock-book" href={book.href} {...bookAttrs}>{book.list ? 'Join the list' : 'Book'}</a>
+  <a class="dock-book" href={book.href} {...bookAttrs}>{book.list ? book.short : 'Book'}</a>
 </nav>
 
 <script>

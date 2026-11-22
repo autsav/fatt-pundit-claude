@@ -33,7 +33,8 @@ export interface MenuPlace {
   street: string;
   menus: string[];
   book?: { href: string; label: string };
-  soon?: { dishes: string[]; href: string };
+  /** label: the list button's wording (src/lib/waitlist.ts listCta), honest when the list isn't open yet. */
+  soon?: { dishes: string[]; href: string; label: string };
 }
 const PLACE_KEY = 'fp-menu-at';
 /** A dish for the signature page that opens the à la carte menu (home page). */
@@ -128,7 +129,7 @@ function Item({ i }: { i: MenuItemLite }) {
       <p className="m-0 text-[3.9cqw] font-bold uppercase leading-[1.3] tracking-[0.04em]">
         {i.name}
         {i.price && !i.options && <span className="font-bold normal-case text-ink"> | {i.price}</span>}
-        {i.tags.length > 0 && <span className="ml-[1.4cqw] align-[0.2cqw] font-label text-[2.6cqw] tracking-[0.18em] text-gold">{i.tags.join(' ')}</span>}
+        {i.tags.length > 0 && <span className="ml-[1.4cqw] align-[0.2cqw] font-label text-[2.6cqw] tracking-[0.18em] text-gold-deep">{i.tags.join(' ')}</span>}
       </p>
       {i.options && i.price && <p className="m-0 text-[3.2cqw] font-bold leading-[1.45]">{i.price}</p>}
       {i.desc && <p className="m-0 text-[3.3cqw] leading-[1.36] text-ink/85">{i.desc}</p>}
@@ -157,7 +158,7 @@ function MenuHeader({ menu, art }: { menu: MenuLite; art: Art }) {
       <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
       <div>
         <p className="m-0 text-[6.6cqw] font-bold uppercase leading-none tracking-[0.1em]">Fatt Pundit</p>
-        <p className="m-0 mt-[1.6cqw] font-note text-[4cqw] text-tiger">{menu.title}</p>
+        <p className="m-0 mt-[1.6cqw] font-note text-[4cqw] text-tiger-deep">{menu.title}</p>
         <p className="m-0 mt-[1cqw] font-label text-[2.6cqw] font-bold uppercase tracking-[0.22em]">Soho and Covent Garden</p>
       </div>
       <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
@@ -419,7 +420,7 @@ export default function MenuBook({
                 </div>
                 {soon.map((p) => (
                   <p key={p.id} className="m-0 text-[16px]">
-                    {p.name}: the menu comes with the opening. <a className="fp-link" href={p.soon!.href}>Join the list</a>
+                    {p.name}: the menu comes with the opening. <a className="fp-link" href={p.soon!.href}>{p.soon!.label}</a>
                   </p>
                 ))}
               </div>
@@ -448,7 +449,7 @@ export default function MenuBook({
                 </li>
               ))}
             </ul>
-            <a href={place.soon.href} className="fp-btn fp-btn--primary mt-6">Join the list</a>
+            <a href={place.soon.href} className="fp-btn fp-btn--primary mt-6">{place.soon.label}</a>
           </div>
         ) : (
         <>

@@ -3,6 +3,14 @@
  * (a form-to-email service sending to the verified Dubai address). Each form: checks the email,
  * shows it is busy, then says "You're on the list" or keeps the email and explains the failure.
  */
+export const LIST_ENDPOINT = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
+/** One source for every "Dubai list" button. No endpoint = no list yet, so say what the button really does:
+ *  it goes to the room page, whose #waitlist block points to Instagram for the opening date. */
+export const listCta = (b: { id: string; shortName: string }) => ({
+  href: `/${b.id}/#waitlist`,
+  label: LIST_ENDPOINT ? `Join the ${b.shortName} list` : `${b.shortName}: get the opening date`,
+  short: LIST_ENDPOINT ? 'Join the list' : 'Get the opening date',
+});
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function bindWaitlists() {

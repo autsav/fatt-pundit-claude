@@ -6,6 +6,7 @@
  * Phase 6: a numbered ledger of equal choices (no tiger here; the drawer holds the one action),
  * each room with its live status, the provider named before the hand-off, and Call.
  */
+import { listCta } from '../lib/waitlist';
 import InfoPage from '../layouts/InfoPage.astro';
 import { dishPhoto } from '../lib/dish-photos';
 import { BOOKING_NAMES, fullAddress, getBranches, groupRules, prettyPhone } from '../lib/site-data';
@@ -16,7 +17,7 @@ const rules = groupRules(open[0]);
 let n = 0;
 const no = () => String(++n).padStart(2, '0');
 ---
-<InfoPage title="Book a table" description="Book a table at Fatt Pundit Soho or Covent Garden, or join the list for Dubai." kicker="Your table" heading="Book a table" layout="full"
+<InfoPage title="Book a table" description="Book a table at Fatt Pundit Soho or Covent Garden, or get the Dubai opening date." kicker="Your table" heading="Book a table" layout="full"
   intro="Choose a day, a time and how many of you. Each restaurant's booking page opens with them filled in."
   next={{ label: 'Not sure yet?', title: 'Read the menus first.', line: 'Every menu as a list, with diet filters.', actions: open.map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` })), photo: dishPhoto('crackling-spinach') }}>
   <!-- Phase 7 §4.5: choose once, every room's link is filled in. Shown before first paint (no shift);
@@ -51,7 +52,7 @@ const no = () => String(++n).padStart(2, '0');
           <p class="desk-status"><span class="fp-badge fp-badge--soon">Opening soon</span></p>
           <p class="desk-addr">{b.address.street}</p>
         </div>
-        <div class="desk-acts"><a class="fp-btn" href={`/${b.id}/#waitlist`}>Join the list<span class="sr-only"> for {b.shortName}</span></a></div>
+        <div class="desk-acts"><a class="fp-btn" href={listCta(b).href}>{listCta(b).short}<span class="sr-only"> for {b.shortName}</span></a></div>
       </li>
     ))}
     {rules && (

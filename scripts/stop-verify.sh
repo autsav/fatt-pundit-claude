@@ -3,6 +3,8 @@
 # (exit 2) and send only the failing lines to Claude. Silent when src/ is clean.
 set -u
 cd "${CLAUDE_PROJECT_DIR:-$(dirname "$0")/..}"
+# Astro needs Node >= 22.23.4; the system Node is older, so prefer Homebrew's when present.
+[ -x /opt/homebrew/bin/node ] && PATH="/opt/homebrew/bin:$PATH"
 
 input="$(cat)"
 

@@ -35,8 +35,8 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | # | Need | Why / where it's used | Pri |
 | --- | --- | --- | --- |
 | 14 | Are Covent Garden's menus and prices the same as Soho's? (Soho has a pescatarian menu; does Covent Garden?) | Covent Garden menus page | L |
-| 15 | Bing bread: "buttery", yet on the vegan and dairy-free menus. Which is right? | Diet tags | L |
-| 16 | Stir-fry Szechuan noodles on the vegan menu: veg option only, or all? | Diet tags | L |
+| 15 | Bing bread: "buttery", yet on the vegan and dairy-free menus. Which is right? Until answered the site shows it as V and H only (VG and DF removed) and it is off the vegan and dairy-free menus | Diet tags, `dishes.json`, `menus.json` | L |
+| 16 | Stir-fry Szechuan noodles on the vegan menu: veg option only, or all? Now split into two rows: veg (V VG DF H, £13) and chicken or beef (DF H, £15). Confirm the tags on both | Diet tags, `dishes.json`, `menus.json` | L |
 | 17 | Spelling "chilly" or "chilli" (the printed menu mixes both; "Lollipop" settled by the printed menu) | All menus | M |
 | 18 | Add "Anti-foaming agent E900" to the dietary, set and pre-theatre menus too? (now on à la carte, as printed) | Allergen notes | M |
 | 20 | Spice level per dish | A spice filter on the menu pages | N |
@@ -45,6 +45,7 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 ### Words, legal and access
 | # | Need | Why / where it's used | Pri |
 | --- | --- | --- | --- |
+| 58 | Do the London rooms take walk-ins, and do they hold tables for them? (We removed "we keep some tables free for guests without a booking": no source) | `/booking-terms/` | M |
 | 22 | House term: "Chinese-Indian" or "Indo-Chinese" | Titles and copy (mixed today) | M |
 | 24 | Allergen page wording sign-off | `/allergens/` (draft) | L |
 | 25 | Privacy: data controller name, address and contact | `/privacy/` (draft) | L |

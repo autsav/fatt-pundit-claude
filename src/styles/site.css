@@ -26,7 +26,7 @@ body { font-size: 17px; line-height: 1.55; }
 .preview-flag { background: var(--color-gold); color: var(--color-ink); text-align: center; font-family: var(--font-label); font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 12px; }
 /* 320px phones: the short line still needs less tracking to fit 296px. */
 @media (max-width: 360px) { .preview-flag { font-size: 11px; letter-spacing: 0.06em; } }
-.skip { position: absolute; left: -999px; top: 8px; z-index: 50; background: var(--color-tiger); color: var(--color-ink); padding: 10px 16px; font-weight: 700; }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 50; background: var(--color-tiger); color: var(--color-ink-deep); padding: 10px 16px; font-weight: 700; }
 .skip:focus { left: 8px; }
 
 /* Buttons: the system's .fp-btn (components.css). The legacy capitals .btn set was removed in Phase 6
