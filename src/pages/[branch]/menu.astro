@@ -223,11 +223,20 @@ const ld = {
     .js-one .menu-pick { display: flex; width: 100%; align-items: center; gap: 8px; min-height: 48px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: 17px; cursor: pointer; }
     .js-one .menu-pick::after { content: ""; margin-left: auto; width: 8px; height: 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
     .js-one .menu-pick[aria-expanded='true']::after { transform: translateY(2px) rotate(-135deg); }
-    .js-one .menu-jump { display: none; }
-    .js-one .menu-jump.is-open { display: grid; position: absolute; left: clamp(16px, 4vw, 40px); right: clamp(16px, 4vw, 40px); top: calc(100% - 2px); max-height: 70svh; overflow-y: auto; padding: 14px; gap: 14px; background: var(--color-paper-light); border: 2px solid var(--color-ink); box-shadow: 6px 6px 0 var(--color-ink); }
-    .js-one .menu-jump.is-open .mj-group { display: block; }
-    .js-one .menu-jump.is-open ul { display: grid; gap: 0; margin-top: 4px; }
-    .js-one .menu-jump.is-open a { width: 100%; border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); font-size: 17px; }
+    /* The list unfolds under its button to its own height and folds back. Only where the browser can
+       interpolate `height: auto` (interpolate-size); elsewhere it snaps open and shut, as before (a
+       discrete transition would otherwise flip it 130 ms late). Closed = height 0 with no block padding
+       or border, so nothing shows while it is shut. */
+    .js-one .menu-jump { display: none; position: absolute; left: clamp(16px, 4vw, 40px); right: clamp(16px, 4vw, 40px); top: calc(100% - 2px); max-height: 70svh; overflow-y: auto; padding: 0 14px; gap: 14px; background: var(--color-paper-light); border: 0 solid var(--color-ink); border-inline-width: 2px; box-shadow: 6px 6px 0 var(--color-ink); height: 0; }
+    .js-one .menu-jump.is-open { display: grid; height: auto; padding-block: 14px; border-block-width: 2px; }
+    @supports (interpolate-size: allow-keywords) {
+      .js-one .menu-jump { interpolate-size: allow-keywords; transition-property: height, padding-block, border-block-width, display; transition-duration: var(--dur-panel); transition-timing-function: var(--curve-in); transition-behavior: allow-discrete; }
+      .js-one .menu-jump.is-open { transition-timing-function: var(--curve-panel); }
+      @starting-style { .js-one .menu-jump.is-open { height: 0; padding-block: 0; border-block-width: 0; } }
+    }
+    .js-one .menu-jump .mj-group { display: block; }
+    .js-one .menu-jump ul { display: grid; gap: 0; margin-top: 4px; }
+    .js-one .menu-jump a { width: 100%; border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); font-size: 17px; }
     .menu-block { scroll-margin-top: 140px; }
     .menu-list { margin-top: var(--space-5); }
   }
@@ -274,7 +283,10 @@ const ld = {
     .menu-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); grid-template-rows: auto 1fr; gap: var(--space-6) calc(var(--grid-gutter) * 2); align-items: start; }
     .menu-tools { display: contents; }
     .menu-pickbar { grid-column: 1; grid-row: 1 / 3; position: sticky; top: 92px; padding-top: var(--space-3); border-top: var(--border-rule) solid var(--fp-rule-strong); max-height: calc(100svh - 120px); overflow-y: auto; }
-    .menu-filter { grid-column: 2; grid-row: 1; max-width: 860px; padding-top: var(--space-3); border-top: var(--border-rule) solid var(--fp-rule-strong); grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); gap: var(--space-3) var(--space-6); align-items: start; }
+    /* Two columns while two 20rem columns fit; one under 200% text zoom, where a fixed 22rem search left
+       the chips a 100px column and "Vegetarian" wrapped letter by letter (Phase 10). */
+    .menu-filter { grid-column: 2; grid-row: 1; max-width: 860px; padding-top: var(--space-3); border-top: var(--border-rule) solid var(--fp-rule-strong); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--space-3) var(--space-6); align-items: start; }
+    .mj-group .tool-lab { white-space: normal; }
     .menu-filter > :not(.menu-search, .menu-diet) { grid-column: 1 / -1; }
     .menu-list { grid-column: 2; grid-row: 2; }
     .menu-jump { gap: 12px; }

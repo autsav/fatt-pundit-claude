@@ -95,7 +95,7 @@ function byDay(b: Branch) {
         <a
           class="pass-stub"
           data-tear
-          href={open ? b.booking!.url : `#wl-${b.id}`}
+          href={open ? b.booking!.url : listEndpoint ? `#wl-${b.id}` : `/${b.id}/#waitlist`}
           {...(open ? { target: '_blank', rel: 'noopener' } : {})}
         >
           {stamps[b.id] ? <Image src={stamps[b.id]} alt="" width={120} class="stub-stamp" /> : <span class="stub-stamp stub-gate" aria-hidden="true">{CODES[b.id]}</span>}
@@ -114,7 +114,7 @@ function byDay(b: Branch) {
 </div>
 
 <script>
-  import { EASE, MS, STAGGER_MS } from '@/lib/motion-tokens';
+  import { EASE, MS, SPRING, STAGGER_MS, animeSpring } from '@/lib/motion-tokens';
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const passes = [...document.querySelectorAll<HTMLElement>('[data-pass]')];
 
@@ -133,25 +133,25 @@ function byDay(b: Branch) {
       async ([e]) => {
         if (!e.isIntersecting) return;
         io.disconnect();
-        const { animate, stagger } = await import('animejs');
+        const { animate, stagger, createSpring } = await import('animejs');
         passes.forEach((p) => p.classList.remove('is-waiting'));
         // Three big objects: twice the sibling stagger. Each stamp lands as its pass settles.
+        // The stamp spring moves the paper (anime takes the duration from it); opacity is an effect and fades out-curve.
         const gap = STAGGER_MS * 2;
+        const thud = createSpring(animeSpring(SPRING.stamp));
         animate(passes, {
-          opacity: [0, 1],
+          opacity: { from: 0, to: 1, duration: MS.fast, ease: EASE.animeOut },
           translateY: [-36, 0],
           rotate: { from: (_?: unknown, i = 0) => [-5, 3, -2][i % 3], to: 0 },
           scale: [1.12, 1],
-          duration: MS.story,
           delay: stagger(gap),
-          ease: EASE.animeThud,
+          ease: thud,
         });
         animate(passes.map((p) => p.querySelector('.pass-boarding')!), {
-          opacity: [0, 0.9],
+          opacity: { from: 0, to: 0.9, duration: MS.fast, ease: EASE.animeOut },
           scale: [2.2, 1],
-          duration: MS.panel,
-          delay: stagger(gap, { start: MS.story * 0.6 }),
-          ease: EASE.animeThud,
+          delay: stagger(gap, { start: MS.spring * 0.6 }),
+          ease: thud,
         });
       },
       { threshold: 0.25 },
@@ -174,9 +174,11 @@ function byDay(b: Branch) {
           if (w) w.opener = null;
           else location.href = stub.href;
         } else {
-          const input = document.querySelector<HTMLInputElement>(stub.hash);
-          input?.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
-          input?.focus({ preventScroll: true });
+          // The list field on this page; before the list service is set, the room's own page.
+          const input = stub.hash ? document.querySelector<HTMLInputElement>(stub.hash) : null;
+          if (!input || new URL(stub.href).pathname !== location.pathname) { location.href = stub.href; return; }
+          input.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
+          input.focus({ preventScroll: true });
         }
       };
       // Booking is the essential action: it goes at once. The tear plays as feedback, not as a wait.
@@ -186,7 +188,7 @@ function byDay(b: Branch) {
       // The stub grows back, so the guest can book again later.
       window.setTimeout(() => {
         pass.classList.replace('is-torn', 'is-back');
-        window.setTimeout(() => pass.classList.remove('is-back'), MS.panel * 2);
+        window.setTimeout(() => pass.classList.remove('is-back'), MS.spring);
       }, 2400);
     });
   }
@@ -220,7 +222,7 @@ function byDay(b: Branch) {
 
 <style>
   .passes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(20px, 3vw, 36px); align-items: start; }
-  .pass { --band: var(--color-tiger); position: relative; display: flex; flex-direction: column; color: var(--color-ink); filter: drop-shadow(0 18px 30px rgb(44 41 37 / 0.35)); transition: transform var(--dur-fast) var(--curve-stamp); }
+  .pass { --band: var(--color-tiger); position: relative; display: flex; flex-direction: column; color: var(--color-ink); filter: drop-shadow(0 18px 30px rgb(44 41 37 / 0.35)); transition: transform var(--dur-spring) var(--curve-spring); }
   /* The pass you point at lifts off the counter a little. */
   @media (hover: hover) and (prefers-reduced-motion: no-preference) { .pass:hover { transform: translateY(-6px) rotate(-0.4deg); } }
   .pass-gold { --band: var(--color-gold); }
@@ -249,7 +251,8 @@ function byDay(b: Branch) {
   .pass-links .pass-more { text-transform: uppercase; letter-spacing: 0.08em; }
   .pass-boarding { position: absolute; right: 16px; top: 112px; padding: 2px 10px; border: 3px double var(--band); color: var(--band); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -10deg; opacity: 0.9; pointer-events: none; }
   .pass-gold .pass-boarding { color: var(--color-gold-deep); border-color: var(--color-gold-deep); }
-  .pass.is-stamped .pass-boarding { animation: pass-thud var(--dur-panel) var(--curve-stamp); }
+  /* The spring curve at the panel beat: the page leaves at 260 ms, by which the stamp has landed. */
+  .pass.is-stamped .pass-boarding { animation: pass-thud var(--dur-panel) var(--curve-spring); }
   @keyframes pass-thud { 0% { scale: 1.6; } 100% { scale: 1; } }
 
   .pass-waitlist { display: flex; flex-direction: column; gap: 8px; }
@@ -281,8 +284,10 @@ function byDay(b: Branch) {
     22% { transform: translate(4px, 8px) rotate(7deg); opacity: 1; }
     100% { transform: translate(40px, 160px) rotate(24deg); opacity: 0; }
   }
-  .pass.is-back .pass-stub { animation: stub-back var(--dur-panel) var(--curve-out); }
-  @keyframes stub-back { from { opacity: 0; transform: translateY(-8px); } }
+  /* The stub grows back with the same spring that dropped the pass; its fade is an effect (out-curve). */
+  .pass.is-back .pass-stub { animation: stub-back-move var(--dur-spring) var(--curve-spring), stub-back-fade var(--dur-fast) var(--curve-out); }
+  @keyframes stub-back-move { from { transform: translateY(-8px); } }
+  @keyframes stub-back-fade { from { opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .pass-stub, .pass-stub:hover { transition: none; transform: none; }
   }

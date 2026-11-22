@@ -30,6 +30,10 @@ const { chapters, after = 0.8 } = Astro.props;
     line.className = 'read-line';
     line.setAttribute('aria-hidden', 'true');
     bar.append(line);
+    // Where CSS can drive the line from the scroll position (animation-timeline), it does, off the main
+    // thread; this script then only tracks the chapter. In calm mode the CSS rule is off and the line is
+    // still written here (it is a position, not a movement).
+    const cssLine = CSS.supports('animation-timeline: scroll()') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
     const links = new Map([...rail.querySelectorAll<HTMLAnchorElement>('[data-ch]')].map((a) => [a.dataset.ch!, a]));
     const order = [...links.keys()];
     const targets = order.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
@@ -56,7 +60,7 @@ const { chapters, after = 0.8 } = Astro.props;
       // The current chapter: the last one whose top has passed the middle of the screen.
       let now = 0;
       tops.forEach((t, i) => { if (t - y <= vh * 0.5) now = i; });
-      line.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
+      if (!cssLine) line.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
       const show = y > vh * after;
       if (show !== on) { on = show; rail.classList.toggle('is-on', show); }
       if (now === cur) return;
@@ -89,7 +93,7 @@ const { chapters, after = 0.8 } = Astro.props;
   .rail a { position: relative; display: grid; place-items: center; width: 44px; height: 44px; text-decoration: none; }
   .rail a::before { content: ''; position: absolute; left: 50%; top: -17px; height: 34px; border-left: 1px dashed rgb(203 160 82 / 0.5); }
   .rail a:first-child::before { display: none; }
-  .rail-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--color-gold); transition: background-color var(--dur-fast) var(--curve-out), transform var(--dur-fast) var(--curve-stamp); }
+  .rail-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px dashed var(--color-gold); transition: background-color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
   .rail a.is-past .rail-dot { background: var(--color-gold); border-style: solid; }
   .rail a.is-here .rail-dot { background: var(--color-tiger); border: 1.5px solid var(--color-tiger); transform: scale(1.3); }
   .rail-lbl { position: absolute; right: calc(100% + 14px); white-space: nowrap; padding: 4px 10px; background: var(--color-ink); border: 1px solid rgb(203 160 82 / 0.45); color: var(--color-sand);
@@ -98,5 +102,6 @@ const { chapters, after = 0.8 } = Astro.props;
   /* Wide screens: the chapter you're in is always named (the margin is wide enough not to cover content). */
   @media (min-width: 1600px) { .rail a.is-here .rail-lbl { opacity: 1; translate: 0 0; } }
   .rail a:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 1px; }
-  :global(.read-line) { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
+  /* .read-line (created above) is styled in global.css: its scroll-timeline rule is nested in @supports and
+     @media, which the scoped-style pipeline emptied when written here with :global(). */
 </style>

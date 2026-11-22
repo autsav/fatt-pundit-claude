@@ -68,14 +68,17 @@ const ROOM: [ImageMetadata, string][] = [
   [g6, 'Pink leather banquette against a green painted wall'],
   [g1, 'Pink booths and bentwood chairs under shelves of lamps and pots, against a green plaster wall'],
 ];
-const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), full: await webp(src, 1600), alt })));
+// Thumbs: 360/480w for the phone's two-up strip at 2x, 640w for the four-up (the sheet's own `sizes`).
+const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640].map(async (w) => `${await webp(src, w)} ${w}w`))).join(', ');
+const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), thumbSet: await thumbSet(src), full: await webp(src, 1600), alt })));
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 const rainPoster = (await getImage({ src: inside, width: 640, format: 'webp', quality: 60 })).src;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
-  map: await img(map, 1295),
+  // The postcard is at most 460 px wide (2x: 920): 900 is enough; 1295 cost 170 KB.
+  map: await img(map, 900),
   // A picture, not the SVG: the browser re-rasterised the vector chart (a
   // 16-megapixel draw) whenever the camera zoomed, stalling scroll frames.
   sea: (await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 })).src,

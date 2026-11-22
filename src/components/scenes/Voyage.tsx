@@ -14,7 +14,8 @@ import { isCalm } from '@/lib/motion-tokens';
  * phones). A ticket strip at the top gets a hole punched per port; tap a hole to jump there.
  *
  * Speed: the chart is one image moved by the GPU (transform only). Route, ship and labels sit in a
- * light SVG on top whose viewBox follows the same camera, so they stay sharp and screen-sized.
+ * light SVG on top whose camera group takes the same transform (no per-frame viewBox, so no layout),
+ * with `--u` keeping strokes and markers screen-sized.
  * Calm mode: no pinning; the whole route is drawn and the postcards sit in a grid.
  */
 
@@ -31,8 +32,6 @@ export interface VoyageArt {
 }
 
 type Pt = [number, number];
-const W = world.w;
-const H = world.h;
 /** The chart image runs past the route box on every side. */
 const SEA = world.sea;
 const PORTS: { id: string; name: string; at: Pt; dx: number; dy: number; anchor: 'start' | 'end' }[] = [
@@ -71,8 +70,9 @@ const SHIP_PX = 64;
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smooth = (t: number) => t * t * (3 - 2 * t);
-/** Points sampled along each leg once (x, y pairs), so a scroll frame never asks the SVG for geometry. */
-const SAMPLES = 480;
+/** Points sampled along each leg once (x, y pairs), so a scroll frame never asks the SVG for geometry.
+ *  240 is a chord every ~6 map units: 14 px at the closest zoom, under what the ship moves between frames. */
+const SAMPLES = 240;
 
 /** A point part-way (0 to 1) along a sampled leg, by straight interpolation between samples. */
 function pointAt(pts: Float32Array, f: number) {
@@ -87,6 +87,8 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const seaRef = useRef<HTMLImageElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  /** Everything drawn in map units; the camera moves this one group. */
+  const camRef = useRef<SVGGElement>(null);
   const shipRef = useRef<SVGGElement>(null);
   const hullRef = useRef<SVGGElement>(null);
   const legRefs = useRef<(SVGPathElement | null)[]>([]);
@@ -135,14 +137,18 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     }
   }, []);
 
-  /** Point the camera at (cx, cy) showing `span` map units across the stage's short side. */
+  /**
+   * Point the camera at (cx, cy) showing `span` map units across the stage's short side. The chart and
+   * the overlay's group take the same move as one transform each (paint, never layout: a viewBox write
+   * laid the whole SVG out again every frame, M4 of docs/MOTION-ROADMAP.md).
+   */
   const camera = (cx: number, cy: number, span: number) => {
-    const { w, h, fx, fy, fit, k } = layout.current;
+    const { fx, fy, fit, k } = layout.current;
     const ppu = fit / span;
     if (seaRef.current) seaRef.current.style.transform = `translate3d(${fx - (cx - SEA.x) * ppu}px, ${fy - (cy - SEA.y) * ppu}px, 0) scale(${ppu / k})`;
+    if (camRef.current) camRef.current.style.transform = `translate(${fx - cx * ppu}px, ${fy - cy * ppu}px) scale(${ppu})`;
     const svg = svgRef.current;
     if (svg) {
-      svg.setAttribute('viewBox', `${cx - fx / ppu} ${cy - fy / ppu} ${w / ppu} ${h / ppu}`);
       // --u keeps strokes and markers screen-sized; a 0.4% step is invisible and spares most frames
       // a style recalculation of everything that reads it.
       const u = 1 / ppu;
@@ -176,10 +182,13 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     } else {
       const len = lens.current[s.leg];
       const pts = samples.current[s.leg];
-      if (!pts || !len) return;
+      const el = legRefs.current[s.leg];
+      if (!len || !el) return;
+      // A leg reached before its idle sampling is done asks the path itself for this frame (two calls).
+      const at = (f: number) => (pts ? pointAt(pts, f) : el.getPointAtLength(clamp(f) * len));
       const e = smooth(t);
-      const pt = pointAt(pts, e);
-      const ahead = pointAt(pts, Math.min(1, e + 4 / len));
+      const pt = at(e);
+      const ahead = at(Math.min(1, e + 4 / len));
       const a = PORTS[s.leg].at;
       const b = PORTS[s.leg + 1].at;
       const pull = Math.sin(Math.PI * e);
@@ -203,22 +212,17 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   };
 
   useEffect(() => {
-    // Decode the chart early so the first close-up isn't a stalled frame.
-    seaRef.current?.decode?.().catch(() => {});
+    // The chart is lazy in the HTML (210 KB that must not compete with the first screen; React would
+    // otherwise emit a preload for it). The scene hydrates one screen before it is reached, so fetch
+    // and decode it now, and the first close-up isn't a stalled frame.
+    const sea = seaRef.current;
+    if (!sea) return;
+    sea.loading = 'eager';
+    sea.decode?.().catch(() => {});
   }, []);
 
   useEffect(() => {
     lens.current = legRefs.current.map((el) => el?.getTotalLength() ?? 0);
-    samples.current = legRefs.current.map((el, i) => {
-      const out = new Float32Array((SAMPLES + 1) * 2);
-      if (!el) return out;
-      for (let k = 0; k <= SAMPLES; k++) {
-        const q = el.getPointAtLength((k / SAMPLES) * lens.current[i]);
-        out[k * 2] = q.x;
-        out[k * 2 + 1] = q.y;
-      }
-      return out;
-    });
     const c = isCalm();
     setCalm(c);
     measure();
@@ -227,13 +231,53 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       legRefs.current.forEach((el) => el && (el.style.strokeDasharray = 'none'));
       return;
     }
+    // Sampling the legs (723 getPointAtLength calls; 1,443 at 480 a leg) is the heavy part of waking the
+    // scene: 750 ms at 4x CPU for 480, which landed in one frame of the first scroll. Done in idle slices
+    // instead, first leg first; a leg reached before its samples exist asks the path per frame meanwhile.
+    samples.current = [];
+    const parts = legRefs.current.map(() => new Float32Array((SAMPLES + 1) * 2));
+    let leg = 0;
+    let k = 0;
+    const hasIdle = 'requestIdleCallback' in window;
+    const idle = (f: (d?: IdleDeadline) => void, o: IdleRequestOptions) => (hasIdle ? window.requestIdleCallback(f, o) : window.setTimeout(f, 16));
+    let slot = 0;
+    const slice = (deadline?: IdleDeadline) => {
+      const until = performance.now() + (deadline ? Math.max(4, deadline.timeRemaining()) : 8);
+      while (leg < parts.length) {
+        const el = legRefs.current[leg];
+        const out = parts[leg];
+        for (; k <= SAMPLES && el; k++) {
+          const q = el.getPointAtLength((k / SAMPLES) * lens.current[leg]);
+          out[k * 2] = q.x;
+          out[k * 2 + 1] = q.y;
+          if (k % 24 === 23 && performance.now() > until) break;
+        }
+        if (k <= SAMPLES && el) break;
+        samples.current[leg] = out;
+        leg++;
+        k = 0;
+        apply(scrollYProgress.get());
+      }
+      if (leg < parts.length) slot = idle(slice, { timeout: 1000 });
+    };
+    slot = idle(slice, { timeout: 1000 });
     apply(scrollYProgress.get());
     const ro = new ResizeObserver(() => {
       measure();
       apply(scrollYProgress.get());
     });
     if (stageRef.current) ro.observe(stageRef.current);
-    return () => ro.disconnect();
+    // The chart keeps its own layer only while the scene is pinned (will-change in global.css).
+    const io = new IntersectionObserver(([e]) => {
+      if (sectionRef.current) sectionRef.current.toggleAttribute('data-pinned', e.isIntersecting);
+    });
+    if (sectionRef.current) io.observe(sectionRef.current);
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+      if (hasIdle) window.cancelIdleCallback(slot);
+      else window.clearTimeout(slot);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -265,8 +309,16 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       <h2 className="sr-only">The voyage: Guangdong to Calcutta, London and Dubai</h2>
       <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[68px] h-[calc(100svh-68px)] overflow-hidden'}>
         {/* The chart: one image, moved only by transform. */}
-        <img ref={seaRef} src={art.sea} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} decoding="async" />
-        <svg ref={svgRef} className="voyage-ink absolute inset-0 h-full w-full" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+        <img ref={seaRef} src={art.sea} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} loading="lazy" decoding="async" />
+        {/* No viewBox: SVG units are stage pixels, and the camera group below scales map units into them. */}
+        <svg ref={svgRef} className="voyage-ink absolute inset-0 h-full w-full" aria-hidden="true">
+          <defs>
+            {/* The hull in sand: the art's own alpha as a mask, instead of a filter on something that moves every frame. */}
+            <mask id="voyage-hull" maskUnits="userSpaceOnUse" x={-SHIP_PX} y={-SHIP_PX} width={SHIP_PX * 2} height={SHIP_PX * 2} style={{ maskType: 'alpha' }}>
+              <image href={art.ship} width={SHIP_PX * 0.78} height={SHIP_PX * 0.78} x={-SHIP_PX * 0.39} y={-SHIP_PX * 0.43} />
+            </mask>
+          </defs>
+          <g ref={camRef} style={{ transform: `translate(0px, 0px) scale(1)` }}>
           <image href={art.mountainsB} x={world.mountains.himalaya[0] - 150} y={world.mountains.himalaya[1] - 70} width="260" opacity="0.85" />
           <image href={art.mountainA} x={world.mountains.alps[0] - 70} y={world.mountains.alps[1] - 40} width="150" opacity="0.85" />
           <image href={art.mountainsC} x={world.mountains.caucasus[0] - 60} y={world.mountains.caucasus[1] - 34} width="130" opacity="0.85" />
@@ -302,11 +354,14 @@ export default function Voyage({ art }: { art: VoyageArt }) {
           <g ref={shipRef} transform={`translate(${PORTS[0].at[0]} ${PORTS[0].at[1]})`}>
             {/* The brand's junk on a tiger badge, so it reads against the busy chart. */}
             <g className="voyage-mk">
+              {/* A hard offset shadow (no blur: the badge moves every frame). */}
+              <circle r={SHIP_PX / 2} cy={4} className="voyage-badge-shadow" />
               <circle r={SHIP_PX / 2} className="voyage-badge" />
               <g ref={hullRef}>
-                <image href={art.ship} width={SHIP_PX * 0.78} height={SHIP_PX * 0.78} x={-SHIP_PX * 0.39} y={-SHIP_PX * 0.43} className="voyage-hull" />
+                <rect x={-SHIP_PX / 2} y={-SHIP_PX / 2} width={SHIP_PX} height={SHIP_PX} className="voyage-hull" mask="url(#voyage-hull)" />
               </g>
             </g>
+          </g>
           </g>
         </svg>
         <div className="voyage-vignette pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -384,11 +439,11 @@ function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; 
         <>
           <div className="flex items-end justify-center gap-6">
             <figure className="m-0 flex flex-col items-center gap-1">
-              <img src={art.stampGold} alt="" className="w-[clamp(64px,8vw,96px)]" loading="lazy" />
+              <img src={art.stampGold} alt="" className="h-auto w-[clamp(64px,8vw,96px)]" width={508} height={564} loading="lazy" decoding="async" />
               <figcaption className="font-note font-medium normal-case italic tracking-normal text-[15px]">Soho, 2019</figcaption>
             </figure>
             <figure className="m-0 flex flex-col items-center gap-1">
-              <img src={art.stampOrange} alt="" className="w-[clamp(68px,8.5vw,102px)]" loading="lazy" />
+              <img src={art.stampOrange} alt="" className="h-auto w-[clamp(68px,8.5vw,102px)]" width={431} height={564} loading="lazy" decoding="async" />
               <figcaption className="font-note font-medium normal-case italic tracking-normal text-[15px]">Covent Garden, 2021</figcaption>
             </figure>
           </div>

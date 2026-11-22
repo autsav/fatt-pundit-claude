@@ -115,7 +115,8 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
   .gate-go { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-tiger); transition: transform var(--dur-fast) var(--curve-out); }
   .gate:hover .gate-go { transform: translateX(4px); }
   .gate.is-chosen { background: rgb(241 93 61 / 0.28); }
-  .gate.is-chosen .gate-code { animation: gate-stamp var(--dur-panel) var(--curve-stamp); }
+  /* The spring curve at the panel beat: the room page morphs in at 260 ms, by which the stamp has landed. */
+  .gate.is-chosen .gate-code { animation: gate-stamp var(--dur-panel) var(--curve-spring); }
   @keyframes gate-stamp { 0% { transform: scale(1.35); } 100% { transform: scale(1); } }
   @media (min-width: 900px) {
     .gates { max-width: 680px; }

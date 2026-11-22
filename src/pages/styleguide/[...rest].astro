@@ -70,8 +70,9 @@ const TYPE = [
 const SPACE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => [n, [4, 8, 12, 16, 24, 32, 48, 64, 96, 128][n - 1]] as const);
 const MOTION = [
   ['--dur-press', '60 ms', '--curve-out', 'Press down (stamp)'],
-  ['--dur-fast', '200 ms', '--curve-stamp / --curve-out', 'Hover lift, focus, colour change, image zoom'],
-  ['--dur-panel', '260 ms', '--curve-panel / --curve-stamp', 'Drawer or sheet travelling in; a stamp or bubble landing; a page change'],
+  ['--dur-fast', '200 ms', '--curve-out', 'Focus, colour change, image zoom'],
+  ['--dur-panel', '260 ms', '--curve-panel / --curve-in', 'Drawer, sheet or list arriving and leaving; a page change'],
+  ['--dur-spring', '460 ms', '--curve-spring', 'Things with weight landing: a stamp, a hover lift, a bubble, the rail dot (transform only)'],
   ['--dur-story', '900 ms', '--curve-out', 'A reveal in a scene (a block rises, a pass drops)'],
   ['--dur-story-long', '1200 ms', '--curve-in-out', 'A long mechanism (receipt printing, a line drawn)'],
   ['--stagger', '60 ms', '', 'Between siblings; at most 6 (big objects 2×)'],

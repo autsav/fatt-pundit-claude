@@ -1,0 +1,160 @@
+320 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=8.32
+320 /soho/: minFont=8
+320 /covent-garden/: minFont=10
+320 /dubai/: minFont=11
+320 /soho/menu/: small:[input 1x1] minFont=11
+320 /covent-garden/menu/: small:[input 1x1] minFont=11
+320 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found) minFont=11
+320 /book/: small:[a.fp-linkbooking terms 113x18] minFont=11
+320 /private-dining/: small:[input 1x1] minFont=11
+320 /our-story/: small:[aread the menus 123x18] minFont=11
+320 /accessibility/: small:[areservations@fattpundit.c 285x21] minFont=11
+320 /allergens/: minFont=11
+320 /booking-terms/: small:[a020 7287 7900 141x21 | abook Covent Garden (opens 186x21 | a020 7836 8883 141x21] minFont=11
+320 /privacy/: small:[areservations@fattpundit.c 285x21] minFont=11
+320 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found);Failed to load resource: the server respo
+375 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=8.5375
+375 /soho/: minFont=8
+375 /covent-garden/: minFont=10
+375 /dubai/: small:[a.fp-link@fattpundit on Instagram  228x19]
+375 /soho/menu/: small:[input 1x1]
+375 /covent-garden/menu/: small:[input 1x1]
+375 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+375 /book/: small:[a.fp-linkbooking terms 113x18]
+375 /private-dining/: small:[input 1x1]
+375 /our-story/: small:[aread the menus 123x18]
+375 /accessibility/: small:[areservations@fattpundit.c 285x21]
+375 /booking-terms/: small:[abook Soho (opens in a new 93x21 | a020 7287 7900 141x21 | a020 7836 8883 141x21 | aSend a group enquiry 197x21]
+375 /privacy/: small:[areservations@fattpundit.c 285x21]
+375 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+390 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=9
+390 /soho/: minFont=8
+390 /covent-garden/: minFont=10
+390 /dubai/: small:[a.fp-link@fattpundit on Instagram  228x19]
+390 /soho/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17]
+390 /covent-garden/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17]
+390 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+390 /book/: small:[a.fp-linkbooking terms 113x18]
+390 /private-dining/: small:[input 1x1]
+390 /our-story/: small:[aread the menus 123x18]
+390 /accessibility/: small:[areservations@fattpundit.c 285x21]
+390 /booking-terms/: small:[abook Soho (opens in a new 93x21 | a020 7287 7900 141x21 | a020 7836 8883 141x21 | aSend a group enquiry 197x21]
+390 /privacy/: small:[areservations@fattpundit.c 285x21]
+390 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+430 /: small:[a@fattpundit on Instagram  98x18 | aPlan a group 100x18] minFont=9
+430 /soho/: minFont=8
+430 /covent-garden/: minFont=10
+430 /dubai/: small:[a.fp-link@fattpundit on Instagram  228x19]
+430 /soho/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17]
+430 /covent-garden/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17]
+430 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+430 /private-dining/: small:[input 1x1]
+430 /our-story/: small:[aread the menus 123x18]
+430 /accessibility/: small:[areservations@fattpundit.c 286x21]
+430 /booking-terms/: small:[abook Soho (opens in a new 94x21 | a020 7287 7900 142x21 | a020 7836 8883 142x21 | aSend a group enquiry 198x21]
+430 /privacy/: small:[areservations@fattpundit.c 286x21]
+430 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+600 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18 | aPlan a group 101x18] minFont=9
+600 /soho/: minFont=8
+600 /covent-garden/: minFont=10
+600 /soho/menu/: small:[input 1x1]
+600 /covent-garden/menu/: small:[input 1x1]
+600 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+600 /book/: small:[a.fp-linkbooking terms 115x18]
+600 /private-dining/: small:[input 1x1]
+600 /our-story/: small:[aread the menus 123x18]
+600 /accessibility/: small:[areservations@fattpundit.c 291x21]
+600 /booking-terms/: small:[abook Soho (opens in a new 95x21 | a020 7287 7900 144x21 | abook Covent Garden (opens 190x21 | a020 7836 8883 144x21]
+600 /privacy/: small:[areservations@fattpundit.c 291x21]
+600 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+768 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=9
+768 /soho/: minFont=8
+768 /covent-garden/: minFont=7.90562
+768 /soho/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+768 /covent-garden/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17] jserr:Failed to load resource: the server responded with a status of 404 (Not Found);Failed to load resource: the server respo
+768 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+768 /book/: small:[a.fp-linkbooking terms 116x18]
+768 /private-dining/: small:[input 1x1]
+768 /our-story/: small:[aread the menus 123x18]
+768 /accessibility/: small:[areservations@fattpundit.c 296x22]
+768 /booking-terms/: small:[abook Soho (opens in a new 97x22 | a020 7287 7900 147x22 | abook Covent Garden (opens 193x22 | a020 7836 8883 147x22]
+768 /privacy/: small:[areservations@fattpundit.c 296x22]
+768 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+844x390-land /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=9
+844x390-land /soho/: minFont=8
+844x390-land /covent-garden/: minFont=8.10266
+844x390-land /soho/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17]
+844x390-land /covent-garden/menu/: small:[input 1x1 | aAllergens and dietary nee 220x17]
+844x390-land /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+844x390-land /book/: small:[a.fp-linkbooking terms 116x18]
+844x390-land /private-dining/: small:[input 1x1]
+844x390-land /our-story/: small:[aread the menus 123x18]
+844x390-land /accessibility/: small:[areservations@fattpundit.c 298x22]
+844x390-land /booking-terms/: small:[abook Soho (opens in a new 97x22 | a020 7287 7900 148x22 | abook Covent Garden (opens 194x22 | a020 7836 8883 148x22]
+844x390-land /privacy/: small:[areservations@fattpundit.c 298x22]
+844x390-land /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1024 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=8.346
+1024 /soho/: minFont=8
+1024 /covent-garden/: minFont=9.26047
+1024 /dubai/: small:[a.fp-link@fattpundit on Instagram  228x19]
+1024 /soho/menu/: small:[input 1x1]
+1024 /covent-garden/menu/: small:[input 1x1]
+1024 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1024 /book/: small:[a.fp-linkbooking terms 118x18]
+1024 /private-dining/: small:[input 1x1]
+1024 /our-story/: small:[aread the menus 123x18]
+1024 /accessibility/: small:[areservations@fattpundit.c 304x22]
+1024 /booking-terms/: small:[abook Soho (opens in a new 99x22 | a020 7287 7900 151x22 | a020 7836 8883 151x22 | aSend a group enquiry 210x22]
+1024 /privacy/: small:[areservations@fattpundit.c 304x22]
+1024 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1280 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=8.97
+1280 /soho/: minFont=9.6
+1280 /covent-garden/: minFont=9.66266
+1280 /dubai/: small:[a.fp-link@fattpundit on Instagram  228x19]
+1280 /soho/menu/: small:[input 1x1]
+1280 /covent-garden/menu/: small:[input 1x1]
+1280 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1280 /book/: small:[a.fp-linkbooking terms 119x18]
+1280 /private-dining/: small:[input 1x1]
+1280 /our-story/: small:[aread the menus 123x18]
+1280 /accessibility/: small:[areservations@fattpundit.c 311x23]
+1280 /booking-terms/: small:[abook Soho (opens in a new 102x23 | a020 7287 7900 154x23 | abook Covent Garden (opens 203x23 | a020 7836 8883 154x23]
+1280 /privacy/: small:[areservations@fattpundit.c 311x23]
+1280 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1440 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=9
+1440 /soho/: minFont=10.8
+1440 /covent-garden/: minFont=9.66266
+1440 /dubai/: small:[a.fp-link@fattpundit on Instagram  228x19]
+1440 /soho/menu/: small:[input 1x1]
+1440 /covent-garden/menu/: small:[input 1x1]
+1440 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1440 /book/: small:[a.fp-linkbooking terms 120x18]
+1440 /private-dining/: small:[input 1x1]
+1440 /our-story/: small:[aread the menus 123x18]
+1440 /accessibility/: small:[areservations@fattpundit.c 316x23]
+1440 /booking-terms/: small:[abook Soho (opens in a new 103x23 | a020 7287 7900 157x23 | abook Covent Garden (opens 206x23 | a020 7836 8883 157x23]
+1440 /privacy/: small:[areservations@fattpundit.c 316x23]
+1440 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1920 /: small:[a.fp-linkJoin the list 101x18 | a@fattpundit on Instagram  98x18] minFont=9
+1920 /soho/: minFont=11
+1920 /covent-garden/: minFont=9.66266
+1920 /soho/menu/: small:[input 1x1]
+1920 /covent-garden/menu/: small:[input 1x1]
+1920 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1920 /book/: small:[a.fp-linkbooking terms 120x18]
+1920 /private-dining/: small:[input 1x1]
+1920 /our-story/: small:[aread the menus 123x18]
+1920 /accessibility/: small:[areservations@fattpundit.c 316x23]
+1920 /booking-terms/: small:[abook Soho (opens in a new 103x23 | a020 7287 7900 157x23 | abook Covent Garden (opens 206x23 | a020 7836 8883 157x23]
+1920 /privacy/: small:[areservations@fattpundit.c 316x23]
+1920 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1280-zoom200 /: small:[a.fp-linkJoin the list 112x18 | a@fattpundit on Instagram  107x18] minFont=8.97
+1280-zoom200 /soho/: minFont=9.6
+1280-zoom200 /covent-garden/: minFont=9.66266
+1280-zoom200 /dubai/: small:[a.fp-link@fattpundit on Instagram  247x19]
+1280-zoom200 /soho/menu/: small:[input 1x1 | aAllergens and dietary nee 241x17]
+1280-zoom200 /covent-garden/menu/: small:[input 1x1 | aAllergens and dietary nee 241x17]
+1280-zoom200 /dubai/menu/: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)
+1280-zoom200 /private-dining/: small:[input 1x1]
+1280-zoom200 /our-story/: small:[aread the menus 134x18]
+1280-zoom200 /404: jserr:Failed to load resource: the server responded with a status of 404 (Not Found)

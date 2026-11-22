@@ -473,7 +473,7 @@ export default function MenuBook({
                     setActive(m.id);
                     setOpened(true);
                   }}
-                  className={`${on ? 'bg-ink text-sand border-ink' : 'bg-paper-light text-ink border-ink/50'} min-h-11 shrink-0 whitespace-nowrap border-2 border-b-0 px-4 font-label text-[15px] font-bold tracking-[0.02em] shadow-[0_-2px_6px_rgb(0_0_0/0.10)] transition-[padding,transform] duration-200 ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 hover:translate-y-0'}`}
+                  className={`${on ? 'bg-ink text-sand border-ink' : 'bg-paper-light text-ink border-ink/50'} min-h-11 shrink-0 whitespace-nowrap border-2 border-b-0 px-4 font-label text-[15px] font-bold tracking-[0.02em] shadow-[0_-2px_6px_rgb(0_0_0/0.10)] [transition:padding_var(--dur-fast)_var(--curve-out),transform_var(--dur-spring)_var(--curve-spring)] ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 hover:translate-y-0'}`}
                 >
                   {m.tab}
                 </button>

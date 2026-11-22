@@ -136,6 +136,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
               type="button"
               aria-pressed={on}
               aria-label={`${d.name}${d.price ? `, ${d.price}` : ''}`}
+              data-plate=""
               className="group absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full [perspective:800px] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[var(--fp-ring)]"
               style={{ left: `${x}%`, top: `${y}%`, width: `${size}%`, aspectRatio: '1' }}
               onClick={() => {
@@ -153,7 +154,9 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                 className="relative block size-full rounded-full [transform-style:preserve-3d]"
                 style={{
                   transform: `rotateY(${on ? 180 : 0}deg)`,
-                  transition: calm ? 'none' : 'transform var(--dur-story) var(--curve-stamp)',
+                  // The plate has weight: a spring on the turn (transform only). A CSS transition reverses
+                  // from wherever it is, so a second tap mid-flip turns the plate back, never restarts it.
+                  transition: calm ? 'none' : 'transform var(--dur-spring) var(--curve-spring)',
                 }}
               >
                 <span className="absolute inset-0 rounded-full shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden]">
@@ -161,12 +164,22 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                 </span>
                 <span className="@container absolute inset-0 flex flex-col items-center justify-center rounded-full border-[0.35em] border-[#23428f] bg-[#fbfaf6] p-[14%] text-center shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
                   {/* Sized so the longest word fits the plate and the name stays within three lines.
-                      Plates whose writing area is under 58px (phones) show only the price; the name is captioned below.
-                      Under 40px even the price would be ~5px type, so the plate back stays blank and the caption carries both. */}
-                  <span className="font-bold uppercase leading-[1.1] text-ink @max-[58px]:hidden" style={{ fontSize: `${nameSize(d.name)}cqi` }}>
+                      Plates whose writing area is under 90px (phones, tablets and the small plates on any wall)
+                      show only the price, at 30cqi (12–27px); the name is captioned below. At 13cqi the price was
+                      8px on a 60px plate (Phase 10). Under 40px even that would be ~5px type, so the plate back
+                      stays blank and the caption carries both. */}
+                  <span className="font-bold uppercase leading-[1.1] text-ink @max-[90px]:hidden" style={{ fontSize: `${nameSize(d.name)}cqi` }}>
                     {d.name}
                   </span>
-                  {d.price && <span className="mt-[0.35em] text-[13cqi] font-bold text-tiger-deep @max-[58px]:mt-0 @max-[58px]:text-[30cqi] @max-[40px]:hidden">{d.price}</span>}
+                  {/* The price is an effect, not a thing: it fades (out-curve) once the plate has turned. */}
+                  {d.price && (
+                    <span
+                      className="mt-[0.35em] text-[13cqi] font-bold text-tiger-deep @max-[90px]:mt-0 @max-[90px]:text-[30cqi] @max-[40px]:hidden"
+                      style={{ opacity: on ? 1 : 0, transition: calm ? 'none' : 'opacity var(--dur-fast) var(--curve-out)', transitionDelay: on && !calm ? 'var(--dur-fast)' : '0ms' }}
+                    >
+                      {d.price}
+                    </span>
+                  )}
                 </span>
               </span>
             </button>

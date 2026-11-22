@@ -6,8 +6,8 @@
     "errors": [],
     "scroll": {
       "frames": 791,
-      "long": 10,
-      "worst": 683
+      "long": 17,
+      "worst": 200
     },
     "loops": [
       "voyage-ping"
@@ -16,89 +16,50 @@
     "revealsLeft": 0,
     "loopsAfterPause": [],
     "videosPlaying": 0,
-    "tearToOpenMs": 32,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "turn": {
+        "before": "Soho À la carte menu, page 1 of 10",
+        "after": "Soho À la carte menu, page 1 of 10",
+        "flap": false,
+        "ok": true
+      }
+    },
+    "tearToOpenMs": 35,
     "focusDuringDrop": "pass-stub"
   },
   {
-    "page": "/soho/",
-    "view": "390",
-    "motion": "no-preference",
-    "errors": [],
-    "scroll": {
-      "frames": 635,
-      "long": 0,
-      "worst": 0
-    },
-    "loops": [],
-    "unknownLoops": [],
-    "revealsLeft": 0,
-    "loopsAfterPause": [],
-    "videosPlaying": 0
-  },
-  {
-    "page": "/covent-garden/",
-    "view": "390",
-    "motion": "no-preference",
-    "errors": [],
-    "scroll": {
-      "frames": 630,
-      "long": 0,
-      "worst": 0
-    },
-    "loops": [],
-    "unknownLoops": [],
-    "revealsLeft": 0,
-    "loopsAfterPause": [],
-    "videosPlaying": 0
-  },
-  {
-    "page": "/our-story/",
-    "view": "390",
-    "motion": "no-preference",
-    "errors": [],
-    "scroll": {
-      "frames": 621,
-      "long": 0,
-      "worst": 0
-    },
-    "loops": [],
-    "unknownLoops": [],
-    "revealsLeft": 0,
-    "loopsAfterPause": [],
-    "videosPlaying": 0
-  },
-  {
     "page": "/",
-    "view": "390",
-    "motion": "reduce",
-    "errors": [],
-    "animating": [],
-    "revealGate": false,
-    "arrival": false,
-    "hidden": 0
-  },
-  {
-    "page": "/soho/",
-    "view": "390",
-    "motion": "reduce",
-    "errors": [],
-    "animating": [],
-    "revealGate": false,
-    "arrival": false,
-    "hidden": 0
-  },
-  {
-    "page": "/covent-garden/",
-    "view": "390",
-    "motion": "reduce",
-    "errors": [],
-    "animating": [],
-    "revealGate": false,
-    "arrival": false,
-    "hidden": 0
-  },
-  {
-    "page": "/our-story/",
     "view": "390",
     "motion": "reduce",
     "errors": [],
@@ -114,8 +75,8 @@
     "errors": [],
     "scroll": {
       "frames": 606,
-      "long": 33,
-      "worst": 617
+      "long": 38,
+      "worst": 117
     },
     "loops": [
       "voyage-ping"
@@ -124,89 +85,50 @@
     "revealsLeft": 0,
     "loopsAfterPause": [],
     "videosPlaying": 0,
-    "tearToOpenMs": 50,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 2,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "turn": {
+        "before": "Soho À la carte menu, page 2–3 of 10",
+        "after": "Soho À la carte menu, page 2–3 of 10",
+        "flap": false,
+        "ok": true
+      }
+    },
+    "tearToOpenMs": 51,
     "focusDuringDrop": "pass-stub"
   },
   {
-    "page": "/soho/",
-    "view": "1440",
-    "motion": "no-preference",
-    "errors": [],
-    "scroll": {
-      "frames": 553,
-      "long": 0,
-      "worst": 0
-    },
-    "loops": [],
-    "unknownLoops": [],
-    "revealsLeft": 0,
-    "loopsAfterPause": [],
-    "videosPlaying": 0
-  },
-  {
-    "page": "/covent-garden/",
-    "view": "1440",
-    "motion": "no-preference",
-    "errors": [],
-    "scroll": {
-      "frames": 562,
-      "long": 12,
-      "worst": 67
-    },
-    "loops": [],
-    "unknownLoops": [],
-    "revealsLeft": 0,
-    "loopsAfterPause": [],
-    "videosPlaying": 0
-  },
-  {
-    "page": "/our-story/",
-    "view": "1440",
-    "motion": "no-preference",
-    "errors": [],
-    "scroll": {
-      "frames": 576,
-      "long": 0,
-      "worst": 0
-    },
-    "loops": [],
-    "unknownLoops": [],
-    "revealsLeft": 0,
-    "loopsAfterPause": [],
-    "videosPlaying": 0
-  },
-  {
     "page": "/",
-    "view": "1440",
-    "motion": "reduce",
-    "errors": [],
-    "animating": [],
-    "revealGate": false,
-    "arrival": false,
-    "hidden": 0
-  },
-  {
-    "page": "/soho/",
-    "view": "1440",
-    "motion": "reduce",
-    "errors": [],
-    "animating": [],
-    "revealGate": false,
-    "arrival": false,
-    "hidden": 0
-  },
-  {
-    "page": "/covent-garden/",
-    "view": "1440",
-    "motion": "reduce",
-    "errors": [],
-    "animating": [],
-    "revealGate": false,
-    "arrival": false,
-    "hidden": 0
-  },
-  {
-    "page": "/our-story/",
     "view": "1440",
     "motion": "reduce",
     "errors": [],

@@ -26,6 +26,7 @@ import {
   useState,
 } from "react";
 import { cn } from "@/lib/utils";
+import { SPRING } from "@/lib/motion-tokens";
 
 interface Pt {
   x: number;
@@ -119,8 +120,14 @@ const PEEK_ZONE = 64;
 const PEEK_MAX = 34;
 /** Pointer travel that turns a press into a drag (px). */
 const DRAG_SLOP = 4;
-const TURN = { duration: 0.6, ease: [0.32, 0.72, 0, 1] } as const;
-const SETTLE = { duration: 0.32, ease: [0.23, 1, 0.32, 1] } as const;
+/**
+ * A page has weight (Fatt Pundit change): the turn is the door spring (near-critical, so paper never
+ * passes its rest), the settle back to the corner the UI spring. The hand's speed carries in as velocity.
+ */
+const TURN = SPRING.door;
+const SETTLE = SPRING.ui;
+/** Fastest a swipe may drive the turn, in turns per second. */
+const MAX_VELOCITY = 6;
 
 const sub = (a: Pt, b: Pt): Pt => ({ x: a.x - b.x, y: a.y - b.y });
 const dot = (a: Pt, b: Pt) => a.x * b.x + a.y * b.y;
@@ -232,11 +239,16 @@ export default function PageFlip({
   const turnRef = useRef<Turn | null>(null);
   const pressRef = useRef<{
     start: Pt;
+    /** When the press began (ms), for the swipe's speed. */
+    t0: number;
     dragging: boolean;
     back?: boolean;
     /** Finger or pen: decided by gesture, so vertical swipes keep scrolling the page. */
     touch?: boolean;
     done?: boolean;
+    /** The pointer's last position and time, and its smoothed speed (px/s). */
+    last?: { p: Pt; t: number };
+    v?: Pt;
   } | null>(null);
   const animRef = useRef<ReturnType<typeof animate> | null>(null);
   const playingRef = useRef(false);
@@ -298,8 +310,11 @@ export default function PageFlip({
     y: y < size.h / 2 ? 0 : size.h,
   });
 
-  /** Runs the corner from where it is to `to`, lifting it on the way over. */
-  const run = (from: Turn, to: Pt, complete: boolean) => {
+  /**
+   * Runs the corner from where it is to `to`, lifting it on the way over. `velocity` is the hand's
+   * speed along that path in paths per second, so a flick keeps its pace.
+   */
+  const run = (from: Turn, to: Pt, complete: boolean, velocity = 0) => {
     stop();
     const start = from.at;
     const lift = complete ? size.h * 0.14 * (from.corner.y === 0 ? 1 : -1) : 0;
@@ -311,11 +326,13 @@ export default function PageFlip({
     playingRef.current = true;
     animRef.current = animate(0, 1, {
       ...(complete ? TURN : SETTLE),
+      velocity: Math.max(0, Math.min(MAX_VELOCITY, velocity)),
       onUpdate: (t) => {
         const p = lerp(start, to, t);
         setAt({
           ...from,
-          at: { x: p.x, y: p.y + Math.sin(Math.PI * t) * lift },
+          // Clamped to the spine's reach: the UI spring overshoots a little past the corner.
+          at: reach({ x: p.x, y: p.y + Math.sin(Math.PI * t) * lift }, from.corner),
         });
       },
       onComplete: () => {
@@ -334,8 +351,26 @@ export default function PageFlip({
   const canTurn = (dir: 1 | -1) =>
     dir === 1 ? spread < spreads - 1 : spread > 0;
 
-  const go = (dir: 1 | -1) => {
-    if (!(canTurn(dir) && size.w) || committingRef.current) {
+  /** A turn in flight the other way comes back to its corner: the second input reverses, never restarts. */
+  const reverse = (dir: 1 | -1, velocity = 0) => {
+    const current = turnRef.current;
+    if (!(current && committingRef.current && current.dir === -dir)) {
+      return false;
+    }
+    // The book stops heading for the next spread at once, so it recentres with the returning page.
+    setHeading(null);
+    run(current, current.corner, false, velocity);
+    return true;
+  };
+
+  const go = (dir: 1 | -1, velocity = 0) => {
+    if (reverse(dir, velocity) || !(canTurn(dir) && size.w) || committingRef.current) {
+      return;
+    }
+    // A page on its way back (a reversed turn) asked to go again: carry on from where it is.
+    const flying = turnRef.current;
+    if (flying && flying.dir === dir && playingRef.current) {
+      run(flying, { x: flying.corner.x - dir * 2 * size.w, y: flying.corner.y }, true, velocity);
       return;
     }
     if (reduceMotion) {
@@ -347,8 +382,16 @@ export default function PageFlip({
     run(
       { dir, corner, at: { x: corner.x - dir * 1, y: corner.y - 1 } },
       { x: corner.x - dir * 2 * size.w, y: corner.y },
-      true
+      true,
+      velocity
     );
+  };
+
+  /** Speed of the hand along the path from `from` to `to`, in paths per second. */
+  const along = (v: Pt | undefined, from: Pt, to: Pt) => {
+    const d = sub(to, from);
+    const l = len(d);
+    return v && l > 1 ? dot(v, d) / (l * l) : 0;
   };
 
   const local = (event: PointerEvent): Pt => {
@@ -359,19 +402,22 @@ export default function PageFlip({
   };
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || !size.w || committingRef.current) {
+    if (event.button !== 0 || !size.w) {
       return;
     }
     const p = local(event);
+    const t0 = event.timeStamp;
     // Touch (Fatt Pundit change): the browser keeps vertical scrolling (touch-action: pan-y).
     // A sideways swipe turns the page; a tap turns it only on a page's outer third.
     if (event.pointerType !== "mouse") {
-      pressRef.current = { start: p, dragging: false, touch: true };
+      pressRef.current = { start: p, t0, dragging: false, touch: true };
       return;
     }
+    // A page in flight can be caught: the press takes the turning corner where it is.
+    const flying = committingRef.current ? turnRef.current : null;
     // On one page, its left edge goes back and the rest turns forward.
     const backZone = single && p.x < size.w * 1.3;
-    const dir: 1 | -1 = p.x >= size.w && !backZone ? 1 : -1;
+    const dir: 1 | -1 = flying ? flying.dir : p.x >= size.w && !backZone ? 1 : -1;
     if (!canTurn(dir)) {
       return;
     }
@@ -381,10 +427,11 @@ export default function PageFlip({
       return;
     }
     stop();
+    committingRef.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
-    pressRef.current = { start: p, dragging: false };
-    if (single && dir === -1) {
-      pressRef.current = { start: p, dragging: false, back: true };
+    pressRef.current = { start: p, t0, dragging: false };
+    if (single && dir === -1 && !flying) {
+      pressRef.current = { start: p, t0, dragging: false, back: true };
       return;
     }
     const current = turnRef.current;
@@ -437,7 +484,9 @@ export default function PageFlip({
       if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.2) {
         press.done = true;
         const dir: 1 | -1 = dx < 0 ? 1 : -1;
-        if (canTurn(dir)) go(dir);
+        // The swipe's speed, as a share of the page's travel: a flick turns faster than a push.
+        const secs = Math.max(0.016, (event.timeStamp - press.t0) / 1000);
+        go(dir, Math.abs(dx) / secs / (2 * size.w));
       }
       return;
     }
@@ -450,6 +499,14 @@ export default function PageFlip({
         return;
       }
       press.dragging = true;
+      // Smoothed hand speed (px/s), handed to the spring on release.
+      const t = event.timeStamp;
+      if (press.last && t > press.last.t) {
+        const dt = (t - press.last.t) / 1000;
+        const v = { x: (p.x - press.last.p.x) / dt, y: (p.y - press.last.p.y) / dt };
+        press.v = press.v ? lerp(press.v, v, 0.5) : v;
+      }
+      press.last = { p, t };
       setAt({ ...current, at: reach(p, current.corner) });
       return;
     }
@@ -489,16 +546,13 @@ export default function PageFlip({
     const crossed =
       current.dir === 1 ? current.at.x < size.w : current.at.x > size.w;
     const complete = press.dragging ? crossed : true;
-    run(
-      current,
-      complete
-        ? {
-            x: current.corner.x - current.dir * 2 * size.w,
-            y: current.corner.y,
-          }
-        : current.corner,
-      complete
-    );
+    const to = complete
+      ? {
+          x: current.corner.x - current.dir * 2 * size.w,
+          y: current.corner.y,
+        }
+      : current.corner;
+    run(current, to, complete, along(press.v, current.at, to));
   };
 
   const onPointerLeave = () => {
@@ -537,7 +591,7 @@ export default function PageFlip({
           "shrink-0 motion-reduce:transition-none",
           single
             ? "w-[200%] self-start"
-            : "w-full transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            : "w-full [transition:transform_var(--dur-spring)_var(--curve-spring)]"
         )}
         style={{ transform: `translateX(${single ? -50 : shift * 100}%)` }}
       >
@@ -584,8 +638,9 @@ export default function PageFlip({
       </div>
 
       <div className="mt-6 flex items-center gap-4 font-label text-[15px] font-bold text-ink">
+        {/* While a turn is in flight (heading set) the opposite button stays live: it reverses the turn. */}
         <NavButton
-          disabled={spread === 0}
+          disabled={spread === 0 && heading === null}
           label="Previous page"
           onClick={() => go(-1)}
           onKeyDown={onKeyDown}
@@ -596,7 +651,7 @@ export default function PageFlip({
           {first === last ? `${first}` : `${first}–${last}`} of {pages.length}
         </span>
         <NavButton
-          disabled={spread === spreads - 1}
+          disabled={spread === spreads - 1 && heading === null}
           label="Next page"
           onClick={() => go(1)}
           onKeyDown={onKeyDown}

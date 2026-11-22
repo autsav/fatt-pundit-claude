@@ -1,0 +1,63 @@
+ok   crawl: every internal link and asset in dist returns 200  -- 227 urls
+ok   crawl: every same-page #hash link has a target id
+ok   crawl: every target=_blank external link has rel=noopener  -- 28 external urls
+ok   crawl: no http:// external link
+ok   external hosts reachable (origin GET, not the deep link)  -- https://www.fattpundit.co.uk https://www.opentable.com https://www.sevenrooms.com https://www.instagram.com https://www.facebook.com https://x.com https://www.google.com https://maps.apple.com https://deliveroo.co.uk https://www.ubereats.com https://maps.google.com
+ok   sitemap.xml lists every public page and each returns 200  -- 13 urls
+ok   robots.txt is served  -- User-agent: * / Disallow: / / 
+ok   unknown URL returns 404 with the Lost luggage page
+ok   /dubai/menu/ (not a route) returns 404
+ok   vercel.json carries every old URL from docs/redirects.csv  -- 4 redirects
+ok   390 /: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai" ld=Organization
+ok   390 /soho/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit Soho · Indo-Chinese Hakka restaurant · 77 Berwick Street" ld=Restaurant
+ok   390 /covent-garden/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit Covent Garden · Indo-Chinese Hakka restaurant · 6 Maiden Lane" ld=Restaurant
+ok   390 /dubai/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit Dubai · Opening soon at The Hangout, Mall of the Emirates" ld=Restaurant
+ok   390 /soho/menu/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Soho menu · Fatt Pundit" ld=Menu
+ok   390 /covent-garden/menu/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Covent Garden menu · Fatt Pundit" ld=Menu
+ok   390 /book/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Book a table · Fatt Pundit" ld=none
+ok   390 /private-dining/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Groups and private dining · Fatt Pundit" ld=none
+ok   390 /our-story/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "The tale of Fatt & Pundit · Our story · Fatt Pundit" ld=none
+ok   390 /accessibility/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Accessibility · Fatt Pundit" ld=none
+ok   390 /allergens/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Allergens and dietary needs · Fatt Pundit" ld=none
+ok   390 /booking-terms/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Booking terms · Fatt Pundit" ld=none
+ok   390 /privacy/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Privacy · Fatt Pundit" ld=none
+ok   1440 /: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit · Chinese-Indian Hakka restaurant · Soho, Covent Garden, Dubai" ld=Organization
+ok   1440 /soho/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit Soho · Indo-Chinese Hakka restaurant · 77 Berwick Street" ld=Restaurant
+ok   1440 /covent-garden/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit Covent Garden · Indo-Chinese Hakka restaurant · 6 Maiden Lane" ld=Restaurant
+ok   1440 /dubai/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Fatt Pundit Dubai · Opening soon at The Hangout, Mall of the Emirates" ld=Restaurant
+ok   1440 /soho/menu/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Soho menu · Fatt Pundit" ld=Menu
+ok   1440 /covent-garden/menu/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Covent Garden menu · Fatt Pundit" ld=Menu
+ok   1440 /book/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Book a table · Fatt Pundit" ld=none
+ok   1440 /private-dining/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Groups and private dining · Fatt Pundit" ld=none
+ok   1440 /our-story/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "The tale of Fatt & Pundit · Our story · Fatt Pundit" ld=none
+ok   1440 /accessibility/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Accessibility · Fatt Pundit" ld=none
+ok   1440 /allergens/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Allergens and dietary needs · Fatt Pundit" ld=none
+ok   1440 /booking-terms/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Booking terms · Fatt Pundit" ld=none
+ok   1440 /privacy/: loads, head tags, JSON-LD, no console errors (full motion, first visit)  -- title "Privacy · Fatt Pundit" ld=none
+ok   1440: header has rooms, Menus, Groups, Book; Index opens and closes with Escape; Menus dropdown opens  -- Soho | Covent Garden | Dubai | Menus | Soho menus77 Berwick Street | Covent Garden menus6 Maiden Lane | Groups | Book a tableBook a table
+ok   1440: skip link is the first Tab stop and moves focus to main  -- {"hash":"#content","active":"BODY","y":102}
+ok   1440: header Book opens the drawer on a text page
+ok   390: dock on home shows Menus, Rooms, Book; Menus opens the room sheet; Rooms opens Index  -- {"items":["Menus","Rooms","Book"],"visible":true,"h":60}
+ok   390: on /soho/ the dock and header Book stay away while the hero is on screen, then appear  -- before {"hero":"in","dockVis":false,"heroBook":true} after {"hero":"out","dockVis":true}
+ok   /book/?branch=soho opens the drawer with Soho chosen; Escape leaves the guest on the desk  -- {"open":true,"where":"soho","name":"at Soho"}
+ok   /book/?branch=covent-garden opens the drawer with Covent Garden chosen
+ok   desk picker: day/time/guests fill each room link; 12 guests routes to the group form  -- Soho books online for up to 7. For 12, call or plan a group. | Covent Garden books online for up to 4. For 12, call or plan a group.
+ok   drawer: 9 guests shows the group route (enquiry link), 2 guests shows Find a table  -- For 8 or more, Soho plans a set menu with you.
+ok   390 menu: one menu shown at a time; search finds momo across menus; empty state + Clear filters  -- 19 momo items, "19 dishes in 8 menus"
+ok   390 menu: diet chip (vg) hides everything without the tag  -- 12 vg dishes
+ok   390 menu: switching menu via the phone picker shows that menu  -- #set-menu current="Set menu"
+FAIL 390 menu: dish passport stamps a dish, opens, clears  -- page.click: Timeout 30000ms exceeded.
+ok   1440 menu: one menu shown at a time; search finds momo across menus; empty state + Clear filters  -- 19 momo items, "19 dishes in 8 menus"
+ok   1440 menu: diet chip (vg) hides everything without the tag  -- 12 vg dishes
+ok   1440 menu: switching menu via the menu links shows that menu  -- #set-menu current="Set menu"
+ok   1440 menu: dish passport stamps a dish, opens, clears  -- {"n":"1","hidden":false,"stored":"{\"soho\":[\"momo-mix-vegetable\"]}"}
+ok   group form: empty submit lists 4 things to fix with links, marks fields invalid, typing clears the error  -- {"alert":"4 things to fixChoose a dateEnter how many guestsEnter your ","links":4,"invalid":["date","guests","name","email"],"focused":"alert"}
+ok   group form: ?branch=covent-garden&guests=12&date prefills; valid submit falls back to the email app (no endpoint)  -- {"room":"covent-garden","guests":"12","date":"2026-12-01","time":"19:30"} status="Your email app should open nowEverything is filled in, addressed to Covent Garde"
+ok   /dubai/: no list form without PUBLIC_DUBAI_LIST_ENDPOINT, the page says so; clock and Book in London present  -- {"form":false,"wl":"Be first through the doorThe list opens soon. For the opening date, follow @fattpundit on Instagram (opens in a new tab).","clock":"Local time in Dubai: 9.20pm, after dark","london":18}
+ok   footer Pause motion: toggles html[data-motion], persists across reload, pauses videos  -- {"m":"paused","pressed":"true","text":"Play motion","ls":"paused","playing":0}
+ok   /covent-garden/ Lights on: scrolling into view turns the lamps on; the pull switch replays  -- cue="Good evening, Maiden Lane" after pull=off then on
+ok   /covent-garden/ contact sheet: a thumb opens the lightbox; next/prev/close work  -- Pink booths and bentwood chairs under shelves of lamps and pots, against a green plaster wallFrame 12, 1 of 8
+ok   home: hero Book opens the drawer; passes link to the rooms; menu book toolbar lists both list menus  -- tabs: À la carte, Set menu, Pre-theatre, Veg pre-theatre, Drinks, Vegan, Halal, Gluten free, Dairy free, Pescatarian
+ok   footer: no newsletter form without PUBLIC_NEWSLETTER_ACTION; today's hours line filled per room  -- Open until 10.30pm | Open until 10.30pm
+
+60 passed, 1 failed

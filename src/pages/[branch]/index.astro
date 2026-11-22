@@ -74,7 +74,8 @@ const LEAD = { tiger: 'var(--color-tiger)', gold: 'var(--color-gold)', slate: 'v
 const LEAD_TEXT = { tiger: 'var(--color-tiger-deep)', gold: 'var(--color-gold-deep)', slate: 'var(--color-slate-deep)' }[p.lead];
 const img = async (src: ImageMetadata, width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // The room's photos as the same contact sheet and lightbox the home page uses.
-const sheet = await Promise.all(gallery.map(async (g) => ({ thumb: await img(g.src, 640), full: await img(g.src, 1600), alt: g.alt })));
+const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640].map(async (w) => `${await img(src, w)} ${w}w`))).join(', ');
+const sheet = await Promise.all(gallery.map(async (g) => ({ thumb: await img(g.src, 640), thumbSet: await thumbSet(g.src), full: await img(g.src, 1600), alt: g.alt })));
 
 // Beat 3: the dish this room is known for, or (Dubai) what is coming.
 const signature = p.signature ? { ...p.signature, d: await dish(p.signature.dish) } : null;
@@ -114,6 +115,8 @@ const rating = p.rating;
 const preTheatre = preTheatreText(b);
 const wallOff = (await getImage({ src: lightsOffStill, width: 1280, format: 'webp', quality: 80 })).src;
 const wallLit = (await getImage({ src: lightsLitStill, width: 1280, format: 'webp', quality: 80 })).src;
+// 800w and 1024w cover phones at 2x (a 412 px screen asks for 824); the 1280w stays for wide screens.
+const wallLitSet = (await Promise.all([800, 1024].map(async (w) => `${(await getImage({ src: lightsLitStill, width: w, format: 'webp', quality: 80 })).src} ${w}w`))).join(', ') + `, ${wallLit} 1280w`;
 // Bulb positions (% of each photo), measured from the frames.
 const WALL_LAMPS = [{ x: 10.5, y: 13.3, size: 0.6 }, { x: 65.9, y: 13.3, size: 0.6 }];
 const menuArt = { stampGold: await stampSrc(stampGoldArt, 220) };
@@ -306,7 +309,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
           <div class="chapter-body room-wall">
             {b.id === 'covent-garden' && (
               <>
-                <LightsOn src={lightsOnClip} off={wallOff} lit={wallLit} label={ALTS['gallery-02']} lamps={WALL_LAMPS} ratio={1760 / 1176} place="Maiden Lane" />
+                <LightsOn src={lightsOnClip} off={wallOff} lit={wallLit} litSet={wallLitSet} label={ALTS['gallery-02']} lamps={WALL_LAMPS} ratio={1760 / 1176} place="Maiden Lane" />
                 <p class="wall-intro">Now turn the plates over: each one hides something from the kitchen.</p>
                 <PlateWall client:visible dishes={plates} />
               </>

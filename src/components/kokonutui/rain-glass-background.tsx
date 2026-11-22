@@ -15,8 +15,8 @@ import { type ReactNode, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 export interface RainGlassBackgroundProps {
-  /** The view behind the window. Served with CORS so WebGL can read it. */
-  src?: string;
+  /** The view behind the window (same-origin, so WebGL can read it). */
+  src: string;
   /** Fatt Pundit: a small still of the same view, shown fogged until (or if never) the glass starts. */
   poster?: string;
   title?: string;
@@ -39,9 +39,6 @@ export interface RainGlassBackgroundProps {
   /** Fatt Pundit: seconds a wiped patch takes to fog over again. */
   fogBack?: number;
 }
-
-const DEFAULT_SRC =
-  "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1800&q=80&auto=format&fit=crop";
 
 // The drop map is drawn at three quarter size, the fog map at half.
 const WATER_SCALE = 0.75;
@@ -450,7 +447,7 @@ function paintWater(
 }
 
 export default function RainGlassBackground({
-  src = DEFAULT_SRC,
+  src,
   title,
   poster,
   children,

@@ -116,17 +116,54 @@
   .lift-2 { box-shadow: var(--lift-2); }
 }
 
+/* The reading line under the header (ChapterRail.astro appends it). It follows the page's scroll in
+   CSS where the browser has scroll timelines (one property, one element: no script per frame). Off in
+   calm mode, where the reduced-motion safety net below would shorten the timeline; the script writes
+   the transform then, and in browsers without the feature. */
+.read-line { position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--color-tiger); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; pointer-events: none; }
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .read-line { animation-name: read-line; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root block); }
+  }
+}
+@keyframes read-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* "Lights on" (LightsOn.astro): the dusk over the photo follows the frame's own scroll position in CSS,
+   from the frame entering the screen to its middle about 65% down (cover 42% of its travel). The timeline
+   is named on the frame because the frame clips (overflow: hidden) and would otherwise be the dusk's
+   scroller. Calm mode keeps the script's still dusk. Here, not in the component: see .read-line. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-lights] .frame { view-timeline-name: --lights-frame; view-timeline-axis: block; }
+    [data-lights] .dusk { animation-name: lights-dusk; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --lights-frame; animation-range: entry 0% cover 42%; }
+  }
+}
+@keyframes lights-dusk { from { opacity: 0; } to { opacity: 0.55; } }
+
+/* Story panels (StoryComic.astro, M3 of docs/MOTION-ROADMAP.md): each panel rises with the scroll, from
+   the moment it enters the screen to 60% of its own height in, instead of on an observer tick. The
+   bubbles still stamp on `.is-in` (that is a beat, not a scroll position). Without view timelines or
+   in calm mode the component's own transition (or nothing) applies. Here, not in the component: see
+   .read-line. The animation beats the component's `.panel.is-in` declarations, as every animation does. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-comic-js] .panel { animation-name: panel-rise; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(block); animation-range: entry 0% entry 60%; }
+  }
+}
+@keyframes panel-rise { from { opacity: 0; transform: translateY(var(--rise)); } to { opacity: 1; transform: none; } }
+
 /* Something new landing in place (a pill's next line, the lightbox photo): transform and opacity only. */
 @keyframes fp-pill-in { from { transform: translateY(calc(var(--rise) / 2)); opacity: 0; } to { transform: none; opacity: 1; } }
 .voyage-paper { background: radial-gradient(rgb(44 41 37 / 0.07) 1px, transparent 1.2px) 0 0 / 7px 7px, radial-gradient(120% 90% at 30% 40%, rgb(255 255 255 / 0.18), transparent 60%); }
 @keyframes fp-pulse { 50% { transform: scale(1.7); opacity: 0.45; } }
 .voyage-pulse { transform-box: fill-box; transform-origin: center; animation: fp-pulse 1.6s ease-in-out infinite; }
 .voyage-place { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: 34px; fill: var(--color-ink); paint-order: stroke; stroke: #fff; stroke-width: 8px; }
-.voyage-stamp { opacity: 0; transform: scale(2.2) rotate(-10deg); transition: opacity var(--dur-fast) var(--curve-out), transform var(--dur-panel) var(--curve-stamp); }
+.voyage-stamp { opacity: 0; transform: scale(2.2) rotate(-10deg); transition: opacity var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 .voyage-stamp.is-in { opacity: 1; transform: none; }
 
 /* Voyage, "follow the ship" (home scene 3). --u = map units per screen pixel, set by the camera. */
-.voyage-sea { will-change: transform; }
+/* The chart's own layer only while the scene is pinned (Voyage.tsx sets data-pinned on the section). */
+.voyage[data-pinned] .voyage-sea { will-change: transform; }
 .voyage-ink { --u: 1; }
 .voyage-course { fill: none; stroke: var(--color-gold); stroke-opacity: 0.75; stroke-linecap: round; stroke-width: calc(var(--u) * 3px); stroke-dasharray: calc(var(--u) * 0.1px) calc(var(--u) * 10px); }
 .voyage-sailed { fill: none; stroke: var(--color-tiger); stroke-linecap: round; stroke-linejoin: round; stroke-width: calc(var(--u) * 5px); }
@@ -141,14 +178,16 @@
 .voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 600; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
 .voyage-port.is-reached .voyage-name { fill: var(--color-paper-light); }
 .voyage-compass { opacity: 0.9; }
-.voyage-badge { fill: var(--color-tiger); stroke: var(--color-sand); stroke-width: 3; filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.5)); }
-.voyage-hull { filter: brightness(0) invert(1); }
+/* The ship moves every frame: no filters on it (a hard offset shadow, the hull masked from the art's alpha). */
+.voyage-badge-shadow { fill: rgb(0 0 0 / 0.45); }
+.voyage-badge { fill: var(--color-tiger); stroke: var(--color-sand); stroke-width: 3; }
+.voyage-hull { fill: var(--color-sand); }
 .voyage-vignette { background: radial-gradient(130% 100% at 55% 45%, transparent 50%, rgb(20 18 16 / 0.6)); }
 
 .voyage-ticket { box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
   -webkit-mask: radial-gradient(circle 8px at 0 50%, transparent 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 8px at 100% 50%, transparent 97%, #000) right / 51% 100% no-repeat;
   mask: radial-gradient(circle 8px at 0 50%, transparent 97%, #000) left / 51% 100% no-repeat, radial-gradient(circle 8px at 100% 50%, transparent 97%, #000) right / 51% 100% no-repeat; }
-.voyage-punch { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed var(--color-ink); transition: background-color var(--dur-fast) var(--curve-out), transform var(--dur-fast) var(--curve-stamp); }
+.voyage-punch { flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed var(--color-ink); transition: background-color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 .voyage-hole.is-punched .voyage-punch { background: var(--color-ink); border-style: solid; transform: scale(1.1); }
 .voyage-hole.is-here { color: var(--color-tiger-deep); }
 .voyage-hole.is-here .voyage-punch { background: var(--color-tiger); border-color: var(--color-tiger); }
@@ -287,6 +326,11 @@
 .room-pick path { fill: none; stroke: var(--color-gold); stroke-width: 5; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 0.5px #8a6a2c); }
 [data-drawn] .room-pick path { stroke-dashoffset: 0; transition: stroke-dashoffset var(--dur-story-long) var(--curve-in-out) var(--dur-fast); }
 .room-lightbox { width: 100vw; height: 100svh; max-width: none; max-height: none; margin: 0; padding: 56px 64px 24px; border: 0; background: rgb(23 21 19 / 0.97); color: var(--color-sand); overscroll-behavior: contain; touch-action: pan-y; }
+/* The dark room fades up at feedback speed and (Chromium, see components.css "Dialogs") fades out the same way. */
+.room-lightbox, .room-lightbox::backdrop { opacity: 0; transition: opacity var(--dur-fast) var(--curve-out); }
+.room-lightbox[open], .room-lightbox[open]::backdrop { opacity: 1; }
+@starting-style { .room-lightbox[open], .room-lightbox[open]::backdrop { opacity: 0; } }
+@supports (overlay: auto) { .room-lightbox, .room-lightbox::backdrop { transition-property: opacity, overlay, display; transition-behavior: allow-discrete; } }
 .room-lightbox::backdrop { background: rgb(0 0 0 / 0.6); }
 @media (max-width: 760px) { .room-lightbox { padding: 56px 8px 16px; } }
 .room-lightbox-img { max-width: min(1100px, 100%); max-height: calc(100svh - 160px); object-fit: contain; border: 8px solid var(--color-paper); animation: fp-pill-in var(--dur-panel) var(--curve-out) both; }
@@ -301,7 +345,7 @@
 /* Menu by location: the restaurant choice, as the system's option chips (sentence case; chosen = ink, not tiger,
    which is kept for actions). */
 .menu-tag { position: relative; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink);
-  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-fast) var(--curve-stamp); }
+  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 .menu-tag:hover { transform: translateY(-2px); }
 .menu-tag:active { transform: translateY(1px) scale(0.98); transition-duration: var(--dur-press); }
 .menu-tag.is-on { background: var(--color-ink); color: var(--color-sand); }

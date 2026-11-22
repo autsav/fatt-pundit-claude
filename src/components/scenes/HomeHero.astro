@@ -103,7 +103,7 @@ const { branches, rainSrc, rainPoster } = Astro.props;
 
   /* Header Book waits while the hero's is in view (≥640; on phones the dock holds Book). */
   :global(html[data-hero-book='in'] .bar .nav-book) { visibility: hidden; }
-  :global(html[data-hero-book='out'] .bar .nav-book) { animation: hero-book-in var(--dur-fast) var(--curve-stamp); }
+  :global(html[data-hero-book='out'] .bar .nav-book) { animation: hero-book-in var(--dur-spring) var(--curve-spring); }
   @keyframes hero-book-in { from { transform: translateY(-8px) scale(1.06); } to { transform: none; } }
 
   /* Phones: the dock carries Book, so the hero doesn't repeat it (one tiger action per view). */

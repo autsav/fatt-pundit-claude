@@ -100,6 +100,62 @@ for (const [vname, v] of VIEWS) {
             await toggle.click();
             await page.evaluate(() => { try { localStorage.removeItem('fp-motion'); } catch {} });
           }
+          // Every dialog leaves with a transition (Chromium keeps a closing dialog in the top layer through
+          // `overlay`, M1 of docs/MOTION-ROADMAP.md) and is gone within the panel beat.
+          row.dialogs = await page.evaluate(async () => {
+            const out = [];
+            const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+            for (const d of document.querySelectorAll('dialog')) {
+              if (d.open) continue;
+              try { d.showModal(); } catch { continue; }
+              // A dialog inside a hidden container (the passport before any stamp) is not rendered: skip it.
+              if (!d.checkVisibility()) { d.close(); continue; }
+              await frame();
+              d.close();
+              await frame();
+              const exit = d.getAnimations({ subtree: true }).filter((a) => a.playState === 'running').length;
+              const shown = getComputedStyle(d).display !== 'none';
+              await new Promise((r) => setTimeout(r, 700));
+              out.push({ dialog: d.className || d.id, exit, shown, gone: getComputedStyle(d).display === 'none' });
+            }
+            return out;
+          });
+          for (const d of row.dialogs) if (!d.exit || !d.shown || !d.gone) fail.push(`${path}@${vname}: dialog ${d.dialog} ${d.gone ? 'closes without an exit transition' : 'never closed'}`);
+          // Interruptions (M2): a second input mid-motion reverses or completes; nothing ends mid-state.
+          row.interrupt = await page.evaluate(async () => {
+            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+            const out = {};
+            const book = document.querySelector('dialog.book');
+            if (book) {
+              // Open, then close within 100 ms; then open again, so a cut-short exit never jams the drawer.
+              book.showModal(); await sleep(80); book.close(); await sleep(700);
+              const gone = getComputedStyle(book).display === 'none';
+              book.showModal(); await sleep(80);
+              const reopened = book.open && getComputedStyle(book).display !== 'none' && book.checkVisibility();
+              book.close(); await sleep(700);
+              out.drawer = { gone, reopened, ok: gone && reopened };
+            }
+            const plate = document.querySelector('[data-plate]');
+            if (plate) {
+              // Two taps within 300 ms: the plate turns back from where it is and ends face up.
+              const face = plate.firstElementChild;
+              plate.click(); await sleep(150); plate.click(); await sleep(900);
+              const m = getComputedStyle(face).transform;
+              out.plate = { pressed: plate.getAttribute('aria-pressed'), transform: m, ok: plate.getAttribute('aria-pressed') === 'false' && (m === 'none' || /^matrix\(1, 0, 0, 1, 0, 0\)$/.test(m)) };
+            }
+            const next = document.querySelector('button[aria-label="Next page"]');
+            const prev = document.querySelector('button[aria-label="Previous page"]');
+            const count = next?.parentElement?.querySelector('[aria-live]');
+            if (next && prev && count && !next.disabled) {
+              // Turn a page and turn back mid-flight: the book settles on the spread it started from.
+              const before = count.textContent;
+              next.click(); await sleep(150); prev.click(); await sleep(1500);
+              const flap = next.parentElement.parentElement.querySelector('[style*="clip-path"]');
+              out.turn = { before, after: count.textContent, flap: !!flap, ok: count.textContent === before && !flap };
+            }
+            return out;
+          });
+          for (const [k, v] of Object.entries(row.interrupt)) if (!v.ok) fail.push(`${path}@${vname}: interrupted ${k} ended mid-state ${JSON.stringify(v)}`);
           if (path === '/') {
             // A stub tear must not delay the booking hand-off.
             await page.evaluate(() => { window.__opened = null; window.open = (u) => { window.__opened = performance.now(); return { opener: null }; }; });

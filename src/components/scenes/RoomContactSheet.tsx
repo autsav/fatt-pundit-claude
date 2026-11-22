@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { MS } from '@/lib/motion-tokens';
 
 /**
  * Scene 7: the room, as a photographer's contact sheet on a halftone print.
@@ -8,17 +9,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface SheetFrame {
   thumb: string;
+  /** Smaller cuts of `thumb` ("url 360w, url 480w, url 640w"), picked by the strip's `sizes`. */
+  thumbSet?: string;
   full: string;
   alt: string;
 }
 
 const FIRST = 12;
+/** The strip is four frames across, two on phones (global.css .room-strip); the wrap tops out at 1240 px. */
+const THUMB_SIZES = '(min-width: 761px) 310px, 50vw';
 
 export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame[]; picks: number[] }) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
+  const unmount = useRef(0);
   const [open, setOpen] = useState<number | null>(null);
   const [drawn, setDrawn] = useState(false);
 
@@ -41,6 +47,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
 
   const show = (i: number, from: HTMLButtonElement) => {
     opener.current = from;
+    window.clearTimeout(unmount.current);
     setOpen(i);
     dialogRef.current?.showModal();
     document.documentElement.style.overflow = 'hidden';
@@ -52,9 +59,10 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
     const dlg = dialogRef.current;
     if (!dlg) return;
     const onClose = () => {
-      setOpen(null);
       document.documentElement.style.overflow = '';
       opener.current?.focus();
+      // The photo stays while the dark room fades out (global.css .room-lightbox); the guest is not held.
+      unmount.current = window.setTimeout(() => setOpen(null), MS.fast);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') step(1);
@@ -63,6 +71,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
     dlg.addEventListener('close', onClose);
     dlg.addEventListener('keydown', onKey);
     return () => {
+      window.clearTimeout(unmount.current);
       dlg.removeEventListener('close', onClose);
       dlg.removeEventListener('keydown', onKey);
     };
@@ -80,7 +89,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
                 FATT PUNDIT 400 <span className="room-edge-n">▸{FIRST + i}</span>
               </span>
               <button type="button" className="room-shot" onClick={(e) => show(i, e.currentTarget)} aria-label={`Open photo ${i + 1} of ${frames.length}: ${f.alt}`}>
-                <img className="fp-photo" src={f.thumb} alt="" loading="lazy" decoding="async" />
+                <img className="fp-photo" src={f.thumb} srcSet={f.thumbSet} sizes={f.thumbSet ? THUMB_SIZES : undefined} alt="" loading="lazy" decoding="async" />
               </button>
               <span className="room-edge" aria-hidden="true">
                 <span className="room-edge-n">{FIRST + i}A</span> ◂
