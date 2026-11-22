@@ -185,6 +185,22 @@
    the "Read as a comic" button). Otherwise no scene shows and each chapter's comic tells it. Here, not in
    the components: see .read-line. */
 .story-scenes { display: none; }
+/* A layer's score is its own: a wrapper that fades a group out must not hand its --o1: 0 to the layers
+   inside it, so these never inherit. */
+@property --from { syntax: '*'; inherits: false; }
+@property --to { syntax: '*'; inherits: false; }
+@property --out-from { syntax: '*'; inherits: false; }
+@property --out-to { syntax: '*'; inherits: false; }
+@property --x0 { syntax: '*'; inherits: false; }
+@property --y0 { syntax: '*'; inherits: false; }
+@property --r0 { syntax: '*'; inherits: false; }
+@property --s0 { syntax: '*'; inherits: false; }
+@property --o0 { syntax: '*'; inherits: false; }
+@property --x1 { syntax: '*'; inherits: false; }
+@property --y1 { syntax: '*'; inherits: false; }
+@property --r1 { syntax: '*'; inherits: false; }
+@property --s1 { syntax: '*'; inherits: false; }
+@property --o1 { syntax: '*'; inherits: false; }
 .fx-fade-up { --o0: 0; --y0: var(--rise); }
 .fx-pop { --o0: 0; --s0: 0.7; }
 .fx-fade { --o0: 0; }
@@ -192,6 +208,10 @@
   @media (prefers-reduced-motion: no-preference) {
     :root:not([data-story='comic']) .story-scenes { display: block; }
     :root:not([data-story='comic']) .story-chapter[data-scenes] .comic { display: none; }
+    /* One screen: stages of chapters that play follow each other with no gap, and the last hands
+       straight over to the end section. */
+    :root:not([data-story='comic']) .story-chapter[data-scenes] + .story-chapter[data-scenes] { margin-top: 0; }
+    :root:not([data-story='comic']) .story-body:has(> .story-chapter[data-scenes]:last-child) { padding-bottom: 0; }
     .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
     .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
     .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
@@ -213,7 +233,8 @@
 :where(.story-scene) { position: relative; height: var(--h, 220vh); }
 :where(.story-scene) .scene-stage { position: sticky; top: 0; height: 100svh; overflow: clip; contain: paint; background: var(--color-paper); }
 :where(.story-scenes) .layer { position: absolute; }
-:where(.story-scenes) .scene-sea { left: 0; right: 0; bottom: 0; width: 100%; height: var(--sea-top); max-width: none; }
+/* will-change: the sea chart is a heavy SVG; as its own layer it is drawn once, not re-tiled as the stage moves. */
+:where(.story-scenes) .scene-sea { left: 0; right: 0; bottom: 0; width: 100%; height: var(--sea-top); max-width: none; will-change: transform; }
 :where(.story-scenes) .scene-ship { width: var(--ship-w); height: auto; max-width: none; }
 /* The narrator top-left under the sticky header: one caption slot, captions take turns in it. */
 :where(.story-scenes) .scene-text { position: absolute; top: var(--top); left: var(--gutter); right: var(--gutter); display: grid; justify-items: start; z-index: 2; }
@@ -231,6 +252,22 @@
 /* A credit line a photo's licence asks for (CC BY-SA). */
 :where(.story-scenes) .scene-credit { position: absolute; right: var(--gutter); bottom: calc(var(--floor) + 8px); z-index: 2; margin: 0; padding: 2px 8px; background: rgb(44 41 37 / 0.8); color: var(--color-sand); font-size: 12px; }
 :where(.story-scenes) .scene-credit a { color: inherit; }
+/* A chapter's title card: the first thing on its stage, lifting away as the scene builds behind it
+   (give it .fx and an out range, e.g. --o1: 0; --y1: -8%; --from: 6%; --to: 12%). */
+:where(.story-scenes) .scene-title { inset: 0; z-index: 3; pointer-events: none; display: grid; place-content: center; gap: 6px; padding: 0 var(--gutter); text-align: center; background: var(--color-sand); }
+:where(.story-scenes) .scene-title .ch-head { margin: 0; padding: 0; }
+/* A photo on the stage, as a print: paper border, soft shadow. Tilt it with the `rotate` property (the
+   animation owns `transform`). */
+:where(.story-scenes) .scene-photo { max-width: none; object-fit: cover; border: clamp(5px, 0.7vw, 10px) solid var(--color-paper-light); box-shadow: 0 10px 28px rgb(44 41 37 / 0.28); }
+/* Ambient layers, gradients only, moved by the scroll like any other layer. */
+/* Steam: one puff per span; stagger their ranges so they rise one after another (--y1 negative, --o1: 0). */
+:where(.story-scenes) .puff { width: clamp(70px, 9vw, 140px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.35) 40%, transparent 70%); --o0: 0.9; }
+/* Rain: a sheet twice the stage's height that slides down (--y1: 50%). */
+:where(.story-scenes) .scene-rain { left: -10%; right: -10%; top: -100%; height: 200%; pointer-events: none;
+  background: repeating-linear-gradient(104deg, transparent 0 22px, rgb(237 229 216 / 0.28) 22px 23.5px, transparent 23.5px 47px) 0 0 / 100% 140px; }
+/* Flame: a hot ellipse that grows from its base (--s0 small, --s1 large). */
+:where(.story-scenes) .scene-flame { transform-origin: 50% 100%; aspect-ratio: 1 / 1.3; border-radius: 50% 50% 45% 45%;
+  background: radial-gradient(ellipse at 50% 80%, rgb(255 236 170 / 0.95), var(--color-gold) 30%, var(--color-tiger) 58%, transparent 72%); }
 @media (max-width: 640px) { :where(.story-scenes) { --floor: calc(60px + env(safe-area-inset-bottom)); } }
 @media (max-width: 599px) {
   :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }

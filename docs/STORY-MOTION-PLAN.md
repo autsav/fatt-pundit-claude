@@ -4,6 +4,101 @@ Status, 22 Nov 2026: step 1 is done (branch `story-motion`, commit `920c603`). C
 scroll-driven scenes; chapters 2-5 are still the comic. This plan takes the "paper puppet theatre" to the
 end of the story, then to the booking section.
 
+## Revision, 22 Nov 2026: the whole story on one screen
+Since 22 Nov the site is live with chapter 1 in motion and chapters 2-5 still as the stacked portrait
+comic. The owner wants the rest of the story to play the same way: on one pinned screen, scene after
+scene, with no stacked panels. This section replaces "The scenes" table and steps 3-6 below. Everything
+in "What stays fixed" still holds.
+
+### How "one screen" works
+- **One stage per chapter, five stages back to back.** Each chapter is one tall track with a single
+  sticky 100svh stage. Its scenes crossfade inside that stage, so the screen never scrolls away in the
+  middle of a chapter. Between chapters the next stage slides up over the last, like a page turn. It
+  is one movement, about one screen long.
+- **Why not one huge track:** Chrome's scrollytelling guide uses one timeline per section, and no
+  source covers about 100 layers on one timeline. Five tracks keep each chapter's layers, and their GPU
+  memory, inside that chapter. The rail also gets a real box to measure for each chapter.
+- **Chapter title inside the stage:** each stage opens on a title card ("Chapter two / Tangra") for
+  the first 10% of the track, then the scene builds behind it. The `h2` stays in the DOM, and its id
+  stays unique as `<chapter>-scenes-title`.
+- **Rail anchors:** `#tangra` and the other chapter ids stay on the in-flow `.story-chapter` wrapper,
+  never inside the sticky stage. The rail's "last chapter past the middle" logic keeps working.
+- **Comic:** once chapter 5 lands, motion mode hides the whole comic. The comic stays for reduced
+  motion, unsupported browsers and the "Read as a comic" switch.
+- **Ending:** chapter 5's last beat warms the stage to gold. The gold `#end` section ("Come and taste
+  the rest") follows with no visible seam.
+- **Length:** chapter 1 is 480vh (two tracks). Chapters 2-5 add about 1500vh. That is about 20
+  screens on desktop, the limit already set in step 8. Phone tracks are about 20% shorter.
+
+### New engine pieces (step 3a, before any chapter)
+- `fx-in-out`: one layer fades in over `--from`/`--to` and out over `--out-from`/`--out-to`, for beats
+  that replace each other on the stage. It is built from the existing `fx-move` and `fx-out`.
+- `.scene-photo`: a photo layer with object-fit cover, a paper border and a slight static tilt, used
+  for dish and room photos.
+- Ambient layers, all CSS gradients that move only by transform and opacity:
+  - steam: soft radial puffs that rise
+  - rain: a repeating streak layer that slides down
+  - flame: a gradient that scales up with the scroll
+- `.scene-title`: the chapter title card.
+- No new dependency, no JS for motion, no filters.
+
+### The scenes
+"Now" means art we own today. Every "slot" is a SceneArt storyboard card until the illustrator's
+layer arrives (story/layers/<scene>-<layer>.png), and then it needs no code change.
+
+| Ch. | Track | Beats in the one stage, by % of track | Art now |
+|---|---|---|---|
+| 1 | 480vh (done) | Harbour, then At sea. Optional later: merge into one stage like the rest | brand cut-outs, map |
+| 2 Tangra | 400vh | 0-12 title card. 5-25 the chart zooms into Calcutta (scale, continuing ch. 1's route). 20-40 the lane rises and steam lifts from the stall; caption p04. 40-60 Pundit's bubble "Good. But where is the fire?", caption p05. 60-95 the spice market: sacks rise from the bottom, chillies drop in, Fatt's "Show me.", caption p06 | map.webp; slots tangra-lane-far/near/stall, pundit, spice-sacks, chillies |
+| 3 Something new | 400vh | 0-12 title. 10-40 the wok: the flame flares, "More chilli!" then "More wok!", the queue grows from the right; caption p07. 40-70 the steamer lid lifts in a cloud of steam to show the momos; chilli chicken and noodles slide in; caption p08. 70-95 the table after service, plates settle; caption p09 | photos: momo-mix-vegetable, crackling-spinach, crispy-okra; slots wok-fatt, wok-pundit, queue, table |
+| 4 London calling | 350vh | 0-12 title. 5-35 the route draws Calcutta to London on world-land.svg. 30-65 the Soho front at dusk: photo plus an ink dusk overlay plus rain, Pundit's "Another sea, another kitchen.", caption p10, visible CC BY-SA credit. 65-95 three Covent Garden photos slide in as postcards; caption p11 | world-land.svg, soho-front photo, covent-garden gallery-01..08 |
+| 5 Next stop | 350vh | 0-12 title. 5-35 the route draws London to Dubai; the skyline rises at dusk, Fatt's "Pack the wok.", caption p12. 40-90 the table: a momo basket with steam, Pundit's "Your table is ready.", caption p13. 90-100 the stage warms to gold and hands over to #end | world-land.svg; photo 04-momos-chutney; slots dubai-skyline, travellers, table-chair |
+
+Art gaps that stay storyboard cards until the illustrator delivers:
+- the Tangra lane, Pundit, the spice market
+- the wok scene and the queue
+- the Dubai skyline
+- the laid table
+
+The tiger head stays out of every scene until client #57 is answered.
+
+### Steps (one commit each on `story-motion`, then a PR to main)
+- **3a.** The engine pieces above. Back-to-back stages join with no gap in motion mode. Probe whether
+  Safari 26 accepts `var()` in `animation-range`. The owner can open the preview in Safari on their
+  Mac. If it fails, switch to fixed range classes.
+- **3b.** Chapter 2 (`ChapterTangra.astro`).
+- **4.** Chapter 3.
+- **5.** Chapter 4.
+- **6.** Chapter 5, the hand-over to the gold end section, and the whole comic hidden in motion mode.
+- **7 and 8** are unchanged: the illustrator's art, then the release check.
+
+Each step runs the same checks: verify, build, docs/qa/story-motion/check.mjs (it finds the new stages
+by itself), the perf budget (median of 3), the reviewer, commit, push. After step 6 the PR to main
+deploys.
+
+### Built, 22 Nov 2026 (steps 3a-6 in one commit)
+- All five chapters play as stages. Chapter 1's heading became a title card too, and its first
+  track is 240vh.
+- The motion custom properties are registered with `@property … inherits: false`. Without that, a
+  wrapper that fades a group out handed its `--o1: 0` to the layers inside, which then never appeared.
+- Chapter 2 zooms the clean world chart (world-land.svg), not the brand map. The brand map turned to
+  noise at 2.6x.
+- Performance: scaling an SVG re-rasters it every frame. Chapter 2's zoom alone dropped 1 frame in 6,
+  and the chapter 1 sea strip cost about 1%. Both now have `will-change: transform`, which brings the
+  page to 1.3-1.7% dropped frames. `content-visibility: auto` on the tracks made no difference and was
+  removed.
+- The Dubai skyline is a plain SVG silhouette until the illustrator's layer arrives.
+
+### Research notes (22 Nov)
+- Scroll-driven animations ship in Chrome 115+, Safari 26 and Firefox 159 (on by default since 27 Oct
+  2026). Sources: web.dev/blog/web-platform-10-2026 and webkit.org/blog/17333.
+- Safari 26.5 fixed view-timeline progress near 0% and 100%.
+- Support for `var()` in `animation-range` in Safari is unconfirmed, so we test it (step 3a).
+- Pure-CSS scroll animations run off the main thread. Sources: the developer.chrome.com
+  scroll-animation-performance case study and the NRK case study.
+- Pure CSS cannot toggle `inert`, so every scene's text stays in DOM order and decorative layers stay
+  `aria-hidden`.
+
 ## What stays fixed
 - CSS scroll-driven animations only: a view timeline per scene track, sticky 100svh stage, linear, fill
   both. Transform and opacity only; dashoffset for drawn routes. No JS for motion, no new dependency, no

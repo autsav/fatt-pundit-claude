@@ -25,12 +25,13 @@ const route = 'M88 30 C 72 14, 56 42, 40 30 S 22 26, 16 34';
 ---
 
 <div class="story-scenes">
-  <header class="ch-head">
-    <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
-    <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
-  </header>
-
-  <StoryScene label={chapter.label} sr={firstSentence(harbour.scene)} h="220vh" hPhone="180vh">
+  <StoryScene label={chapter.label} sr={firstSentence(harbour.scene)} h="240vh" hPhone="200vh">
+    <div class="layer fx scene-title sh-title">
+      <header class="ch-head">
+        <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
+        <h2 id={`${chapter.id}-scenes-title`} class="ch-title">{chapter.title}</h2>
+      </header>
+    </div>
     <div class="layer fx sh-sun" aria-hidden="true"></div>
     <SceneArt name="harbour-hills-far" fallback={mountainsC} widths={[120]} sizes="min(40vw, 460px)" class="layer fx sh-hills sh-mtn-c" />
     <SceneArt name="harbour-hills-near" fallback={mountainsB} widths={[180]} sizes="min(58vw, 640px)" class="layer fx sh-hills sh-mtn-b" />
@@ -73,7 +74,8 @@ const route = 'M88 30 C 72 14, 56 42, 40 30 S 22 26, 16 34';
 </div>
 
 <style>
-  /* Scene 1, the harbour at dawn: sun up, hills drift (far ones slower), the ship comes in, then the words. */
+  /* Scene 1, the harbour at dawn: the title lifts, sun up, hills drift (far ones slower), the ship comes in, then the words. */
+  .sh-title { --o1: 0; --y1: -8%; --from: 4%; --to: 12%; }
   .sh-sun { left: 60%; top: 26%; width: clamp(110px, 16vw, 230px); aspect-ratio: 1; border-radius: 50%;
     background: radial-gradient(circle at 40% 38%, rgb(255 255 255 / 0.25), transparent 55%), var(--color-gold); box-shadow: 0 0 60px 18px rgb(203 160 82 / 0.35);
     --y0: 45%; --y1: -25%; }
