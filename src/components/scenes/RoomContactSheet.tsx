@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MS } from '@/lib/motion-tokens';
+import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
 /**
  * Scene 7: the room, as a photographer's contact sheet on a halftone print.
@@ -59,6 +60,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
     setOpen(i);
     dialogRef.current?.showModal();
     document.documentElement.style.overflow = 'hidden';
+    lockScroll();
   };
   const close = () => dialogRef.current?.close();
   const step = useCallback((d: number) => setOpen((i) => (i === null ? i : (i + d + frames.length) % frames.length)), [frames.length]);
@@ -68,6 +70,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
     if (!dlg) return;
     const onClose = () => {
       document.documentElement.style.overflow = '';
+      unlockScroll();
       opener.current?.focus();
       // The photo stays while the dark room fades out (global.css .room-lightbox); the guest is not held.
       unmount.current = window.setTimeout(() => setOpen(null), MS.fast);
@@ -121,6 +124,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
       <dialog
         ref={dialogRef}
         className="room-lightbox"
+        data-lenis-prevent
         aria-label="Photo of the room"
         onClick={(e) => e.target === e.currentTarget && close()}
         onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}

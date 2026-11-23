@@ -5,6 +5,8 @@
  * - Focus goes back to whatever opened it.
  * Delegated on the document, so triggers added later work too. Safe to call once per page.
  */
+import { lockScroll, unlockScroll } from './smooth-scroll';
+
 export function bindDialogs(doc: Document = document): void {
   const openers = new WeakMap<HTMLDialogElement, HTMLElement>();
   doc.addEventListener('click', (e) => {
@@ -16,6 +18,8 @@ export function bindDialogs(doc: Document = document): void {
         e.preventDefault();
         openers.set(dlg, trigger);
         dlg.showModal();
+        dlg.setAttribute('data-lenis-prevent', '');
+        lockScroll();
       }
       return;
     }
@@ -26,6 +30,6 @@ export function bindDialogs(doc: Document = document): void {
   // `close` doesn't bubble: listen in the capture phase.
   doc.addEventListener('close', (e) => {
     const dlg = e.target;
-    if (dlg instanceof HTMLDialogElement) openers.get(dlg)?.focus();
+    if (dlg instanceof HTMLDialogElement) { openers.get(dlg)?.focus(); if (dlg.hasAttribute('data-lenis-prevent')) unlockScroll(); }
   }, true);
 }

@@ -265,7 +265,7 @@ function Signatures({ dishes, art }: { dishes: SignatureDish[]; art: Art }) {
       <div className="mt-[3cqw] grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-[3cqw]">
         {pics.map((d) => (
           <figure key={d.name} className="m-0 flex min-h-0 flex-col">
-            <img src={d.image} alt={d.alt ?? ''} className="fp-photo min-h-0 w-full flex-1 object-cover" style={{ filter: 'saturate(.9) sepia(.08)' }} loading="lazy" decoding="async" draggable={false} />
+            <img src={d.image} alt={d.alt ?? ''} className="fp-photo min-h-0 w-full flex-1 object-cover" loading="lazy" decoding="async" draggable={false} />
             <figcaption className="mt-[1.2cqw] text-[2.8cqw] font-bold uppercase leading-tight tracking-[0.05em]">
               {d.name}
               {d.price && <span className="font-normal"> | {d.price}</span>}
@@ -388,8 +388,29 @@ export default function MenuBook({
     return out;
   }, [menu, art, z, place, signatures]);
 
+  // Decode ahead: a lazy picture one and a half screens away loads and decodes now, so no frame stalls when it arrives.
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const img = e.target as HTMLImageElement;
+          io.unobserve(img);
+          img.loading = 'eager';
+          img.decode?.().catch(() => {});
+        }
+      },
+      { rootMargin: '150% 0px' },
+    );
+    root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => io.observe(img));
+    return () => io.disconnect();
+  }, [menu?.id, place?.id, opened, pages]);
+
   return (
-    <section id="menu" className="relative overflow-hidden bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
+    <section ref={sectionRef} id="menu" className="relative overflow-hidden bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="wrap relative flex flex-col items-center">
         {/* Chapter head (the home page's numbered chapters), then one toolbar: which room's book, or the list. */}
@@ -496,7 +517,7 @@ export default function MenuBook({
           <ul className="m-0 mt-5 grid w-full max-w-[420px] list-none grid-cols-2 gap-3 p-0 sm:hidden" aria-label="Signature dishes">
             {signatures.slice(0, 2).map((d) => (
               <li key={d.name} className="flex flex-col gap-1.5">
-                {d.image && <img src={d.image} alt={d.alt ?? ''} className="fp-photo aspect-[4/3] w-full object-cover" style={{ filter: 'saturate(.9) sepia(.08)' }} loading="lazy" decoding="async" />}
+                {d.image && <img src={d.image} alt={d.alt ?? ''} className="fp-photo aspect-[4/3] w-full object-cover" loading="lazy" decoding="async" />}
                 <p className="m-0 text-[14px] font-bold uppercase leading-tight tracking-[0.05em]">{d.name}{d.price && <span className="font-normal"> | {d.price}</span>}</p>
               </li>
             ))}

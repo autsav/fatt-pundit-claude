@@ -355,6 +355,7 @@ const ld = {
 </style>
 
 <script>
+  import { scrollToEl } from '@/lib/smooth-scroll';
   // One menu at a time, chosen by the address (#vegan), so Back works and links can be shared.
   // Search looks across every menu; diet filters apply to the menu shown (or to all, on request).
   const layout = document.querySelector<HTMLElement>('[data-menu-layout]')!;
@@ -427,7 +428,7 @@ const ld = {
     run();
     nav.classList.remove('is-open'); pick.setAttribute('aria-expanded', 'false');
     // Focus follows the menu: the new H2 takes focus and a polite region says what is showing.
-    document.getElementById(id)?.scrollIntoView({ block: 'start' });
+    { const el = document.getElementById(id); if (el) scrollToEl(el, { immediate: true }); }
     document.getElementById(`${id}-h`)?.focus({ preventScroll: true });
     live.textContent = `Showing the ${NAME[id] ?? id} menu`;
   };
@@ -436,7 +437,7 @@ const ld = {
     const c = (e.target as Element).closest<HTMLAnchorElement>('[data-chip]');
     if (!c) return;
     e.preventDefault();
-    document.getElementById(c.dataset.chip!)?.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    { const el = document.getElementById(c.dataset.chip!); if (el) scrollToEl(el); }
   });
   if (chips.length && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver((entries) => {
@@ -486,5 +487,5 @@ const ld = {
   addEventListener('popstate', () => { everyMenu = false; run(); });
   addEventListener('hashchange', () => { everyMenu = false; run(); });
   run();
-  if (location.hash) document.getElementById(selected())?.scrollIntoView({ block: 'start' });
+  if (location.hash) { const el = document.getElementById(selected()); if (el) scrollToEl(el, { immediate: true }); }
 </script>

@@ -63,11 +63,15 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
         if ((nav && nav.type !== 'navigate') || location.hash) return;
         let touched = false;
         for (const t of ['wheel', 'touchstart', 'keydown', 'pointerdown']) addEventListener(t, () => (touched = true), { once: true, passive: true });
-        const top = () => { if (!touched && scrollY > 0) scrollTo(0, 0); };
+        const top = () => { if (!touched && scrollY > 0) { scrollTo({ top: 0, behavior: 'instant' }); window.__lenis?.scrollTo(0, { immediate: true }); } };
         addEventListener('DOMContentLoaded', top);
         addEventListener('pagereveal', top);
         addEventListener('load', () => { top(); setTimeout(top, 300); });
       })();
+    </script>
+    <script>
+      import { initSmoothScroll } from '../lib/smooth-scroll';
+      initSmoothScroll();
     </script>
     <script is:inline>
       // Page-to-page morphs: when the browser skips one (fast double click, calm mode), stay quiet.

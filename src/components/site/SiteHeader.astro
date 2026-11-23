@@ -61,7 +61,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
 </header>
 <BookDrawer />
 
-<dialog class="index" data-index aria-labelledby="index-title">
+<dialog class="index" data-index data-lenis-prevent aria-labelledby="index-title">
   <div class="index-head">
     <h2 id="index-title">Menu</h2>
     <button type="button" class="index-close" data-sheet-close>Close</button>
@@ -102,7 +102,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
   </ol>
 </dialog>
 
-<dialog class="index index-menus" data-menus aria-labelledby="menus-title">
+<dialog class="index index-menus" data-menus data-lenis-prevent aria-labelledby="menus-title">
   <div class="index-head">
     <h2 id="menus-title">Which restaurant's menus?</h2>
     <button type="button" class="index-close" data-sheet-close>Close</button>
@@ -138,7 +138,9 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
 </nav>
 
 <script>
+  import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
   const sheets = { index: document.querySelector<HTMLDialogElement>('[data-index]'), menus: document.querySelector<HTMLDialogElement>('[data-menus]') };
+  for (const d of Object.values(sheets)) d?.addEventListener('close', unlockScroll);
   const pop = document.querySelector<HTMLDetailsElement>('[data-menus-pop]');
   document.addEventListener('click', (e) => {
     const t = e.target as Element;
@@ -146,6 +148,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
     if (opener) {
       e.preventDefault();
       (opener.hasAttribute('data-menus-open') ? sheets.menus : sheets.index)?.showModal();
+      lockScroll();
       return;
     }
     for (const d of Object.values(sheets)) {

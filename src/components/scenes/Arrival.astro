@@ -51,6 +51,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 
 <script>
   import { createTimeline } from 'animejs';
+  import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
   const root = document.querySelector<HTMLElement>('[data-arrival-overlay]');
   const html = document.documentElement;
@@ -65,6 +66,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 
   if (root && html.dataset.arrival === 'play') {
     document.body.style.overflow = 'hidden';
+    lockScroll();
     // While the board is up, nothing behind it can take keyboard focus (only Skip can).
     const behind: HTMLElement[] = [];
     for (let el: HTMLElement = root; el.parentElement && el !== document.body; el = el.parentElement) {
@@ -72,20 +74,21 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     }
     const ac = new AbortController();
     let started = false;
+    let unlocked = false;
     const open = (fast = false) => {
       if (started) return;
       started = true;
       ac.abort();
       for (const s of behind) s.inert = false;
       // The shutter is about to open: give scrolling back now, not when the last frame lands.
-      window.setTimeout(() => { document.body.style.overflow = ''; }, fast ? 0 : 760);
+      window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 760);
       // The board is leaving: take it out of the accessibility tree and the tab order now,
       // not when the last frame lands (a fading label is not content).
       root.setAttribute('aria-hidden', 'true');
       root.inert = true;
       // A choreographed intro with its own beats (a documented exception in docs/MOTION.md).
       const tl = createTimeline({
-        onComplete: () => { document.body.style.overflow = ''; finish(); },
+        onComplete: () => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } finish(); },
       });
       if (!fast) {
         // The stamp thuds onto the board…

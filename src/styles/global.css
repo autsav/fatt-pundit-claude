@@ -225,15 +225,15 @@
     :root:not([data-story='comic']) .story-body:has(> .story-chapter[data-scenes]:last-child) { padding-bottom: 0; }
     .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
     .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
-    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out, fx-gone; animation-fill-mode: both, both, forwards;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-fill-mode: both, both;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
     /* Opt-in, cheaper exit: the move keeps its transform only, so opacity has one animation (.fx-solo-out + .fx-then-out). */
-    .story-scene .fx.fx-then-out.fx-solo-out { animation-name: fx-move-t, fx-out, fx-gone; }
+    .story-scene .fx.fx-then-out.fx-solo-out { animation-name: fx-move-t, fx-out; }
     /* Opt-in, hidden until its range: .fx-late is visibility:hidden until --from, so it is not rastered early. */
     .story-scene .fx.fx-late { visibility: hidden; animation-name: fx-move, fx-show; animation-fill-mode: both, forwards;
       animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--from, 0%) contain 100%; }
-    .story-scene .fx.fx-late.fx-then-out { animation-name: fx-move, fx-out, fx-show, fx-gone; animation-fill-mode: both, both, forwards, forwards;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--from, 0%) contain 100%, contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-late.fx-then-out { animation-name: fx-move, fx-out, fx-show; animation-fill-mode: both, both, forwards;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--from, 0%) contain 100%; }
     .story-scene .fx.fx-draw { animation-name: fx-draw; }
     /* Easing by role. Scroll-coupled motion (camera, parallax, the route, the ship) stays linear: the scroll is the
        clock. What arrives lands softly (ease-out-quart), what pops overshoots and settles like a stamp, and what
@@ -246,14 +246,14 @@
        --rock-a scales the swing). `rotate`, so it composes with the engine's transform. */
     .story-scene .fx.fx-puppet { transform-origin: 50% 100%; animation-name: fx-move, fx-rock; animation-timing-function: var(--ease-land), ease-in-out;
       animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
-    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock, fx-gone; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out, linear; animation-fill-mode: both, both, both, forwards;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out; animation-fill-mode: both, both, both;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
     /* Cast: the rock sits on .cast-art, so the group's transform and opacity stay uncluttered (and the bubble does not rock). */
     .story-scene .cast > .cast-art.fx-rock { transform-origin: 50% 100%; animation: fx-rock ease-in-out both; animation-timeline: --scene; animation-range: contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
     /* Captions hand over in turn: the old one is gone by the middle of the shared window, the new one starts after it,
        so two are never legible at once. Same --from/--to/--out-* as any .fx; the first half of a window is the exit. */
     .story-scene .scene-text :is(.cap, .cap-t).fx { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%); }
-    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
+    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
     /* Between stages: each stage overlaps the last by its torn top edge, so a scene change reads as a fresh sheet of
        paper laid over the last one: no ruler-straight seam, no screen of blank paper. The edge hides under the
        header while the stage is pinned. The wrappers lose their sand fill so the overlap shows the scene beneath. */
@@ -279,8 +279,6 @@
   to { transform: translate(var(--x1, 0), var(--y1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); }
 }
 @keyframes fx-out { to { opacity: 0; } }
-/* visibility is visible through the range and hidden at its end: a layer that has faded out stops being rastered. */
-@keyframes fx-gone { from { visibility: visible; } to { visibility: hidden; } }
 @keyframes fx-show { from, to { visibility: visible; } }
 @keyframes fx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
@@ -514,13 +512,14 @@
 .bar-embroidery { font-family: var(--font-display); font-size: 128px; font-weight: 700; letter-spacing: 0.12em; }
 .bar-stitch { fill: none; stroke: #f3e7d6; stroke-width: 2; stroke-dasharray: 7 4; stroke-linecap: round; }
 .bar-print { position: absolute; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 6px solid var(--color-paper); box-shadow: 0 16px 34px rgb(0 0 0 / 0.55); }
-.bar-stage { --lx: 30%; --ly: 45%; border: 2px solid var(--color-gold); cursor: none; touch-action: pan-y; }
+.bar-stage { border: 2px solid var(--color-gold); cursor: none; touch-action: pan-y; }
 @media (hover: none) { .bar-stage { cursor: auto; } }
-/* Darkness with a warm hole where the light is. */
-.bar-dark-veil { background:
-    radial-gradient(circle clamp(130px, 22vw, 260px) at var(--lx) var(--ly), rgb(255 190 110 / 0.16), transparent 70%),
-    radial-gradient(circle clamp(150px, 26vw, 320px) at var(--lx) var(--ly), transparent 0, rgb(12 10 8 / 0.5) 45%, rgb(12 10 8 / 0.95) 80%); }
-.bar-stage.is-lit .bar-dark-veil { background: linear-gradient(180deg, rgb(12 10 8 / 0.05), rgb(12 10 8 / 0.25)); }
+/* Darkness with a warm hole. The veil is twice the stage each way, centred on the light (left/top -100% puts its middle at the stage's corner),
+   so one transform: translate3d(x, y, 0) moves the hole with no gradient repaint. */
+.bar-dark-veil { position: absolute; left: -100%; top: -100%; width: 200%; height: 200%; pointer-events: none; will-change: transform; transform: translate3d(0, 0, 0); background:
+    radial-gradient(circle clamp(130px, 22vw, 260px) at 50% 50%, rgb(255 190 110 / 0.16), transparent 70%),
+    radial-gradient(circle clamp(150px, 26vw, 320px) at 50% 50%, transparent 0, rgb(12 10 8 / 0.5) 45%, rgb(12 10 8 / 0.95) 80%); }
+.bar-stage.is-lit .bar-dark-veil { left: 0; top: 0; width: 100%; height: 100%; transform: none !important; will-change: auto; background: linear-gradient(180deg, rgb(12 10 8 / 0.05), rgb(12 10 8 / 0.25)); }
 /* Leather apron: brown hide, stitched edge, a tiger pressed into it. */
 .bar-apron { padding: clamp(22px, 3vw, 36px); border-radius: 6px; overflow: hidden;
   background: radial-gradient(120% 90% at 30% 20%, #6a4631, #43291c 70%), #43291c;

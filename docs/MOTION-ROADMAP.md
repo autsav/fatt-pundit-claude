@@ -60,9 +60,11 @@ measuring interaction latency, not only scroll.
 Awwwards' restaurant category (GEM, White Desert, Dishoom's per-location myths) and the 2026
 round-ups share four moves: a cinematic first screen, scroll storytelling with pinned scenes, menus as
 objects (sheets, books, cards), and one memorable interaction per page. We have all four. What they also
-share and we should **keep refusing**: smooth-scroll hijacking (Lenis-style), cursor followers,
+share and we should **keep refusing**: cursor followers,
 parallax for atmosphere, text that drifts in on every scroll, loaders over 1 s. Each of those costs
-INP or vestibular comfort and none has evidence of helping a booking.
+INP or vestibular comfort and none has evidence of helping a booking. Decision change (owner's request): smooth
+scrolling is now in, via Lenis, for notched mouse wheels only. Trackpad and touch stay native, and it is off under
+reduced motion and Pause motion (`src/lib/smooth-scroll.ts`).
 
 ## 2. Plan
 

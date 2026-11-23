@@ -213,6 +213,11 @@ const orgLd = {
   // Chapter heads rise into place as they come on screen (.fp-reveal).
   bindReveals();
 </script>
+<script>
+  import { prewarm } from '@/lib/prewarm';
+  // Decode the long sections' pictures before the scroll gets there.
+  for (const id of ['menu', 'bar', 'room', 'tables']) prewarm(document.getElementById(id));
+</script>
 
 <style>
   .story-more { display: flex; justify-content: center; padding: clamp(28px, 5vw, 56px) 20px; }

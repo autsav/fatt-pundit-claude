@@ -116,6 +116,7 @@ function byDay(b: Branch) {
 </div>
 
 <script>
+  import { scrollToEl } from '@/lib/smooth-scroll';
   import { EASE, MS, SPRING, STAGGER_MS, animeSpring } from '@/lib/motion-tokens';
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const passes = [...document.querySelectorAll<HTMLElement>('[data-pass]')];
@@ -173,7 +174,7 @@ function byDay(b: Branch) {
         // The list field on this page; before the list service is set, the room's own page.
         const input = stub.hash ? document.querySelector<HTMLInputElement>(stub.hash) : null;
         if (!input || new URL(stub.href).pathname !== location.pathname) { location.href = stub.href; return; }
-        input.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
+        scrollToEl(input, { offset: -(innerHeight / 2 - input.offsetHeight / 2) });
         input.focus({ preventScroll: true });
       };
       // Booking is the essential action: it goes at once. The tear plays as feedback, not as a wait.
@@ -200,7 +201,7 @@ function byDay(b: Branch) {
       url.hash = 'menu';
       history.replaceState(history.state, '', url);
       window.dispatchEvent(new CustomEvent('fp:menu-at', { detail: a.dataset.menuAt }));
-      menu.scrollIntoView({ behavior: calm ? 'auto' : 'smooth' });
+      scrollToEl(menu);
     });
   }
 

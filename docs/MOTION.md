@@ -14,9 +14,11 @@ The styleguide (`/styleguide/#motion`) shows them live.
    value, *panel* (260 ms), is for something arriving: a drawer, a sheet, a stamp landing, a page
    change.
 3. **Motion never holds the guest up.** Links go on the click; a booking opens at once and the
-   stub tears as feedback afterwards. A page change crossfades at feedback speed. Scroll is never
+   stub tears as feedback afterwards. A page change crossfades at feedback speed. Scroll is not
    hijacked: the two scroll-driven scenes (doors, voyage) are pinned sections the guest scrolls
-   through at their own pace, and every in-page jump uses `scrollIntoView`.
+   through at their own pace. By the owner's request, a notched mouse wheel is smoothed with Lenis
+   (`src/lib/smooth-scroll.ts`); trackpad and touch stay native, and it is off under reduced motion
+   and Pause motion. In-page jumps go through `scrollToEl`.
 4. **Once, then still.** Reveals play the first time only. The only loops are the pulsing dot on
    the voyage, the breathing lamp halos and the rain, and the footer's *Pause motion* stops all
    of them (plus the loop videos and the cycling "Open now" line).
