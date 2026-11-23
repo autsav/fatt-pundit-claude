@@ -5,6 +5,16 @@ Method: live walk on the dev server (1440×900 desktop, 375×812 phone) plus thr
 Severity: **H** = visible defect or major jank, **M** = noticeable polish gap, **L** = refinement.
 Measured live (dev build): CLS 0.001, LCP = `h1.hero-title` at about 530ms, 12 of 22 images have no `width` attribute, `scroll-padding-top` is `auto` under a 70px sticky header. Scroll FPS could not be measured: the preview pane throttled rAF. Run `scripts/perf-budget.mjs` on a prod build for real fps numbers.
 
+**Status (23 Nov 2026, branch home-audit).** Every item was re-checked against the code after the door, premium and story passes.
+- 24 were already done and 3 no longer apply (Doors was rewritten).
+- About 64 were fixed in this pass.
+- Deferred, needing new art, a creative call or the client: #1, #2, #4, #7, #8, #9, #12, and #93 (the review counts and sources).
+- Deferred, needing their own pass: #51 (re-pinning every scene to hide the header) and #56 (a site-wide container width).
+- Partly done:
+  - #61: phones open the menu as a list. The book's text cannot reach 13px at phone width.
+  - #74: the reduced-motion catch-all stays, because four hard-coded animations still rely on it.
+  - #27: a first visit's intro now ends by about 2.2s (was 2.5–3s).
+
 ---
 
 ## Verdict

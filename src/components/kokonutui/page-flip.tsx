@@ -19,6 +19,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
+  type Ref,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -169,6 +170,10 @@ function clipPolygon(poly: Pt[], m: Pt, n: Pt, keepNegative: boolean): Pt[] {
   return out;
 }
 
+/** The shadow's filter is constant; its strength fades with this opacity instead. */
+const SHADOW_MAX = 0.22;
+const shadowOpacity = (progress: number) => (0.12 + (1 - progress) * 0.1) / SHADOW_MAX;
+
 const polygon = (points: Pt[], dx: number) =>
   points.length
     ? `polygon(${points.map((p) => `${(p.x - dx).toFixed(2)}px ${p.y.toFixed(2)}px`).join(", ")})`
@@ -293,6 +298,26 @@ export default function PageFlip({
     turnRef.current = next;
     setTurn(next);
   }, []);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const flapRef = useRef<HTMLDivElement>(null);
+  const shadowRef = useRef<HTMLDivElement>(null);
+
+  /** Per frame of a running turn: write the fold to the DOM, no re-render. Falls back to state if the layers aren't mounted. */
+  const paint = (next: Turn) => {
+    turnRef.current = next;
+    const f = foldStyles(next, size.w, size.h);
+    const front = frontRef.current;
+    const flap = flapRef.current;
+    const shadow = shadowRef.current;
+    if (!(front && flap && shadow)) {
+      setTurn(next);
+      return;
+    }
+    front.style.clipPath = f ? f.front.clipPath : "";
+    flap.style.clipPath = f ? f.flap.clipPath : "polygon(0 0)";
+    flap.style.transform = f ? f.flap.transform : "";
+    shadow.style.opacity = String(shadowOpacity(f ? f.progress : 0));
+  };
 
   /** Keeps the corner where paper can reach: the page stays on its spine. */
   const reach = useCallback(
@@ -324,12 +349,14 @@ export default function PageFlip({
       setHeading(next);
     }
     playingRef.current = true;
+    // State only at the start and end of the run; frames in between go straight to the DOM.
+    setAt(from);
     animRef.current = animate(0, 1, {
       ...(complete ? TURN : SETTLE),
       velocity: Math.max(0, Math.min(MAX_VELOCITY, velocity)),
       onUpdate: (t) => {
         const p = lerp(start, to, t);
-        setAt({
+        paint({
           ...from,
           // Clamped to the spine's reach: the UI spring overshoots a little past the corner.
           at: reach({ x: p.x, y: p.y + Math.sin(Math.PI * t) * lift }, from.corner),
@@ -610,7 +637,7 @@ export default function PageFlip({
           {left !== undefined && <Paper side="left">{left}</Paper>}
           {right !== undefined && <Paper side="right">{right}</Paper>}
           {turn && fold && turning !== undefined && (
-            <Paper side={turn.dir === 1 ? "right" : "left"} style={fold.front}>
+            <Paper innerRef={frontRef} side={turn.dir === 1 ? "right" : "left"} style={fold.front}>
               {turning}
             </Paper>
           )}
@@ -621,12 +648,15 @@ export default function PageFlip({
             // The shadow sits on a wrapper: a clip on the same element would cut it off.
             <div
               className="pointer-events-none absolute inset-0"
+              ref={shadowRef}
               style={{
-                filter: `drop-shadow(0 ${2 + fold.progress * 6}px ${6 + fold.progress * 10}px rgb(0 0 0 / ${0.12 + (1 - fold.progress) * 0.1}))`,
+                filter: `drop-shadow(0 5px 12px rgb(0 0 0 / ${SHADOW_MAX}))`,
+                opacity: shadowOpacity(fold.progress),
               }}
             >
               <Paper
                 back
+                innerRef={flapRef}
                 side={turn.dir === 1 ? "right" : "left"}
                 style={fold.flap}
               >
@@ -667,8 +697,10 @@ function Paper({
   side,
   back = false,
   style,
+  innerRef,
   children,
 }: {
+  innerRef?: Ref<HTMLDivElement>;
   side: "left" | "right";
   back?: boolean;
   style?: CSSProperties;
@@ -676,6 +708,7 @@ function Paper({
 }) {
   return (
     <div
+      ref={innerRef}
       className={cn(
         "@container absolute top-0 h-full w-1/2 origin-top-left overflow-hidden text-ink",
         // The back of a sheet is a shade darker, so a fold reads as paper.

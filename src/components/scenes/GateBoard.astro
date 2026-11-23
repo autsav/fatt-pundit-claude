@@ -44,8 +44,7 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
 <script>
   import { openStatus, statusLine, type Hours } from '@/lib/hours';
   import { clockIn, daypart, ICON } from '@/lib/clock';
-  import { MS } from '@/lib/motion-tokens';
-
+  
   // Fill each row's status on the guest's own clock, in the branch's time zone.
   // The hero re-mounts its content once the rain starts, so this re-runs whenever the rows change.
   const fill = () => {
@@ -69,7 +68,11 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
     }
   };
   fill();
-  setInterval(fill, 60_000);
+  // Tick on the minute, not 0-59 s late.
+  window.setTimeout(() => {
+    fill();
+    setInterval(fill, 60_000);
+  }, 60_000 - (Date.now() % 60_000));
   let queued = false;
   new MutationObserver(() => {
     if (queued) return;
@@ -80,14 +83,12 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
     });
   }).observe(document.querySelector('.gates')?.closest('section') ?? document.body, { childList: true, subtree: true });
 
-  // Choosing a row: the row stamps (one panel beat), then the branch page opens (cross-page morph).
+  // Choosing a row: the row stamps while the branch page opens at once (cross-page morph).
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.addEventListener('click', (e) => {
     const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[data-gate]');
     if (!a || calm || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-    e.preventDefault();
     a.classList.add('is-chosen');
-    window.setTimeout(() => (location.href = a.href), MS.panel);
   });
 </script>
 
@@ -100,10 +101,10 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
   .gate-clock[data-part='night'] { color: rgb(218 199 181 / 0.9); }
   .gate-clock[data-part='day'] :global(svg), .gate-clock[data-part='dusk'] :global(svg) { color: var(--color-gold); }
   .gates-title { margin: 0 0 10px; text-align: center; font-family: var(--font-note); font-style: italic; font-size: 19px; color: var(--color-sand); }
-  .gates-list { margin: 0; padding: 0; list-style: none; border: 2px solid var(--color-gold); background: rgb(28 25 22 / 0.88); box-shadow: 0 20px 50px rgb(0 0 0 / 0.45); }
+  .gates-list { margin: 0; padding: 0; list-style: none; border: 2px solid var(--color-gold); background: rgb(28 25 22 / 0.88); box-shadow: var(--shadow-photo, 0 20px 50px rgb(0 0 0 / 0.45)); }
   .gates-list li + li { border-top: 1px solid rgb(203 160 82 / 0.35); }
   .gate { display: grid; grid-template-columns: 64px 1fr auto 28px; align-items: center; gap: 12px; min-height: 72px; padding: 10px 14px; color: var(--color-sand); text-decoration: none; transition: background-color var(--dur-fast) var(--curve-out); }
-  .gate:hover { background: rgb(241 93 61 / 0.16); }
+  @media (hover: hover) { .gate:hover { background: rgb(241 93 61 / 0.16); } }
   .gate:active { background: rgb(241 93 61 / 0.3); transition-duration: var(--dur-press); }
   .gate:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: -3px; }
   /* The gate code reads like a flap on a departure board. */
@@ -113,7 +114,7 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
   .gate-status { font-family: var(--font-note); font-style: italic; font-size: 16px; color: rgb(218 199 181 / 0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* one line: a re-wrap when Lora lands would shift the board */ }
   .gate-status[data-open='true']::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--fp-success); vertical-align: 1px; /* the system's open colour (no green in the palette) */ }
   .gate-go { display: grid; place-items: center; width: 44px; height: 44px; color: var(--color-tiger); transition: transform var(--dur-fast) var(--curve-out); }
-  .gate:hover .gate-go { transform: translateX(4px); }
+  @media (hover: hover) { .gate:hover .gate-go { transform: translateX(4px); } }
   .gate.is-chosen { background: rgb(241 93 61 / 0.28); }
   /* The spring curve at the panel beat: the room page morphs in at 260 ms, by which the stamp has landed. */
   .gate.is-chosen .gate-code { animation: gate-stamp var(--dur-panel) var(--curve-spring); }
@@ -124,12 +125,9 @@ const CODES: Record<string, string> = { soho: 'W1', 'covent-garden': 'WC2', duba
     .gate-code { height: 46px; font-size: 19px; }
     .gate-status { font-size: 17px; }
   }
-  @media (max-width: 420px) {
-    .gate { grid-template-columns: 52px 1fr auto 22px; gap: 10px; padding: 10px 10px; }
-  }
   /* Small phones: the clock drops under the status, so the hours read on one line. */
   @media (max-width: 420px) {
-    .gate { grid-template-columns: 52px 1fr 22px; row-gap: 2px; }
+    .gate { grid-template-columns: 52px 1fr 22px; gap: 10px; row-gap: 2px; padding: 10px 10px; }
     .gate-code { grid-column: 1; grid-row: 1 / span 2; }
     .gate-main { grid-column: 2; grid-row: 1; }
     .gate-clock { grid-column: 2; grid-row: 2; margin-left: 0; min-width: 0; justify-content: flex-start; padding-right: 0; }

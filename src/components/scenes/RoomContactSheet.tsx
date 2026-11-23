@@ -1,5 +1,6 @@
+import { flushSync } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MS } from '@/lib/motion-tokens';
+import { MS, isCalm } from '@/lib/motion-tokens';
 import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
 /**
@@ -57,10 +58,18 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
   const show = (i: number, from: HTMLButtonElement) => {
     opener.current = from;
     window.clearTimeout(unmount.current);
-    setOpen(i);
-    dialogRef.current?.showModal();
-    document.documentElement.style.overflow = 'hidden';
-    lockScroll();
+    const thumb = from.querySelector<HTMLElement>('img');
+    const go = () => {
+      if (thumb) thumb.style.viewTransitionName = ''; // old snapshot is taken; the name must be unique in the new state
+      flushSync(() => setOpen(i));
+      dialogRef.current?.showModal();
+      document.documentElement.style.overflow = 'hidden';
+      lockScroll();
+    };
+    // Shared element: the thumb and the lightbox photo share a view-transition-name for the swap.
+    if (!thumb || isCalm() || !document.startViewTransition) return go();
+    thumb.style.viewTransitionName = 'room-photo';
+    document.startViewTransition(go);
   };
   const close = () => dialogRef.current?.close();
   const step = useCallback((d: number) => setOpen((i) => (i === null ? i : (i + d + frames.length) % frames.length)), [frames.length]);
@@ -87,6 +96,15 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
       dlg.removeEventListener('keydown', onKey);
     };
   }, [step]);
+
+  // Warm the neighbours so arrow keys land on a decoded photo.
+  useEffect(() => {
+    if (open === null) return;
+    [1, -1].forEach((d) => {
+      const f = frames[(open + d + frames.length) % frames.length];
+      if (f) new Image().src = f.full;
+    });
+  }, [open, frames]);
 
   const cur = open === null ? null : frames[open];
 
@@ -126,7 +144,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
         className="room-lightbox"
         data-lenis-prevent
         aria-label="Photo of the room"
-        onClick={(e) => e.target === e.currentTarget && close()}
+        onClick={(e) => !(e.target as Element).closest('img,button,figcaption') && close()}
         onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}
         onPointerUp={(e) => {
           const s = swipe.current;
@@ -138,10 +156,10 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
       >
         {cur && open !== null && (
           <figure className="m-0 flex h-full flex-col items-center justify-center gap-4">
-            <img key={cur.full} src={cur.full} alt={cur.alt} className="fp-photo room-lightbox-img" />
+            <img key={cur.full} src={cur.full} srcSet={cur.thumbSet ? `${cur.thumbSet}, ${cur.full} 1600w` : undefined} sizes={cur.thumbSet ? '100vw' : undefined} alt={cur.alt} className="fp-photo room-lightbox-img" style={{ viewTransitionName: 'room-photo' }} />
             <figcaption className="flex w-full max-w-[1100px] items-center justify-between gap-4 px-2 text-sand">
               <span className="font-note text-[16px] italic">{cur.alt}</span>
-              <span className="shrink-0 font-label text-[12px] font-bold uppercase tracking-[0.24em] text-gold">
+              <span aria-live="polite" className="shrink-0 font-label text-[12px] font-bold uppercase tracking-[0.24em] text-gold">
                 Frame {FIRST + open}, {open + 1} of {frames.length}
               </span>
             </figcaption>

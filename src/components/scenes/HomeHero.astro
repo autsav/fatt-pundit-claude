@@ -14,15 +14,17 @@ interface Props {
   branches: Branch[];
   rainSrc: string;
   rainPoster: string;
+  posterSrcset?: string;
+  posterSizes?: string;
 }
-const { branches, rainSrc, rainPoster } = Astro.props;
+const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props;
 ---
 <!-- The hero's Book is on screen at first, so the header's Book waits (set before the header paints;
      without JavaScript the attribute is never set and the header's Book simply stays). -->
 <script is:inline>document.documentElement.dataset.heroBook = 'in';</script>
 <section id="top" class="hero rain" aria-labelledby="hero-title">
   <div class="hero-glass" role="img" aria-label="The dining room at Covent Garden through a rainy window: pink booths and bentwood chairs under shelves of brass lamps">
-    <RainHero client:idle src={rainSrc} poster={rainPoster} />
+    <RainHero client:idle src={rainSrc} poster={rainPoster} posterSrcset={posterSrcset} posterSizes={posterSizes} />
   </div>
   <div class="hero-words">
     <p class="hero-kicker">Hakka cooking from Calcutta's Chinatown</p>
@@ -31,8 +33,7 @@ const { branches, rainSrc, rainPoster } = Astro.props;
     <div class="hero-actions">
       <a class="fp-btn fp-btn--primary hero-book" href="/book/" data-book="">Book a table</a>
     </div>
-    <a class="hero-menus" href="#menu">Or see the menus first</a>
-    <p class="hero-wipe">Wipe the glass to look inside</p>
+    <p class="hero-wipe" aria-hidden="true">Wipe the glass to look inside</p>
   </div>
 </section>
 
@@ -43,23 +44,31 @@ const { branches, rainSrc, rainPoster } = Astro.props;
   // One Book in view: the header's Book steps aside while the hero's Book is on screen, and comes
   // back (stamped in) once the guest scrolls past it.
   const actions = document.querySelector<HTMLElement>('.hero-actions');
-  const bar = document.querySelector<HTMLElement>('.bar');
+  const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 72;
   if (actions && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver(
       ([e]) => { document.documentElement.dataset.heroBook = e.isIntersecting ? 'in' : 'out'; },
-      { rootMargin: `-${bar?.offsetHeight ?? 72}px 0px 0px 0px` },
+      { rootMargin: `-${headerH}px 0px 0px 0px` },
     );
     io.observe(actions);
   } else document.documentElement.dataset.heroBook = 'out';
 
-  // First visit only: the name rises letter by letter as the arrival board opens. Returning guests
+  // The wipe hint appears once, after ~3s with no pointer input (a guest who is already wiping needs none).
+  const wipe = document.querySelector<HTMLElement>('.hero-wipe');
+  if (wipe) {
+    const t = window.setTimeout(() => wipe.classList.add('is-on'), 3000);
+    window.addEventListener('pointerdown', () => window.clearTimeout(t), { once: true, passive: true });
+    window.addEventListener('pointermove', () => window.clearTimeout(t), { once: true, passive: true });
+  }
+
+  // First visit only: the name rises letter by letter as the arrival shutter opens. Returning guests
   // (and calm mode, where the board never plays) get the name painted finished.
   const el = document.querySelector<HTMLElement>('[data-hero-title]');
   if (el && document.documentElement.dataset.arrival === 'play') {
     window.addEventListener(
-      'fp:arrived',
+      'fp:opening',
       () => {
-        // Same task as the board's removal, so no frame shows the name before it rises. The soft
+        // Starts with the shutter, not after it, so the name is readable as the board opens. The soft
         // shadow is held off while the letters rise (it would be cut to their clip boxes).
         el.style.textShadow = 'none';
         const split = splitText(el, { chars: { wrap: 'clip' } });
@@ -84,23 +93,22 @@ const { branches, rainSrc, rainPoster } = Astro.props;
 </script>
 
 <style>
-  .hero { position: relative; display: grid; place-items: center; min-height: 100svh; overflow: hidden; background: var(--color-ink); color: var(--color-sand); }
+  .hero { position: relative; display: grid; place-items: center; min-height: calc(100svh - var(--header-h, 72px)); overflow: hidden; background: var(--color-ink); color: var(--color-sand); }
   /* The glass dissolves into the street below over its last 20svh (no flat edge). */
   .hero-glass { position: absolute; inset: 0; -webkit-mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); }
 
   /* The words float on the glass: they let drags through to it, only their links take pointers. */
   .hero-words { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: var(--space-5); width: 100%; max-width: 64rem; padding: var(--space-8) var(--space-5); text-align: center; pointer-events: none; }
   .hero-words :is(a, .hero-board) { pointer-events: auto; }
-  .hero-kicker { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 19px; color: var(--color-gold); }
-  .hero-title { margin: 0; font-size: min(clamp(52px, 10vw, 140px), 17svh); line-height: 0.9; color: var(--color-sand); text-shadow: 0 6px 40px rgb(0 0 0 / 0.55); }
+  .hero-kicker { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: var(--step-h4); color: var(--color-gold); }
+  .hero-title { margin: 0; font-size: min(clamp(52px, 10vw, 140px), 17svh); line-height: 0.9; color: var(--color-sand); text-shadow: 0 6px 40px rgb(0 0 0 / 0.55); transition: text-shadow var(--dur-panel); }
   /* Held back while the arrival board is up; the script lets it rise as the board opens. */
   :global(html[data-arrival='play']) .hero-title:not(.is-rising) { opacity: 0; }
   .hero-board { width: 100%; margin-top: var(--space-2); }
   .hero-actions { display: flex; justify-content: center; width: 100%; }
   .hero-book { min-width: min(280px, 100%); }
-  .hero-menus { font-family: var(--font-note); font-style: italic; font-size: 17px; color: var(--color-sand); text-decoration: underline; text-decoration-color: var(--color-gold); text-underline-offset: 4px; }
-  .hero-menus:hover { color: var(--color-gold); }
-  .hero-wipe { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 16px; color: rgb(218 199 181 / 0.8); }
+  .hero-wipe { margin: 0; font-family: var(--font-note); font-style: italic; font-size: var(--step-small); color: rgb(218 199 181 / 0.8); opacity: 0; transition: opacity var(--dur-panel); }
+  .hero-wipe.is-on { opacity: 1; }
 
   /* Header Book waits while the hero's is in view (≥640; on phones the dock holds Book). */
   :global(html[data-hero-book='in'] .bar .nav-book) { visibility: hidden; }

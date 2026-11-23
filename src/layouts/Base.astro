@@ -37,6 +37,7 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     {hide && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#2c2925" />
+    <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/png" href={icon.src} />
     <link rel="apple-touch-icon" href={touchIcon.src} />
     <link rel="manifest" href="/site.webmanifest" />
@@ -54,6 +55,13 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <script is:inline>
       // The guest's own "Pause motion" choice (footer button), applied before first paint.
       try { if (localStorage.getItem('fp-motion') === 'paused') document.documentElement.dataset.motion = 'paused'; } catch (e) {}
+    </script>
+    <script is:inline>
+      // Content reveals (src/lib/reveal.ts): hide .fp-reveal blocks from the first paint, so those already on screen
+      // rise in instead of painting, vanishing and rising. Not in calm mode; reveal.ts lifts it if it cannot run.
+      try { if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) document.documentElement.dataset.reveal = ''; } catch (e) {}
+      // Failsafe: if reveal.ts never runs (a script failed or is blocked), show everything after 3s.
+      setTimeout(function () { if (!window.__fpReveal) delete document.documentElement.dataset.reveal; }, 3000);
     </script>
     <script is:inline>
       // A fresh visit starts at the top. Some in-app viewers keep the last page's scroll offset,

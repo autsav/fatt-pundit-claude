@@ -7,6 +7,7 @@
  * Everything printed comes from menus.json + dishes.json via index.astro; nothing is typed here.
  */
 import { Fragment, type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import PageFlip from '@/components/kokonutui/page-flip';
 
 export interface MenuItemLite {
@@ -47,6 +48,9 @@ export interface SignatureDish {
   price?: string;
   image?: string;
   alt?: string;
+  /** Optional responsive sources for the photo. */
+  srcset?: string;
+  sizes?: string;
 }
 
 interface Art {
@@ -171,10 +175,10 @@ function MenuHeader({ menu, art }: { menu: MenuLite; art: Art }) {
 }
 
 /** Hidden 1000px page: every block rendered once so its real height can be read. */
-function Measure({ menu, art, onSizes }: { menu: MenuLite; art: Art; onSizes: (z: Sizes) => void }) {
+function Measure({ menu, art, onSizes }: { menu: MenuLite; art: Art; onSizes: (z: Sizes, final: boolean) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    const read = () => {
+    const read = (final: boolean) => {
       const el = ref.current;
       if (!el) return;
       const h = (q: string) => (el.querySelector(q) as HTMLElement | null)?.offsetHeight ?? 0;
@@ -186,11 +190,13 @@ function Measure({ menu, art, onSizes }: { menu: MenuLite; art: Art; onSizes: (z
         items: menu.sections.map((s, si) => s.items.map((_, i) => cq(h(`[data-m="item-${si}-${i}"]`)))),
         allergy: cq(h('[data-m="allergy"]')),
         gap: 2,
-      });
+      }, final);
     };
-    read();
+    // Final once the fonts are in: until then the book stays hidden, so text never reflows in view.
+    const loaded = !document.fonts || document.fonts.status === 'loaded';
+    read(loaded);
     let live = true;
-    document.fonts?.ready.then(() => live && read());
+    if (!loaded) document.fonts.ready.then(() => live && read(true));
     return () => {
       live = false;
     };
@@ -265,7 +271,7 @@ function Signatures({ dishes, art }: { dishes: SignatureDish[]; art: Art }) {
       <div className="mt-[3cqw] grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-[3cqw]">
         {pics.map((d) => (
           <figure key={d.name} className="m-0 flex min-h-0 flex-col">
-            <img src={d.image} alt={d.alt ?? ''} className="fp-photo min-h-0 w-full flex-1 object-cover" loading="lazy" decoding="async" draggable={false} />
+            <img src={d.image} srcSet={d.srcset} sizes={d.sizes} alt={d.alt ?? ''} width={800} height={600} className="fp-photo min-h-0 w-full flex-1 object-cover" loading="lazy" decoding="async" draggable={false} />
             <figcaption className="mt-[1.2cqw] text-[2.8cqw] font-bold uppercase leading-tight tracking-[0.05em]">
               {d.name}
               {d.price && <span className="font-normal"> | {d.price}</span>}
@@ -285,13 +291,13 @@ function Back({ art }: { art: Art }) {
   return (
     <Frame art={art}>
       <div className="flex items-start justify-between gap-[3cqw]">
-        <img src={art.stampGold} alt="" className="w-[18cqw]" draggable={false} />
+        <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[18cqw]" draggable={false} />
         <p className="m-0 flex-1 text-center font-note text-[3.3cqw] leading-[1.4]">
           Originating from Calcutta, this unique cuisine was invented when the Hakka people migrated to India from the Chinese province of Guangdong, bringing their traditional cooking with them and meeting the spices of India.
         </p>
-        <img src={art.stampOrange} alt="" className="w-[18cqw]" draggable={false} />
+        <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[18cqw]" draggable={false} />
       </div>
-      <img src={art.map} alt="The hand-drawn map from the menu: Guangdong to Calcutta" className="mt-[3cqw] min-h-0 w-full flex-1 object-contain" draggable={false} />
+      <img src={art.map} alt="The hand-drawn map from the menu: Guangdong to Calcutta" width={1000} height={1019} loading="lazy" decoding="async" className="mt-[3cqw] min-h-0 w-full flex-1 object-contain" draggable={false} />
     </Frame>
   );
 }
@@ -335,6 +341,12 @@ export default function MenuBook({
   }, []);
   const menu = shown.find((m) => m.id === active) ?? shown[0] ?? menus[0];
   const tagRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const menuTabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const listRef = useRef<HTMLDetailsElement>(null);
+  // Phones: the book's type is small there, so the readable list view starts open.
+  useEffect(() => {
+    if (listRef.current && window.matchMedia('(max-width: 639px)').matches) listRef.current.open = true;
+  }, []);
 
   // Which branch: a shared link (?at=soho) first, then the guest's last pick on this device.
   useEffect(() => {
@@ -356,9 +368,30 @@ export default function MenuBook({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [places]);
 
+  /** Tab or branch change cross-fades (View Transitions); a plain swap when unsupported or motion is reduced. */
+  const swap = (change: () => void) => {
+    if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return change();
+    document.startViewTransition(() => flushSync(change));
+  };
+  const pickTab = (id: string) =>
+    swap(() => {
+      setActive(id);
+      setOpened(true);
+    });
+  const onTabKey = (e: KeyboardEvent, i: number) => {
+    const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? shown.length - 1 : -1;
+    if (n < 0) return;
+    e.preventDefault();
+    const to = (n + shown.length) % shown.length;
+    pickTab(shown[to].id);
+    menuTabRefs.current[to]?.focus();
+  };
+
   const choose = (id: string) => {
-    setPlaceId(id);
-    setOpened(false);
+    swap(() => {
+      setPlaceId(id);
+      setOpened(false);
+    });
     try {
       localStorage.setItem(PLACE_KEY, id);
     } catch {}
@@ -376,9 +409,10 @@ export default function MenuBook({
     choose(places[n].id);
     tagRefs.current[n]?.focus();
   };
-  const [sizes, setSizes] = useState<{ id: string; z: Sizes } | null>(null);
-  const onSizes = useCallback((z: Sizes) => setSizes({ id: menu.id, z }), [menu.id]);
+  const [sizes, setSizes] = useState<{ id: string; z: Sizes; final: boolean } | null>(null);
+  const onSizes = useCallback((z: Sizes, final: boolean) => setSizes({ id: menu.id, z, final }), [menu.id]);
   const z = sizes?.id === menu.id ? sizes.z : estimate(menu);
+  const measured = sizes?.id === menu.id && sizes.final;
 
   const pages = useMemo(() => {
     const out: ReactNode[] = [<Cover key="cover" menu={menu} art={art} place={place} />];
@@ -414,13 +448,13 @@ export default function MenuBook({
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="wrap relative flex flex-col items-center">
         {/* Chapter head (the home page's numbered chapters), then one toolbar: which room's book, or the list. */}
-        <header className="fp-section-head chapter-head w-full">
+        <header className="fp-section-head chapter-head fp-reveal w-full">
           <p className="fp-section-label"><span className="fp-section-no">02</span> The menus</p>
           <h2 className="fp-h2"><span className="sr-only">The menus: </span>Turn the pages</h2>
           <div className="menu-toolbar">
             {places && (
               <div className="menu-toolbar-group">
-                <p className="menu-toolbar-label" id="menu-where">Open the book for</p>
+                <p className="menu-toolbar-label !text-[13px] text-ink/70" id="menu-where">Open the book for</p>
                 <div role="radiogroup" aria-labelledby="menu-where" className="flex flex-wrap gap-2 sm:gap-3">
                   {places.map((p, i) => {
                     const on = p.id === place?.id;
@@ -436,7 +470,7 @@ export default function MenuBook({
                         tabIndex={on ? 0 : -1}
                         onClick={() => choose(p.id)}
                         onKeyDown={(e) => onTagKey(e, i)}
-                        className={`${on ? CHOICE_ON : CHOICE_OFF} ${CHOICE}`}
+                        className={`${on ? CHOICE_ON : CHOICE_OFF} ${CHOICE} !text-[14px]`}
                       >
                         {p.name}
                       </button>
@@ -451,10 +485,10 @@ export default function MenuBook({
               </div>
             )}
             {lists && lists.length > 0 && (
-              <details className="menu-toolbar-group">
-                <summary className="menu-toolbar-label cursor-pointer font-bold">List view &amp; diet filters</summary>
-                <div className="mt-3 flex flex-wrap gap-2 sm:gap-3">
-                  {lists.map((l) => <a key={l.href} className="fp-btn fp-btn--sm" href={l.href}>{l.label}</a>)}
+              <details ref={listRef} className="menu-toolbar-group">
+                <summary className="menu-toolbar-label cursor-pointer !text-[13px] text-ink/70">List view &amp; diet filters</summary>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {lists.map((l) => <a key={l.href} className="fp-btn fp-btn--sm !border-ink/40 !bg-transparent !text-[13px]" href={l.href}>{l.label}</a>)}
                 </div>
               </details>
             )}
@@ -492,14 +526,18 @@ export default function MenuBook({
                 {firstDiet && <span aria-hidden="true" className="self-center shrink-0 whitespace-nowrap px-1 pb-1 font-note text-[15px] italic text-ink/80 max-sm:hidden">For dietary needs:</span>}
                 <button
                   key={m.id}
+                  ref={(el) => {
+                    menuTabRefs.current[i] = el;
+                  }}
+                  id={`menu-tab-${m.id}`}
                   role="tab"
                   aria-selected={on}
+                  aria-controls="menu-panel"
+                  tabIndex={on ? 0 : -1}
                   type="button"
-                  onClick={() => {
-                    setActive(m.id);
-                    setOpened(true);
-                  }}
-                  className={`${on ? CHOICE_ON : CHOICE_OFF} ${CHOICE} snap-start shrink-0 whitespace-nowrap !border-b-0 shadow-[0_-2px_6px_rgb(0_0_0/0.10)] [transition:padding_var(--dur-fast)_var(--curve-out),transform_var(--dur-spring)_var(--curve-spring)] ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 hover:translate-y-0'}`}
+                  onClick={() => pickTab(m.id)}
+                  onKeyDown={(e) => onTabKey(e, i)}
+                  className={`${on ? CHOICE_ON : CHOICE_OFF} ${CHOICE} snap-start shrink-0 whitespace-nowrap !border-b-0 shadow-[0_-2px_6px_rgb(0_0_0/0.10)] [transition:transform_var(--dur-spring)_var(--curve-spring)] pb-4 pt-3 ${on ? '' : 'translate-y-2 hover:translate-y-1'}`}
                 >
                   {m.tab}
                 </button>
@@ -509,7 +547,7 @@ export default function MenuBook({
           </div>
           {/* Sized from the viewport height so the open book fits one screen, with a floor: on a phone on its
               side (390px tall) the height rule alone gave a 75px book with 2px type. Past the floor it scrolls. */}
-          <div className="relative mx-auto shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))' }}>
+          <div id="menu-panel" role="tabpanel" aria-labelledby={`menu-tab-${menu.id}`} className="relative mx-auto shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)] [transition:opacity_var(--dur-fast)_var(--curve-out)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))', opacity: measured ? 1 : 0, viewTransitionName: 'menu-book' }}>
             <PageFlip key={`${place?.id}-${menu.id}-${opened ? 'open' : 'shut'}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
           </div>
         </div>
@@ -517,13 +555,13 @@ export default function MenuBook({
           <ul className="m-0 mt-5 grid w-full max-w-[420px] list-none grid-cols-2 gap-3 p-0 sm:hidden" aria-label="Signature dishes">
             {signatures.slice(0, 2).map((d) => (
               <li key={d.name} className="flex flex-col gap-1.5">
-                {d.image && <img src={d.image} alt={d.alt ?? ''} className="fp-photo aspect-[4/3] w-full object-cover" loading="lazy" decoding="async" />}
+                {d.image && <img src={d.image} srcSet={d.srcset} sizes={d.sizes} alt={d.alt ?? ''} width={800} height={600} className="fp-photo aspect-[4/3] w-full object-cover" loading="lazy" decoding="async" />}
                 <p className="m-0 text-[14px] font-bold uppercase leading-tight tracking-[0.05em]">{d.name}{d.price && <span className="font-normal"> | {d.price}</span>}</p>
               </li>
             ))}
           </ul>
         )}
-        <p className="m-0 mt-5 text-center font-note text-[16px] italic text-ink/80 sm:hidden">Swipe sideways or tap a page edge to turn</p>
+        <p className="m-0 mt-5 text-center font-note text-[16px] italic text-ink/80 sm:hidden"><span className="sr-only">Swipe sideways or tap a page edge to turn. </span><span aria-hidden="true">Every dish gets a page of its own.</span></p>
         {place?.book && (
           <a href={place.book.href} data-book={place.id} className="fp-btn fp-btn--primary mt-6">
             {place.book.label}

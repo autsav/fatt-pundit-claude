@@ -30,6 +30,8 @@ const { branch, name } = Astro.props;
 
 <style>
   .pp { position: fixed; z-index: 30; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); }
+  /* Below 1024px the phone dock sits along the bottom edge: clear it. */
+  @media (max-width: 1023.98px) { .pp { bottom: calc(var(--dock-h, 64px) + env(safe-area-inset-bottom, 0px) + 14px); } }
   .pp-open { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-gold); color: var(--color-ink-deep); font: inherit; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 14px; cursor: pointer; box-shadow: 4px 4px 0 var(--color-ink); }
   .pp-n { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 50%; background: var(--color-ink); color: var(--color-sand); font-size: 13px; }
   .pp-open.is-bump { animation: pp-bump var(--dur-spring) var(--curve-spring); }
@@ -48,6 +50,7 @@ const { branch, name } = Astro.props;
   .pp-list { margin: 0 0 12px; padding-left: 1.4em; display: grid; gap: 6px; font-weight: 700; }
   .pp-list :global(button) { min-height: 24px; margin-left: 8px; font: inherit; font-size: 13px; font-weight: 400; background: none; border: 0; color: var(--color-tiger-deep); text-decoration: underline; cursor: pointer; }
   .pp-empty, .pp-hint, .pp-done { margin: 0 0 10px; font-family: var(--font-note); font-style: italic; }
+  .pp-done :global(button) { min-height: 44px; margin-left: 8px; font: inherit; font-weight: 700; background: none; border: 0; color: var(--color-tiger-deep); text-decoration: underline; cursor: pointer; }
   .pp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
   /* The stamp button the script adds to each dish row. */
   :global(.pp-stamp) { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; margin: -8px 0 -8px 4px; border: 0; background: none; cursor: pointer; color: var(--fp-fg-muted); }
@@ -117,8 +120,21 @@ const { branch, name } = Astro.props;
     btnOpen.addEventListener('click', () => { done.textContent = ''; dlg.showModal(); lockScroll(); });
     root.querySelector('[data-pp-close]')!.addEventListener('click', () => dlg.close());
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-    dlg.addEventListener('close', () => { unlockScroll(); render(); btnOpen.focus(); });
-    root.querySelector('[data-pp-clear]')!.addEventListener('click', () => { save([]); sync(); });
+    dlg.addEventListener('close', () => { window.clearTimeout(undoTimer); unlockScroll(); render(); btnOpen.focus(); });
+    // Clear can be undone for a few seconds.
+    let undoTimer = 0;
+    const endUndo = () => { window.clearTimeout(undoTimer); done.textContent = ''; };
+    root.querySelector('[data-pp-clear]')!.addEventListener('click', () => {
+      const prev = mine();
+      if (!prev.length) return;
+      save([]); sync();
+      endUndo();
+      const undo = document.createElement('button');
+      undo.type = 'button'; undo.textContent = 'Undo';
+      undo.addEventListener('click', () => { save(prev); sync(); endUndo(); });
+      done.append('Passport cleared.', undo);
+      undoTimer = window.setTimeout(endUndo, 6000);
+    });
     root.querySelector('[data-pp-share]')!.addEventListener('click', async () => {
       const text = `Tonight at Fatt Pundit ${root.dataset.name}:\n${mine().map((id) => `• ${nameOf(id)}`).join('\n')}`;
       try {

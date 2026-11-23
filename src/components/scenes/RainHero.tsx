@@ -6,6 +6,9 @@ interface Props {
   src: string;
   /** Small soft still of the same room, painted at once and kept if WebGL can't run. */
   poster: string;
+  /** Optional responsive candidates for the poster. */
+  posterSrcset?: string;
+  posterSizes?: string;
 }
 
 /**
@@ -14,7 +17,7 @@ interface Props {
  * the arrival board has opened, so the two never fight for the CPU. Guests can wipe the glass to look
  * inside; a hand wipes one streak first, so they see that they can.
  */
-export default function RainHero({ src, poster }: Props) {
+export default function RainHero({ src, poster, posterSrcset, posterSizes }: Props) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -26,15 +29,15 @@ export default function RainHero({ src, poster }: Props) {
     start();
   }, []);
 
-  if (!ready) {
-    return (
-      <div className="absolute inset-0 overflow-hidden bg-ink">
-        <FoggedStill src={poster} priority />
-        <Pool />
-      </div>
-    );
-  }
-  return <RainGlassBackground className="absolute inset-0 h-full min-h-0" rain={0.55} streak src={src} poster={poster} />;
+  // The still stays mounted the whole time; the glass mounts over it (no swap, so no flash). The glass is
+  // transparent until its canvas fades in, and if WebGL cannot run the still is what remains.
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-ink">
+      <FoggedStill src={poster} srcSet={posterSrcset} sizes={posterSizes} priority />
+      {!ready && <Pool />}
+      {ready && <RainGlassBackground className="absolute inset-0 h-full min-h-0 bg-transparent" rain={0.55} streak src={src} />}
+    </div>
+  );
 }
 
 /** The soft dark pool behind the words (the glass draws the same one), for the still before the rain. */

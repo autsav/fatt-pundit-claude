@@ -6,9 +6,13 @@
 import { isCalm } from './motion-tokens';
 
 export function bindReveals(selector = '.fp-reveal'): void {
+  (window as Window & { __fpReveal?: boolean }).__fpReveal = true; // Base.astro's failsafe stands down
   const els = document.querySelectorAll<HTMLElement>(selector);
-  if (!els.length || isCalm() || !('IntersectionObserver' in window)) return;
-  document.documentElement.dataset.reveal = '';
+  if (!els.length || isCalm() || !('IntersectionObserver' in window)) {
+    delete document.documentElement.dataset.reveal; // Base.astro's head script may have set it: show everything
+    return;
+  }
+  document.documentElement.dataset.reveal = ''; // already set by Base.astro; kept for pages that skip it
   // Any pixel past the bottom 12% of the screen counts (the same rule as the comic's panels).
   const io = new IntersectionObserver(
     (entries) => {

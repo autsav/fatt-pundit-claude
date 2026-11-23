@@ -43,11 +43,14 @@ const { chapters, after = 0.8 } = Astro.props;
     // (about 1 s of forced layout across the voyage at 4x CPU).
     let tops: number[] = [];
     let max = 0;
+    let footTop = Infinity;
     let vh = innerHeight;
     const measure = () => {
       vh = innerHeight;
       tops = targets.map((el) => el.getBoundingClientRect().top + window.scrollY);
       max = document.documentElement.scrollHeight - vh;
+      const foot = document.querySelector('footer.foot');
+      footTop = foot ? foot.getBoundingClientRect().top + window.scrollY : Infinity;
     };
     let raf = 0;
     let cur = -1;
@@ -61,8 +64,9 @@ const { chapters, after = 0.8 } = Astro.props;
       let now = 0;
       tops.forEach((t, i) => { if (t - y <= vh * 0.5) now = i; });
       if (!cssLine) line.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
-      const show = y > vh * after;
-      if (show !== on) { on = show; rail.classList.toggle('is-on', show); }
+      // Hidden again once the footer would sit under it.
+      const show = y > vh * after && y + vh < footTop;
+      if (show !== on) { on = show; rail.classList.toggle('is-on', show); rail.inert = !show; }
       if (now === cur) return;
       cur = now;
       order.forEach((id, i) => {
@@ -75,8 +79,8 @@ const { chapters, after = 0.8 } = Astro.props;
     const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
     new ResizeObserver(() => { y = scrollY; measure(); queue(); }).observe(document.body);
     addEventListener('scroll', () => { y = scrollY; queue(); }, { passive: true });
-    addEventListener('resize', () => { measure(); queue(); });
     measure();
+    rail.inert = true;
     tick();
   }
 </script>

@@ -1,10 +1,11 @@
-import { useMotionValueEvent, useScroll } from 'motion/react';
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Mark, MarkerText } from '@/components/kokonutui/marker-text';
-import SplitFlapText from '@/components/kokonutui/split-flap-text';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import world from '@/data/world-route.json';
 import { isCalm } from '@/lib/motion-tokens';
 import { scrollToEl } from '../../lib/smooth-scroll';
+
+// Neither is on screen at first paint (Calcutta and Dubai cards), so they load after it.
+const SplitFlapText = lazy(() => import('@/components/kokonutui/split-flap-text'));
+const VoyageCalcutta = lazy(() => import('./VoyageCalcutta'));
 
 /**
  * Scene 3: the voyage, "follow the ship". Pinned while the guest scrolls.
@@ -25,6 +26,8 @@ import { scrollToEl } from '../../lib/smooth-scroll';
 
 export interface VoyageArt {
   sea: string;
+  /** Sea at 1600/2400/3200 w; the browser picks by the laid-out width (see `size`). */
+  seaSet?: string;
   map: string;
   ship: string;
   compass: string;
@@ -53,16 +56,20 @@ const AT_SEA = [
 ];
 
 /** The scroll script: a hold at each port, sailing in between. `peak` = widest view on that leg. */
-type Seg = { a: number; b: number } & ({ hold: number } | { leg: number; peak: number });
+type Seg = { a: number; b: number } & ({ hold: number } | { leg: number; peak: number } | { out: true });
+// Every port hold is 16% of the track (about 620 px), so a flick can't skip one. The last 6% eases out to the whole route.
 const SEGS: Seg[] = [
-  { a: 0, b: 0.1, hold: 0 },
-  { a: 0.1, b: 0.27, leg: 0, peak: 520 },
-  { a: 0.27, b: 0.41, hold: 1 },
-  { a: 0.41, b: 0.69, leg: 1, peak: 1180 },
-  { a: 0.69, b: 0.79, hold: 2 },
-  { a: 0.79, b: 0.92, leg: 2, peak: 860 },
-  { a: 0.92, b: 1.0001, hold: 3 },
+  { a: 0, b: 0.16, hold: 0 },
+  { a: 0.16, b: 0.23, leg: 0, peak: 520 },
+  { a: 0.23, b: 0.39, hold: 1 },
+  { a: 0.39, b: 0.54, leg: 1, peak: 1180 },
+  { a: 0.54, b: 0.7, hold: 2 },
+  { a: 0.7, b: 0.78, leg: 2, peak: 860 },
+  { a: 0.78, b: 0.94, hold: 3 },
+  { a: 0.94, b: 1.0001, out: true },
 ];
+/** The whole-route view (also the calm-mode camera). */
+const WHOLE: [number, number, number] = [660, 600, 1080];
 /** Map units that fit the short side of the stage when the camera is in close. */
 const CLOSE = 360;
 // The sea picture is 3200 px wide. Lay it out no bigger than that in device
@@ -128,7 +135,12 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   const store = useRef<LiveStore>({ v: 0, subs: new Set() }).current;
   const [calm, setCalm] = useState(false);
 
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
+  /** How far through the pinned track the page is (0 to 1). */
+  const progress = () => {
+    const sec = sectionRef.current;
+    if (!sec) return 0;
+    return clamp(-sec.getBoundingClientRect().top / (sec.offsetHeight - window.innerHeight || 1));
+  };
 
   /** The chart image and both SVG layers share one size: map units × k, so they take one transform. */
   const size = (k: number) => {
@@ -137,6 +149,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       el.style.width = `${SEA.w * k}px`;
       el.style.height = `${SEA.h * k}px`;
     }
+    if (seaRef.current) seaRef.current.sizes = `${Math.round(SEA.w * k)}px`;
   };
 
   /** Stage size → focal point (where the camera's centre lands) and the scale for the chart image. */
@@ -242,6 +255,14 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       placeShip(x, y, 0);
       drawn = s.hold;
       paint(s.hold, -1, s.hold);
+    } else if ('out' in s) {
+      // Dubai to the whole route: the camera eases out, the ship stays put.
+      const [x, y] = PORTS[3].at;
+      const e = smooth(t);
+      camera(lerp(x, WHOLE[0], e), lerp(y, WHOLE[1], e), lerp(CLOSE * 0.95, WHOLE[2], e));
+      placeShip(x, y, 0);
+      drawn = 3;
+      paint(3, -1, 3);
     } else {
       const len = lens.current[s.leg];
       const pts = samples.current[s.leg];
@@ -278,8 +299,16 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     // and decode it now, and the first close-up isn't a stalled frame.
     const sea = seaRef.current;
     if (!sea) return;
+    measure(); // sets `sizes` so the right sea width is the one fetched
     sea.loading = 'eager';
     sea.decode?.().catch(() => {});
+    // The art drawn on the chart and the ship's hull: decoded now too, not on first sight.
+    for (const src of [art.mountainA, art.mountainsB, art.mountainsC, art.compass, art.ship]) {
+      const im = new Image();
+      im.src = src;
+      im.decode().catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -317,15 +346,25 @@ export default function Voyage({ art }: { art: VoyageArt }) {
         samples.current[leg] = out;
         leg++;
         k = 0;
-        apply(scrollYProgress.get());
+        apply(progress());
       }
       if (leg < parts.length) slot = idle(slice, { timeout: 1000 });
     };
     slot = idle(slice, { timeout: 1000 });
-    apply(scrollYProgress.get());
+    apply(progress());
+    // One write per frame, whatever the scroll event rate.
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        apply(progress());
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     const ro = new ResizeObserver(() => {
       measure();
-      apply(scrollYProgress.get());
+      apply(progress());
     });
     if (stageRef.current) ro.observe(stageRef.current);
     // The chart keeps its own layer only while the scene is pinned (will-change in global.css).
@@ -336,6 +375,8 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     });
     if (sectionRef.current) io.observe(sectionRef.current);
     return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
       if (hasIdle) window.cancelIdleCallback(slot);
@@ -348,14 +389,10 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   useEffect(() => {
     if (!calm) return;
     measure(true);
-    camera(660, 600, 1080);
+    camera(...WHOLE);
     placeShip(...PORTS[2].at, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calm]);
-
-  useMotionValueEvent(scrollYProgress, 'change', (p) => {
-    if (!calm) apply(p);
-  });
 
   /** Ticket holes jump to a port. */
   const jump = (i: number) => {
@@ -368,12 +405,12 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   };
 
   return (
-    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : 'calc(100svh + 7 * 300px)' }} aria-label="The journey from Guangdong to Calcutta, London and Dubai">
+    <section ref={sectionRef} id="story" className="voyage relative bg-ink text-ink" style={{ height: calm ? 'auto' : 'calc(100svh + 13 * 300px)' }} aria-label="The journey from Guangdong to Calcutta, London and Dubai">
       <h2 className="sr-only">The voyage: Guangdong to Calcutta, London and Dubai</h2>
-      <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[68px] h-[calc(100svh-68px)] overflow-hidden'}>
+      <div ref={stageRef} className={calm ? 'relative h-[min(80svh,760px)] overflow-hidden' : 'sticky top-[var(--header-h,68px)] h-[calc(100svh-var(--header-h,68px))] overflow-hidden'}>
         {/* The pan layer: chart, static art and route share one transform. */}
         <div ref={panRef} className="absolute left-0 top-0 origin-top-left" style={{ width: SEA.w, height: SEA.h }}>
-          <img ref={seaRef} src={art.sea} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} loading="lazy" decoding="async" />
+          <img ref={seaRef} src={art.sea} srcSet={art.seaSet} alt="" aria-hidden="true" className="voyage-sea absolute left-0 top-0 max-w-none origin-top-left" width={SEA.w} height={SEA.h} loading="lazy" decoding="async" />
           {/* viewBox = the chart's box in map units, so the SVG and the image scale together. */}
           <svg ref={baseRef} className="voyage-ink absolute left-0 top-0" viewBox={`${SEA.x} ${SEA.y} ${SEA.w} ${SEA.h}`} style={{ width: SEA.w, height: SEA.h }} aria-hidden="true">
             <image href={art.mountainsB} x={world.mountains.himalaya[0] - 150} y={world.mountains.himalaya[1] - 70} width="260" opacity="0.7" style={MTN} />
@@ -416,7 +453,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
         {/* The brand's junk on a tiger badge, so it reads against the busy chart. A hard offset shadow (no blur: it moves every frame). */}
         <div ref={shipRef} aria-hidden="true" className="pointer-events-none absolute left-0 top-0 rounded-full" style={{ width: SHIP_PX, height: SHIP_PX, opacity: 0, background: 'var(--color-tiger)', border: '3px solid var(--color-sand)', boxShadow: '0 4px 0 rgb(0 0 0 / 0.45)', boxSizing: 'border-box' }}>
           {/* The hull in sand: the art's own alpha as a mask. Mirrored when sailing east. */}
-          <div ref={hullRef} className="absolute" style={{ left: SHIP_PX * 0.11 - 3, top: SHIP_PX * 0.07 - 3, width: SHIP_PX * 0.78, height: SHIP_PX * 0.78, background: 'var(--color-sand)', WebkitMask: `url(${art.ship}) center / 100% 100% no-repeat`, mask: `url(${art.ship}) center / 100% 100% no-repeat` }} />
+          <div ref={hullRef} className="absolute" style={{ left: SHIP_PX * 0.11 - 3, top: SHIP_PX * 0.07 - 3, width: SHIP_PX * 0.78, height: SHIP_PX * 0.78, background: 'var(--color-sand)', transition: 'transform 450ms var(--curve-out)', WebkitMask: `url(${art.ship}) center / 100% 100% no-repeat`, mask: `url(${art.ship}) center / 100% 100% no-repeat` }} />
         </div>
         <div className="voyage-vignette pointer-events-none absolute inset-0" aria-hidden="true" />
 
@@ -469,6 +506,11 @@ function Postcard({ i, art, store, still = false }: { i: number; art: VoyageArt;
     <article className="voyage-postcard">
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
+          {i === 0 && (
+            <p className="fp-section-label">
+              <span className="fp-section-no">01</span> Our story
+            </p>
+          )}
           <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[17px] text-tiger-deep">Stop {i + 1} of 4</p>
           <h3 className="voyage-title m-0">{['Guangdong', 'Calcutta', 'London', 'Dubai'][i]}</h3>
         </div>
@@ -482,9 +524,9 @@ function Postcard({ i, art, store, still = false }: { i: number; art: VoyageArt;
       {i === 1 && (
         <>
           <img src={art.map} alt="The hand-drawn map from the Fatt Pundit menu: southern China, the Bay of Bengal and India" className="voyage-pic" width={1295} height={1320} loading="lazy" />
-          <MarkerText as="p" className={text} show={live || still}>
-            They make a new home in Calcutta. In <Mark type="circle" className="px-1.5">Tangra</Mark>, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, <Mark type="underline">new, yet familiar</Mark>.
-          </MarkerText>
+          <Suspense fallback={<p className={text}>They make a new home in Calcutta. In Tangra, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, new, yet familiar.</p>}>
+            <VoyageCalcutta className={text} show={live || still} />
+          </Suspense>
         </>
       )}
 
@@ -511,11 +553,19 @@ function Postcard({ i, art, store, still = false }: { i: number; art: VoyageArt;
           </p>
           <div className="flex flex-wrap gap-x-6 gap-y-3 border-t border-ink/20 pt-3">
             <div className="flex flex-col gap-1">
-              {live ? <SplitFlapText className="text-[clamp(18px,2vw,26px)]" length={4} maxFlips={8} text="FATT" tileClassName="w-[0.86em] bg-ink text-sand" /> : <span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">FATT</span>}
+              {live ? (
+                <Suspense fallback={<span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">FATT</span>}>
+                  <SplitFlapText className="text-[clamp(18px,2vw,26px)]" length={4} maxFlips={8} text="FATT" tileClassName="w-[0.86em] bg-ink text-sand" />
+                </Suspense>
+              ) : <span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">FATT</span>}
               <span className="text-[13px]">a common Chinese surname</span>
             </div>
             <div className="flex flex-col gap-1">
-              {live ? <SplitFlapText className="text-[clamp(18px,2vw,26px)]" length={6} maxFlips={8} text="PUNDIT" tileClassName="w-[0.86em] bg-ink text-sand" /> : <span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">PUNDIT</span>}
+              {live ? (
+                <Suspense fallback={<span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">PUNDIT</span>}>
+                  <SplitFlapText className="text-[clamp(18px,2vw,26px)]" length={6} maxFlips={8} text="PUNDIT" tileClassName="w-[0.86em] bg-ink text-sand" />
+                </Suspense>
+              ) : <span className="text-[clamp(18px,2vw,26px)] font-bold tracking-[0.2em]">PUNDIT</span>}
               <span className="text-[13px]">the Indian word for a scholar</span>
             </div>
           </div>
