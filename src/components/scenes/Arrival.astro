@@ -3,7 +3,6 @@
 // A departure board clatters into FATT PUNDIT, the tiger stamp thuds down,
 // and the board splits open onto the rainy street.
 import { stampSrc } from '../../lib/stamp';
-import ArrivalBoard from './ArrivalBoard.tsx';
 // Tiger-orange stamp as a plain picture (a CSS mask made the browser wait on
 // scripts before it counted as painted).
 import stamp from '../../assets/images/brand/logo-stamp-tiger.png';
@@ -20,16 +19,14 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   })();
 </script>
 
-<!-- The stamp is the biggest thing on the first screen: fetch it first. -->
-<link rel="preload" as="image" href={stampImg.src} fetchpriority="high" />
 <div class="arrival" data-arrival-overlay>
   <div class="half top"></div>
   <div class="half bottom"></div>
   <div class="center" aria-hidden="true">
     <p class="kicker">Now arriving</p>
-    <div class="board"><ArrivalBoard client:load /></div>
+    <div class="board"></div>
     <p class="route">Guangdong, Calcutta, London, Dubai</p>
-    <img class="stamp" data-stamp src={stampImg.src} alt="" width="329" height="430" fetchpriority="high" decoding="sync" />
+    <img class="stamp" data-stamp src={stampImg.src} alt="" width="329" height="430" loading="lazy" decoding="async" />
   </div>
   <button class="skip-arrival" type="button" data-skip>Skip</button>
 </div>
@@ -50,14 +47,18 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </style>
 
 <script>
-  import { createTimeline } from 'animejs';
+  import { createTimeline, createSpring } from 'animejs';
+  import { SPRING, animeSpring } from '@/lib/motion-tokens';
   import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
   const root = document.querySelector<HTMLElement>('[data-arrival-overlay]');
   const html = document.documentElement;
+  let board: { unmount(): void } | null = null;
 
   function finish() {
     if (!root || !root.isConnected) return;
+    board?.unmount();
+    board = null;
     root.remove();
     html.dataset.arrival = 'done';
     try { localStorage.setItem('fp-arrived', '1'); } catch {}
@@ -72,6 +73,18 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     for (let el: HTMLElement = root; el.parentElement && el !== document.body; el = el.parentElement) {
       for (const s of el.parentElement.children) if (s !== el && s instanceof HTMLElement && !s.inert && !/^(SCRIPT|STYLE|LINK)$/.test(s.tagName)) { s.inert = true; behind.push(s); }
     }
+    // The board is mounted only here, so returning guests never download or hydrate it; the stamp
+    // fetches at high priority only now.
+    const stamp = root.querySelector<HTMLImageElement>('[data-stamp]');
+    if (stamp) { stamp.loading = 'eager'; stamp.fetchPriority = 'high'; }
+    const boardEl = root.querySelector<HTMLElement>('.board');
+    if (boardEl) {
+      Promise.all([import('react'), import('react-dom/client'), import('./ArrivalBoard.tsx')]).then(([{ createElement }, { createRoot }, { default: Board }]) => {
+        if (!boardEl.isConnected) return;
+        board = createRoot(boardEl);
+        board.render(createElement(Board));
+      });
+    }
     const ac = new AbortController();
     let started = false;
     let unlocked = false;
@@ -79,6 +92,8 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       if (started) return;
       started = true;
       ac.abort();
+      // The hero's name starts rising with the shutter, not after it.
+      window.dispatchEvent(new Event('fp:opening'));
       for (const s of behind) s.inert = false;
       // The shutter is about to open: give scrolling back now, not when the last frame lands.
       window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 760);
@@ -91,16 +106,13 @@ const stampImg = { src: await stampSrc(stamp, 320) };
         onComplete: () => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } finish(); },
       });
       if (!fast) {
-        // The stamp thuds onto the board…
-        // Painted from the first frame (so the page's main picture is not held back
-        // by the intro); the thud is a press, not an appearance.
-        tl.add('[data-stamp]', { scale: [1, 1.14, 1], duration: 380, ease: 'inOutQuad' })
-          // …the whole board jolts from the impact…
-          .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, '-=40')
-          // …a breath, then it splits open like a station shutter.
-          .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, '+=100');
+        // The stamp thuds onto the board (a spring: it has weight), the board jolts and the shutter
+        // starts to split while the thud still rings, with no pause between beats.
+        tl.add('[data-stamp]', { scale: [1.14, 1], ease: createSpring(animeSpring(SPRING.stamp)) }, 0)
+          .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, 60)
+          .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, 160);
       }
-      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, fast ? 0 : '-=120')
+      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, fast ? 0 : 280)
         .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, '<<')
         .add('.arrival .skip-arrival', { opacity: 0, duration: 150 }, '<<');
     };

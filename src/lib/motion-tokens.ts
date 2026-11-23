@@ -5,7 +5,6 @@
 // Same values as the CSS tokens in src/styles/tokens.css (--dur-press, --dur-fast, --dur-panel,
 // --dur-spring, --dur-story, --dur-story-long, --stagger, --rise). Change both together.
 // `spring` is how long SPRING.stamp takes to be still (1% rest); --curve-spring is that spring sampled.
-export const DURATION = { press: 0.06, fast: 0.2, panel: 0.26, spring: 0.46, story: 0.9, storyLong: 1.2 } as const; // seconds (Motion)
 export const MS = { press: 60, fast: 200, panel: 260, spring: 460, story: 900, storyLong: 1200 } as const; // milliseconds (anime.js)
 /** Gap between siblings in a sequence; never more than 6 in one sequence. Big objects (passes) may use 2x. */
 export const STAGGER_MS = 60;
@@ -30,7 +29,6 @@ export const EASE = {
   in: [0.5, 0, 0.75, 0] as const,
   inOut: [0.65, 0, 0.35, 1] as const,
   animeOut: 'outExpo',
-  animeThud: 'outBack(1.6)',
 } as const;
 
 /** Calm mode: visitors who switch off motion get the same content, still. */

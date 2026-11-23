@@ -11,6 +11,8 @@ import { isCalm } from '@/lib/motion-tokens';
 export interface BarPhoto {
   src: string;
   alt: string;
+  srcset?: string;
+  sizes?: string;
 }
 export interface BarDrink {
   id: string;
@@ -23,6 +25,8 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
   const stageRef = useRef<HTMLDivElement>(null);
   const [calm, setCalm] = useState(false);
   const [touch, setTouch] = useState(false);
+  const [lit, setLit] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -106,9 +110,9 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
   return (
     <section id="bar" className="bar-dark relative overflow-hidden text-sand" aria-labelledby="bar-title">
       <div className="wrap relative py-[var(--section-pad)]">
-        <header className="fp-section-head chapter-head">
+        <header className="fp-section-head chapter-head fp-reveal">
           <p className="fp-section-label"><span className="fp-section-no">03</span> The bar</p>
-          <h2 id="bar-title" className="bar-title m-0">
+          <h2 id="bar-title" className="fp-h2 bar-title m-0">
             <span className="sr-only">The bar</span>
             <svg viewBox="0 0 760 150" className="block h-auto w-full" aria-hidden="true">
               <defs>
@@ -131,14 +135,27 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
 
         <div className="grid items-center gap-[clamp(24px,4vw,56px)] lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
           <figure className="m-0 flex flex-col gap-3">
-            <div ref={stageRef} className={`bar-stage relative aspect-[4/5] w-full overflow-hidden sm:aspect-[3/2] ${calm ? 'is-lit' : ''}`}>
-              <img src={room.src} alt={room.alt} className="fp-photo absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
-              <img src={prints[0].src} alt={prints[0].alt} className="fp-photo bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
-              <img src={prints[1].src} alt={prints[1].alt} className="fp-photo bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
+            <div
+              ref={stageRef}
+              tabIndex={0}
+              role="group"
+              aria-label="The bar after dark"
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              className={`bar-stage relative aspect-[4/5] w-full overflow-hidden sm:aspect-[3/2] ${calm || lit || focused ? 'is-lit' : ''}`}
+            >
+              <img src={room.src} srcSet={room.srcset} sizes={room.srcset ? room.sizes : undefined} alt={room.alt} className="fp-photo absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+              <img src={prints[0].src} srcSet={prints[0].srcset} sizes={prints[0].srcset ? prints[0].sizes : undefined} alt={prints[0].alt} className="fp-photo bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
+              <img src={prints[1].src} srcSet={prints[1].srcset} sizes={prints[1].srcset ? prints[1].sizes : undefined} alt={prints[1].alt} className="fp-photo bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
               <div className="bar-dark-veil" style={touch ? { opacity: 0.45 } : undefined} aria-hidden="true" />
             </div>
-            <figcaption className="font-note text-[16px] italic text-sand/80">
-              {calm ? 'The bar at Covent Garden, lit for the evening.' : touch ? 'Tap the bar to move the light.' : 'Move your light across the bar.'}
+            <figcaption className="flex items-center justify-between gap-3 font-note text-[16px] italic text-sand/80">
+              <span>{calm ? 'The bar at Covent Garden, lit for the evening.' : 'The bar after dark.'}</span>
+              {!calm && (
+                <button type="button" className="fp-btn fp-btn--text shrink-0 font-label text-[12px] font-bold uppercase not-italic tracking-[0.2em] text-gold" aria-pressed={lit} onClick={() => setLit((v) => !v)}>
+                  Lights up
+                </button>
+              )}
             </figcaption>
           </figure>
 

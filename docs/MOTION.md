@@ -10,9 +10,9 @@ The styleguide (`/styleguide/#motion`) shows them live.
    no blur, no parallax for its own sake. Only `transform` and `opacity` animate (plus a few SVG
    stroke draws); never layout properties, filters or shadows.
 2. **Two speeds, nothing in between.** *Fast* is feedback: the thing you touched answers in
-   200 ms or less. *Story* is a reveal: 900 ms, once, as a scene comes on screen. The one middle
-   value, *panel* (260 ms), is for something arriving: a drawer, a sheet, a stamp landing, a page
-   change.
+   200 ms or less. *Story* is a reveal: 900 ms, once, as a scene comes on screen. *Panel* (260 ms) and *spring* (460 ms, with
+   `--curve-spring`) are arrivals, not a third speed: a drawer, a sheet, a page change, a stamp
+   landing. *Press* (60 ms) is the press down; *story-long* (1200 ms) a long mechanism.
 3. **Motion never holds the guest up.** Links go on the click; a booking opens at once and the
    stub tears as feedback afterwards. A page change crossfades at feedback speed. Scroll is not
    hijacked: the two scroll-driven scenes (doors, voyage) are pinned sections the guest scrolls
@@ -55,9 +55,9 @@ Curves:
 `--curve-out` / `EASE.out`, because an overshoot on a colour or an opacity is a flicker, not weight.
 When one rule moves and fades the same element, list the two properties with their own curves.
 
-In TypeScript: `MS.fast` etc. (milliseconds, anime.js), `DURATION.fast` (seconds, Motion),
-`STAGGER_MS`, `RISE_PX`, `EASE.out / in / inOut` (arrays) and `EASE.animeOut / animeThud` (anime.js
-names), `SPRING.door / stamp / ui`, `isCalm()`, `isPaused()`.
+In TypeScript: `MS.fast` etc. (milliseconds, anime.js), (milliseconds only; Motion takes seconds, so divide by 1000),
+`STAGGER_MS`, `RISE_PX`, `EASE.out / in / inOut` (arrays) and `EASE.animeOut` (anime.js
+name), `SPRING.door / stamp / ui`, `isCalm()`, `isPaused()`.
 
 ## The vocabulary, by situation
 

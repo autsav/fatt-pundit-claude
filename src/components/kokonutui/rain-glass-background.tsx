@@ -546,6 +546,8 @@ export default function RainGlassBackground({
       pane.draw();
     };
 
+    // Phones start at 1.5x; frame() drops to 1x if frames keep running past ~20 ms.
+    let coarseCap = 1.5;
     const build = () => {
       const rect = root.getBoundingClientRect();
       const resized =
@@ -555,9 +557,8 @@ export default function RainGlassBackground({
       if (width < 2 || height < 2) {
         return;
       }
-      // Phones: 1x is plenty behind fogged glass and halves the fill work.
       const coarse = window.matchMedia("(pointer: coarse)").matches;
-      const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1 : 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, coarseCap);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       pane.resize(canvas.width, canvas.height, width, height);
@@ -583,6 +584,7 @@ export default function RainGlassBackground({
     };
 
     let slowAvg = 16;
+    let slowRun = 0;
     let tick = 0;
     let skip = false;
     let half = false;
@@ -601,6 +603,11 @@ export default function RainGlassBackground({
       const gap = tick ? Math.min(now - tick, 100) : 16;
       tick = now;
       slowAvg = slowAvg * 0.9 + gap * 0.1;
+      slowRun = slowAvg > 20 ? slowRun + 1 : 0;
+      if (slowRun > 30 && coarseCap > 1 && window.matchMedia("(pointer: coarse)").matches) {
+        coarseCap = 1;
+        build();
+      }
       if (slowAvg > 26 && (skip = !skip)) {
         raf = requestAnimationFrame(frame);
         return;
@@ -828,11 +835,11 @@ export default function RainGlassBackground({
 
 /** Fatt Pundit: the room behind fogged glass as a plain picture. A small image
  * stretched full screen is naturally soft, so no blur filter is needed. */
-export function FoggedStill({ src, shade = 0.6, priority = false }: { src: string; shade?: number; priority?: boolean }) {
+export function FoggedStill({ src, shade = 0.6, priority = false, srcSet, sizes }: { src: string; shade?: number; priority?: boolean; srcSet?: string; sizes?: string }) {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
       {/* Fatt Pundit: as a full-screen hero this still is the largest thing painted, so it loads first. */}
-      <img src={src} alt="" className="size-full scale-105 object-cover" decoding={priority ? "sync" : "async"} fetchPriority={priority ? "high" : "auto"} />
+      <img src={src} srcSet={srcSet} sizes={sizes} alt="" className="size-full scale-105 object-cover" decoding={priority ? "sync" : "async"} fetchPriority={priority ? "high" : "auto"} />
       <div className="absolute inset-0 bg-ink" style={{ opacity: shade }} />
     </div>
   );

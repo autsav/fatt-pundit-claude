@@ -140,13 +140,13 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
 <style>
   /* The pinned walk is a fixed scroll budget in px (--len): enough per beat on a short phone
      flick and not endless on a tall desktop. The street rises into view in the first screen. */
-  .doors { position: relative; --bar: 72px; --len: clamp(2600px, 300svh, 3400px); height: calc(100svh - var(--bar) + var(--len)); background: var(--color-ink); --door-x: 25.56%; --door-y: 68.07%; }
+  .doors { position: relative; --bar: var(--header-h, 72px); --len: clamp(2600px, 300svh, 3400px); height: calc(100svh - var(--bar) + var(--len)); background: var(--color-ink); --door-x: 25.56%; --door-y: 68.07%; }
   @media (pointer: coarse) { .doors { --len: clamp(2800px, 380svh, 3600px); } }
   .stage { position: sticky; top: var(--bar); height: calc(100svh - var(--bar)); overflow: hidden; display: grid; place-items: center; }
   /* Phones: the stage keeps its size when the URL bar collapses (no ink strip under it). */
   @supports (height: 100lvh) { @media (pointer: coarse) { .stage { height: calc(100lvh - var(--bar)); } } }
   /* The front always covers the stage like a street seen straight on (sides and sky crop). */
-  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: max(100%, calc((100svh - var(--bar)) * 4096 / 3089)); aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 1200px; perspective-origin: var(--door-x) var(--door-y); will-change: transform; }
+  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: max(100%, calc((100svh - var(--bar)) * 4096 / 3089)); aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 1200px; perspective-origin: var(--door-x) var(--door-y); }
   /* Ultrawide and short landscape (phone on its side): hang the front from its lamps, not its middle. */
   @media (min-aspect-ratio: 2/1) { .camera { top: 0; translate: -50% -12%; } }
   @media (orientation: landscape) and (max-height: 500px) { .camera { top: 0; translate: -50% -11%; } }
@@ -273,8 +273,8 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
   @keyframes o-cue-bob { 50% { translate: 0 4px; } }
 
   /* Phones: keep the line under the front clear of the fixed dock. */
-  @media (max-width: 640px) { .doors { --bar: 64px; } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
-  @media (min-width: 641px) and (max-height: 700px) { .doors { --bar: 58px; } }
+  @media (max-width: 640px) { .doors { --bar: var(--header-h, 64px); } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
+  @media (min-width: 641px) and (max-height: 700px) { .doors { --bar: var(--header-h, 58px); } }
   @media (prefers-reduced-motion: reduce) {
     /* Calm: the front is lit and the door stands open onto the curtain; the story opening simply follows. */
     .doors { height: auto; }
@@ -409,6 +409,7 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
     // Lights switch at thresholds (a lamp clicks on; it isn't dimmed up), so they are classes.
     const setOn = (els: HTMLElement[], n: number) => els.forEach((el, i) => el.classList.toggle('is-on', i < n));
     let shineOn = false;
+    let wcTimer = 0; // will-change on the camera only while scrolling inside the pinned walk
 
     // Beat sheet in pinned progress t (0 = stage pins, 1 = section ends). See docs/qa/DOOR-SCENE-100.md.
     const render = (t: number) => {
@@ -421,7 +422,8 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
       shine.classList.toggle('is-on', shineOn);
       const pinned = t > 0 && t < 1;
       rail?.classList.toggle('is-quiet', pinned); navBook?.classList.toggle('is-quiet', pinned);
-      set(camera, 'will-change', pinned ? 'transform' : 'auto');
+      if (pinned) { set(camera, 'will-change', 'transform'); clearTimeout(wcTimer); wcTimer = window.setTimeout(() => set(camera, 'will-change', 'auto'), 150); }
+      else set(camera, 'will-change', 'auto');
       const lit = range(t, 0.06, 0.22);
       set(dim, 'opacity', (0.78 - 0.56 * lit).toFixed(3));
       const r = (0.9 - 0.82 * lit).toFixed(3);

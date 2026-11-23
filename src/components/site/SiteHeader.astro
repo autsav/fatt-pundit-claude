@@ -170,6 +170,12 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
   const heroSection = document.querySelector('section[data-room-hero]');
   const hero = heroSection?.querySelector('.arrival-actions') ?? heroSection;
   const bar = document.querySelector<HTMLElement>('.bar');
+  // One live header height for everyone (hero, doors, voyage): zoom, wrapping and breakpoints all land here.
+  if (bar) {
+    const setH = () => document.documentElement.style.setProperty('--header-h', `${Math.round(bar.getBoundingClientRect().height)}px`);
+    setH();
+    new ResizeObserver(setH).observe(bar);
+  }
   if (hero && bar && document.querySelector('[data-after-hero]')) {
     const h = Math.round(bar.getBoundingClientRect().height);
     // Not intersecting but below the header line (e.g. under the fold) still counts as "in".

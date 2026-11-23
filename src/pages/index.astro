@@ -51,10 +51,12 @@ const DRINK_IDS = ['guava-chilli-sour', 'white-tiger', 'hakka-garden', 'the-scho
 const drinks = await Promise.all(DRINK_IDS.map(dish));
 // Scene 6: the bar after dark.
 const webp = async (src: ImageMetadata, width: number) => (await getImage({ src, width, format: 'webp', quality: 78 })).src;
-const barRoom = { src: await webp(g3, 1400), alt: 'The bar at Covent Garden: copper shelves of bottles, brass lamps and arched mirrors over the booths' };
-const barPrints: [{ src: string; alt: string }, { src: string; alt: string }] = [
-  { src: await webp(barSour, 800), alt: 'Guava chilli sour with a chilli-salt rim, fresh guavas beside it' },
-  { src: await webp(barCocktail, 700), alt: 'A deep red fruit cooler with mint and citrus' },
+const webpSet = async (src: ImageMetadata, widths: number[]) => (await Promise.all(widths.map(async (w) => `${await webp(src, w)} ${w}w`))).join(', ');
+type BarPhoto = { src: string; srcset?: string; sizes?: string; alt: string };
+const barRoom: BarPhoto = { src: await webp(g3, 1400), srcset: await webpSet(g3, [800, 1100, 1400]), sizes: '100vw', alt: 'The bar at Covent Garden: copper shelves of bottles, brass lamps and arched mirrors over the booths' };
+const barPrints: [BarPhoto, BarPhoto] = [
+  { src: await webp(barSour, 800), srcset: await webpSet(barSour, [480, 800]), sizes: '(min-width: 1024px) 40vw, 90vw', alt: 'Guava chilli sour with a chilli-salt rim, fresh guavas beside it' },
+  { src: await webp(barCocktail, 700), srcset: await webpSet(barCocktail, [420, 700]), sizes: '(min-width: 1024px) 40vw, 90vw', alt: 'A deep red fruit cooler with mint and citrus' },
 ];
 const barDrinks = drinks.map((d, i) => ({ id: DRINK_IDS[i], name: d.name, description: d.description, price: priceOf(d) }));
 const barTiger = await stampSrc(tigerHead, 400);
@@ -74,19 +76,23 @@ const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640
 const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), thumbSet: await thumbSet(src), full: await webp(src, 1600), alt })));
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
-const rainPoster = (await getImage({ src: inside, width: 640, format: 'webp', quality: 60 })).src;
+// The hero still: 640w for phones, 1280w for larger screens (it is the LCP image).
+const rainPoster640 = (await getImage({ src: inside, width: 640, format: 'webp', quality: 65 })).src;
+const rainPoster = (await getImage({ src: inside, width: 1280, format: 'webp', quality: 70 })).src;
+const rainPosterSet = `${rainPoster640} 640w, ${rainPoster} 1280w`;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
-  // The postcard is at most 460 px wide (2x: 920): 900 is enough; 1295 cost 170 KB.
-  map: await img(map, 900),
+  // One width per asset (shared with the menu book's map, so one file).
+  map: await img(map, 1000),
   // A picture, not the SVG: the browser re-rasterised the vector chart (a
   // 16-megapixel draw) whenever the camera zoomed, stalling scroll frames.
   sea: (await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 })).src,
-  ship: await img(shipArt, 400),
+  seaSet: (await Promise.all([1600, 2400, 3200].map(async (w) => `${(await getImage({ src: voyageSea, width: w, format: 'avif', quality: 50 })).src} ${w}w`))).join(', '),
+  ship: await img(shipArt, 160),
   compass: await img(compassArt, 240),
-  stampGold: await stampSrc(stampGoldArt, 280),
-  stampOrange: await stampSrc(stampOrangeArt, 280),
+  stampGold: await stampSrc(stampGoldArt, 300),
+  stampOrange: await stampSrc(stampOrangeArt, 300),
   mountainA: await img(mountainAArt, 300),
   mountainsB: await img(mountainsBArt, 520),
   mountainsC: await img(mountainsCArt, 260),
@@ -94,7 +100,8 @@ const voyageArt = {
 // The menu book opens on the signature dishes. Photos only where we have the real dish; the rest are named.
 const sigDish = async (id: string, photo?: { src: Parameters<typeof getImage>[0]['src']; alt: string; name?: string }) => {
   const d = await dish(id);
-  return { name: photo?.name ?? d.name, price: priceOf(d) ?? undefined, image: photo ? await img(photo.src, 520) : undefined, alt: photo?.alt };
+  const set = photo ? (await Promise.all([320, 520].map(async (w) => `${await img(photo.src, w)} ${w}w`))).join(', ') : undefined;
+  return { name: photo?.name ?? d.name, price: priceOf(d) ?? undefined, image: photo ? await img(photo.src, 520) : undefined, srcset: set, alt: photo?.alt };
 };
 const signatureDishes = await Promise.all([
   sigDish('momo-mix-vegetable', { src: imgVegMomo, alt: 'Green spinach-dough vegetable momos with red chutney on a banana leaf' }),
@@ -122,8 +129,10 @@ const menuPlaces = await Promise.all(
     soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: listCta(b).href, label: listCta(b).short },
   })),
 );
-const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 220), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
+const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 300), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
 // Search engines: the group, with each restaurant as its own entity.
+// The group rules differ by room, so each room states its own.
+const groupNotes = branches.flatMap((b) => { const g = groupRules(b); return g ? [`${b.shortName}: ${g.depositShort} ${g.setMenu}`] : []; });
 const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -149,7 +158,7 @@ const orgLd = {
     <!-- 0 · Arrival -->
     <Arrival />
     <!-- 1 · The window: name, restaurant board, Book; the room behind rainy glass -->
-    <HomeHero branches={branches} rainSrc={rainSrc} rainPoster={rainPoster} />
+    <HomeHero branches={branches} rainSrc={rainSrc} rainPoster={rainPoster} posterSrcset={rainPosterSet} posterSizes="100vw" />
     <!-- 2 · The doors -->
     <Doors />
 
@@ -161,7 +170,7 @@ const orgLd = {
 
 
     <!-- 5 · The menu book -->
-    <MenuBook client:visible menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} lists={branches.filter((b) => b.status === 'open').map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` }))} next={{ href: '#bar', label: 'Continue to the bar' }} />
+    <MenuBook client:visible={{ rootMargin: '100% 0px' }} menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} lists={branches.filter((b) => b.status === 'open').map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` }))} next={{ href: '#bar', label: 'Continue to the bar' }} />
 
     <!-- 6 · The bar after dark -->
     <BarAfterDark client:visible room={barRoom} prints={barPrints} drinks={barDrinks} tiger={barTiger} />
@@ -190,10 +199,10 @@ const orgLd = {
         <header class="fp-section-head chapter-head fp-reveal">
           <p class="fp-section-label"><span class="fp-section-no">05</span> Your table</p>
           <h2 id="tables-title" class="fp-h2"><span class="sr-only">Your table: </span>Choose your gate</h2>
-          <p class="chapter-intro">Three passes, one for each room. Tear off a stub to book.</p>
+          <p class="chapter-intro">Your seat is waiting. Pick a room.</p>
         </header>
         <BoardingPasses branches={branches} stamps={stamps} />
-        <p class="tables-note fp-reveal">{onlineSummary(branches)}. {groupRules(branches[0])?.depositShort} {groupRules(branches[0])?.setMenu} <a href="/private-dining/">Plan a group</a>.</p>
+        <p class="tables-note fp-reveal">{onlineSummary(branches)}. {groupNotes.join(' ')} <a href="/private-dining/">Plan a group</a>.</p>
       </div>
     </section>
   </main>
@@ -220,7 +229,9 @@ const orgLd = {
 </script>
 
 <style>
-  .story-more { display: flex; justify-content: center; padding: clamp(28px, 5vw, 56px) 20px; }
+  .story-more { position: relative; display: flex; justify-content: center; padding: clamp(28px, 5vw, 56px) 20px calc(clamp(28px, 5vw, 56px) + 112px); }
+  /* Ink melts into the sand menu below (this band replaces the menu's own top band). */
+  .story-more::after { content: ''; position: absolute; inset: auto 0 0; height: 112px; pointer-events: none; background: linear-gradient(var(--color-ink), var(--color-sand)); }
   p { margin: 0; }
 
   /* Bar */
@@ -236,9 +247,7 @@ const orgLd = {
   #room::before { content: ''; position: absolute; inset: 0 0 auto; height: 112px; z-index: 0; pointer-events: none; background: linear-gradient(#171513, transparent); }
 
   /* Soft bands in place of hard ink/sand cuts: story to menu, menu to bar. */
-  :global(#menu)::before, :global(#menu)::after { content: ''; position: absolute; inset-inline: 0; height: 112px; pointer-events: none; }
-  :global(#menu)::before { top: 0; background: linear-gradient(var(--color-ink), transparent); }
-  :global(#menu)::after { bottom: 0; background: linear-gradient(transparent, #171513); }
+  :global(#menu)::after { content: ''; position: absolute; inset-inline: 0; height: 112px; pointer-events: none; bottom: 0; background: linear-gradient(transparent, #171513); }
   :global(#menu) { padding-top: calc(var(--section-pad) + 48px); padding-bottom: calc(var(--section-pad) + 48px); }
   /* Doors' sand melts into the voyage's ink. */
   :global(.voyage)::before { content: ''; position: absolute; inset: 0 0 auto; height: 25svh; z-index: 5; pointer-events: none; background: linear-gradient(var(--color-sand), transparent); }
@@ -248,8 +257,8 @@ const orgLd = {
   #tables { position: relative; padding-bottom: calc(var(--section-pad) + 120px); }
   #tables::after { content: ''; position: absolute; inset: auto 0 0; height: 120px; pointer-events: none; background: linear-gradient(var(--color-gold), #171513); }
   .room-head { display: grid; gap: var(--space-4); }
-  @media (min-width: 1100px) {
-    #room > .wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: clamp(32px, 4vw, 64px); align-items: start; }
+  @media (min-width: 1024px) {
+    #room > .wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--grid-gutter); align-items: start; }
     #room > .wrap > .room-words { grid-column: 1; }
     #room > .wrap :global(.room-sheet) { grid-column: 2; grid-row: 1; }
     /* The words are the short column: they follow the tall film sheet down the page. */
@@ -257,7 +266,7 @@ const orgLd = {
   }
   /* The rating as a ledger fact: the figure in the headline face, its source right under it. */
   .rating { display: grid; gap: var(--space-2); margin: 0; padding-block: var(--space-4); border-block: var(--border-rule) solid var(--fp-rule-strong); max-width: 30em; }
-  .rating-n { font-weight: 300; font-size: clamp(44px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: lining-nums; }
+  .rating-n { font-weight: 300; font-size: clamp(44px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: lining-nums proportional-nums; }
   .rating-of { font-size: var(--step-h3); letter-spacing: 0; vertical-align: baseline; }
   .rating-src { font-size: var(--step-small); line-height: var(--lh-small); }
   .tables-note { margin: var(--space-7) 0 0; max-width: 46em; font-size: var(--step-small); line-height: var(--lh-small); }
