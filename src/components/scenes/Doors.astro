@@ -6,7 +6,7 @@
 // Art: covent-garden/front/*.webp, the real shopfront redrawn (Higgsfield GPT Image 2.6 +
 // upscale, 23 Nov 2026), glass keyed out so the room shows through; the door is its own layer.
 // Plan and review: docs/qa/DOOR-SCENE-PLAN.md (phase 1).
-import { Picture } from 'astro:assets';
+import { Picture, getImage } from 'astro:assets';
 import type { ImageOutputFormat } from 'astro';
 import { getBranches } from '../../lib/site-data';
 import facade from '../../assets/images/covent-garden/front/facade.webp';
@@ -15,6 +15,8 @@ import room from '../../assets/images/covent-garden/interior-door-view.jpg';
 // The street opposite (striped arches), mirrored in the glass: you see the reflection first, the room once it's lit.
 import reflectFront from '../../assets/images/covent-garden/front/reflect-front.webp';
 import reflectDoor from '../../assets/images/covent-garden/front/reflect-door.webp';
+// Tall screens: Maiden Lane around the front (upper floors, dusk sky, neighbours, cobbles), outpainted from the same art.
+import surround from '../../assets/images/covent-garden/front/surround.webp';
 
 const cg = (await getBranches()).find((b) => b.id === 'covent-garden');
 const street = cg?.address.street ?? '6 Maiden Lane';
@@ -22,12 +24,21 @@ const houseNo = street.match(/^\d+/)?.[0];
 const address = `${street.replace(/\bLane\b/, 'Ln')}, ${cg?.address.locality ?? 'Covent Garden'}`;
 const name = 'Fatt Pundit';
 const formats: ImageOutputFormat[] = ['avif', 'webp'];
+// The street surround is for tall screens only: landscape gets a blank source so it is never fetched.
+const surAvif = await getImage({ src: surround, format: 'avif', widths: [900, 1696] });
+const surWebp = await getImage({ src: surround, format: 'webp', widths: [900, 1696] });
+const blank = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 // One srcset for both room images so the browser fetches it once.
 const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3600], sizes: '100vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
 ---
 <section class="doors" data-doors aria-label={`Step inside Fatt Pundit, ${street}, Covent Garden`}>
   <div class="stage">
     <div class="camera" data-camera aria-hidden="true">
+      <picture>
+        <source media="not all and (max-aspect-ratio: 3/4)" srcset={blank} />
+        <source type="image/avif" srcset={surAvif.srcSet.attribute} sizes="230vw" />
+        <img class="surround" src={surWebp.src} srcset={surWebp.srcSet.attribute} sizes="230vw" alt="" loading="lazy" decoding="async" fetchpriority="low" />
+      </picture>
       <div class="room-wrap" data-room-wrap>
         <Picture {...roomImg} class="room" />
       </div>
@@ -61,6 +72,8 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
     </div>
     <!-- One grade for the whole scene: a fine film grain over painted front and photo alike. -->
     <span class="grain" aria-hidden="true"></span>
+    <!-- Night falls over the top of the front as it rises out of the hero, so there's no hard cut. -->
+    <span class="seam" aria-hidden="true" data-seam></span>
     <div class="below" data-comein>
       <p class="come-in">Come in.</p>
       <a class="skip-story" href="#tables" data-skip-story>Skip the story: choose your table</a>
@@ -86,7 +99,7 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
     html .doors .dim { opacity: 0.15 !important; } html .doors .reflect { opacity: 0.3 !important; } html .doors .door { transform: rotateY(-62deg) !important; }
     html .doors .below { position: relative !important; bottom: 0 !important; background: none !important; padding-block: 16px !important; }
     html .doors .flood { position: relative !important; opacity: 1 !important; padding-block: 64px !important; background: var(--color-sand) !important; }
-    html .doors .o-cue { display: none !important; }
+    html .doors .o-cue, html .doors .seam, html .doors .surround { display: none !important; }
   </style>
 </noscript>
 
@@ -110,6 +123,10 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
   /* Grade: the painted front pulled toward the real, weathered vermilion and the photo's softer blacks. */
   .facade, .door-img { filter: saturate(0.86) contrast(0.95) brightness(0.98); }
   .facade { inset: 0; width: 100%; height: 100%; }
+  /* The street around the front, placed so its painted shopfront sits exactly under ours. Tall screens only
+     (hidden + lazy elsewhere, so it is never fetched on landscape). */
+  .surround { position: absolute; left: -16.37%; top: -102.49%; width: 132.81%; height: 262.51%; max-width: none; display: none; filter: saturate(0.86) contrast(0.95) brightness(0.98); }
+  @media (max-aspect-ratio: 3/4) { .surround { display: block; } }
   /* The door leaf, hinged on the left (the handle is on the right), opening inward, with a painted edge. */
   .door { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
   .door::after { content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 1cqw; transform-origin: right center; transform: rotateY(-90deg); background: linear-gradient(90deg, #3d0f0b, #6e1d15 40%, #4a120d); }
@@ -147,6 +164,7 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
   .come-in { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.32em; color: var(--color-gold); font-size: 14px; }
   .skip-story { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; color: rgb(218 199 181 / 0.78); font-size: 13px; text-decoration: none; }
   .skip-story:hover, .skip-story:focus-visible { color: var(--color-gold); text-decoration: underline; text-underline-offset: 4px; }
+  .seam { position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; background: linear-gradient(var(--color-ink), rgb(44 41 37 / 0.6) 35%, transparent); will-change: opacity; }
   .grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.07; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
   /* While the scene is pinned the page chrome steps back (rail and header button). */
   :global(html[data-door-scene] .rail.is-on), :global(html[data-door-scene] .nav-book) { opacity: 0.35; }
@@ -176,7 +194,7 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
     .doors { height: auto; }
     .stage { position: relative; top: 0; height: auto; aspect-ratio: auto; display: block; }
     .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; height: auto; }
-    .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; } .sign-shine { display: none; }
+    .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; } .sign-shine, .seam, .surround { display: none; }
     .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .spill { opacity: 0.6; } .door { transform: rotateY(-62deg); }
     .inside { display: none; }
     .below { position: relative; bottom: 0; background: none; padding-block: 16px; }
@@ -210,7 +228,8 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
       if (!e.isIntersecting) return;
       io.disconnect();
       for (const img of section.querySelectorAll<HTMLImageElement>('.facade, .room, .door-img')) { img.loading = 'eager'; img.decode().catch(() => {}); }
-      const rest = () => section.querySelectorAll<HTMLImageElement>('img').forEach((img) => { img.loading = 'eager'; });
+      // Only images that are actually shown (the street surround is hidden on landscape).
+      const rest = () => section.querySelectorAll<HTMLImageElement>('img').forEach((img) => { if (img.offsetParent) img.loading = 'eager'; });
       ('requestIdleCallback' in window ? requestIdleCallback : setTimeout)(rest);
     }, { rootMargin: '50% 0px' });
     io.observe(section);
@@ -231,6 +250,7 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
     const opening = flood.querySelector<HTMLElement>('.opening')!;
     const insideMove = $('[data-inside-move]');
     const shine = $('[data-shine]');
+    const seam = $('[data-seam]');
     const root = document.documentElement;
 
     // Layout, read on resize only (never inside a frame).
@@ -269,6 +289,7 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
       setOn(chars, Math.ceil(range(t, 0.06, 0.18) * chars.length));
       setOn(subs, t >= 0.2 ? subs.length : 0);
       shine.classList.toggle('is-on', t >= 0.2);
+      seam.style.opacity = (1 - range(t, 0, 0.05)).toFixed(3);
       const pinned = t > 0 && t < 1;
       if (pinned !== root.hasAttribute('data-door-scene')) root.toggleAttribute('data-door-scene', pinned);
       const lit = range(t, 0.07, 0.27);
