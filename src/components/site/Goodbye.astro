@@ -5,23 +5,16 @@ import { stampSrc } from '@/lib/stamp';
  * stamp, "Thank you!" in gold. When it comes into view it opens and a receipt prints the opening hours.
  * Calm mode: already open, receipt in place. No JS: same, nothing hidden.
  */
-import { hoursLines, prettyPhone, type Branch } from '@/lib/site-data';
+import type { Branch } from '@/lib/site-data';
 import stampArt from '@/assets/images/brand/logo-stamp-distressed-left.png';
 
 interface Props {
   branches: Branch[];
 }
-const { branches } = Astro.props;
 const stamp = await stampSrc(stampArt, 300);
 const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1];
 ---
 <div class="bill" data-bill>
-  <div class="sr-only">
-    <p>Opening hours</p>
-    <ul>
-      {branches.map((b) => <li>{b.shortName}: {b.hours ? hoursLines(b.hours).map((l) => `${l.days} ${l.text}`).join('; ') : 'Opening soon'}{b.phone ? `. Phone ${prettyPhone(b.phone)}` : ''}</li>)}
-    </ul>
-  </div>
   <div class="bill-pocket">
     <div class="receipt-slot" aria-hidden="true"></div>
     <div class="receipt-clip">
