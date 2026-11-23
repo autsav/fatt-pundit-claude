@@ -40,7 +40,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   description="How Indo-Chinese food began: a Hakka cook from Guangdong, a scholar in Calcutta's Chinatown, and the recipes that travelled on to Soho, Covent Garden and Dubai."
   og="home"
 >
-  <a class="skip" href="#content">Skip to the story</a>
+  <a class="skip" href="#canton">Skip to the story</a>
   <!-- Before the scenes paint: a reader who chose the comic gets it straight away (global.css "Story scenes"). -->
   <script is:inline>try { if (localStorage.getItem('fp-story') === 'comic') document.documentElement.dataset.story = 'comic'; } catch {}</script>
   <SiteHeader branches={branches} />
@@ -58,12 +58,22 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
     </header>
     <StoryOpening />
 
+    <p class="chap-chip" aria-hidden="true" data-chap-chip hidden>Chapter <span data-chap-n>1</span> / {chapters.length}</p>
     <div class="sec story-body">
       {chapters.map((c) => {
         const Scenes = scenesFor[c.id];
         return (
           <div class="story-chapter" id={c.id} data-scenes={Scenes ? '' : undefined}>
             {Scenes && <Scenes />}
+            {/* Story-order transcript for screen readers, shown only while the scenes play (the comic is real text itself). */}
+            <ol class="story-transcript" aria-label={`${c.title}: the story in words`}>
+              {c.panels.map((p) => (
+                <li>
+                  {p.caption}
+                  {p.bubbles?.map((b) => <> {b.who} says: “{b.text}”</>)}
+                </li>
+              ))}
+            </ol>
             <div class="wrap">
               <StoryComic mode="full" only={c.id} />
             </div>
@@ -78,16 +88,17 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
         <h2 id="end-title" class="h2">Come and taste the rest</h2>
         <div class="end-actions">
           {open.map((b) => (
-            <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book at {b.shortName}</a>
+            <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book {b.shortName}</a>
           ))}
           {soon.map((b) => (
             <a class="fp-btn" href={listCta(b).href}>{listCta(b).label}</a>
           ))}
         </div>
-        <p class="small">Or read the menus first: {open.map((b, i) => <>{i > 0 && ' · '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}.</p>
-        <p>The story is best told by the food. Come and taste where it went.</p>
+        <p class="end-menus"><span>Or read the menus first:</span> {open.map((b) => <a class="menu-chip" href={`/${b.id}/menu/`}>{b.shortName} menu</a>)}</p>
+        <h3 class="end-lead">Six dishes that made the journey</h3>
         <TastingStrip />
         <ChooseTiger />
+        <p class="story-mode story-mode--end" data-story-mode hidden><button type="button" aria-pressed="false" data-story-toggle>Read as a comic</button></p>
       </div>
     </section>
   </main>
@@ -109,20 +120,31 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
      plain display and position rules survive @supports here (animation-timeline would not). */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
+      :global(:root:not([data-story='comic'])) .story-chapter[data-scenes] .story-transcript { display: block; position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
       :global(:root:not([data-story='comic'])) .story-hero { position: relative; z-index: 5; height: 0; padding: 0; background: none; }
       :global(:root:not([data-story='comic'])) .story-hero .wrap { position: static; }
       :global(:root:not([data-story='comic'])) .story-hero :is(.story-stamp, .kicker, .story-h1, .story-lede, .story-note, .story-cue) {
         position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-      :global(:root:not([data-story='comic'])) .story-mode { position: absolute; top: 12px; right: clamp(12px, 3vw, 40px); margin: 0; }
-      :global(:root:not([data-story='comic'])) .story-mode button { min-height: 44px; padding: 6px 12px; background: rgb(250 246 239 / 0.85); }
+      :global(:root:not([data-story='comic'])) .story-hero .story-mode { position: absolute; top: 12px; right: clamp(12px, 3vw, 40px); margin: 0; }
+      :global(:root:not([data-story='comic'])) .story-hero .story-mode button { min-height: 44px; padding: 6px 12px; background: rgb(250 246 239 / 0.85); }
     }
   }
   .story-body { background: var(--color-sand); padding-top: 0; }
   .story-chapter + .story-chapter { margin-top: clamp(56px, 9vw, 120px); }
+  .story-transcript { display: none; }
+  .chap-chip { display: none; }
+  @media (max-width: 640px) {
+    .chap-chip { position: fixed; z-index: 29; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); left: 8px; margin: 0; padding: 2px 10px; border-radius: 999px; pointer-events: none;
+      background: rgb(250 246 239 / 0.88); color: var(--color-ink); font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; opacity: 0; transition: opacity var(--dur-fast) var(--curve-out); }
+    .chap-chip.on { display: block; opacity: 1; }
+    /* Clear of the caption plate (top) and of the dock: shown only while the dock is away (reading down). */
+    html:has(.dock:not([data-away])) .chap-chip.on { opacity: 0; }
+  }
   .story-mode { margin: 4px 0 0; }
   .story-mode button { padding: 6px 4px; border: 0; background: none; color: var(--color-ink); font-family: var(--font-note); font-style: italic; font-size: 16px;
     text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
   .story-mode button[aria-pressed='true'] { text-decoration-style: solid; font-weight: 600; }
+  .story-mode--end button { min-height: 44px; }
   .story-mode button:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
   /* The last scene hands over to #end by tearing in over it, as every stage does (global.css "Between stages"). */
   @supports (animation-timeline: view()) {
@@ -132,6 +154,11 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
         mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat; }
     }
   }
+  .end-menus { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 0; }
+  .menu-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 1.5px solid var(--color-ink); border-radius: 999px; color: var(--color-ink); text-decoration: none; font-weight: 600; }
+  .menu-chip:hover { background: var(--color-ink); color: var(--color-sand); }
+  .menu-chip:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
+  .end-lead { margin: var(--space-4) 0 0; font-family: var(--font-note); font-style: italic; font-weight: 600; font-size: clamp(19px, 1.8vw, 23px); }
   .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
   /* Equal-width buttons: each takes the same share, never narrower than its label. */
   .end-actions > .fp-btn { flex: 1 1 14rem; max-width: 20rem; justify-content: center; text-align: center; }
@@ -139,12 +166,16 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
 
 <script>
   // "Read as a comic": only offered where the scenes can play. Swaps them for the comic and remembers it.
-  const wrap = document.querySelector<HTMLElement>('[data-story-mode]');
-  const btn = document.querySelector<HTMLButtonElement>('[data-story-toggle]');
-  if (wrap && btn && CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // One toggle under the title, one at the end; both stay in step.
+  const wraps = document.querySelectorAll<HTMLElement>('[data-story-mode]');
+  const btns = document.querySelectorAll<HTMLButtonElement>('[data-story-toggle]');
+  if (wraps.length && CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const root = document.documentElement;
-    const sync = () => btn.setAttribute('aria-pressed', String(root.dataset.story === 'comic'));
-    btn.addEventListener('click', () => {
+    const sync = () => {
+      const comic = root.dataset.story === 'comic';
+      btns.forEach((b) => { b.setAttribute('aria-pressed', String(comic)); b.textContent = comic ? 'Play as scenes' : 'Read as a comic'; });
+    };
+    btns.forEach((btn) => btn.addEventListener('click', () => {
       const comic = root.dataset.story !== 'comic';
       if (comic) root.dataset.story = 'comic';
       else delete root.dataset.story;
@@ -153,8 +184,28 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
         else localStorage.removeItem('fp-story');
       } catch {}
       sync();
-    });
+    }));
     sync();
-    wrap.hidden = false;
+    wraps.forEach((w) => (w.hidden = false));
+  }
+
+  // Phone chapter chip ("Chapter 2 / 5"): refreshed only when a chapter edge crosses mid-screen, never per frame.
+  const chip = document.querySelector<HTMLElement>('[data-chap-chip]');
+  const chaps = [...document.querySelectorAll<HTMLElement>('.story-chapter')];
+  const end = document.getElementById('end');
+  if (chip && chaps.length && end && 'IntersectionObserver' in window) {
+    const num = chip.querySelector('[data-chap-n]')!;
+    const update = () => {
+      const mid = innerHeight / 2;
+      let n = 0;
+      chaps.forEach((c, i) => { if (c.getBoundingClientRect().top <= mid) n = i + 1; });
+      const on = n > 0 && end.getBoundingClientRect().top > mid;
+      chip.hidden = false;
+      chip.classList.toggle('on', on);
+      if (on) num.textContent = String(n);
+    };
+    const io = new IntersectionObserver(update, { rootMargin: '-50% 0px -49% 0px' });
+    [...chaps, end].forEach((el) => io.observe(el));
+    update();
   }
 </script>

@@ -16,7 +16,8 @@ const tangra = panelOf(chapter, 'p04-tangra');
 const taste = panelOf(chapter, 'p05-first-taste');
 const market = panelOf(chapter, 'p06-spice-market');
 // Steam puffs: [left offset, from%, to%]. Chillies: [left in % of the market box, from%, to%, spin, colour]; they land on the sack rims.
-const puffs = [['-0.03', 16, 32], ['0.02', 22, 38], ['-0.01', 28, 44], ['0.04', 34, 48]] as const;
+// Phones (beats of 19): puffs [from, to] and the chillies' start beat, two a beat (12, 13, 14); each falls for 1 beat.
+const puffs = [['-0.03', 16, 32, 3, 6], ['0.02', 22, 38, 4, 7.5], ['-0.01', 28, 44, 5, 9], ['0.04', 34, 48, 6, 10.5]] as const;
 const chillies = [['7%', 56, 66, '-40deg', 'red'], ['13%', 58, 69, '30deg', 'green'], ['41%', 60, 72, '-25deg', 'red'], ['48%', 62, 74, '50deg', 'green'], ['55%', 58, 70, '-55deg', 'red'], ['62%', 61, 76, '35deg', 'green']] as const;
 // Chilli garlands strung across the spice market's sky (two ropes, placed by --gt/--gl/--gw in the style block), the
 // chillies hung along its sag (a quadratic curve: y = 40t(1-t) of the rope's 20-unit box), alternating colours.
@@ -28,38 +29,38 @@ const words = (() => { let n = 0; const total = chapter.title.replace(/ /g, '').
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(tangra.scene)} h="290vh" hPhone="240vh">
-    <SceneArt name="tangra-lane-far" note="Tangra lane, far: shop fronts with signs in Chinese and Bengali" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 112vw" class="layer fx fx-fade tg-far" />
-    <SceneArt name="tangra-lane-near" note="Rickshaws and passers-by in the lane" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 108vw" class="layer fx fx-fade fx-then-out tg-near" />
+  <StoryScene label={chapter.label} sr={firstSentence(tangra.scene)} h="290vh" beats={19}>
+    <SceneArt name="tangra-lane-far" note="Tangra lane, far: shop fronts with signs in Chinese and Bengali" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 154svh, 112vw" class="layer fx fx-ease fx-fade tg-far" />
+    <SceneArt name="tangra-lane-near" note="Rickshaws and passers-by in the lane" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 108vw" class="layer fx fx-ease fx-fade fx-then-out tg-near" />
     <!-- The set: stall, sacks, both tigers, steam, hiss and the falling chillies in ONE fixed-aspect box sized by --u,
          so their places on each other are the same at every screen. Tiers, not DOM order: sacks and stall are props
          (z 1), the tigers are cast (z 2) and always in front of them. -->
     <div class="layer tg-set">
-      <SceneArt name="spice-sacks" note="Sacks of red and green chillies, ginger, garlic, cumin" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 160vw, 104vw" class="layer fx fx-fade z-prop tg-sacks" />
-      <SceneArt name="tangra-stall" note="Fatt's roadside stall, wok and flame" widths={[480, 800, 1121]} sizes="(max-width: 599px) 56vw, min(32vw, 440px)" class="layer fx fx-fade fx-then-out z-prop tg-stall" />
+      <SceneArt name="spice-sacks" note="Sacks of red and green chillies, ginger, garlic, cumin" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 160vw, 104vw" class="layer fx fx-ease fx-fade z-prop tg-sacks" />
+      <SceneArt name="tangra-stall" note="Fatt's roadside stall, wok and flame" widths={[480, 800, 1121]} sizes="(max-width: 599px) 56vw, min(32vw, 440px)" class="layer fx fx-ease fx-fade fx-then-out z-prop tg-stall" />
       <div class="layer fx fx-fade fx-then-out tg-steam" aria-hidden="true">
-        {puffs.map(([x, from, to]) => <span class="layer puff fx" style={`left:calc(var(--mk-w) * ${x});--from:${from}%;--to:${to}%`}></span>)}
+        {puffs.map(([x, from, to, pf, pt]) => <span class="layer puff fx" style={`left:calc(var(--mk-w) * ${x});--df:${from}%;--dt:${to}%;--pf:${pf};--pt:${pt}`}></span>)}
       </div>
       <p class="scene-sfx fx fx-pop fx-then-out tg-sfx" aria-hidden="true">Tssss!</p>
       <!-- Pundit walks in from the left, tastes, and stays: he leads Fatt on into the market. He faces right. -->
-      <div class="cast layer fx fx-fade tg-pundit">
+      <div class="cast layer fx fx-ease fx-fade tg-pundit">
         <SceneArt name="tangra-pundit" note="Pundit tastes from a bowl, doubtful" widths={[480, 800, 1200]} sizes="(max-width: 599px) 24vw, min(19vw, 300px)" class="cast-art fx-rock" warm />
         {taste.bubbles?.slice(0, 1).map((b) => (
-          <p class={`bubble scene-bubble tail-${b.tail ?? 'right'} fx fx-pop fx-then-out tg-bubble1`} style="--bx:var(--pbx);--by:9%"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+          <p aria-hidden="true" class={`bubble scene-bubble tail-${b.tail ?? 'right'} fx fx-pop fx-then-out tg-bubble1`} style="--bx:var(--pbx);--by:9%"><span class="sr-only">{b.who} says: </span>{b.text}</p>
         ))}
       </div>
       <!-- Fatt at the wok, then at the spice stall: the same Fatt, chillies in his paw, facing left. (Stopgap for the missing cook art: the doc's mirror is not needed, he already faces the Pundit.) -->
       <div class="cast layer fx fx-fade-up tg-fatt">
         <SceneArt name="spice-fatt" note="Fatt at the stall, chillies in his paw" widths={[400, 700, 1000]} sizes="(max-width: 599px) 26vw, min(21vw, 320px)" class="cast-art fx-rock" />
         {market.bubbles?.slice(0, 1).map((b) => (
-          <p class={`bubble scene-bubble tail-${b.tail ?? 'left'} fx fx-pop fx-then-out tg-bubble2`} style="--bx:30%;--by:2%"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+          <p aria-hidden="true" class={`bubble scene-bubble tail-${b.tail ?? 'left'} fx fx-pop fx-then-out tg-bubble2`} style="--bx:30%;--by:2%"><span class="sr-only">{b.who} says: </span>{b.text}</p>
         ))}
       </div>
-      {chillies.map(([x, from, to, spin, colour]) => (
-        <img class={`layer fx fx-fade fx-then-out tg-chilli ${colour}`} src={chilliImg[colour].src} width={chilliImg[colour].attributes.width} height={chilliImg[colour].attributes.height} alt="" loading="lazy" decoding="async" data-warm style={`left:${x};--from:${from}%;--to:${to}%;--out-from:${to + 2}%;--out-to:${to + 5}%;--r0:${spin};--r1:0deg`} />
+      {chillies.map(([x, from, to, spin, colour], i) => (
+        <img class={`layer fx fx-ease fx-fade fx-then-out tg-chilli ${colour}`} src={chilliImg[colour].src} width={chilliImg[colour].attributes.width} height={chilliImg[colour].attributes.height} alt="" loading="lazy" decoding="async" data-warm style={`left:${x};--df:${from}%;--dt:${to}%;--do1:${to + 2}%;--do2:${to + 5}%;--pf:${12 + Math.floor(i / 2)};--r0:${spin};--r1:0deg`} />
       ))}
     </div>
-    <div class="layer fx fx-fade tg-garlands" aria-hidden="true">
+    <div class="layer fx fx-ease fx-fade tg-garlands" aria-hidden="true">
       {garlands.map((g) => (
         <div class={`tg-garland ${g}`}>
           <svg class="tg-rope" viewBox="0 0 100 20" preserveAspectRatio="none" focusable="false"><path d="M0 2 Q50 22 100 2" /></svg>
@@ -67,16 +68,16 @@ const words = (() => { let n = 0; const total = chapter.title.replace(/ /g, '').
         </div>
       ))}
     </div>
-    <div class="layer fx scene-title tg-title">
+    <div class="layer fx fx-ease scene-title tg-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
         <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
       </header>
     </div>
     <div class="scene-text">
-      <p class="cap fx fx-fade-up fx-then-out tg-cap1">{tangra.caption}</p>
-      <p class="cap fx fx-fade-up fx-then-out tg-cap2">{taste.caption}</p>
-      <p class="cap fx fx-fade-up fx-then-out tg-cap3">{market.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out tg-cap1">{tangra.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out tg-cap2">{taste.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out tg-cap3">{market.caption}</p>
     </div>
   </StoryScene>
 </div>
@@ -84,6 +85,7 @@ const words = (() => { let n = 0; const total = chapter.title.replace(/ /g, '').
 <style>
   /* Colour: monsoon ochre, a wet golden light; the glow warms the stall's steam. */
   .story-scenes { --sky: #ecc98a; --ground: #cf9a4e; --glow: #f2b84b; }
+  /* (--ground is the stage's foot colour, read by the engine; the painted road's height is --ground-y on phones, below.) */
 
   /* Score (% of the track): 0-12 title lifts, lane rises | 6-16 Fatt and the stall | 20-32 Pundit walks in, tastes, doubts |
      46-62 the stall leaves, the sacks rise behind the same two | 56-76 chillies land | 66-90 Fatt's line. */
@@ -103,7 +105,7 @@ const words = (() => { let n = 0; const total = chapter.title.replace(/ /g, '').
   /* The stall, centre. Wok measured on tangra-stall.webp (1121 x 880): centre x 48% of its width, rim top 37% down, so 63% of the height up = 0.495 x width. */
   .tg-stall { left: calc(var(--sx) * 100%); width: calc(var(--sw) * 100%); bottom: 2%; height: auto; max-width: none; --y0: 45vh; --from: 4%; --to: 18%; --out-from: 46%; --out-to: 52%; }
   .tg-steam { left: calc((var(--sx) + var(--sw) * 0.482) * 100%); bottom: calc(var(--mk-w) * (0.0092 + var(--sw) * 0.495)); width: 0; height: 0; z-index: 1; --from: 14%; --to: 18%; --out-from: 46%; --out-to: 52%; }
-  .tg-steam .puff { bottom: 0; translate: -50% 30%; --y0: 0; --y1: calc(-30 * var(--u)); --o0: 0.9; --o1: 0; }
+  .tg-steam .puff { bottom: 0; translate: -50% 30%; --from: var(--df); --to: var(--dt); --y0: 0; --y1: calc(-30 * var(--u)); --o0: 0.9; --o1: 0; }
   /* The hiss, just above the wok, inside the stall box's reach. */
   .tg-sfx { left: calc((var(--sx) + var(--sw) * 0.55) * 100%); bottom: calc(var(--mk-w) * (0.0092 + var(--sw) * 0.75)); --from: 14%; --to: 18%; --out-from: 24%; --out-to: 28%; rotate: -5deg; }
 
@@ -116,7 +118,7 @@ const words = (() => { let n = 0; const total = chapter.title.replace(/ /g, '').
   .tg-bubble2 { --from: 68%; --to: 71%; --out-from: 88%; --out-to: 91%; }
 
   /* Chillies fall behind the sack rims (z 0, under the front of the sacks) and vanish into them. */
-  .tg-chilli { z-index: 0; bottom: calc(var(--mk-w) * 0.12); width: clamp(34px, calc(5 * var(--u)), 72px); height: auto; --y0: calc(-28 * var(--u)); --y1: 0px; }
+  .tg-chilli { --from: var(--df); --to: var(--dt); --out-from: var(--do1); --out-to: var(--do2); z-index: 0; bottom: calc(var(--mk-w) * 0.12); width: clamp(34px, calc(5 * var(--u)), 72px); height: auto; --y0: calc(-28 * var(--u)); --y1: 0px; }
 
   /* Garlands over the market sky: placed by --gt/--gl/--gw (stage %), overridden on phones, no !important. */
   .tg-garlands { inset: 0; pointer-events: none; --y0: -6vh; --from: 54%; --to: 62%; }
@@ -139,5 +141,40 @@ const words = (() => { let n = 0; const total = chapter.title.replace(/ /g, '').
     .tg-bubble1 { max-width: calc(40 * var(--u)); }
     .tg-g0 { --gt: 24%; --gl: -10%; --gw: 80%; }
     .tg-g1 { --gt: 32%; --gl: 30%; --gw: 90%; }
+  }
+
+  /* PHONES: the score in beats (19; one beat = 30svh of scroll, --b = a beat in % of the track). An entrance takes 1 beat, an exit 0.5, no
+     more than 2 movers start in a beat, captions hold ceil(words / 2), a bubble max(2, ceil(words / 2)), a sound word 1.
+     b0 far lane, title (0.7) | b1 near lane, stall (1.5) | b2 Fatt, steam (2.5) | b3 hiss (3), first puff | b7 Pundit walks in (7.7) |
+     b11 sacks, garlands (11.5); stall and near lane out | b12-14 chillies, two a beat | b15 Fatt's line (15.7), then a closing half beat.
+     Captions: 7 | 6 | the last holds to the end (3.3: the 19 beats are full). Ground: the lane's road front edge is 2svh up; both tigers stand on it. */
+  @media (max-width: 599px) {
+    .story-scenes { --b: calc(100% / 19); --ground-y: 2svh; }
+    .tg-title { --from: calc(0.7 * var(--b)); --to: calc(1.2 * var(--b)); }
+    .tg-title .tl { --from: calc(0.6 * var(--b) + var(--i, 0) * 0.02 * var(--b)); --to: calc(1.1 * var(--b) + var(--i, 0) * 0.02 * var(--b)); }
+    /* The far shop fronts: 66svh tall so the top storey clears the caption plate (the image is 2.333 x as wide as tall). */
+    .tg-far { height: 66svh; --from: 0%; --to: var(--b); }
+    .tg-near { --from: var(--b); --to: calc(2 * var(--b)); --out-from: calc(11 * var(--b)); --out-to: calc(11.5 * var(--b)); }
+    .tg-set { bottom: calc(var(--floor) + var(--ground-y)); --px: 0.292; --fx: 0.49; }
+    .tg-stall { --from: calc(1.5 * var(--b)); --to: calc(2.5 * var(--b)); --out-from: calc(11 * var(--b)); --out-to: calc(11.5 * var(--b)); }
+    .tg-steam { --from: calc(2.5 * var(--b)); --to: calc(3.5 * var(--b)); --out-from: calc(10.5 * var(--b)); --out-to: calc(11 * var(--b)); }
+    .tg-steam .puff { --from: calc(var(--pf) * var(--b)); --to: calc(var(--pt) * var(--b)); }
+    /* The hiss: clear of the awning (below) and the turban (left), above the wok. */
+    .tg-sfx { left: 49%; bottom: 63%; --from: calc(3 * var(--b)); --to: calc(3.5 * var(--b)); --out-from: calc(4.5 * var(--b)); --out-to: calc(5 * var(--b)); }
+    /* The cast: one baseline (the road), sized by --cast-h (Pundit 0.95, Fatt 0.85: both medium shots, a hair under 1 so the two fit 412px). */
+    .tg-pundit { bottom: 0; width: auto; height: calc(var(--cast-h) * 0.95); aspect-ratio: 1357 / 1924; --from: calc(7.7 * var(--b)); --to: calc(8.7 * var(--b)); }
+    .tg-pundit > .cast-art { --rock-from: calc(8.7 * var(--b)); }
+    .tg-fatt { bottom: 0; width: auto; height: calc(var(--cast-h) * 0.85); aspect-ratio: 1576 / 1968; --from: calc(2 * var(--b)); --to: calc(3 * var(--b)); }
+    .tg-fatt > .cast-art { --rock-from: calc(3 * var(--b)); }
+    .tg-pundit > .cast-art, .tg-fatt > .cast-art { height: 100%; }
+    .tg-bubble1 { --from: calc(9.2 * var(--b)); --to: calc(9.7 * var(--b)); --out-from: calc(12.7 * var(--b)); --out-to: calc(13.2 * var(--b)); }
+    .tg-bubble2 { --from: calc(15.7 * var(--b)); --to: calc(16.2 * var(--b)); --out-from: calc(18.2 * var(--b)); --out-to: calc(18.7 * var(--b)); }
+    /* The sacks sit behind the legs (z-prop under the cast), 6% lower so their rims stay under the knees; the chillies vanish at the lowered rim. */
+    .tg-sacks { bottom: -6%; --from: calc(11 * var(--b)); --to: calc(12 * var(--b)); }
+    .tg-chilli { bottom: calc(var(--mk-w) * 0.092); --from: calc(var(--pf) * var(--b)); --to: calc((var(--pf) + 1) * var(--b)); --out-from: calc((var(--pf) + 1) * var(--b)); --out-to: calc((var(--pf) + 1.5) * var(--b)); }
+    .tg-garlands { --from: calc(11.5 * var(--b)); --to: calc(12.5 * var(--b)); }
+    .tg-cap1 { --from: calc(1.2 * var(--b)); --to: calc(1.7 * var(--b)); --out-from: calc(8.7 * var(--b)); --out-to: calc(9.2 * var(--b)); }
+    .tg-cap2 { --from: calc(8.7 * var(--b)); --to: calc(9.2 * var(--b)); --out-from: calc(15.2 * var(--b)); --out-to: calc(15.7 * var(--b)); }
+    .tg-cap3 { --from: calc(15.2 * var(--b)); --to: calc(15.7 * var(--b)); --out-from: 101%; --out-to: 102%; }
   }
 </style>

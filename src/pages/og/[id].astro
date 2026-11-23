@@ -20,7 +20,7 @@ export const getStaticPaths = (async () => {
     { params: { id: 'home' }, props: { gate: 'LDN', place: 'Fatt Pundit', line: 'Soho · Covent Garden · Dubai', note: 'Hakka cooking from Tangra, Calcutta', mark: 'left' as const } },
     ...Object.values(TIGERS).map((t) => ({
       params: { id: t.id },
-      props: { gate: t.trait, place: t.name, line: `“${t.line}”`, note: 'Are you a Fatt or a Pundit?', mark: t.id === 'fatt' ? ('right' as const) : ('left' as const), tiger: t.id },
+      props: { gate: t.trait, place: t.name, line: `“${t.line}”`, note: 'Which tiger are you?', mark: t.id === 'fatt' ? ('right' as const) : ('left' as const), tiger: t.id },
     })),
     ...branches.map((b) => ({
       params: { id: b.id },

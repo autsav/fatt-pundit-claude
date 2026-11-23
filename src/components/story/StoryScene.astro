@@ -11,12 +11,15 @@ interface Props {
   sr: string;
   /** Track height on wider screens, then under 600px (each about one screen per 100vh). */
   h: `${number}vh`;
-  hPhone: `${number}vh`;
+  hPhone?: `${number}vh`;
+  /** Phone track length in beats (--beat = 30svh of scroll each): track = 100svh + beats * --beat. Wins over hPhone. */
+  beats?: number;
 }
-const { label, sr, h, hPhone } = Astro.props;
+const { label, sr, h, hPhone, beats } = Astro.props;
+const phone = beats === undefined ? hPhone : `calc(100svh + ${beats} * var(--beat))`;
 ---
 
-<section class="story-scene" aria-label={label} style={`--h:${h};--h-phone:${hPhone}`}>
+<section class="story-scene" aria-label={label} style={`--h:${h}${phone ? `;--h-phone:${phone}` : ''}`}>
   <div class="scene-stage">
     <p class="sr-only">{sr}</p>
     <slot />

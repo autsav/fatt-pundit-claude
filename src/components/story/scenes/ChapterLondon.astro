@@ -48,7 +48,7 @@ const A = {
 };
 
 // "FATT PUNDIT": each letter lights on its own scroll range, 36% on, 0.7% apart; the D flickers on the way.
-const letters = [...'FATT PUNDIT'].map((ch, i) => ({ ch, n: i, from: +(36 + (i > 4 ? i - 1 : i) * 0.7).toFixed(2) }));
+const letters = [...'FATT PUNDIT'].map((ch, i) => ({ ch, n: i, k: i > 4 ? i - 1 : i }));
 
 // Covent Garden, in walking order along the string. The string sags like a quadratic; each print's hang point is read off the
 // same curve (x in % of the width). Landscape: all four on one string. Portrait: two strings of two.
@@ -58,14 +58,14 @@ const prints = [
   { src: cg4, tag: 'the mirror room', x: 34.5, x2: 73, d: -1 },
   { src: cg7, tag: 'the green banquettes', x: 58, x2: 27, d: 1 },
   { src: cg5, tag: 'the tiger mural', x: 81, x2: 73, d: -1 },
-].map((p, i) => ({ ...p, y: sag(p.x), y2: sag(p.x2), from: 62 + i * 7, row: i > 1 ? 2 : 1 }));
+].map((p, i) => ({ ...p, y: sag(p.x), y2: sag(p.x2), k: i, row: i > 1 ? 2 : 1 }));
 // The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
 const total = [...chapter.title].filter((c) => c !== ' ').length;
 const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => ({ ch, style: `--i:${n++};--n:${total}` }))); })();
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={`${firstSentence(sohoPanel.scene)} ${firstSentence(garden.scene)}`} h="420vh" hPhone="360vh">
+  <StoryScene label={chapter.label} sr={`${firstSentence(sohoPanel.scene)} ${firstSentence(garden.scene)}`} h="420vh" hPhone="360vh" beats={18}>
     <div class="layer fx scene-title lo-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
@@ -74,9 +74,13 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     </div>
 
     <!-- Leg 2 on the night chart: the noodle draws Calcutta to London (4-15; the title is gone by 5), London's stamp lands at 16, the chart is gone by 22 (the sky is opaque from 20). -->
-    <RouteChart id="london" legs={[{ lane: 'leg2', from: 4, to: 15 }]}
+    <div class="lo-cd"><RouteChart id="london" legs={[{ lane: 'leg2', from: 4, to: 15 }]}
       places={[{ at: 'kolkata', name: 'Calcutta', lands: 5, side: 'right', sidePhone: 'left' }, { at: 'london', name: 'London', lands: 16, side: 'left', sidePhone: 'right' }]}
-      focus={[568, 683]} zoom={0.791} zoomMaxH={1.266} y={50} zoomPhone={1.226} yPhone={42} focusPhone={[507.5, 646]} out={[21, 22]} />
+      focus={[568, 683]} zoom={0.791} zoomMaxH={1.266} y={50} zoomPhone={1.226} yPhone={42} focusPhone={[507.5, 646]} out={[21, 22]} /></div>
+    <!-- Phones: the same chart on the beat clock (N=18): draws 0.5-3.5, London lands 3.5, out 4-5 as the sky comes in. -->
+    <div class="lo-cp"><RouteChart id="london-p" legs={[{ lane: 'leg2', from: 2.78, to: 19.44 }]}
+      places={[{ at: 'kolkata', name: 'Calcutta', lands: 8.33, side: 'right', sidePhone: 'left' }, { at: 'london', name: 'London', lands: 19.44, side: 'left', sidePhone: 'right' }]}
+      focus={[568, 683]} zoom={0.791} zoomMaxH={1.266} y={50} zoomPhone={1.226} yPhone={42} focusPhone={[507.5, 646]} out={[22.22, 27.78]} /></div>
 
     <!-- One stage-sized box (a size container, so cq units are the stage's) holds the whole shopfront group, the rain, the room and the prints. -->
     <div class="lo-st" aria-hidden="true">
@@ -96,7 +100,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
           <div class="lo-m lo-halo"></div>
           <div class="lo-sign">
             {letters.map((l) => l.ch === ' ' ? <span class="lo-sp"></span> : (
-              <span class="lo-L">{l.ch}<i class={`lo-m lo-lit${l.n === 7 ? ' lo-flick' : ''}`} style={`--from:${l.from}%;--to:${+(l.from + (l.n === 7 ? 1.3 : 0.5)).toFixed(2)}%`}>{l.ch}</i></span>
+              <span class="lo-L">{l.ch}<i class={`lo-m lo-lit${l.n === 7 ? ' lo-flick' : ''}`} style={`--k:${l.k}`}>{l.ch}</i></span>
             ))}
           </div>
           <p class="lo-m lo-plate">Berwick Street W1</p>
@@ -118,7 +122,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
       </div>
 
       <!-- Rain: two time-based sheets (they fall on their own clock), faded in and out by the scroll. -->
-      <div class="fx fx-fade fx-then-out lo-rain-wrap"><div class="lo-rain lo-rain-far"></div><div class="lo-rain lo-rain-near"></div></div>
+      <div class="lo-rain-gate"><div class="fx fx-fade fx-then-out lo-rain-wrap"><div class="lo-rain lo-rain-far"></div><div class="lo-rain lo-rain-near"></div></div></div>
 
       <!-- The camera arrives: light fills the frame, the room is there under it. -->
       <div class="fx fx-fade lo-in-w"><div class="fx lo-in"><img {...A.inn} /></div></div>
@@ -128,12 +132,12 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
       <svg class="lo-m lo-str" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M-2 10Q50 90 102 10" vector-effect="non-scaling-stroke" /></svg>
       <svg class="lo-m lo-str lo-str2" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M-2 10Q50 90 102 10" vector-effect="non-scaling-stroke" /></svg>
       {prints.map((p) => (
-        <figure class={`lo-pr lo-row${p.row}`} style={`--x:${p.x};--y:${p.y};--x2:${p.x2};--y2:${p.y2}`}>
-          <div class="lo-m lo-slide" style={`--from:${p.from}%;--to:${p.from + 4}%;--x0:-30cqw;--o0:0`}>
-            <div class="lo-pend" style={`--from:${p.from}%;--to:${p.from + 6.5}%;--d:${p.d}`}>
+        <figure class={`lo-pr lo-row${p.row}`} style={`--x:${p.x};--y:${p.y};--x2:${p.x2};--y2:${p.y2};--pk:${p.k};--rw:${p.row}`}>
+          <div class="lo-m lo-slide" style="--x0:-30cqw;--o0:0">
+            <div class="lo-pend" style={`--d:${p.d}`}>
               <span class="lo-peg"></span>
               <Picture src={p.src} alt="" widths={[480, 800, 1200, 1600]} sizes="(min-width: 1700px) 560px, (orientation: portrait) 41vw, 21vw" formats={['webp']} quality={76} class="scene-photo lo-pimg" />
-              <figcaption class="lo-m lo-tag" style={`--from:${p.from + 4}%;--to:${p.from + 6.5}%;--o0:0`}>{p.tag}</figcaption>
+              <figcaption class="lo-m lo-tag" style="--o0:0">{p.tag}</figcaption>
             </div>
           </div>
         </figure>
@@ -141,11 +145,15 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     </div>
 
     <div class="scene-text">
-      <p class="cap fx fx-fade-up fx-then-out lo-cap1">{sohoPanel.caption}</p>
-      <p class="cap fx fx-fade-up fx-then-out lo-cap2">{garden.caption}</p>
+      {/* Phones: Pundit's line has no speaker on an empty street, so it plays as a narrator caption (the bubble is desktop only). */}
+      {sohoPanel.bubbles?.slice(0, 1).map((b) => (
+        <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out lo-capB"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+      ))}
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out lo-cap1">{sohoPanel.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out lo-cap2">{garden.caption}</p>
     </div>
     {sohoPanel.bubbles?.slice(0, 1).map((b) => (
-      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out lo-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+      <p aria-hidden="true" class="bubble tail-left scene-bubble fx fx-pop fx-then-out lo-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
     ))}
   </StoryScene>
 </div>
@@ -174,6 +182,8 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   @keyframes lo-fall { to { transform: translateY(var(--t)); } }
   @keyframes lo-sway { from { rotate: -1.3deg; } to { rotate: 1.3deg; } }
 
+  .lo-cp { display: none; }
+  @media (max-width: 599px) { .lo-cp { display: block; } }
   .lo-m { --e: linear; animation: lo-move var(--e) both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
   .lo-m.lo-door { animation-name: lo-door; }
   .lo-m.lo-blade { animation-name: lo-blade; animation-timing-function: ease-in-out; }
@@ -226,8 +236,9 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .lo-sign { left: 0; width: 100%; top: 26.6%; height: 11.8%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: calc(var(--c) * 6.6); line-height: 1; letter-spacing: 0.12em; text-transform: uppercase; }
   .lo-L { position: relative; color: #3a2a26; }
   .lo-sp { width: 0.5em; }
-  .lo-lit { position: absolute; inset: 0; font-style: normal; color: #ffe8b4; --o0: 0;
+  .lo-lit { position: absolute; inset: 0; font-style: normal; color: #ffe8b4; --o0: 0; --from: calc(36% + var(--k) * 0.7%); --to: calc(var(--from) + 0.5%);
     text-shadow: 0 0 0.12em #ffb347, 0 0 0.3em rgb(255 150 50 / 0.85), 0 0 0.7em rgb(255 110 30 / 0.55); }
+  .lo-lit.lo-flick { --to: calc(var(--from) + 1.3%); }
   .lo-halo { left: 12%; width: 76%; top: 22%; height: 22%; background: radial-gradient(closest-side, rgb(255 160 70 / 0.34), transparent); --o0: 0; --from: 36%; --to: 43%; }
   /* The street plate and the blade sign (bracket, chains, roundel with the tiger stamp). */
   .lo-plate { left: 4.5%; top: calc(var(--c) * 8.4); width: calc(var(--c) * 21); margin: 0; padding: calc(var(--c) * 0.7) 0; text-align: center; background: #f2ecdd; color: #15233b; border: calc(var(--c) * 0.4) solid #15233b; box-shadow: inset 0 0 0 calc(var(--c) * 0.22) #f2ecdd, 0 calc(var(--c) * 0.3) calc(var(--c) * 0.6) rgb(0 0 0 / 0.35);
@@ -245,6 +256,9 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     transform-origin: 50% 0; --sy0: 0; --o0: 0; --o1: 1; --from: 45%; --to: 50%; }
 
   /* Rain: tiles of short slanted streaks that fall exactly one tile per loop, so the loop is seamless; the wrapper's scroll fade is the only coupling. */
+  /* Gate (M23): hidden, so not painted, outside the rain's own range (the wrapper's fade is the look; this is the cost). */
+  @keyframes lo-gate { from, to { visibility: visible; } }
+  .lo-rain-gate { position: absolute; inset: 0; visibility: hidden; animation: lo-gate linear; animation-timeline: --scene; animation-range: contain 26% contain 59%; }
   .lo-rain-wrap { position: absolute; inset: 0; overflow: clip; --from: 26%; --to: 29%; --out-from: 57%; --out-to: 59%; }
   .lo-rain { position: absolute; left: 0; right: 0; bottom: 0; top: calc(-1 * var(--t)); animation: lo-fall var(--d) linear infinite; background-repeat: repeat; background-size: var(--t) var(--t); }
   .lo-rain-far { --t: 140px; --d: 0.95s; opacity: 0.2;
@@ -254,7 +268,10 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
 
   /* 56-72, the room: the amber interior fills the stage (its own window frame cropped by the 1.1x), a vignette to seat the prints. */
   .lo-in-w { position: absolute; inset: 0; overflow: clip; --from: 56%; --to: 59%; }
-  .lo-in-w::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 22cqw rgb(22 10 6 / 0.6); background: linear-gradient(180deg, rgb(22 10 6 / 0.4), transparent 40%); }
+  /* The vignette fades in as the room does (G36): no dark frame round an empty orange field. */
+  @keyframes lo-vig { from { opacity: 0; } }
+  .lo-in-w::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 22cqw rgb(22 10 6 / 0.6); background: linear-gradient(180deg, rgb(22 10 6 / 0.4), transparent 40%);
+    animation: lo-vig linear both; animation-timeline: --scene; animation-range: contain 58% contain 60%; }
   .lo-in { position: absolute; inset: 0; --s0: 1.3; --s1: 1.08; --from: 56%; --to: 72%; }
   .lo-in img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; max-width: none; scale: 1.14; transform-origin: 50% 25%; }
   .lo-bloom { position: absolute; inset: 0; background: radial-gradient(circle farthest-corner at 50% 46%, #fff3d4 0%, #ffcb82 24%, #ff9d3e 52%, rgb(255 140 50 / 0) 100%); --o0: 0; --from: 52%; --to: 58%; --out-from: 60%; --out-to: 65%; }
@@ -267,14 +284,16 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .lo-str2 { display: none; }
   .lo-pr { position: absolute; margin: 0; --pw: calc(var(--u) * 20); --px: var(--x); --py: var(--y); --gr: var(--gy);
     width: var(--pw); left: calc(var(--px) * 1% - var(--pw) / 2); top: calc(var(--gr) + var(--py) * var(--gh) / 100); }
-  .lo-slide { --e: var(--ease-land); }
+  /* Print k: slides in 62 + 7k (4%), swings its pendulum over 6.5%, its tag lands as it settles. */
+  .lo-slide { --e: var(--ease-land); --from: calc(62% + var(--pk) * 7%); --to: calc(var(--from) + 4%); }
+  .lo-pend { --from: calc(62% + var(--pk) * 7%); --to: calc(var(--from) + 6.5%); }
   .lo-pimg { display: block; box-sizing: content-box; width: calc(var(--pw) * 0.93); height: auto; border-width: calc(var(--pw) * 0.035) calc(var(--pw) * 0.035) calc(var(--pw) * 0.1); }
   .lo-peg { position: absolute; z-index: 1; left: 50%; top: calc(var(--pw) * -0.07); width: calc(var(--pw) * 0.055); height: calc(var(--pw) * 0.15); translate: -50% 0; border-radius: 2px;
     background: linear-gradient(90deg, #cfa66b, #e8c791 45%, #b98a52); box-shadow: 0 2px 3px rgb(0 0 0 / 0.35); }
   .lo-peg::after { content: ''; position: absolute; left: 50%; top: 52%; width: 1px; height: 36%; background: rgb(60 36 14 / 0.6); }
   .lo-tag { position: absolute; z-index: 1; right: -3%; bottom: calc(var(--pw) * -0.045); margin: 0; padding: 0.22em 0.7em 0.26em 0.9em; rotate: -4deg; transform-origin: 85% 0;
     background: #dcc196; color: #3a2616; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: max(12px, calc(var(--pw) * 0.075)); line-height: 1.1; white-space: nowrap;
-    border-radius: 2px 5px 5px 2px; box-shadow: 0 2px 5px rgb(0 0 0 / 0.35); --e: var(--ease-stamp); }
+    border-radius: 2px 5px 5px 2px; box-shadow: 0 2px 5px rgb(0 0 0 / 0.35); --e: var(--ease-stamp); --from: calc(66% + var(--pk) * 7%); --to: calc(var(--from) + 2.5%); }
   .lo-tag::before { content: ''; position: absolute; left: 0.28em; top: 50%; width: 0.3em; height: 0.3em; margin-top: -0.15em; border-radius: 50%; background: #3b2a1a; opacity: 0.55; }
   .lo-pr:nth-of-type(1) { --tilt: -1.2deg; } .lo-pr:nth-of-type(2) { --tilt: 0.9deg; } .lo-pr:nth-of-type(3) { --tilt: -0.7deg; } .lo-pr:nth-of-type(4) { --tilt: 1.3deg; }
   .lo-pr { rotate: var(--tilt, 0deg); }
@@ -282,7 +301,8 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   /* Captions: the Soho one clears for the push (51-53), the Covent Garden one lands in the room (57-59); the last holds to the end of the track. */
   .lo-cap1 { --from: 20%; --to: 22%; --out-from: 51%; --out-to: 53%; }
   .lo-cap2 { --from: 57%; --to: 59%; --out-from: 97%; --out-to: 100%; }
-  .lo-bubble { left: var(--gutter); right: auto; top: auto; bottom: calc(var(--floor) + 3%); --from: 30%; --to: 31%; --out-from: 41%; --out-to: 42%; }
+  .lo-bubble { left: var(--gutter); right: auto; top: auto; bottom: calc(var(--floor) + 3%); --from: 30%; --to: 33%; --out-from: 41%; --out-to: 42%; }
+  .lo-capB { display: none; }
 
   /* Portrait and square stages: the shopfront a little narrower than the stage with the street at its sides, the prints two by two on two strings. */
   @media (max-aspect-ratio: 1 / 1) {
@@ -292,5 +312,51 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     .lo-row2 { --gr: calc(var(--gy) + 41cqw * 0.75 + 12cqh); }
     .lo-plate { left: 4%; width: calc(var(--c) * 34); font-size: calc(var(--c) * 2.4); top: calc(var(--c) * 7.5); }
     .lo-bubble { left: 5%; bottom: calc(var(--floor) + 2%); }
+  }
+  /* PHONES, the beat clock. 18 beats; 1 beat = 1/18 of the track (--p). Entrance 1 beat, exit 0.5, at most 2 movers start per beat.
+       0-1 title lifts. 0.5-3.5 the chart draws Calcutta to London; out 4-5 as the sky comes in (a crossfade, no cut)
+       4-5 sky; 5-6 neighbours (2); 6-7 pavement + shopfront (2); 7-8 awning + rain (2); 8-9 plate + blade sign (2)
+       9-10 shade lifts + FATT PUNDIT lights (2); 10-11 halo + door (2); 11-12 doorway glow + light wedge (2)
+       12-14 the camera pushes in (ease-in-out), bloom 12.5-13.5, the group is gone under it 13.5-14, the bloom clears 14-15
+       13-14 the room fades in under the light, settling to 17; 14-16 the strings; 15-16 prints 1+2 (2); 16-17 prints 3+4 (2), each tag by +1.6
+       Captions: Pundit's line 1-2 (holds 2 beats), the Soho one 4-5 (holds 7), the Garden one 12-13 (holds 4, to the end, no exit). */
+  @media (max-width: 599px) {
+    .story-scenes { --p: calc(100% / 18); }
+    .lo-cd, .lo-bubble { display: none; }
+    .lo-capB { display: block; }
+    .lo-st { --F: min(100cqw, 70cqh); --Hp: 10cqh; --sh: 0px; }
+    .lo-title { --from: 0%; --to: calc(1 * var(--p)); }
+    .lo-sf { --from: calc(12 * var(--p)); --to: calc(14 * var(--p)); --out-from: calc(13.5 * var(--p)); --out-to: calc(14 * var(--p)); }
+    .story-scenes .lo-sf.fx { animation-timing-function: cubic-bezier(.65, 0, .35, 1), var(--ease-leave); }
+    .lo-sky { --from: calc(4 * var(--p)); --to: calc(5 * var(--p)); }
+    .lo-nb { --from: calc(5 * var(--p)); --to: calc(6 * var(--p)); }
+    .lo-front { --from: calc(6 * var(--p)); --to: calc(7 * var(--p)); }
+    .lo-pave { --from: calc(6 * var(--p)); --to: calc(7 * var(--p)); }
+    .lo-aw { --from: calc(7 * var(--p)); --to: calc(8 * var(--p)); }
+    .lo-plate { --from: calc(8 * var(--p)); --to: calc(9 * var(--p)); }
+    .lo-arm { --from: calc(8 * var(--p)); --to: calc(8.5 * var(--p)); }
+    .lo-blade { --from: calc(8 * var(--p)); --to: calc(9.5 * var(--p)); }
+    .lo-shade { --from: calc(9 * var(--p)); --to: calc(10 * var(--p)); }
+    .lo-lit { --from: calc((9 + var(--k) * 0.05) * var(--p)); --to: calc(var(--from) + 0.5 * var(--p)); }
+    .lo-lit.lo-flick { --to: calc(var(--from) + 0.65 * var(--p)); }
+    .lo-halo { --from: calc(10 * var(--p)); --to: calc(11 * var(--p)); }
+    .lo-door { --from: calc(10 * var(--p)); --to: calc(11 * var(--p)); }
+    .lo-dglow { --from: calc(11 * var(--p)); --to: calc(12 * var(--p)); }
+    .lo-wedge { --from: calc(11 * var(--p)); --to: calc(12 * var(--p)); }
+    .lo-rain-gate { animation-range: contain calc(7 * var(--p)) contain calc(13.5 * var(--p)); }
+    .lo-rain-wrap { --from: calc(7 * var(--p)); --to: calc(8 * var(--p)); --out-from: calc(13 * var(--p)); --out-to: calc(13.5 * var(--p)); }
+    .lo-bloom { --from: calc(12.5 * var(--p)); --to: calc(13.5 * var(--p)); --out-from: calc(14 * var(--p)); --out-to: calc(15 * var(--p)); }
+    .lo-in-w { --from: calc(13 * var(--p)); --to: calc(14 * var(--p)); }
+    .lo-in-w::after { animation-range: contain calc(13 * var(--p)) contain calc(13.5 * var(--p)); }
+    .lo-in { --s0: 1.12; --s1: 1.04; --from: calc(13 * var(--p)); --to: calc(17 * var(--p)); }
+    .story-scenes .lo-in.fx { animation-timing-function: var(--ease-land); }
+    .lo-str { --from: calc(14 * var(--p)); --to: calc(15 * var(--p)); }
+    .lo-str2 { --from: calc(15 * var(--p)); --to: calc(16 * var(--p)); }
+    .lo-slide { --from: calc((14 + var(--rw)) * var(--p)); --to: calc(var(--from) + 1 * var(--p)); }
+    .lo-pend { --from: calc((14 + var(--rw)) * var(--p)); --to: calc(var(--from) + 1.6 * var(--p)); }
+    .lo-tag { --from: calc((15 + var(--rw)) * var(--p)); --to: calc(var(--from) + 0.6 * var(--p)); }
+    .lo-capB { --from: calc(1 * var(--p)); --to: calc(2 * var(--p)); --out-from: calc(4 * var(--p)); --out-to: calc(4.5 * var(--p)); }
+    .lo-cap1 { --from: calc(4 * var(--p)); --to: calc(5 * var(--p)); --out-from: calc(12 * var(--p)); --out-to: calc(12.5 * var(--p)); }
+    .lo-cap2 { --from: calc(12 * var(--p)); --to: calc(13 * var(--p)); --out-from: 150%; --out-to: 160%; }
   }
 </style>

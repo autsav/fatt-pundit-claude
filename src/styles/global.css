@@ -240,6 +240,9 @@
        leaves accelerates away (ease-in). With fx-then-out the second curve is the exit's. */
     .story-scene .fx:is(.fx-fade-up, .fx-fade) { animation-timing-function: var(--ease-land); }
     .story-scene .fx.fx-pop { animation-timing-function: var(--ease-stamp); }
+    /* Opt-in for moving layers (camera moves, entrances, exits): Apple-like ease-out landing; plain .fx stays linear for ambient layers. */
+    .story-scene .fx.fx-ease { animation-timing-function: var(--ease-land); }
+    .story-scene .fx.fx-ease.fx-then-out { animation-timing-function: var(--ease-land), var(--ease-leave); }
     .story-scene .fx.fx-then-out:is(.fx-fade-up, .fx-fade) { animation-timing-function: var(--ease-land), var(--ease-leave); }
     .story-scene .fx.fx-then-out.fx-pop { animation-timing-function: var(--ease-stamp), var(--ease-leave); }
     /* Rod puppets: a character cut-out rocks from its feet as the scene plays (--rock-from/--rock-to, % of the track;
@@ -250,16 +253,27 @@
       animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
     /* Cast: the rock sits on .cast-art, so the group's transform and opacity stay uncluttered (and the bubble does not rock). */
     .story-scene .cast > .cast-art.fx-rock { transform-origin: 50% 100%; animation: fx-rock ease-in-out both; animation-timeline: --scene; animation-range: contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
-    /* Captions hand over in turn: the old one is gone by the middle of the shared window, the new one starts after it,
-       so two are never legible at once. Same --from/--to/--out-* as any .fx; the first half of a window is the exit. */
-    .story-scene .scene-text :is(.cap, .cap-t).fx { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%); }
-    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
+    /* Captions: a caption enters over its full --from/--to and leaves over its full --out-from/--out-to (same custom
+       properties as any .fx). The engine no longer halves the windows, so two captions are kept apart by the chapter's
+       ranges: the outgoing caption's --out-from/--out-to must overlap the next caption's --from/--to as a crossfade
+       (old fading while the new rises), never leave both fully opaque at once. */
+    .story-scene .scene-text :is(.cap, .cap-t).fx { animation-range: contain var(--from, 0%) contain var(--to, 100%); }
+    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    /* Wider screens keep their pre-beat ranges, where a caption's in and the last one's out share one window: halve
+       them there (rise in the second half, leave in the first) so the two never sit half-opaque on top of each other. */
+    @media (min-width: 600px) {
+      .story-scene .scene-text :is(.cap, .cap-t).fx { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%); }
+      .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
+    }
     /* Between stages: each stage overlaps the last by its torn top edge, so a scene change reads as a fresh sheet of
        paper laid over the last one: no ruler-straight seam, no screen of blank paper. The edge hides under the
        header while the stage is pinned. The wrappers lose their sand fill so the overlap shows the scene beneath. */
     :root:not([data-story='comic']) .story-scenes { background: none; }
-    .story-scene .scene-stage { -webkit-mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat;
-      mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat; }
+    /* The stage itself is unmasked (a mask on a full-screen sticky layer is costly); only this top strip is shaped:
+       sand paper above the torn line (the torn shape XOR-ed out of a full box), laid over the stage's top edge. */
+    .story-scene .scene-stage::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: var(--edge-h); z-index: 30; pointer-events: none; background: var(--color-sand);
+      -webkit-mask: var(--torn-top) 0 0 / 100% 100% no-repeat, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+      mask: var(--torn-top) 0 0 / 100% 100% no-repeat, linear-gradient(#000 0 0); mask-composite: exclude; }
     :root:not([data-story='comic']) :is(.story-scene + .story-scene, .story-chapter[data-scenes] + .story-chapter[data-scenes] .story-scene:first-child, .story-body > .story-chapter[data-scenes]:first-child .story-scene:first-child) { margin-top: calc(-1 * var(--edge-h)); }
   }
 }
@@ -286,8 +300,12 @@
    wins. --floor is what the phone dock (site.css .dock, 640px and below) covers at the stage's foot. */
 /* The torn paper edge stages (and the finale map) overlap each other with; see "Between stages" below. */
 :root { --edge-h: clamp(24px, 4vw, 56px); --torn-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 60' preserveAspectRatio='none'%3E%3Cpath d='M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L168 36 L190 25 L214 33 L236 10 L262 24 L281 30 L309 18 L333 35 L360 21 L384 29 L402 8 L431 26 L455 19 L478 34 L506 24 L529 31 L552 12 L580 27 L601 33 L627 17 L652 30 L679 22 L702 37 L726 15 L749 28 L775 20 L798 33 L826 9 L850 25 L873 32 L901 19 L925 30 L951 14 L976 28 L1000 22 L1000 60 Z'/%3E%3C/svg%3E"); }
-:where(.story-scenes) { --ease-land: cubic-bezier(.165, .84, .44, 1); --ease-stamp: linear(0, .62 22%, 1.07 48%, .98 72%, 1); --ease-leave: cubic-bezier(.55, .055, .675, .19);
+:where(.story-scenes) { --ease-land: cubic-bezier(.28, .11, .32, 1); --ease-stamp: linear(0, .62 22%, 1.07 48%, .98 72%, 1); --ease-leave: cubic-bezier(.4, 0, .6, 1);
   --gutter: clamp(16px, 4vw, 48px); --top: 96px; --ship-w: min(26vw, 300px); --sea-h: 26%; --floor: 0px;
+  /* One beat of story scroll (StoryScene beats={n}: track = 100svh + n beats) and the phone cast's base height (chapters use calc(var(--cast-h) * mult)). */
+  --beat: 30svh; --cast-h: clamp(220px, 34svh, 360px);
+  /* --floor eases when the dock hides (registered below); unsupported browsers just jump. */
+  transition: --floor .3s var(--ease-land);
   --sea-top: calc(var(--floor) + var(--sea-h)); background: var(--color-sand);
   /* The scene unit: 1% of the width, or of a 16:9 frame's width on tall windows. Size the cast and props in
      --u and backdrops as max(112vw, calc(112 * var(--u))), so the set and the cast keep their proportions. */
@@ -300,7 +318,11 @@
    art in .cast-art, and the bubble as a child: --bx/--by are where its tail points, in % of the group
    (the character's box). The bubble's own tail-left / tail-right (from story.ts `tail`) picks the side;
    .cast-flip mirrors the art only. Rock the art with .fx-rock on .cast-art. */
+@property --floor { syntax: '<length>'; inherits: true; initial-value: 0px; }
 :where(.story-scenes) .cast { position: absolute; z-index: var(--z-cast); }
+/* Contact shadow under the feet (opt out: .no-shadow). Behind the art (z-index -1 inside the cast's own stacking context). */
+:where(.story-scenes) .cast::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: -1.5%; height: 5%; z-index: -1; pointer-events: none; background: radial-gradient(rgb(44 41 37 / 0.38), transparent 70%); }
+:where(.story-scenes) .cast.no-shadow::after { content: none; }
 :where(.story-scenes) .cast-art { display: block; width: 100%; height: auto; max-width: none; }
 :where(.story-scenes) .cast-flip > .cast-art { scale: -1 1; }
 :where(.story-scenes) .cast > .bubble { z-index: var(--z-bubble); left: var(--bx, 50%); top: var(--by, 0%); width: max-content; translate: -32px calc(-100% - 14px); }
@@ -366,7 +388,11 @@
 /* Flame: a hot ellipse that grows from its base (--s0 small, --s1 large). */
 :where(.story-scenes) .scene-flame { transform-origin: 50% 100%; aspect-ratio: 1 / 1.3; border-radius: 50% 50% 45% 45%;
   background: radial-gradient(ellipse at 50% 80%, rgb(255 236 170 / 0.95), var(--color-gold) 30%, var(--color-tiger) 58%, transparent 72%); }
-@media (max-width: 640px) { :where(.story-scenes) { --floor: calc(var(--dock-h, 60px) + env(safe-area-inset-bottom)); } }
+@media (max-width: 640px) {
+  :where(.story-scenes) { --floor: calc(var(--dock-h, 60px) + env(safe-area-inset-bottom)); }
+  /* The dock slides away on scroll down (SiteHeader sets data-away), so the cast settles to the screen foot. */
+  html:has(.dock[data-away]) :where(.story-scenes) { --floor: env(safe-area-inset-bottom, 0px); }
+}
 @media (max-width: 599px) {
   :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }
   :where(.story-scene) { height: var(--h-phone, var(--h, 180vh)); }
@@ -596,7 +622,7 @@
 .arrival-flap { font-size: min(clamp(22px, 4.6vw, 56px), calc(100cqw / (var(--n, 13) * 0.8))); }
 
 /* "Pause motion" (footer button): the loops that never end on their own stand still. */
-html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, [data-idle='true']) { animation: none !important; }
+html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, [data-idle='true']) { animation: none !important; }
 
 /* Stand-in for the typewriter font while it loads: Courier New, resized per weight so lines break in
    the same places and nothing jumps when the brand font arrives. Measured on this site's own text:

@@ -25,7 +25,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(dubai.scene)} h="280vh" hPhone="240vh">
+  <StoryScene label={chapter.label} sr={firstSentence(dubai.scene)} h="280vh" hPhone="240vh" beats={13}>
     <div class="layer fx scene-title ns-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
@@ -40,7 +40,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     <div class="cast layer fx fx-fade fx-then-out ns-travellers">
       <SceneArt name="dubai-travellers" note="Fatt and Pundit with stamped suitcases, looking out" widths={[480, 800, 1200]} sizes="(max-width: 599px) 52vw, min(24vw, 360px)" class="cast-art fx-rock" warm />
       {dubai.bubbles?.slice(0, 1).map((b) => (
-        <p class="bubble scene-bubble tail-right fx fx-pop fx-then-out ns-bubble1"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+        <p aria-hidden="true" class={`bubble scene-bubble tail-${b.tail} fx fx-pop fx-then-out ns-bubble1`}><span class="sr-only">{b.who} says: </span>{b.text}</p>
       ))}
     </div>
 
@@ -57,7 +57,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     <div class="cast cast-flip layer fx fx-fade-up ns-tigers">
       <SceneArt name="table-tigers" note="Fatt and Pundit waving the reader in" widths={[480, 800, 1200]} sizes="(max-width: 599px) 52vw, 34vw" class="cast-art fx-rock" />
       {table.bubbles?.slice(0, 1).map((b) => (
-        <p class="bubble scene-bubble tail-left fx fx-pop fx-then-out ns-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+        <p aria-hidden="true" class={`bubble scene-bubble tail-${b.tail} fx fx-pop fx-then-out ns-bubble2`}><span class="sr-only">{b.who} says: </span>{b.text}</p>
       ))}
     </div>
     <SceneArt name="table-momos" fallback={momos} widths={[300, 612]} sizes="(max-width: 599px) 26vw, 260px" class="layer fx fx-fade-up ns-photo" />
@@ -71,8 +71,8 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
 
     <p class="scene-sfx fx fx-pop fx-then-out ns-ding" aria-hidden="true">Ding!</p>
     <div class="scene-text">
-      <p class="cap fx fx-fade-up fx-then-out ns-cap1">{dubai.caption}</p>
-      <p class="cap fx fx-fade-up fx-then-out ns-cap2">{table.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out ns-cap1">{dubai.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out ns-cap2">{table.caption}</p>
     </div>
   </StoryScene>
 </div>
@@ -115,7 +115,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .ns-photo { left: calc(50% - var(--tw) * 0.13); bottom: calc(var(--tb) + var(--tw) * 0.25); translate: -50% 0; width: calc(var(--tw) * 0.21); height: auto; aspect-ratio: 612 / 416; max-width: none;
     filter: drop-shadow(0 6px 5px rgb(44 41 37 / 0.4)); --y0: 40vh; --from: 50%; --to: 58%; z-index: var(--z-prop-front); }
   /* A warm pool of lamplight on the floor round the table, and the table's own soft shadow: the set stands on something. */
-  .ns-floor { inset: 0; background: radial-gradient(calc(var(--tw) * 0.75) calc(var(--tw) * 0.16) at 50% calc(100% - var(--tb) + var(--tw) * 0.02), rgb(92 52 24 / 0.32), transparent 72%),
+  .ns-floor { inset: 0; background: radial-gradient(calc(var(--tw) * 0.62) calc(var(--tw) * 0.09) at 50% calc(100% - var(--tb) + var(--tw) * 0.01), rgb(60 32 12 / 0.6), transparent 75%),
     radial-gradient(calc(var(--tw) * 1.1) calc(var(--tw) * 0.5) at 46% calc(100% - var(--tb) - var(--tw) * 0.2), rgb(255 238 200 / 0.7), transparent 70%); --from: 49%; --to: 51%; }
   /* Chilli garlands across the top corners, under the caption, dropping in with the table. */
   .ns-garlands { inset: 0; pointer-events: none; --y0: -8vh; --from: 49%; --to: 56%; }
@@ -142,22 +142,41 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   /* The bell as "Your table is ready." lands: below the bubble, right of the photo, clear of the caption (top left). */
   .ns-ding { left: calc(50% - var(--tw) * 0.05); top: 24%; translate: -50% 0; font-size: clamp(28px, calc(var(--u) * 4.5), 64px); rotate: 7deg; --from: 64%; --to: 69%; --out-from: 78%; --out-to: 81%; }
 
+  /* PHONES, the beat clock. 13 beats; 1 beat = 1/13 of the track (--p). Entrance 1 beat, exit 0.5, at most 2 movers start per beat.
+       0-1 title lifts, the sky stays. 0.5-1.5 caption 1 (holds 6, to 7.5). 1-2 the tag (out 2.5-3). 2-3 skyline + dunes (2)
+       3-4 travellers (rock 4-7). 4-5 Fatt's bubble (holds 2). 7.5-8.5 Dubai crossfades out, the table + floor come in (2) + caption 2
+       8-9 garlands + tigers (2). 9-10 momos + the Reserved card (2). 10-11 steam + Pundit's bubble (holds 2, to the end). Caption 2 holds to the end, no exit. */
   @media (max-width: 599px) {
-    .ns-skyline { left: -45vw; width: 190vw; bottom: calc(var(--floor) + 20vw); }
+    .story-scenes { --p: calc(100% / 13); --tw: 112vw; --tb: calc(var(--floor) + 6%); }
+    .ns-title { --from: 0%; --to: calc(1 * var(--p)); }
+    .ns-sky { --from: 0%; --to: calc(1 * var(--p)); --out-from: calc(7.5 * var(--p)); --out-to: calc(8.5 * var(--p)); }
+    .ns-tag { --from: calc(1 * var(--p)); --to: calc(2 * var(--p)); --out-from: calc(2.5 * var(--p)); --out-to: calc(3 * var(--p)); }
+    .ns-skyline, .ns-dunes { --from: calc(2 * var(--p)); --to: calc(3 * var(--p)); --out-from: calc(7.5 * var(--p)); --out-to: calc(8.5 * var(--p)); }
+    .ns-skyline { left: -45vw; width: 190vw; bottom: calc(var(--floor) + 14vw); }
     .ns-dunes { left: -35vw; width: 170vw; }
-    /* Phones: sat to the right, so the Burj Khalifa behind them stays in view. */
-    .ns-travellers { right: -3%; bottom: calc(var(--floor) + 2%); width: 48vw; }
-    /* The set stands lower, so the floor isn't an empty band under it. */
-    .story-scenes { --tw: 104vw; --tb: calc(var(--floor) + 12%); }
+    /* Phones: sat to the right, so the Burj Khalifa behind them stays in view. Sized from --cast-h, so Pundit's head clears the top of the card. */
+    .ns-travellers { right: 2%; bottom: calc(var(--floor) + 2%); width: auto; height: calc(var(--cast-h) * 0.9); --x0: 24vw; --from: calc(3 * var(--p)); --to: calc(4 * var(--p));
+      --out-from: calc(7.5 * var(--p)); --out-to: calc(8.5 * var(--p)); --rock-from: calc(4 * var(--p)); --rock-to: calc(7 * var(--p)); }
+    .ns-bubble1 { --bx: 32%; --from: calc(4 * var(--p)); --to: calc(5 * var(--p)); --out-from: calc(7 * var(--p)); --out-to: calc(7.5 * var(--p)); }
+    .ns-cap1 { --from: calc(0.5 * var(--p)); --to: calc(1.5 * var(--p)); --out-from: calc(7.5 * var(--p)); --out-to: calc(8 * var(--p)); }
+    .ns-cap2 { --from: calc(7.5 * var(--p)); --to: calc(8.5 * var(--p)); --out-from: 150%; --out-to: 160%; }
+    .ns-table { --from: calc(7.5 * var(--p)); --to: calc(8.5 * var(--p)); }
+    .ns-floor { --from: calc(7.5 * var(--p)); --to: calc(8.5 * var(--p)); }
+    .ns-garlands { --from: calc(8 * var(--p)); --to: calc(9 * var(--p)); }
     .ns-garland-l { top: 19%; width: 60%; left: -12%; }
     .ns-garland-r { top: 23%; width: 60%; right: -14%; }
     .ns-puff { top: calc(100% - var(--tb) - var(--tw) * 0.5); }
-    /* Phones: the two stand in front of the table on the left (the cast tier), 52vw wide. */
-    /* They stand in front of the table, so they are drawn over the momo plate on it (never the plate over a head). */
-    .ns-tigers { left: 0; bottom: calc(var(--tb) - 9%); width: 54vw; z-index: var(--z-prop-front); }
-    .ns-photo { z-index: var(--z-cast); }
-    /* Above Pundit's head, clear of the plate on the table. */
-    .ns-bubble2 { --bx: 72%; --by: -118%; }
+    .ns-photo { left: calc(50% + var(--tw) * 0.12); --from: calc(9 * var(--p)); --to: calc(10 * var(--p)); z-index: var(--z-cast); }
+    .ns-reserved { --from: calc(9 * var(--p)); --to: calc(10 * var(--p)); }
+    .ns-steam { --from: calc(10 * var(--p)); --to: calc(11 * var(--p)); }
+    .ns-puff1 { --from: calc(10 * var(--p)); --to: calc(12 * var(--p)); }
+    .ns-puff2 { --from: calc(10.5 * var(--p)); --to: calc(12.5 * var(--p)); }
+    .ns-puff3 { --from: calc(11 * var(--p)); --to: calc(13 * var(--p)); }
+    .ns-puff4 { --from: calc(11.5 * var(--p)); --to: calc(13 * var(--p)); }
+    /* Fatt and Pundit stand on the table's own plane (same foot line), in front of it and the plate (z-front over z-cast), sized from --cast-h. */
+    .ns-tigers { left: -3vw; bottom: var(--tb); width: auto; height: calc(var(--cast-h) * 0.72); z-index: var(--z-prop-front); --from: calc(8 * var(--p)); --to: calc(9 * var(--p)); --rock-from: calc(9 * var(--p)); --rock-to: calc(13 * var(--p)); }
+    /* Pundit's bubble: its tail aims at his head, just above it, clear of the plate. */
+    .ns-bubble2 { --bx: 24%; --by: -10%; --from: calc(10 * var(--p)); --to: calc(11 * var(--p)); --out-from: 150%; --out-to: 160%; }
     .ns-ding { display: none; } /* no room on a phone: it would sit on the garland */
   }
 </style>

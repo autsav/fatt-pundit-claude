@@ -244,11 +244,13 @@ const tel = (p: string) => `tel:${p.replace(/\s/g, '')}`;
     .room-phone { display: block; }
     .room-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-block: 8px; }
     .room-btns > :only-child { grid-column: 1 / -1; }
+    .room-btns > .fp-btn { white-space: normal; text-align: center; }
     .room-phone .hours > :not(summary) { display: flex; }
     .room-phone .hours address, .room-phone .hours dl { display: block; }
     .room-phone .hours dl { display: grid; }
     .room-phone .hours { display: block; }
   }
+  @media (max-width: 400px) { .room-btns { grid-template-columns: minmax(0, 1fr); } }
 
   /* 2 · Keep in touch */
   .touch { display: grid; grid-template-columns: 1fr 1fr; gap: 32px clamp(32px, 6vw, 96px); align-items: start; }

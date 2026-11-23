@@ -4,7 +4,7 @@ import fatt from '../../assets/images/brand/tiger-head-right.png';
 import pundit from '../../assets/images/brand/tiger-head-left.png';
 
 export const TIGERS = {
-  fatt: { id: 'fatt', name: 'Fatt', trait: 'Fire', line: 'More wok!', image: fatt, path: '/our-story/fatt/', alt: 'Fatt, the tiger in the beaded crown' },
+  fatt: { id: 'fatt', name: 'Fatt', trait: 'Wok', line: 'Hotter wok!', image: fatt, path: '/our-story/fatt/', alt: 'Fatt, the tiger in the beaded crown' },
   pundit: { id: 'pundit', name: 'Pundit', trait: 'Spice', line: 'More chilli!', image: pundit, path: '/our-story/pundit/', alt: 'Pundit, the tiger in the turban' },
 } as const;
 export type TigerId = keyof typeof TIGERS;
