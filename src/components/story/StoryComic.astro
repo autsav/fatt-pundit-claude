@@ -78,12 +78,12 @@ const groups =
                   sizes={p.shownSize === 'wide' ? '(min-width: 1300px) 1240px, 94vw' : '(min-width: 900px) 600px, 94vw'}
                   width={p.img.w}
                   height={p.img.h}
-                  alt={p.scene}
+                  alt={p.alt}
                   loading="lazy"
                   decoding="async"
                 />
               ) : (
-                <div class="sketch" role="img" aria-label={p.scene}>
+                <div class="sketch" role="img" aria-label={p.alt}>
                   <img class="sketch-art" src={sketchUrl[p.sketch]} alt="" loading="lazy" decoding="async" />
                   <p class="sketch-note" aria-hidden="true">{p.scene}</p>
                 </div>

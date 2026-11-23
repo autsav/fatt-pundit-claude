@@ -1,5 +1,5 @@
 ---
-// "Are you a Fatt or a Pundit?" (pending client approval of the tigers; see tigers.ts for removal).
+// "Which tiger are you?" (pending client approval of the tigers; see tigers.ts for removal).
 // No JS: each choice is a plain link to its share page. With JS: the pick shows a result here, with Share + Book.
 import { Image } from 'astro:assets';
 import { TIGERS } from './tigers';
@@ -7,7 +7,7 @@ import { TIGERS } from './tigers';
 const tigers = Object.values(TIGERS);
 ---
 <div class="tiger-pick" data-tiger-pick>
-  <h3 id="tiger-title" class="tp-title">Are you a Fatt or a Pundit?</h3>
+  <h3 id="tiger-title" class="tp-title">Which tiger are you?</h3>
   <ul class="tp-grid" aria-labelledby="tiger-title">
     {tigers.map((t) => (
       <li>

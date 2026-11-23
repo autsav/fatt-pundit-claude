@@ -68,6 +68,9 @@ const hasTwo = pairFrom >= 0;
 const seaShare = SEA.w / W;
 const seaSize = (z: number, maxH?: number) => (maxH ? `min(${pct(z * seaShare, 1)}vw, ${pct(maxH * seaShare, 1)}svh)` : `${pct(z * seaShare, 1)}vw`);
 const seaSizes = `(max-width: 599px) ${seaSize(zoomPhone, zoomMaxHPhone)}, ${seaSize(zoom, zoomMaxH)}`;
+// Phones decode at most the 2400w crop (M22): the 3200w sea is about 30MB of bitmap at 3.5 screens wide.
+const seaPhoneSrcset = seaImgs.filter((_, i) => seaWs[i] <= 2400).map((m, i) => `${m.src} ${seaWs[i]}w`).join(', ');
+const seaPhoneSizes = seaSize(zoomPhone, zoomMaxHPhone);
 const seaStyle = `left:${pct(SEA.x, W)}%;top:${pct(SEA.y, H)}%;width:${pct(SEA.w, W)}%;height:${pct(SEA.h, H)}%`;
 const at = ([x, yy]: number[]) => `left:${pct(x, W)}%;top:${pct(yy, H)}%`;
 const width = (z: number, maxH?: number) => (maxH ? `min(${pct(z, 1)}%, ${pct(maxH, 1)}svh)` : `${pct(z, 1)}%`);
@@ -159,7 +162,10 @@ const sideCls = (p: (typeof places)[number]) => {
 <Fragment set:html={`<style>${css}</style>`} />
 <div class:list={['layer', 'rc', `rcid-${id}`, finished && 'rc-done', out && 'fx fx-then-out']} style={`${box}${out ? `;--out-from:${out[0]}%;--out-to:${out[1]}%` : ''}`}>
   <div class="layer rc-map" style={`aspect-ratio:${W} / ${H}`}>
-    <img class="rc-sea" src={sea.src} srcset={seaSrcset} sizes={seaSizes} width={SEA.w} height={SEA.h} alt="" style={seaStyle} loading="lazy" decoding="async" />
+    <picture class="rc-pic">
+      <source media="(max-width: 599px)" srcset={seaPhoneSrcset} sizes={seaPhoneSizes} />
+      <img class="rc-sea" src={sea.src} srcset={seaSrcset} sizes={seaSizes} width={SEA.w} height={SEA.h} alt="" style={seaStyle} loading="lazy" decoding="async" />
+    </picture>
     <svg class="layer rc-svg rc-svg-dots" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
       {legs.map((l) => <path class="rc-dots" d={world[l.lane]} />)}
     </svg>
@@ -182,7 +188,7 @@ const sideCls = (p: (typeof places)[number]) => {
       <>
         <!-- The stamp carries the name; this is only the dot on the route. -->
         <p class:list={['rc-name', 'fx', 'fx-fade-up']} data-at={p.at} style={`${at(world.points[p.at])};--from:${p.lands - 4}%;--to:${p.lands}%`} aria-hidden="true"></p>
-        <div class="rc-stamp fx fx-pop" data-at={p.at} aria-hidden="true" style={`${at(world.points[p.at])};--from:${p.lands - 3}%;--to:${p.lands}%`}><span style={`--n:${p.name.length}`}>{p.name}</span></div>
+        <div class="rc-stamp fx fx-pop" data-at={p.at} aria-hidden="true" style={`${at(world.points[p.at])};--from:${p.lands - 3}%;--to:${p.lands}%;--n:${p.name.length}`}><span style={`--n:${p.name.length}`}>{p.name}</span></div>
       </>
     ))}
     <!-- Not aria-hidden: callers may put interactive content here (pins). -->
@@ -198,6 +204,7 @@ const sideCls = (p: (typeof places)[number]) => {
   /* The map box: `zoom` x the stage wide, its focus point at the frame centre (translate % is of the box itself). */
   .rc-map { left: 50%; top: var(--rc-top); width: var(--rc-w); translate: calc(var(--rc-x) * -1) calc(var(--rc-y) * -1); }
   /* Static art on its own composited layer so the noodle's repaints never re-raster the 3200px sea. */
+  .rc-pic { display: contents; }
   .rc-sea { position: absolute; max-width: none; will-change: transform; contain: paint; }
   .rc-svg { inset: 0; width: 100%; height: 100%; overflow: visible; }
   .rc-svg-draw { will-change: transform; }
@@ -237,7 +244,8 @@ const sideCls = (p: (typeof places)[number]) => {
     .rc-body { stroke-width: 5px; }
     .rc-shine { stroke-width: 1.5px; }
     .rc-pr { flex-direction: row; translate: -9px -50%; }
-    .rc-stamp { width: 64px; padding: 3px; border-width: 2px; }
-    .rc-stamp span { font-size: min(8px, calc(64px * 1.35 / (var(--n, 6) + 2))); letter-spacing: 0.02em; }
+    /* Stamps grow with the name so the lettering stays at 11px or more (T24); the chart frames them inside the screen. */
+    .rc-stamp { width: calc(var(--n, 6) * 7.6px + 22px); padding: 3px; border-width: 2px; }
+    .rc-stamp span { font-size: 11px; letter-spacing: 0.02em; }
   }
 </style>

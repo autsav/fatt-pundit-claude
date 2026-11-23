@@ -13,6 +13,7 @@ import hakkaBowl from '../../../assets/images/story/food/hakka-bowl.png';
 import stickyPan from '../../../assets/images/story/food/sticky-pan.png';
 import malabarPan from '../../../assets/images/story/food/malabar-pan.png';
 import { susanDishes, susanCss } from '../../../lib/lazy-susan';
+import { getImage } from 'astro:assets';
 
 const { chapter, index } = chapterOf('something-new');
 const wok = panelOf(chapter, 'p07-the-wok');
@@ -27,6 +28,11 @@ const dishes = susanDishes([
   { src: malabarPan, name: 'Malabar curry', w: 1 }, { src: hakkaBowl, name: 'Vegetable Hakka noodles', w: 0.92 },
 ]);
 // The title as letters: --i/--n drive the engine's staggered scatter (the h2 keeps one sr-only copy of the text).
+// Phones (23 beats): dish k drops at 15.1 + k/2 (two a beat); the row slides 17.6-22.6 (three slides of 1.667 beats, the first 0.917 of each moving),
+// each name shows from just before its dish arrives to just before the next slide; the last holds to the end.
+const tagBeats = (i: number) => { const last = i === dishes.length - 1; const f = 16.55 + i * 1.667; return `--pf:${f.toFixed(2)};--po:${last ? 24 : (17.5 + i * 1.667).toFixed(2)}`; };
+// The food photos' paper grain is masked to each dish's own shape (never a square): a small webp of the same cut-out.
+const masks = await Promise.all([...dishes.map((d) => d.src), momosPlate].map((m) => getImage({ src: m, width: 480, format: 'webp' })));
 const total = chapter.title.replace(/ /g, '').length;
 const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => ({ ch, style: `--i:${n++};--n:${total}` }))); })();
 // Paper lanterns hung along the cord's sag (a quadratic, as ChapterTangra's rope: y = 2 + 40t(1-t) of a 20-unit box): [t along, colour].
@@ -36,8 +42,8 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
 ---
 
 <div class="story-scenes">
-  <StoryScene label={chapter.label} sr={firstSentence(wok.scene)} h="330vh" hPhone="275vh">
-    <div class="layer fx scene-title sn-title">
+  <StoryScene label={chapter.label} sr={firstSentence(wok.scene)} h="330vh" beats={23}>
+    <div class="layer fx fx-ease scene-title sn-title">
       <header class="ch-head">
         <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
         <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
@@ -46,27 +52,29 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
     <div class="layer fx sn-wok-out">
       <SceneArt name="wok-street-night" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer sn-backdrop" />
       <div class="layer sn-evening" aria-hidden="true"></div>
-      <SceneArt name="wok-queue" note="A long queue of hungry neighbours" widths={[480, 960, 1400]} sizes="(max-width: 599px) 62vw, min(30vw, 440px)" class="layer fx fx-puppet sn-queue" warm />
+      <SceneArt name="wok-queue" note="A long queue of hungry neighbours" widths={[480, 960, 1400]} sizes="(max-width: 599px) 62vw, min(30vw, 440px)" class="layer fx fx-ease fx-puppet sn-queue" warm />
+      <div class="cast layer fx fx-fade sn-pundit">
+        <SceneArt name="wok-pundit" note="Pundit throwing in chillies" widths={[600, 1000, 1600]} sizes="(max-width: 599px) 80vw, 30vw" class="cast-art fx-rock" />
+        {pundit && <p aria-hidden="true" class:list={['bubble scene-bubble fx fx-pop fx-then-out sn-bub-pundit', `tail-${pundit.tail}`]}><span class="sr-only">{pundit.who} says: </span>{pundit.text}</p>}
+      </div>
       <div class="cast layer fx fx-fade sn-fatt">
-        <SceneArt name="wok-fatt" note="Fatt tossing a roaring wok" widths={[600, 1000, 1600]} sizes="(max-width: 599px) 66vw, 36vw" class="cast-art fx-rock" />
-        {fatt && <p class:list={['bubble scene-bubble fx fx-pop fx-then-out sn-bub-fatt', `tail-${fatt.tail}`]}><span class="sr-only">{fatt.who} says: </span>{fatt.text}</p>}
+        <SceneArt name="wok-fatt" note="Fatt tossing a roaring wok" widths={[600, 1000, 1600]} sizes="(max-width: 599px) 80vw, 36vw" class="cast-art fx-rock" />
+        {fatt && <p aria-hidden="true" class:list={['bubble scene-bubble fx fx-pop fx-then-out sn-bub-fatt', `tail-${fatt.tail}`]}><span class="sr-only">{fatt.who} says: </span>{fatt.text}</p>}
       </div>
       <p class="scene-sfx fx fx-pop fx-then-out sn-sizzle" aria-hidden="true">Sizzle!</p>
-      <div class="cast layer fx fx-fade sn-pundit">
-        <SceneArt name="wok-pundit" note="Pundit throwing in chillies" widths={[600, 1000, 1600]} sizes="(max-width: 599px) 46vw, 30vw" class="cast-art fx-rock" />
-        {pundit && <p class:list={['bubble scene-bubble fx fx-pop fx-then-out sn-bub-pundit', `tail-${pundit.tail}`]}><span class="sr-only">{pundit.who} says: </span>{pundit.text}</p>}
-      </div>
     </div>
     <div class="layer fx sn-photos">
-      <div class="layer fx fx-late sn-steam-set">
+      <div class="layer fx fx-fade fx-late sn-steam-set">
         <span class="layer sn-spot" aria-hidden="true"></span>
+        <span class="layer sn-table" aria-hidden="true"></span>
         <SceneArt name="momos-plate" fallback={momosPlate} widths={[480, 612]} sizes="(max-width: 599px) 78vw, min(40vw, 560px)" class="layer sn-plate" />
+        <span class="layer sn-plate sn-plate-paper" aria-hidden="true" style={`--m:url(${masks[4].src})`}></span>
         <SceneArt name="steamer-lid" note="The steamer lid" widths={[480, 800, 1026]} sizes="(max-width: 599px) 72vw, min(37vw, 520px)" class="layer fx sn-lid" />
         <span class="layer fx fx-then-out puff sn-puff sn-puff1" aria-hidden="true"></span>
         <span class="layer fx fx-then-out puff sn-puff sn-puff2" aria-hidden="true"></span>
         <span class="layer fx fx-then-out puff sn-puff sn-puff3" aria-hidden="true"></span>
         <span class="layer fx fx-then-out puff sn-puff sn-puff4" aria-hidden="true"></span>
-        <p class="scene-sfx fx fx-pop fx-then-out sn-psshh" aria-hidden="true">Psshh</p>
+        <p class="scene-sfx fx fx-pop fx-then-out sn-psshh" aria-hidden="true">Psshh!</p>
       </div>
     </div>
     <!-- The banquet, side-on (docs/qa/STORY-100-ISSUES.md W4, audit-B Direction B): a long table edge-on at the stage's foot, Fatt and Pundit
@@ -77,22 +85,22 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
       <svg class="sn-cord" viewBox="0 0 100 20" preserveAspectRatio="none" focusable="false"><path d="M-2 2 Q50 22 102 2" /></svg>
       {lanterns.map((l) => <span class="sn-lant" style={`left:${l.x}%;top:${l.y}%;--c:${l.c}`}></span>)}
     </div>
-    <div class="cast layer fx fx-fade-up sn-cast">
+    <div class="cast no-shadow layer fx fx-fade-up sn-cast">
       <SceneArt name="friends-table" note="Fatt and Pundit at a long table after service, sharing a feast" widths={[600, 960, 1400]} sizes="(max-width: 599px) 125vw, (max-width: 1000px) 112vw, 66vw" class="cast-art fx-rock sn-cast-art" />
     </div>
-    <div class="layer fx fx-fade-up z-prop-front sn-counter" aria-hidden="true"><span class="sn-cloth"></span><span class="sn-wood"></span></div>
+    <div class="layer fx fx-ease fx-fade-up fx-late z-prop-front sn-counter" aria-hidden="true"><span class="sn-cloth"></span><span class="sn-wood"></span></div>
     <div class="layer fx z-prop-front sn-row" style={`--x1:calc(var(--gap) * ${-(dishes.length - 1)})`}>
       {dishes.map((d) => (
-        <div class="sn-dish" style={`--k:${d.i};--dw:${d.w}`}><div class="fx fx-fade sn-dish-drop" style={d.drop}><SceneArt name={`susan-${d.i}`} fallback={d.src} widths={[240, 480]} sizes="(max-width: 599px) 30vw, 200px" class="sn-dish-img" /></div></div>
+        <div class="sn-dish" style={`--k:${d.i};--dw:${d.w}`}><div class="fx fx-fade sn-dish-drop" style={`${d.drop.replaceAll('--', '--d')};--m:url(${masks[d.i].src})`}><SceneArt name={`susan-${d.i}`} fallback={d.src} widths={[240, 480]} sizes="(max-width: 599px) 30vw, 200px" class="sn-dish-img" /></div></div>
       ))}
     </div>
-    {dishes.map((d) => <p class="fx fx-fade-up fx-then-out z-prop-front sn-tag" style={d.tag} aria-hidden="true">{d.name}</p>)}
+    {dishes.map((d) => <p class="fx fx-fade-up fx-then-out z-prop-front sn-tag" style={`${d.tag.replaceAll('--', '--d')};${tagBeats(d.i)}`} aria-hidden="true">{d.name}</p>)}
     <style is:inline set:html={susanCss(dishes.length)}></style>
     <div class="scene-text">
       <p class="sr-only">{wok.caption}</p>
       {cues.map((t, i) => <p class={`cap fx fx-fade-up fx-then-out sn-cap1-${i}`} aria-hidden="true">{t}</p>)}
-      <p class="cap fx fx-fade-up fx-then-out sn-cap2">{momos.caption}</p>
-      <p class="cap fx fx-fade-up fx-then-out sn-cap3">{friends.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out sn-cap2">{momos.caption}</p>
+      <p aria-hidden="true" class="cap fx fx-fade-up fx-then-out sn-cap3">{friends.caption}</p>
     </div>
   </StoryScene>
 </div>
@@ -134,6 +142,7 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
   .sn-steam-set { inset: 0; --y0: 12vh; --from: 36%; --to: 40%; }
   .sn-spot { inset: 0; background: radial-gradient(calc(var(--pw) * 0.9) calc(var(--pw) * 0.42) at 50% calc(var(--py) + 2%), rgb(255 240 205 / 0.85), rgb(255 226 170 / 0.35) 55%, transparent 75%),
     radial-gradient(calc(var(--pw) * 0.52) calc(var(--pw) * 0.12) at 50% calc(var(--py) + var(--pw) * 0.3), rgb(44 41 37 / 0.35), transparent 80%), linear-gradient(to bottom, var(--sky), var(--ground)); }
+  img.sn-plate { filter: saturate(0.85) contrast(0.95); }
   .sn-plate { left: 50%; top: var(--py); translate: -50% -50%; width: var(--pw); height: auto; aspect-ratio: 612 / 416; max-width: none; }
   /* The lid sits on the plate (its rim over the momos), then lifts away. */
   .sn-lid { left: 50%; top: calc(var(--py) - var(--pw) * 0.2); translate: -50% -50%; width: calc(var(--pw) * 0.93); height: auto; aspect-ratio: 1026 / 736; max-width: none; --y1: -40vh; --x1: 6vw; --r1: -10deg; --o1: 0; --from: 41%; --to: 52%; }
@@ -185,29 +194,77 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
   /* The row: one wrapper on the lip's centre line, the dishes spaced by --gap and slid left as one (72-97), a dwell on each. */
   .sn-row { left: 50%; bottom: calc(var(--line) - var(--q) * 1.1); width: 0; height: 0; --x0: 0px; --from: 72%; --to: 97%; }
   .sn-dish { position: absolute; bottom: 0; left: calc(var(--k) * var(--gap)); width: calc(var(--dw) * var(--dk)); translate: -50% 0; }
+  /* The crumpled-paper grain (as on the lanterns), multiplied over the photo and masked to the dish's own shape. */
+  .sn-dish-drop::after, .sn-plate-paper { content: ''; position: absolute; inset: 0; pointer-events: none; background: url("../../../assets/images/story/paper-crumpled.webp") 0 0 / 256px 256px; mix-blend-mode: multiply; opacity: 0.45;
+    -webkit-mask: var(--m) center / 100% 100% no-repeat; mask: var(--m) center / 100% 100% no-repeat; }
   .sn-dish-drop::before { content: ''; position: absolute; left: 4%; right: 4%; bottom: calc(var(--q) * -0.5); height: calc(var(--q) * 1.4); border-radius: 50%; background: radial-gradient(rgb(44 41 37 / 0.42), transparent 70%); }
-  .sn-dish-drop { --y0: -16vh; position: relative; }
+  .sn-dish-drop { --y0: -16vh; position: relative; --from: var(--dfrom); --to: var(--dto); }
   /* A paper-white die-cut edge (four 1-step shadows chain into an outline), then the flat contact shadow above. */
   .sn-dish-img { position: relative; display: block; width: 100%; height: auto; max-width: none;
-    filter: drop-shadow(calc(var(--q) * 0.16) 0 0 #fbf6ea) drop-shadow(calc(var(--q) * -0.16) 0 0 #fbf6ea) drop-shadow(0 calc(var(--q) * 0.16) 0 #fbf6ea) drop-shadow(0 calc(var(--q) * -0.16) 0 #fbf6ea); }
+    filter: saturate(0.85) contrast(0.95) drop-shadow(calc(var(--q) * 0.16) 0 0 #fbf6ea) drop-shadow(calc(var(--q) * -0.16) 0 0 #fbf6ea) drop-shadow(0 calc(var(--q) * 0.16) 0 #fbf6ea) drop-shadow(0 calc(var(--q) * -0.16) 0 #fbf6ea); }
   /* The name of the dish at the centre: on the cloth, under the lip, always inside the stage. */
-  .sn-tag { position: absolute; left: 50%; bottom: calc(var(--floor) + var(--lip) * 0.3); translate: -50% 0; margin: 0; padding: 0.35em 0.9em; white-space: nowrap; rotate: -2deg;
+  .sn-tag { --from: var(--dfrom); --to: var(--dto); --out-from: var(--dout-from); --out-to: var(--dout-to); position: absolute; left: 50%; bottom: calc(var(--floor) + var(--lip) * 0.3); translate: -50% 0; margin: 0; padding: 0.35em 0.9em; white-space: nowrap; rotate: -2deg;
     font: 700 clamp(13px, calc(var(--u) * 1.5), 22px) / 1.2 var(--font-display, Georgia, serif); letter-spacing: 0.04em; text-transform: uppercase;
     color: var(--color-paper); background: var(--color-ink); box-shadow: 3px 3px 0 var(--color-tiger, #e8811f); }
   .sn-cap3 { --from: 63%; --to: 66%; --out-from: 97%; --out-to: 100%; }
 
+  /* PHONES: the score in beats (23; one beat = 30svh of scroll, --b = a beat in % of the track). An entrance takes 1 beat, an exit 0.5, no more
+     than 2 movers start in a beat, captions hold ceil(words / 2), a bubble max(2, ceil(words / 2)), a sound word 1, every switch is a crossfade
+     of at least half a beat.
+       title out 0.6 | Fatt 1.1, Pundit 2.1, queue 3.1 | SIZZLE 2.1-4.1 | Pundit's bubble 3.1-6.1, then Fatt's 6.1-9.1 (never together) |
+       wok out and steamer in, crossfaded 9.1-10.1 | lid 10.6, puffs 10.6-12.1 | Psshh! 11.1-13.1 | photos out, wall and counter in 13.6-14.6 |
+       lanterns, cast 14.1 | dishes 15.1-17.6 | the row slides 17.6-22.6.
+     Captions: 2 | 5 | 4 | 9 (the last holds to the end, 8.9: the 23 beats are full). Ground: the road's front edge is 7svh up in the art. */
   @media (max-width: 599px) {
-    .sn-backdrop { object-position: 50% 100%; }
-    .sn-fatt { left: 38%; bottom: calc(var(--floor) + 26%); width: 66vw; }
-    .sn-pundit { left: 76%; bottom: calc(var(--floor) + 36%); width: 44vw; }
-    /* Too narrow a stage for the queue too: the wok and the argument carry the beat on phones. */
-    .sn-queue { display: none; }
-    .sn-sizzle { left: 46%; top: 52%; }
-    .story-scenes { --pw: 78vw; --py: 60%; }
-    .sn-psshh { left: auto; right: 4%; top: calc(var(--py) - var(--pw) * 0.62); }
-    /* Phones: the tigers run a little off both sides so their faces stay big; the dishes are bigger and further apart, so about two show. */
-    .story-scenes { --lip: clamp(130px, 22svh, 280px); --cw: min(125vw, calc((100svh - var(--floor) - var(--lip) - 220px) / 0.451)); --gap: calc(var(--cw) * 0.4); --dk: calc(var(--cw) * 0.27); }
-    .sn-tag { font-size: 13px; }
+    .story-scenes { --b: calc(100% / 23); --ground-y: 7svh; --pw: 78vw; --py: 60%;
+      --lip: clamp(130px, 22svh, 280px); --cw: min(125vw, calc((100svh - var(--floor) - var(--lip) - 220px) / 0.451)); --gap: calc(var(--cw) * 0.4); --dk: calc(var(--cw) * 0.27); --sink: calc(var(--q) * 5.5); }
+    .sn-title { --from: calc(0.6 * var(--b)); --to: calc(1.1 * var(--b)); }
+    .sn-title .tl { --from: calc(0.5 * var(--b) + var(--i, 0) * 0.02 * var(--b)); --to: calc(1 * var(--b) + var(--i, 0) * 0.02 * var(--b)); }
+    .sn-wok-out { --from: calc(9.1 * var(--b)); --to: calc(10.1 * var(--b)); }
+    /* The painted street, cropped to the empty road between the buildings (its own stove and wok, at 53-66% of the art, are out of frame). */
+    .sn-backdrop { object-position: 36% 100%; }
+    /* The cast: one baseline, the road's front edge, sized by --cast-h (about x1.1 of before). Fatt in front of Pundit. */
+    .sn-fatt, .sn-pundit { bottom: calc(var(--floor) + var(--ground-y)); width: auto; }
+    .sn-fatt { left: 36%; height: calc(var(--cast-h) * 0.92); z-index: 3; --y0: 0px; --from: calc(1.1 * var(--b)); --to: calc(2.1 * var(--b)); }
+    .sn-pundit { left: 76%; height: calc(var(--cast-h) * 0.85); z-index: 2; --from: calc(2.1 * var(--b)); --to: calc(3.1 * var(--b)); }
+    .sn-fatt > .cast-art, .sn-pundit > .cast-art { height: 100%; }
+    .sn-fatt > .cast-art { --rock-from: calc(2.1 * var(--b)); --rock-to: calc(9.1 * var(--b)); }
+    .sn-pundit > .cast-art { --rock-from: calc(3.1 * var(--b)); --rock-to: calc(9.1 * var(--b)); }
+    /* A reduced queue (the caption talks of it): small, in the distance behind the cast. */
+    .sn-queue { display: block; right: 0; bottom: calc(var(--floor) + var(--ground-y) + 26svh); width: 46vw; --o0: 0; --x0: 30vw; --from: calc(3.1 * var(--b)); --to: calc(4.1 * var(--b)); --rock-from: calc(4.1 * var(--b)); --rock-to: calc(9.1 * var(--b)); }
+    /* SIZZLE! in the dark sky: sand fill, ink stroke. */
+    .sn-sizzle { left: 50%; top: 30%; translate: -50% 0; color: var(--color-sand); -webkit-text-stroke: 3px var(--color-ink); --from: calc(2.1 * var(--b)); --to: calc(2.6 * var(--b)); --out-from: calc(3.6 * var(--b)); --out-to: calc(4.1 * var(--b)); }
+    .sn-cap1-0 { --from: calc(1.1 * var(--b)); --to: calc(1.6 * var(--b)); --out-from: calc(3.6 * var(--b)); --out-to: calc(4.1 * var(--b)); }
+    .sn-cap1-1 { --from: calc(3.6 * var(--b)); --to: calc(4.1 * var(--b)); --out-from: calc(9.1 * var(--b)); --out-to: calc(9.6 * var(--b)); }
+    /* The tails point at the speakers' heads: Pundit's at the right of his art, Fatt's at the left of his. */
+    .sn-bub-pundit { --bx: 70%; --by: 8%; --from: calc(3.1 * var(--b)); --to: calc(3.6 * var(--b)); --out-from: calc(5.6 * var(--b)); --out-to: calc(6.1 * var(--b)); }
+    .sn-bub-fatt { --bx: 24%; --by: 6%; --from: calc(6.1 * var(--b)); --to: calc(6.6 * var(--b)); --out-from: calc(8.6 * var(--b)); --out-to: calc(9.1 * var(--b)); }
+    /* The steamer set fades in under the wok's fade-out (no move: it is the same stage). */
+    .sn-steam-set { --y0: 0px; --from: calc(9.1 * var(--b)); --to: calc(10.1 * var(--b)); }
+    .sn-photos { --from: calc(13.6 * var(--b)); --to: calc(14.6 * var(--b)); }
+    .sn-lid { --from: calc(10.6 * var(--b)); --to: calc(12.1 * var(--b)); }
+    .sn-puff1 { --from: calc(10.6 * var(--b)); --to: calc(12.6 * var(--b)); --out-from: calc(12.6 * var(--b)); --out-to: calc(13.1 * var(--b)); }
+    .sn-puff2 { --from: calc(11.1 * var(--b)); --to: calc(13.1 * var(--b)); --out-from: calc(13.1 * var(--b)); --out-to: calc(13.6 * var(--b)); }
+    .sn-puff3 { --from: calc(11.6 * var(--b)); --to: calc(13.6 * var(--b)); --out-from: calc(13.6 * var(--b)); --out-to: calc(14.1 * var(--b)); }
+    .sn-puff4 { --from: calc(12.1 * var(--b)); --to: calc(14.1 * var(--b)); --out-from: calc(13.6 * var(--b)); --out-to: calc(14.1 * var(--b)); }
+    /* "Psshh!" below the plate's right edge: clear of the lid (it lifts up and right), the steam and the caption. */
+    .sn-psshh { left: auto; right: 6%; top: calc(var(--py) + var(--pw) * 0.44); rotate: 5deg; --from: calc(11.1 * var(--b)); --to: calc(11.6 * var(--b)); --out-from: calc(12.6 * var(--b)); --out-to: calc(13.1 * var(--b)); }
+    .sn-cap2 { --from: calc(9.1 * var(--b)); --to: calc(9.6 * var(--b)); --out-from: calc(13.6 * var(--b)); --out-to: calc(14.1 * var(--b)); }
+    /* The momo plate on a red paper cloth (the banquet's), its edge a wood lip, in the same light. */
+    .sn-table { left: 0; right: 0; bottom: 0; top: calc(var(--py) - var(--pw) * 0.4);
+      background: radial-gradient(calc(var(--pw) * 0.9) calc(var(--pw) * 0.5) at 50% calc(var(--pw) * 0.4), rgb(255 232 190 / 0.55), transparent 70%), url("../../../assets/images/story/paper-crumpled.webp") 0 0 / 512px 512px, #b3342a;
+      background-blend-mode: normal, multiply, normal; border-top: 10px solid #a8703d; box-shadow: 0 -6px 10px rgb(44 41 37 / 0.25); }
+    /* The banquet: the backdrop crossfades with the photos (13.6-14.6); the counter is hidden until then (no early leak). */
+    .sn-wall { --from: calc(13.6 * var(--b)); --to: calc(14.6 * var(--b)); }
+    .sn-lanterns { --from: calc(14.1 * var(--b)); --to: calc(15.1 * var(--b)); }
+    .sn-counter { --o0: 0; --y0: calc(var(--lip) * 1.1 + var(--floor)); --from: calc(13.6 * var(--b)); --to: calc(14.6 * var(--b)); }
+    .sn-cast { --from: calc(14.1 * var(--b)); --to: calc(15.1 * var(--b)); }
+    .sn-cast-art { --rock-from: calc(15.1 * var(--b)); }
+    .sn-row { bottom: calc(var(--line) - var(--q) * 1.1 - var(--sink)); --from: calc(17.6 * var(--b)); --to: calc(22.6 * var(--b)); }
+    .sn-dish-drop { --from: calc((15.1 + var(--k, 0) * 0.5) * var(--b)); --to: calc((16.1 + var(--k, 0) * 0.5) * var(--b)); }
+    /* Each name sits just under its dish. */
+    .sn-tag { bottom: calc(var(--line) - var(--q) * 1.1 - var(--sink) - var(--q) * 5); font-size: 13px; --from: calc(var(--pf) * var(--b)); --to: calc((var(--pf) + 0.5) * var(--b)); --out-from: calc(var(--po) * var(--b)); --out-to: calc((var(--po) + 0.4) * var(--b)); }
+    .sn-cap3 { --from: calc(13.6 * var(--b)); --to: calc(14.1 * var(--b)); --out-from: 101%; --out-to: 102%; }
   }
   /* Portrait tablets: wider than the 16:9 unit, so the tigers fill the width. */
   @media (min-width: 600px) and (max-aspect-ratio: 1 / 1) {

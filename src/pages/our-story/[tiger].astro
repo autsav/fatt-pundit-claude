@@ -14,13 +14,13 @@ export const getStaticPaths = (() => TIGER_IDS.map((id) => ({ params: { tiger: i
 const t = TIGERS[Astro.params.tiger as keyof typeof TIGERS];
 const branches = await getBranches();
 ---
-<Base title={`You're a ${t.name} · Fatt Pundit`} description={`${t.name}: ${t.trait.toLowerCase()}. “${t.line}” Are you a Fatt or a Pundit?`} og={t.id} noindex>
+<Base title={`You're a ${t.name} · Fatt Pundit`} description={`${t.name}: ${t.trait.toLowerCase()}. “${t.line}” Which tiger are you?`} og={t.id} noindex>
   <SiteHeader branches={branches} />
   <main id="content">
     <section class="sec gold-bg">
       <div class="wrap narrow stack center">
         <Image src={t.image} alt={t.alt} width={200} densities={[1, 2]} class="pick-img" />
-        <p class="kicker">Are you a Fatt or a Pundit?</p>
+        <p class="kicker">Which tiger are you?</p>
         <h1 class="pick-h1">You’re a {t.name}</h1>
         <p class="pick-line">{t.trait}. “{t.line}”</p>
         <div class="pick-actions">
