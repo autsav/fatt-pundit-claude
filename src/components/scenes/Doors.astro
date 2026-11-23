@@ -1,12 +1,12 @@
 ---
-// Scene 2: the front door at Covent Garden. The street comes into view; once it is pinned the
-// three brass lamps flick on, the sign lights letter by letter and the glass clears. Behind the
-// door hangs the red velvet curtain (as at Maiden Lane): the door swings open onto it, you walk
-// up until it fills your view, it slides aside and you step into the room (POV). A slow drift
-// toward the bar, then the bar light blooms into the story (the voyage's paper).
-// Art: covent-garden/front/*.webp, the real shopfront redrawn (Higgsfield GPT Image 2.6 +
-// upscale, 23 Nov 2026), glass keyed out so the room shows through; the door is its own layer.
-// Plan and review: docs/qa/DOOR-SCENE-PLAN.md (phases 1-3, 5).
+// Scene 2: the front door at Covent Garden, walked into first-person. The street comes into
+// view; once it is pinned the brass lamps flick on, the sign lights letter by letter and the
+// glass clears. Behind the door hangs the red velvet curtain (as at Maiden Lane): the door swings
+// open onto it, you walk up (scale from distance, a faint step), cross the dark of the door
+// depth, the curtain is drawn aside (split from the middle on tall screens) and you step into the
+// room as your eyes adjust. A slow drift toward the bar, then the bar light blooms into the story.
+// Art: covent-garden/front/*.webp (Higgsfield GPT Image 2.6 + upscale, 23 Nov 2026).
+// Plans and audits: docs/qa/DOOR-SCENE-PLAN.md, docs/qa/DOOR-SCENE-100.md.
 import { Picture, getImage } from 'astro:assets';
 import type { ImageOutputFormat } from 'astro';
 import { getBranches } from '../../lib/site-data';
@@ -18,9 +18,9 @@ import reflectFront from '../../assets/images/covent-garden/front/reflect-front.
 import reflectDoor from '../../assets/images/covent-garden/front/reflect-door.webp';
 // Tall screens: Maiden Lane around the front (upper floors, dusk sky, neighbours, cobbles), outpainted from the same art.
 import surround from '../../assets/images/covent-garden/front/street.webp';
-// The velvet draught curtain inside the door: flat, gathered aside, and its brass rail (Higgsfield, 23 Nov 2026).
+// The velvet draught curtain inside the door: flat, gathered aside, and its brass rail.
 import velvet from '../../assets/images/covent-garden/front/velvet.webp';
-import gathered from '../../assets/images/covent-garden/front/curtain-gathered.webp';
+import stack from '../../assets/images/covent-garden/front/curtain-stack.webp';
 import railArt from '../../assets/images/covent-garden/front/rail.webp';
 
 const cg = (await getBranches()).find((b) => b.id === 'covent-garden');
@@ -29,49 +29,54 @@ const houseNo = street.match(/^\d+/)?.[0];
 const address = `${street.replace(/\bLane\b/, 'Ln')}, ${cg?.address.locality ?? 'Covent Garden'}`;
 const name = 'Fatt Pundit';
 const formats: ImageOutputFormat[] = ['avif', 'webp'];
-// The street surround is for tall screens only: landscape gets a blank source so it is never fetched.
+// Maiden Lane around the front: on tall screens it fills above and below; on wide screens it is
+// what you see at the edges as you turn to the door.
 const surAvif = await getImage({ src: surround, format: 'avif', widths: [900, 1696] });
 const surWebp = await getImage({ src: surround, format: 'webp', widths: [900, 1696] });
-const blank = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-// One srcset for both room images so the browser fetches it once.
-const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3600], sizes: '100vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
-// Likewise one srcset for the velvet (behind the glass, in the doorway and filling the view).
-const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 3200], sizes: '100vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
+// The rail is drawn as end caps + a repeating rod and rings (border-image), so it keeps its
+// finials and ring spacing at any width; its height follows the stage.
+const rail = await getImage({ src: railArt, format: 'webp' });
+// Cover images on a portrait stage need ~1.5-1.8x the width of the screen.
+const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3600], sizes: '(max-aspect-ratio: 3/4) 150svh, 100vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
+const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 3200], sizes: '(max-aspect-ratio: 3/4) 150svh, 100vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
+const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes: '(max-aspect-ratio: 3/4) 30vw, 20vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
 ---
-<section class="doors" data-doors aria-label={`Step inside Fatt Pundit, ${street}, Covent Garden`}>
+<section class="doors" data-doors aria-label={`Step inside Fatt Pundit, ${street}, Covent Garden`} style={`--rail-src: url("${rail.src}")`}>
   <div class="stage">
     <!-- Past the curtain: the room, already there underneath, that you walk into. -->
     <div class="inside" data-inside aria-hidden="true">
       <div class="inside-move" data-inside-move><Picture {...roomImg} class="inside-img" /></div>
     </div>
-    <!-- The velvet curtain inside the door. One layer for the whole walk: seen through the door glass,
-         in the open doorway, then filling your view before it slides aside (no hand-off to hide). -->
+    <!-- The velvet curtain inside the door: one layer for the whole walk (through the glass, in
+         the doorway, filling your view), its rail at its head, so nothing appears from nowhere. -->
     <div class="threshold" data-threshold aria-hidden="true">
       <div class="velvet" data-velvet>
-        <div class="velvet-panel" data-velvet-panel>
-          <Picture {...velvetImg} class="velvet-img" />
-          <span class="velvet-dim" data-velvet-dim></span>
-          <span class="velvet-rim" data-velvet-rim></span>
-          <span class="velvet-folds" data-velvet-folds></span>
-        </div>
+        {['r', 'l'].map((side) => (
+          <div class={`velvet-panel panel-${side}`} data-panel={side}>
+            <Picture {...velvetImg} class="velvet-img" />
+            <span class="velvet-shade" data-shade></span>
+            <span class="velvet-hem"></span>
+          </div>
+        ))}
+        <span class="velvet-dim" data-velvet-dim></span>
+        <span class="velvet-rim" data-velvet-rim></span>
+        {['r', 'l'].map((side) => <div class={`stack stack-${side}`} data-stack={side}><Picture {...stackImg} class="stack-img" /></div>)}
+        <span class="rail-bar" data-rail></span>
       </div>
-      <span class="leak" data-leak></span>
-      <Picture src={gathered} alt="" formats={formats} class="gathered" widths={[300, 470]} sizes="(max-aspect-ratio: 3/4) 60vw, 30vw" loading="lazy" fetchpriority="low" data-gathered />
-      <Picture src={railArt} alt="" formats={formats} class="rail-bar" widths={[800, 1343]} sizes="104vw" loading="lazy" fetchpriority="low" data-rail />
+      {['r', 'l'].map((side) => <span class={`leak leak-${side}`} data-leak={side}></span>)}
     </div>
     <div class="camera" data-camera aria-hidden="true">
       <picture>
-        <source media="not all and (max-aspect-ratio: 3/4)" srcset={blank} />
-        <source type="image/avif" srcset={surAvif.srcSet.attribute} sizes="230vw" />
-        <img class="surround" src={surWebp.src} srcset={surWebp.srcSet.attribute} sizes="230vw" alt="" loading="lazy" decoding="async" fetchpriority="low" />
+        <source type="image/avif" srcset={surAvif.srcSet.attribute} sizes="(max-aspect-ratio: 3/4) 230vw, 135vw" />
+        <img class="surround" src={surWebp.src} srcset={surWebp.srcSet.attribute} sizes="(max-aspect-ratio: 3/4) 230vw, 135vw" alt="" loading="lazy" decoding="async" fetchpriority="low" />
       </picture>
-      <div class="room-wrap" data-room-wrap>
+      <div class="room-wrap">
         <Picture {...roomImg} class="room" />
       </div>
       <div class="dim" data-dim></div>
       <!-- Calm / no-script: the curtain drawn in the doorway (the live scene uses the threshold layer instead). -->
       <div class="curtain-still"><Picture {...velvetImg} class="curtain-still-img" /></div>
-      <Picture src={facade} alt="" formats={formats} class="facade" widths={[900, 1400, 2000, 2800]} sizes="(max-aspect-ratio: 3/4) 200vw, (min-aspect-ratio: 1/1) max(100vw, 133svh), 100vw" loading="lazy" fetchpriority="low" />
+      <Picture src={facade} alt="" formats={formats} class="facade" widths={[900, 1400, 2000, 2800, 4096]} sizes="(max-aspect-ratio: 3/4) 170vw, max(100vw, 133svh)" loading="lazy" fetchpriority="low" />
       <Picture src={reflectFront} alt="" formats={formats} class="reflect" widths={[1000, 2048]} sizes="(max-aspect-ratio: 3/4) 200vw, 100vw" loading="lazy" fetchpriority="low" data-reflect />
       <div class="door" data-door>
         <Picture src={door} alt="" formats={formats} class="door-img" widths={[400, 712]} sizes="(max-aspect-ratio: 3/4) 40vw, 25vw" loading="lazy" fetchpriority="low" />
@@ -92,7 +97,8 @@ const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 320
       <p class="sign sign-shine" aria-hidden="true" data-shine><span class="sign-name">{name}</span></p>
       {houseNo && <span class="house-no">{houseNo}</span>}
     </div>
-    <!-- Crossing the threshold: eyes adjusting to the warm room, and the edges of your view. -->
+    <!-- Crossing the threshold: the dark of the door depth, eyes adjusting to the warm room, the edges of your view. -->
+    <span class="dip" aria-hidden="true" data-dip></span>
     <span class="exposure" aria-hidden="true" data-exposure></span>
     <span class="vig" aria-hidden="true" data-vig></span>
     <!-- One grade for the whole scene: a fine film grain over painted front and photo alike. -->
@@ -107,7 +113,7 @@ const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 320
       <!-- The bar light past the door is where the story starts: the voyage picks it up next. -->
       <div class="opening">
         <p class="o-label"><span class="o-no">01</span> Our story</p>
-        <h2 class="o-line">From Guangdong<br />to Calcutta</h2>
+        <h2 class="o-line">From Guangdong to Calcutta</h2>
         <p class="o-sub">Hakka families sailed from southern China with their recipes, and met the spices of India in Tangra, Calcutta's Chinatown.</p>
         <p class="o-cue" aria-hidden="true">Keep scrolling to follow the ship</p>
       </div>
@@ -116,50 +122,56 @@ const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 320
 </section>
 
 <noscript>
-  <!-- No script: show the calm version (lit front, open door, story opening below). -->
+  <!-- No script: show the calm version (lit front, open door onto the curtain, story opening below). -->
   <style is:inline>
     html .doors { height: auto !important; } html .doors .stage { position: relative !important; top: 0 !important; height: auto !important; display: block !important; }
-    html .doors .camera { position: relative !important; left: 0 !important; top: 0 !important; translate: none !important; width: 100% !important; height: auto !important; }
+    html .doors .camera { position: relative !important; left: 0 !important; top: 0 !important; translate: none !important; width: 100% !important; height: auto !important; margin: 0 !important; }
     html .doors .lamp, html .doors .sign-lit [data-ch], html .doors .sign-lit [data-sub], html .doors .opening { opacity: 1 !important; }
     html .doors .dim { opacity: 0.15 !important; } html .doors .reflect { opacity: 0.3 !important; } html .doors .door { transform: rotateY(-62deg) !important; }
-    html .doors .below { position: relative !important; bottom: 0 !important; background: none !important; padding-block: 16px !important; }
-    html .doors .flood { position: relative !important; opacity: 1 !important; padding-block: 64px !important; background: var(--color-sand) !important; }
-    html .doors .o-cue, html .doors .seam, html .doors .surround, html .doors .exposure, html .doors .vig { display: none !important; }
+    html .doors .below { position: relative !important; bottom: 0 !important; padding-block: 16px !important; }
+    html .doors .flood { position: relative !important; display: grid !important; opacity: 1 !important; padding-block: 64px !important; background: var(--color-sand) !important; }
+    html .doors .o-cue, html .doors .seam, html .doors .surround, html .doors .exposure, html .doors .vig, html .doors .dip { display: none !important; }
   </style>
 </noscript>
 
 <style>
-  /* 330svh: the street rises into view (first 100svh), then 230svh pinned for the walk in. */
-  .doors { position: relative; height: 330svh; background: var(--color-ink); --bar: 72px; --door-x: 25.56%; --door-y: 68.07%; }
+  /* The pinned walk is a fixed scroll budget in px (--len): enough per beat on a short phone
+     flick and not endless on a tall desktop. The street rises into view in the first screen. */
+  .doors { position: relative; --bar: 72px; --len: clamp(2600px, 300svh, 3400px); height: calc(100svh - var(--bar) + var(--len)); background: var(--color-ink); --door-x: 25.56%; --door-y: 68.07%; }
+  @media (pointer: coarse) { .doors { --len: clamp(2800px, 380svh, 3600px); } }
   .stage { position: sticky; top: var(--bar); height: calc(100svh - var(--bar)); overflow: hidden; display: grid; place-items: center; }
-  /* Landscape: the shopfront covers the stage like a street seen straight on (sides and sky crop). */
-  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: 100%; aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 1200px; perspective-origin: var(--door-x) var(--door-y); will-change: transform; }
-  @media (min-aspect-ratio: 1/1) { .camera { width: max(100%, calc((100svh - var(--bar)) * 4096 / 3089)); } }
-  /* Tall screens: sized by height and centred on the sign (the brick ends and the side door crop). */
+  /* Phones: the stage keeps its size when the URL bar collapses (no ink strip under it). */
+  @supports (height: 100lvh) { @media (pointer: coarse) { .stage { height: calc(100lvh - var(--bar)); } } }
+  /* The front always covers the stage like a street seen straight on (sides and sky crop). */
+  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: max(100%, calc((100svh - var(--bar)) * 4096 / 3089)); aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 1200px; perspective-origin: var(--door-x) var(--door-y); will-change: transform; }
+  /* Ultrawide and short landscape (phone on its side): hang the front from its lamps, not its middle. */
+  @media (min-aspect-ratio: 2/1) { .camera { top: 0; translate: -50% -12%; } }
+  @media (orientation: landscape) and (max-height: 500px) { .camera { top: 0; translate: -50% -11%; } }
+  /* Tall screens: sized by height and centred on the sign, in its street (brick ends and side door crop). */
   @media (max-aspect-ratio: 3/4) { .camera { width: auto; height: 62%; top: 40%; translate: -50% -46%; } }
-  .camera :global(picture) { display: contents; }
+  /* Portrait tablets: a bigger front, less pavement. */
+  @media (max-aspect-ratio: 3/4) and (min-aspect-ratio: 3/5) { .camera { height: 72%; top: 44%; } }
+  .camera :global(picture), .inside :global(picture), .threshold :global(picture) { display: contents; }
   .room-wrap { position: absolute; inset: 18% 4% 2% 4%; overflow: hidden; }
   /* Live: the doorway is cut out of the room and the dim (a little oversize, hidden by the jambs), so the
      door glass and the open doorway show the velvet underneath; the shop windows keep the room. */
   .doors:global(.is-live) .room-wrap { clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 13.4% 34.9%, 13.4% 89.9%, 33.4% 89.9%, 33.4% 34.9%, 13.4% 34.9%, 0 0); }
-  .doors:global(.is-live) .dim { clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.8% 34.8%, 5.8% 100%, 29.9% 100%, 29.9% 34.8%, 5.8% 34.8%, 0 0); }
-  /* Put the bar (≈52% 50% of the photo) behind the left door (≈23% 63% of this box). */
-  .room { width: 100%; height: 100%; object-fit: cover; transform: translate(-30.4%, 13%) scale(1.7); }
+  .doors:global(.is-live) .dim { clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 5.8% 34.2%, 5.8% 100%, 29.9% 100%, 29.9% 34.2%, 5.8% 34.2%, 0 0); }
+  /* Put the bar (≈52% 50% of the photo) behind the left door (≈23% 63% of this box); graded warm like the front. */
+  .room { width: 100%; height: 100%; object-fit: cover; transform: translate(-30.4%, 13%) scale(1.7); filter: sepia(0.08) saturate(0.92) contrast(1.08) brightness(0.95); }
   .dim, .facade, .door-img { position: absolute; }
   /* Night inside until the lamps come on (opacity only: compositor). */
   .dim { inset: 22% 12% 8% 12%; background: #0d0b09; opacity: 0.78; will-change: opacity; }
   /* The still curtain in the doorway (calm and no-script only). */
-  .curtain-still { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; overflow: hidden; }
+  .curtain-still { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; overflow: hidden; background: #4a0d0a; }
   .curtain-still::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(255 190 110 / 0.28), transparent 45%); }
   .curtain-still-img { width: 100%; height: 100%; object-fit: cover; }
   .doors:global(.is-live) .curtain-still { display: none; }
   /* Grade: the painted front pulled toward the real, weathered vermilion and the photo's softer blacks. */
   .facade, .door-img { filter: saturate(0.86) contrast(0.95) brightness(0.98); }
   .facade { inset: 0; width: 100%; height: 100%; }
-  /* The street around the front, placed so its painted shopfront sits exactly under ours. Tall screens only
-     (hidden + lazy elsewhere, so it is never fetched on landscape). */
-  .surround { position: absolute; left: -16.37%; top: -102.49%; width: 132.81%; height: 262.51%; max-width: none; display: none; filter: saturate(0.86) contrast(0.95) brightness(0.98); }
-  @media (max-aspect-ratio: 3/4) { .surround { display: block; } }
+  /* The street around the front, placed so its painted shopfront sits exactly under ours. */
+  .surround { position: absolute; left: -16.37%; top: -102.49%; width: 132.81%; height: 262.51%; max-width: none; filter: saturate(0.86) contrast(0.95) brightness(0.98); }
   /* The door leaf, hinged on the left (the handle is on the right), opening inward, with a painted edge. */
   .door { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
   .door::after { content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 1cqw; transform-origin: right center; transform: rotateY(-90deg); background: linear-gradient(90deg, #3d0f0b, #6e1d15 40%, #4a120d); }
@@ -167,89 +179,112 @@ const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 320
   /* Glass reflection (blend baked into the file); fades as the room lights up. */
   .reflect { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.9; pointer-events: none; will-change: opacity; }
   .door-shade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.55)); opacity: 0; will-change: opacity; }
-  /* A lamp: the warm pool under each brass shade; unlit until it flicks on. */
-  .lamp { position: absolute; left: var(--x); top: 17.6%; width: 13cqw; height: 9cqw; translate: -50% -22%; background: radial-gradient(50% 50% at 50% 30%, rgb(255 214 140 / 0.85), rgb(255 170 70 / 0.35) 35%, transparent 70%); opacity: 0; pointer-events: none; will-change: opacity; }
+  /* A lamp: a warm pool thrown down the fascia from the brass shade; unlit until it flicks on. */
+  .lamp { position: absolute; left: var(--x); top: 17%; width: 14cqw; height: 12cqw; translate: -50% 0; background: radial-gradient(55% 60% at 50% 12%, rgb(255 214 140 / 0.8), rgb(255 170 70 / 0.3) 40%, transparent 75%); opacity: 0; pointer-events: none; }
   .lamp.is-on { opacity: 1; animation: lamp-flick 520ms steps(1, end); }
   @keyframes lamp-flick { 0% { opacity: 0.7; } 18% { opacity: 0.1; } 34% { opacity: 0.9; } 46% { opacity: 0.3; } 60%, 100% { opacity: 1; } }
-  /* The sign: gold slab capitals on the red fascia, as on Maiden Lane. */
-  .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #6f5228; text-align: center; line-height: 1; text-shadow: 0 0.03em 0 rgb(40 10 6 / 0.55); }
+  /* The sign: gilt slab capitals on the red fascia, as on Maiden Lane; unlit gilt is dark with a faint catch-light. */
+  .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #4a3418; text-align: center; line-height: 1; text-shadow: 0 0.03em 0 rgb(255 220 160 / 0.12); }
   .sign-name { font-weight: 700; font-size: 4.3cqw; letter-spacing: 0.1em; }
   .ch { display: inline-block; white-space: pre; }
   /* As on Maiden Lane: the lines under the name are white sans, not gold slab. */
   .sign-sub, .sign-addr { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-stretch: 87.5%; font-weight: 700; color: rgb(236 230 220 / 0.42); text-shadow: none; }
   .sign-sub { font-size: max(1.2cqw, 9px); letter-spacing: 0.08em; }
   .sign-addr { font-size: max(0.88cqw, 8px); letter-spacing: 0.08em; }
-  /* The lit copy: each letter flicks on (opacity only). */
+  @media (max-aspect-ratio: 3/4) { .sign-sub { font-size: max(1.6cqw, 10px); } .sign-addr { font-size: max(1.2cqw, 9px); } }
   /* Lit: gilt leaf (a vertical bevel of golds) with a thin dark keyline; the lamps' glow on the fascia. */
-  .sign-lit { text-shadow: none; filter: drop-shadow(0 0 0.35cqw rgb(255 190 90 / 0.45)); }
+  .sign-lit { text-shadow: none; filter: drop-shadow(0 0 0.35cqw rgb(255 190 90 / 0.45)); will-change: transform; }
   .sign-lit .ch { background: linear-gradient(180deg, #fbe4a4 0%, #e6b85e 42%, #a97629 56%, #ecc571 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 0.012em rgb(60 22 10 / 0.6); }
   .sign-lit .sign-sub, .sign-lit .sign-addr { color: #f6f1e8; }
-  /* The shine: a pale band wiped across the name once (mask moves; plays one time). */
-  .sign-shine { color: #fff6dc; text-shadow: none; opacity: 0; -webkit-mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; }
+  /* The shine: a pale band wiped across the name once (mask moves; plays one time, in its own layer). */
+  .sign-shine { color: #fff6dc; text-shadow: none; opacity: 0; will-change: transform; -webkit-mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; }
   .sign-shine.is-on { animation: sign-shine 1400ms var(--curve-out, ease-out) 200ms 1 both; }
   @keyframes sign-shine { from { opacity: 0.85; -webkit-mask-position: 150% 0; mask-position: 150% 0; } to { opacity: 0.85; -webkit-mask-position: -50% 0; mask-position: -50% 0; } }
   .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 0; }
   .sign-lit .is-on { opacity: 1; animation: lamp-flick 300ms steps(1, end); }
   .sign-lit [data-sub].is-on { animation: none; transition: opacity var(--dur-panel) var(--curve-out, ease-out); }
   .house-no { position: absolute; left: 71.6%; top: 50%; translate: -50% 0; font-family: var(--font-display); font-weight: 700; font-size: 2.2cqw; color: #2b2522; }
-  /* "Come in.": small tracked capitals over a soft pool of shadow, not a strip. */
-  .below { position: absolute; left: 0; right: 0; bottom: 4vh; display: grid; justify-items: center; gap: 2px; padding: 28px 16px 0; background: radial-gradient(60% 100% at 50% 100%, rgb(13 11 9 / 0.62), transparent 70%); }
-  .come-in { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.32em; color: var(--color-gold); font-size: 14px; }
-  .skip-story { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; color: rgb(218 199 181 / 0.78); font-size: 13px; text-decoration: none; }
+  /* "Come in.": small tracked capitals over a soft pool of shadow (no box edges). */
+  .below { position: absolute; left: 0; right: 0; bottom: 4vh; display: grid; justify-items: center; gap: 2px; padding: 28px 16px 0; isolation: isolate; }
+  .below::before { content: ""; position: absolute; inset: -40px -10% -24px; z-index: -1; background: radial-gradient(closest-side, rgb(13 11 9 / 0.6), transparent); }
+  .come-in { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.32em; color: var(--color-gold); font-size: 16px; text-shadow: 0 1px 8px rgb(0 0 0 / 0.8); }
+  .skip-story { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; color: rgb(218 199 181 / 0.9); font-size: 14px; text-decoration: none; text-shadow: 0 1px 6px rgb(0 0 0 / 0.8); }
   .skip-story:hover, .skip-story:focus-visible { color: var(--color-gold); text-decoration: underline; text-underline-offset: 4px; }
-  .seam { position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; background: linear-gradient(var(--color-ink), rgb(44 41 37 / 0.6) 35%, transparent); will-change: opacity; }
-  /* Tall screens already rise out of the street's sky and upper floors: just soften the very edge. */
-  @media (max-aspect-ratio: 3/4) { .seam { height: 6%; background: linear-gradient(rgb(44 41 37 / 0.7), transparent); } }
-  .grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.07; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
-  /* While the scene is pinned the page chrome steps back (rail and header button). */
-  :global(html[data-door-scene] .rail.is-on), :global(html[data-door-scene] .nav-book) { opacity: 0.35; }
-  /* The room past the curtain: full stage, under everything, shown once the curtain fills your view. */
-  .inside { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
-  .inside-move { position: absolute; inset: 0; transform-origin: 52% 50%; will-change: transform; }
-  .inside :global(picture), .threshold :global(picture) { display: contents; }
+  @media (orientation: landscape) and (max-height: 500px) { .below { bottom: 4px; padding-top: 8px; } .come-in { font-size: 12px; } }
+  .seam { position: absolute; left: 0; right: 0; top: 0; height: 46%; pointer-events: none; background: linear-gradient(var(--color-ink), rgb(44 41 37 / 0.35) 50%, transparent); }
+  /* Tall screens already rise out of the street's sky and upper floors: a softer, shorter edge. */
+  @media (max-aspect-ratio: 3/4) { .seam { height: 14%; background: linear-gradient(var(--color-ink), transparent); } }
+  .grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.05; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  /* While the scene is pinned the page chrome steps back (rail and header button), still legible. */
+  :global(html[data-door-scene] .rail.is-on) { opacity: 0.35; }
+  :global(html[data-door-scene] .nav-book) { opacity: 0.6; filter: saturate(0.4); }
+
+  /* The room past the curtain: full stage, under everything, shown under the opaque front before it is needed. */
+  .inside { position: absolute; inset: 0; display: none; pointer-events: none; background: #2b1d14; }
+  .inside-move { position: absolute; inset: 0; transform-origin: 52% 46%; will-change: transform; }
+  .inside-img { width: 100%; height: 100%; object-fit: cover; object-position: 52% 50%; filter: sepia(0.08) saturate(0.92) contrast(1.04) brightness(0.95); }
+  @media (max-aspect-ratio: 3/4) { .inside-img { object-position: 58% 50%; } }
   /* The curtain layer: stage-sized (one screen of GPU memory), moved to track the doorway. */
   .threshold { position: absolute; inset: 0; pointer-events: none; display: none; }
   .doors:global(.is-live) .threshold { display: block; }
-  .velvet, .velvet-panel { position: absolute; inset: 0; will-change: transform; }
-  .velvet-panel { transform-origin: right center; }
-  .velvet-img { width: 100%; height: 100%; object-fit: cover; }
-  .velvet-dim, .velvet-rim, .velvet-folds { position: absolute; inset: 0; }
-  .velvet-dim { background: #0d0b09; opacity: 0.78; }
+  .velvet { position: absolute; inset: 0; will-change: transform; --rh: clamp(28px, 7svh, 64px); }
+  .velvet-panel { position: absolute; inset: 0; background: #4a0d0a; will-change: transform, opacity; }
+  /* Landscape: one curtain drawn to the right. Tall screens: split from the middle, drawn to both sides. */
+  .panel-r { transform-origin: right center; }
+  .panel-l { transform-origin: left center; display: none; clip-path: inset(0 50% 0 0); }
+  .doors:global(.is-split) .panel-r { clip-path: inset(0 0 0 50%); }
+  .doors:global(.is-split) .panel-l { display: block; }
+  .velvet-img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.9) brightness(0.94); }
+  .velvet-dim, .velvet-rim, .velvet-shade, .velvet-hem { position: absolute; inset: 0; }
+  .velvet-dim { background: #0d0b09; opacity: 0.78; will-change: opacity; }
   /* Warm light from the room catching the near edge of the velvet once the door is open. */
-  .velvet-rim { background: radial-gradient(90% 120% at 0% 50%, rgb(255 190 110 / 0.4), transparent 60%); opacity: 0; }
-  /* As the panel gathers, its folds crowd and deepen. */
-  .velvet-folds { background: repeating-linear-gradient(90deg, rgb(0 0 0 / 0.55) 0 1.1%, transparent 2.4% 4.6%); opacity: 0; }
-  /* The warm light leaking past the curtain's moving edge. */
-  .leak { position: absolute; top: 0; bottom: 0; left: 0; width: 26vw; margin-left: -13vw; background: linear-gradient(90deg, transparent, rgb(255 196 120 / 0.45) 42%, rgb(255 232 190 / 0.75) 50%, rgb(255 196 120 / 0.45) 58%, transparent); opacity: 0; will-change: transform, opacity; }
-  .gathered { position: absolute; top: 0; right: 0; height: 100%; width: auto; max-width: none; opacity: 0; transform-origin: right center; will-change: transform, opacity; }
-  .rail-bar { position: absolute; top: -1%; left: -2%; width: 104%; height: auto; max-width: none; opacity: 0; transform-origin: 50% 0; will-change: transform, opacity; }
-  .exposure { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 60% at 52% 45%, #fff2d6, rgb(255 226 170 / 0.5) 45%, transparent 75%); opacity: 0; }
-  .vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 90% at 50% 50%, transparent 48%, rgb(13 11 9 / 0.85)); opacity: 0.2; }
-  .inside-img { width: 100%; height: 100%; object-fit: cover; object-position: 52% 50%; }
-  /* The bar light blooms into the story's paper; a trace of the room stays under it. */
-  .flood { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 52% 40%, #fff4dc 0, #f1dcb6 26%, var(--color-sand) 62%); opacity: 0; pointer-events: none; }
-  .opening { display: grid; justify-items: center; gap: clamp(14px, 2vw, 22px); max-width: min(100%, 1000px); text-align: center; color: var(--color-ink); opacity: 0; }
+  .velvet-rim { background: radial-gradient(90% 120% at 0% 50%, rgb(255 190 110 / 0.4), transparent 60%); opacity: 0; will-change: opacity; }
+  /* As the panel gathers, its folds deepen (a darkening, not a stripe pattern). */
+  .velvet-shade { background: #12070a; opacity: 0; }
+  /* The hem meets the floor: a soft floor shadow at the bottom. */
+  .velvet-hem { background: linear-gradient(transparent 82%, rgb(13 11 9 / 0.55)); }
+  /* The gathered stack(s) hang from under the rail at the edge. */
+  .stack { position: absolute; top: calc(var(--rh) * 0.5); bottom: 0; width: 18%; opacity: 0; display: none; will-change: transform, opacity; }
+  .stack-r { right: 0; transform-origin: right center; }
+  .stack-l { left: 0; transform-origin: left center; }
+  .stack-l .stack-img { transform: scaleX(-1); }
+  .doors:global(.is-split) .stack { width: 14%; }
+  .stack-img { width: 100%; height: 100%; object-fit: cover; }
+  /* The brass rail at the curtain's head: whole finials, rod and rings repeated between them. */
+  .rail-bar { position: absolute; top: 0; left: 0; right: 0; height: var(--rh); box-sizing: border-box; border-style: solid; border-width: 0 calc(var(--rh) * 1.11); border-image-source: var(--rail-src); border-image-slice: 0 165 fill; border-image-repeat: round; will-change: transform, opacity; }
+  /* The warm light leaking past the curtain's moving edge (its width follows the screen). */
+  .leak { position: absolute; top: 0; bottom: 0; left: 0; width: clamp(120px, 14vw + 8svh, 40vw); translate: -50% 0; background: linear-gradient(90deg, transparent, rgb(255 196 120 / 0.32) 40%, rgb(255 220 170 / 0.5) 50%, rgb(255 196 120 / 0.32) 60%, transparent); opacity: 0; display: none; will-change: transform, opacity; }
+  /* The dark of the door depth, then eyes adjusting to the warm room, and the edges of your view. */
+  .dip { position: absolute; inset: 0; pointer-events: none; background: #0d0b09; opacity: 0; display: none; will-change: opacity; }
+  .exposure { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 70% at 52% 45%, #fff2d6, rgb(255 226 170 / 0.45) 50%, transparent 85%); opacity: 0; display: none; will-change: opacity; }
+  .vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(closest-corner at 50% 50%, transparent 55%, rgb(13 11 9 / 0.85) 130%); opacity: 0.2; will-change: opacity; }
+  /* The bar light blooms into the story's paper (fully opaque: no room ghost under the words). */
+  .flood { position: absolute; inset: 0; display: none; place-items: center; padding: 24px; background: radial-gradient(circle at 50% 45%, #fbefd8, var(--color-sand) 75%); opacity: 0; pointer-events: none; will-change: opacity; }
+  .opening { display: grid; justify-items: center; gap: clamp(14px, 2vw, 22px); max-width: min(100%, 1000px); text-align: center; color: var(--color-ink); opacity: 0; contain: paint; }
   .opening p, .opening h2 { margin: 0; }
   /* Chapter 01: the same numbered label (rule above, number, plain words) as the home chapters that follow. */
   .o-label { display: inline-flex; gap: var(--space-2); padding-top: var(--space-3); border-top: var(--border-rule) solid var(--color-ink); font-size: var(--step-label); font-weight: 700; line-height: 1.3; }
   .o-no { color: var(--color-tiger-deep); font-variant-numeric: tabular-nums; }
-  .o-line { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(40px, 6.4vw, 92px); line-height: 0.95; }
+  .o-line { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(30px, 5.6vw + 8px, 92px); line-height: 0.95; text-wrap: balance; max-width: 14ch; }
   .o-sub { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.5; max-width: 44ch; }
-  .o-cue { font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
+  .o-cue { font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); animation: o-cue-bob 1.6s ease-in-out infinite; }
+  @keyframes o-cue-bob { 50% { translate: 0 4px; } }
 
   /* Phones: keep the line under the front clear of the fixed dock. */
-  @media (max-width: 640px) { .doors { --bar: 64px; height: 310svh; } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
+  @media (max-width: 640px) { .doors { --bar: 64px; } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
   @media (min-width: 641px) and (max-height: 700px) { .doors { --bar: 58px; } }
   @media (prefers-reduced-motion: reduce) {
-    /* Calm: the front is lit and the door stands open; the story opening simply follows. */
+    /* Calm: the front is lit and the door stands open onto the curtain; the story opening simply follows. */
     .doors { height: auto; }
     .stage { position: relative; top: 0; height: auto; aspect-ratio: auto; display: block; }
     .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; height: auto; }
+    /* Tall screens: a wider front (its sides crop) instead of a small card. */
+    @media (max-aspect-ratio: 3/4) { .camera { width: 150%; margin-left: -25%; } }
     .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; } .sign-shine, .seam, .surround { display: none; }
     .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .door { transform: rotateY(-62deg); }
-    .inside, .threshold, .exposure, .vig { display: none; }
-    .below { position: relative; bottom: 0; background: none; padding-block: 16px; }
-    .flood { position: relative; opacity: 1; padding-block: 64px; background: var(--color-sand); }
+    .inside, .threshold, .exposure, .vig, .dip { display: none; }
+    .below { position: relative; bottom: 0; padding-block: 16px; }
+    .flood { position: relative; display: grid; opacity: 1; padding-block: 64px; background: var(--color-sand); }
     .opening { opacity: 1; }
     .o-cue { display: none; }
   }
@@ -259,7 +294,10 @@ const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 320
   const section = document.querySelector<HTMLElement>('[data-doors]');
   const camera = section?.querySelector<HTMLElement>('[data-camera]');
   const stage = section?.querySelector<HTMLElement>('.stage');
-  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const calm = reduce.matches;
+  // Switching reduced motion live: start again in the right mode rather than unpick inline styles.
+  reduce.addEventListener('change', () => location.reload());
 
   const clamp = (v: number) => Math.min(1, Math.max(0, v));
   const range = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
@@ -269,182 +307,227 @@ const velvetImg = { src: velvet, alt: '', formats, widths: [960, 1600, 2400, 320
   const outCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const inQuad = (t: number) => t * t;
 
-  const MAX_ZOOM = 2.6; // the walk stops here (the painted front goes soft past it)
-  const PUSH_ZOOM = 6; // the last step through the frame: it rushes past the lens as it fades
+  // First-person walk: the front is 4 m away and you walk 3.33 m to it, so its scale is
+  // d / (d - z): 1x to 6x, speeding up naturally as you near the door (a dolly, not a zoom).
+  const DIST = 4, WALK = 3.333;
+  const STEPS = 5; // ~0.7 m strides
   const DOOR = { l: 0.1687, t: 0.4678, w: 0.1738, h: 0.4257 }; // the doorway, as a fraction of the camera
-  const ORIGIN = { x: 0.2556, y: 0.6807 }; // --door-x / --door-y
+  const ORIGIN = { x: 0.2556, y: 0.6807 }; // --door-x / --door-y (the doorway's centre)
 
-  // Decode the front and the room shortly before they are needed (not at page load: the hero's LCP comes first).
+  // Decode the front, the curtain and the room shortly before they are needed (the hero's LCP comes first).
   if (section && !calm) {
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      for (const img of section.querySelectorAll<HTMLImageElement>('.facade, .room, .door-img, .velvet-img')) { img.loading = 'eager'; img.decode().catch(() => {}); }
-      // Only images that are actually shown (the street surround is hidden on landscape).
-      const rest = () => section.querySelectorAll<HTMLImageElement>('img').forEach((img) => { if (img.offsetParent) img.loading = 'eager'; });
-      ('requestIdleCallback' in window ? requestIdleCallback : setTimeout)(rest);
+      for (const img of section.querySelectorAll<HTMLImageElement>('.facade, .room, .door-img, .velvet-img, .inside-img')) { img.loading = 'eager'; img.decode().catch(() => {}); }
+      // Then everything that is actually shown (the street surround is hidden on landscape).
+      const rest = () => section.querySelectorAll<HTMLImageElement>('img').forEach((img) => {
+        if (img.offsetParent || img.closest('.threshold, .inside')) { img.loading = 'eager'; img.decode().catch(() => {}); }
+      });
+      if ('requestIdleCallback' in window) requestIdleCallback(rest, { timeout: 1200 }); else setTimeout(rest, 300);
     }, { rootMargin: '50% 0px' });
     io.observe(section);
   }
 
   if (section && camera && stage && !calm) {
-    // Write transform/opacity straight onto each element (custom properties on the
-    // camera made every child recalc style each frame).
     const $ = <T extends HTMLElement>(sel: string) => section.querySelector<T>(sel)!;
     const all = (sel: string) => [...section.querySelectorAll<HTMLElement>(sel)];
-    const lamps = all('[data-lamp]');
-    const chars = all('[data-ch]');
-    const subs = all('[data-sub]');
-    const reflects = all('[data-reflect]');
+    const lamps = all('[data-lamp]'), chars = all('[data-ch]'), subs = all('[data-sub]'), reflects = all('[data-reflect]');
     const door = $('[data-door]'), doorShade = $('[data-door-shade]'), dim = $('[data-dim]');
-    const threshold = $('[data-threshold]'), velvet = $('[data-velvet]'), panel = $('[data-velvet-panel]');
-    const vDim = $('[data-velvet-dim]'), vRim = $('[data-velvet-rim]'), vFolds = $('[data-velvet-folds]');
-    const leak = $('[data-leak]'), gatheredEl = $('[data-gathered]'), railEl = $('[data-rail]');
-    const exposure = $('[data-exposure]'), vig = $('[data-vig]');
-    section.classList.add('is-live');
-    const comein = $('[data-comein]'), flood = $('[data-flood]'), inside = $('[data-inside]');
+    const threshold = $('[data-threshold]'), velvet = $('[data-velvet]');
+    const panelR = $('[data-panel="r"]'), panelL = $('[data-panel="l"]'), shades = all('[data-shade]');
+    const vDim = $('[data-velvet-dim]'), vRim = $('[data-velvet-rim]'), railEl = $('[data-rail]');
+    const stackR = $('[data-stack="r"]'), stackL = $('[data-stack="l"]'), leakR = $('[data-leak="r"]'), leakL = $('[data-leak="l"]');
+    const dip = $('[data-dip]'), exposure = $('[data-exposure]'), vig = $('[data-vig]');
+    const comein = $('[data-comein]'), flood = $('[data-flood]'), inside = $('[data-inside]'), insideMove = $('[data-inside-move]');
     const opening = flood.querySelector<HTMLElement>('.opening')!;
-    const insideMove = $('[data-inside-move]');
-    const shine = $('[data-shine]');
-    const seam = $('[data-seam]');
-    const root = document.documentElement;
+    const shine = $('[data-shine]'), seam = $('[data-seam]');
+    const root = document.documentElement, header = document.querySelector<HTMLElement>('header.bar');
+    section.classList.add('is-live');
+
+    // Inline style writes only when the value changes (most beats sit still most of the time).
+    const memo = new WeakMap<HTMLElement, Record<string, string>>();
+    const set = (el: HTMLElement, prop: string, v: string) => {
+      let m = memo.get(el); if (!m) memo.set(el, (m = {}));
+      if (m[prop] !== v) { m[prop] = v; el.style.setProperty(prop, v); }
+    };
+    const show = (el: HTMLElement, on: boolean, disp = 'block') => set(el, 'display', on ? disp : 'none');
 
     // Layout, read on resize only (never inside a frame).
-    let bar = 72, len = 1, toX = 0, toY = 0;
-    let stageW = 1, stageH = 1, cam = { l: 0, t: 0, w: 1, h: 1 }, base = 1, bands = false;
+    let bar = 72, len = 1, secTop = 0, toX = 0, toY = 0, split = false, portrait = false;
+    let stageW = 1, stageH = 1, cam = { l: 0, t: 0, w: 1, h: 1 }, base = 1;
     const measure = () => {
-      const s = stage.getBoundingClientRect();
-      const tf = camera.style.transform; camera.style.transform = 'none';
-      const c = camera.getBoundingClientRect();
-      camera.style.transform = tf;
+      // The sticky top follows the real header (zoom-safe), not a guessed height.
+      if (header) section.style.setProperty('--bar', `${Math.round(header.getBoundingClientRect().height)}px`);
+      portrait = matchMedia('(max-aspect-ratio: 3/4)').matches;
+      split = portrait;
+      section.classList.toggle('is-split', split);
+      // Measure the front even when it is hidden (you're past the door): show it for the read only.
+      const hid = camera.style.display; camera.style.display = 'block';
+      const tf = camera.style.transform; camera.style.transform = 'none'; camera.style.marginTop = '0px';
+      let s = stage.getBoundingClientRect(), c = camera.getBoundingClientRect();
+      // Keep a little sky above the lamps (wide or short screens crop them otherwise).
+      const lampTop = c.top - s.top + c.height * 0.13;
+      if (!portrait && lampTop < s.height * 0.04) {
+        camera.style.marginTop = `${Math.min(s.top - c.top, s.height * 0.04 - lampTop).toFixed(1)}px`;
+        c = camera.getBoundingClientRect();
+      }
+      camera.style.transform = tf; camera.style.display = hid;
       stageW = s.width; stageH = s.height;
       cam = { l: c.left - s.left, t: c.top - s.top, w: c.width, h: c.height };
-      // The doorway's centre to just below the middle of the stage.
+      // The doorway's centre goes to the eye line: half height (above the dock on phones).
+      const dock = innerWidth <= 640 ? 68 : 0;
       toX = stageW / 2 - (cam.l + cam.w * ORIGIN.x);
-      toY = stageH * 0.55 - (cam.t + cam.h * ORIGIN.y);
-      // Pinned stretch: from the stage sticking under the bar to the section's end.
+      toY = (stageH - dock) * 0.5 - (cam.t + cam.h * ORIGIN.y);
       bar = parseFloat(getComputedStyle(section).getPropertyValue('--bar')) || 72;
+      secTop = section.getBoundingClientRect().top + scrollY;
       len = Math.max(1, section.offsetHeight - stage.offsetHeight);
       // The velvet starts 1.6x the doorway (the excess hides behind the front) and grows a little
-      // slower than the frame (it hangs deeper), so the walk has depth.
-      const d = doorRect(1, 0);
-      base = 1.6 * Math.max((d.y1 - d.y0) / stageH, (d.x1 - d.x0) / stageW);
-      // Bare stage around the front (3:4 to 1:1): keep the velvet inside the front's box there.
-      bands = cam.t > 1 || cam.l > 1 || cam.t + cam.h < stageH - 1 || cam.l + cam.w < stageW - 1;
+      // slower than the frame (it hangs deeper), so the walk has depth. Capped so wide screens keep it.
+      const d = doorRect(1, 0, 0);
+      base = Math.min(0.85, 1.6 * Math.max((d.y1 - d.y0) / stageH, (d.x1 - d.x0) / stageW));
+      s = stage.getBoundingClientRect();
     };
+
+    // Where a point of the front (fractions of the camera) lands on the stage for a camera scale/shift.
+    function map(fx: number, fy: number, sc: number, k: number, bob: number) {
+      const ox = cam.l + cam.w * ORIGIN.x, oy = cam.t + cam.h * ORIGIN.y;
+      return [ox + (cam.l + cam.w * fx - ox) * sc + toX * k, oy + (cam.t + cam.h * fy - oy) * sc + toY * k + bob];
+    }
+    function doorRect(sc: number, k: number, bob: number) {
+      const [x0, y0] = map(DOOR.l, DOOR.t, sc, k, bob), [x1, y1] = map(DOOR.l + DOOR.w, DOOR.t + DOOR.h, sc, k, bob);
+      return { x0, y0, x1, y1 };
+    }
     measure();
 
     // Lights switch at thresholds (a lamp clicks on; it isn't dimmed up), so they are classes.
     const setOn = (els: HTMLElement[], n: number) => els.forEach((el, i) => el.classList.toggle('is-on', i < n));
+    let shineOn = false;
 
-    // Where a point of the front (as fractions of the camera) lands on the stage for a camera scale/shift.
-    function map(fx: number, fy: number, s: number, k: number) {
-      const ox = cam.l + cam.w * ORIGIN.x, oy = cam.t + cam.h * ORIGIN.y;
-      return [ox + (cam.l + cam.w * fx - ox) * s + toX * k, oy + (cam.t + cam.h * fy - oy) * s + toY * k];
-    }
-    function doorRect(s: number, k: number) {
-      const [x0, y0] = map(DOOR.l, DOOR.t, s, k), [x1, y1] = map(DOOR.l + DOOR.w, DOOR.t + DOOR.h, s, k);
-      return { x0, y0, x1, y1 };
-    }
-
-    // Beat sheet in pinned progress t (0 = stage pins, 1 = section ends). See docs/qa/DOOR-SCENE-PLAN.md.
+    // Beat sheet in pinned progress t (0 = stage pins, 1 = section ends). See docs/qa/DOOR-SCENE-100.md.
     const render = (t: number) => {
-      setOn(lamps, Math.ceil(range(t, 0.02, 0.1) * lamps.length));
-      setOn(chars, Math.ceil(range(t, 0.06, 0.18) * chars.length));
-      setOn(subs, t >= 0.2 ? subs.length : 0);
-      shine.classList.toggle('is-on', t >= 0.2);
-      seam.style.opacity = (1 - range(t, 0, 0.05)).toFixed(3);
+      // Street: lamps, sign, glass clears, then a hold on the lit front.
+      show(seam, t < 0.03); set(seam, 'opacity', (1 - range(t, 0, 0.03)).toFixed(3));
+      setOn(lamps, Math.ceil(range(t, 0.02, 0.08) * lamps.length));
+      setOn(chars, Math.ceil(range(t, 0.05, 0.15) * chars.length));
+      setOn(subs, t >= 0.16 ? subs.length : 0);
+      if (t >= 0.16) shineOn = true; else if (t < 0.05) shineOn = false;
+      shine.classList.toggle('is-on', shineOn);
       const pinned = t > 0 && t < 1;
       if (pinned !== root.hasAttribute('data-door-scene')) root.toggleAttribute('data-door-scene', pinned);
-      const lit = range(t, 0.07, 0.27);
-      dim.style.opacity = (0.78 - 0.62 * lit).toFixed(3);
-      const r = (0.9 - 0.65 * lit).toFixed(3);
-      reflects.forEach((el) => (el.style.opacity = r));
-
-      const below = 1 - range(t, 0.16, 0.22);
-      comein.style.opacity = below.toFixed(3);
-      comein.style.visibility = below > 0.02 ? 'visible' : 'hidden';
+      const lit = range(t, 0.06, 0.22);
+      set(dim, 'opacity', (0.78 - 0.56 * lit).toFixed(3));
+      const r = (0.9 - 0.82 * lit).toFixed(3);
+      reflects.forEach((el) => set(el, 'opacity', r));
+      const below = 1 - range(t, 0.04, 0.1);
+      set(comein, 'opacity', below.toFixed(3)); set(comein, 'visibility', below > 0.02 ? 'visible' : 'hidden');
 
       // The door swings in onto the velvet; warm light from the room catches its near edge.
-      const open = inOut(range(t, 0.22, 0.38));
-      door.style.transform = `rotateY(${(open * -78).toFixed(2)}deg)`;
-      doorShade.style.opacity = Math.min(1, open * 1.3).toFixed(3);
-      vDim.style.opacity = dim.style.opacity;
-      vRim.style.opacity = open.toFixed(3);
+      const open = inOut(range(t, 0.24, 0.38));
+      set(door, 'transform', `rotateY(${(open * -78).toFixed(2)}deg)`);
+      set(doorShade, 'opacity', Math.min(1, open * 1.3).toFixed(3));
+      set(vDim, 'opacity', ((0.78 - 0.62 * lit) * (1 - range(t, 0.46, 0.54))).toFixed(3));
+      set(vRim, 'opacity', (open * (1 - range(t, 0.5, 0.56))).toFixed(3));
 
-      // Walk to the door (log-even scale, short ease-in), then one quick step through the frame:
-      // it rushes past the lens and fades as the velvet fills your view.
-      const w = range(t, 0.26, 0.48);
-      const wk = w < 0.1 ? (w * w) / 0.2 : w - 0.05;
-      const step = inQuad(range(t, 0.48, 0.56));
-      const s = Math.exp(lerp(0, Math.log(MAX_ZOOM), wk / 0.95)) * (1 + step * (PUSH_ZOOM / MAX_ZOOM - 1));
-      const k = Math.min(1, (s - 1) / (MAX_ZOOM - 1));
-      camera.style.transform = `translate(${(toX * k).toFixed(1)}px, ${(toY * k).toFixed(1)}px) scale(${s.toFixed(4)})`;
-      camera.style.opacity = (1 - range(t, 0.53, 0.56)).toFixed(3);
-      camera.style.visibility = t >= 0.56 ? 'hidden' : 'visible';
+      // Turn to the door, then walk: distance-based scale, a faint step, the frame passing the lens.
+      const p = range(t, 0.3, 0.54);
+      const pe = p < 0.1 ? (p * p) / 0.2 : (p - 0.05) / 0.95; // a short ease-in from standing
+      const sc = DIST / (DIST - WALK * pe);
+      const k = outCubic(range(t, portrait ? 0.32 : 0.3, 0.4));
+      const bob = Math.sin(2 * Math.PI * STEPS * pe) * 0.0035 * stageH * Math.sin(Math.PI * p);
+      const d = doorRect(sc, k, bob);
+      const through = t >= 0.54 || (d.x0 <= 0 && d.y0 <= 0 && d.x1 >= stageW && d.y1 >= stageH);
+      show(camera, !through);
+      if (!through) set(camera, 'transform', `translate(${(toX * k).toFixed(1)}px, ${(toY * k + bob).toFixed(1)}px) scale(${sc.toFixed(4)})`);
+      // While turning to the door the street's edge can come into view: keep the curtain inside it.
+      const [sx0, sy0] = map(-0.1637, -1.0249, sc, k, bob), [sx1, sy1] = map(1.1644, 1.6002, sc, k, bob);
+      const gap = !through && (sx0 > 0.5 || sy0 > 0.5 || sx1 < stageW - 0.5 || sy1 < stageH - 0.5);
+      set(threshold, 'clip-path', gap ? `inset(${Math.max(0, sy0).toFixed(0)}px ${Math.max(0, stageW - sx1).toFixed(0)}px ${Math.max(0, stageH - sy1).toFixed(0)}px ${Math.max(0, sx0).toFixed(0)}px)` : 'none');
 
       // The velvet follows the doorway until it is the size of the stage.
-      const d = doorRect(s, k);
       const cover = 1.08 * Math.max((d.y1 - d.y0) / stageH, (d.x1 - d.x0) / stageW);
-      const sv = Math.min(1, Math.max(cover, base * Math.pow(s, 0.85)));
-      const u = sv >= 1 || base >= 1 ? 1 : clamp((sv - base) / (1 - base));
+      const sv = Math.min(1, Math.max(cover, base * Math.pow(sc, 0.85)));
+      const u = sv >= 1 ? 1 : clamp((sv - base) / (1 - base));
       const vx = lerp((d.x0 + d.x1) / 2 - stageW / 2, 0, u), vy = lerp((d.y0 + d.y1) / 2 - stageH / 2, 0, u);
-      velvet.style.transform = `translate(${vx.toFixed(1)}px, ${vy.toFixed(1)}px) scale(${sv.toFixed(4)})`;
-      if (bands && t < 0.56) {
-        const [cx0, cy0] = map(0, 0, s, k), [cx1, cy1] = map(1, 1, s, k);
-        threshold.style.clipPath = `inset(${Math.max(0, cy0).toFixed(1)}px ${Math.max(0, stageW - cx1).toFixed(1)}px ${Math.max(0, stageH - cy1).toFixed(1)}px ${Math.max(0, cx0).toFixed(1)}px)`;
-      } else threshold.style.clipPath = 'none';
+      set(velvet, 'transform', `translate(${vx.toFixed(1)}px, ${vy.toFixed(1)}px) scale(${sv.toFixed(4)})`);
+      // Crossing the door depth: a brief dark.
+      const dk = Math.sin(Math.PI * range(t, 0.5, 0.57));
+      show(dip, dk > 0.001); set(dip, 'opacity', (0.45 * dk).toFixed(3));
 
-      // The curtain is drawn aside to the right: the panel gathers (folds crowd and deepen), light
-      // leaks past its moving edge, then the gathered stack takes over and you pass it.
-      const slide = inOut(range(t, 0.56, 0.7));
-      const sx = 1 - 0.82 * slide;
-      panel.style.transform = `scaleX(${sx.toFixed(4)}) skewX(${(-4 * slide).toFixed(2)}deg)`;
-      panel.style.opacity = (1 - range(t, 0.66, 0.7)).toFixed(3);
-      vFolds.style.opacity = (0.6 * slide).toFixed(3);
-      leak.style.transform = `translateX(${(stageW * (1 - sx)).toFixed(1)}px)`;
-      leak.style.opacity = (0.9 * Math.sin(Math.PI * slide)).toFixed(3);
-      const passT = range(t, 0.6, 0.74), pass = outCubic(passT), by = outCubic(range(t, 0.68, 0.74));
-      gatheredEl.style.opacity = range(t, 0.65, 0.69).toFixed(3);
-      gatheredEl.style.transform = `translateX(${(by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)})`;
-      railEl.style.opacity = (range(t, 0.5, 0.56) * (1 - range(t, 0.7, 0.74))).toFixed(3);
-      railEl.style.transform = `translateY(${(-by * 120).toFixed(1)}%) scale(${(1 + 0.3 * by).toFixed(4)})`;
-      threshold.style.visibility = t >= 0.74 ? 'hidden' : 'visible';
+      // Hold on the full curtain, then it is drawn aside (to the right; split from the middle on tall
+      // screens): the panel gathers and darkens, light leaks past its edge, the stack takes over.
+      const slide = inOut(range(t, 0.6, 0.72));
+      const sx = 1 - (split ? 0.72 : 0.82) * slide;
+      set(panelR, 'transform', `scaleX(${sx.toFixed(4)}) skewX(${(-3 * slide).toFixed(2)}deg)`);
+      if (split) set(panelL, 'transform', `scaleX(${sx.toFixed(4)}) skewX(${(3 * slide).toFixed(2)}deg)`);
+      const po = (1 - range(t, 0.7, 0.72)).toFixed(3);
+      set(panelR, 'opacity', po); if (split) set(panelL, 'opacity', po);
+      shades.forEach((el) => set(el, 'opacity', (0.35 * slide).toFixed(3)));
+      const leakOn = slide > 0.001 && slide < 0.999, lo = ((split ? 0.6 : 0.85) * Math.sin(Math.PI * slide)).toFixed(3);
+      const edge = split ? stageW * (1 - 0.5 * sx) : stageW * (1 - sx);
+      show(leakR, leakOn); set(leakR, 'opacity', lo); set(leakR, 'transform', `translateX(${edge.toFixed(1)}px)`);
+      show(leakL, leakOn && split); if (split) { set(leakL, 'opacity', lo); set(leakL, 'transform', `translateX(${(stageW * 0.5 * sx).toFixed(1)}px)`); }
+      // The stack arrives first; the panel fades under it (no double image). Then you pass it and the rail.
+      const by = inOut(range(t, 0.7, 0.78)), so = range(t, 0.66, 0.69).toFixed(3);
+      show(stackR, t >= 0.66 && t < 0.78); set(stackR, 'opacity', so); set(stackR, 'transform', `translateX(${(by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)})`);
+      show(stackL, split && t >= 0.66 && t < 0.78); if (split) { set(stackL, 'opacity', so); set(stackL, 'transform', `translateX(${(-by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)})`); }
+      set(railEl, 'opacity', (1 - by).toFixed(3));
+      set(railEl, 'transform', `translateY(${(-by * 60).toFixed(1)}%) scale(${(1 + 0.2 * by).toFixed(4)})`);
+      show(threshold, t < 0.78);
 
-      // Walking in (POV): the room is already there under the curtain; you move into it with a
-      // small sway, your eyes adjust to the warm light, then a slow drift toward the bar.
-      const drift = range(t, 0.72, 0.86);
-      inside.style.visibility = t >= 0.55 ? 'visible' : 'hidden';
-      insideMove.style.transform = `translateX(${(-1.5 * drift).toFixed(2)}%) rotate(${(Math.sin(Math.PI * passT) * 0.35).toFixed(3)}deg) scale(${(1 + 0.14 * pass + 0.06 * drift).toFixed(4)})`;
-      exposure.style.opacity = (0.45 * Math.sin(Math.PI * passT)).toFixed(3);
-      vig.style.opacity = (0.2 + 0.35 * range(t, 0.48, 0.56) - 0.4 * pass + 0.1 * drift).toFixed(3);
+      // Walking in: the room is already there under the curtain; you move into it with a small sway,
+      // your eyes adjust (bright and warm, then settled), a hold, then a slow drift toward the bar.
+      show(inside, t >= 0.42);
+      const passT = range(t, 0.64, 0.76), pass = outCubic(passT), drift = range(t, 0.74, 0.88);
+      const dolly = portrait ? 0.1 : 0.12, sway = portrait ? 0.25 : 0.35;
+      set(insideMove, 'transform', `translate(${(-3 * drift).toFixed(2)}%, ${(-1 * drift).toFixed(2)}%) rotate(${(Math.sin(Math.PI * passT) * sway).toFixed(3)}deg) scale(${(1 + dolly * pass + 0.08 * drift).toFixed(4)})`);
+      const ex = 0.22 * Math.min(range(t, 0.62, 0.66), 1 - range(t, 0.66, 0.76));
+      show(exposure, ex > 0.001); set(exposure, 'opacity', ex.toFixed(3));
+      set(vig, 'opacity', (0.2 + 0.15 * range(t, 0.48, 0.56) - 0.15 * pass + 0.05 * drift).toFixed(3));
 
-      // The bar light blooms into the story's paper and holds there for the hand-off.
-      const bloom = inQuad(range(t, 0.8, 0.95));
-      flood.style.opacity = (0.93 * bloom).toFixed(3);
-      opening.style.opacity = range(t, 0.88, 0.97).toFixed(3);
+      // The bar light blooms into the story's paper; the heading is up by .92 and held to the end.
+      const bloom = inQuad(range(t, 0.82, 0.92));
+      show(flood, bloom > 0.001, 'grid'); set(flood, 'opacity', bloom.toFixed(3));
+      set(opening, 'opacity', range(t, 0.86, 0.92).toFixed(3));
     };
 
-    // Wheel steps are smoothed toward the scroll position (~90ms); touch and keys follow 1:1
-    // (native momentum is already smooth). The page itself still scrolls natively.
-    let target = 0, cur = -1, raf = 0, prev = 0, smooth = false;
-    // Read the section's live position (one rect read per scroll event, not per frame), so
-    // fonts or images loading above it can't knock the timeline out of step.
-    const read = () => clamp((bar - section.getBoundingClientRect().top) / len);
+    // Mouse-wheel notches are smoothed toward the scroll position (~60ms); trackpads (OS momentum),
+    // touch, keys and jumps follow 1:1. The page itself still scrolls natively.
+    let target = 0, cur = -1, raf = 0, prev = 0, smooth = false, idle = 0;
+    const read = () => clamp((scrollY + bar - secTop) / len);
     const tick = (now: number) => {
-      const dt = Math.min(64, now - (prev || now)); prev = now;
-      cur = smooth && cur >= 0 ? cur + (target - cur) * (1 - Math.exp(-dt / 90)) : target;
+      const dt = Math.min(64, now - prev); prev = now;
+      cur = smooth && cur >= 0 && Math.abs(target - cur) < 0.3 ? cur + (target - cur) * (1 - Math.exp(-dt / 60)) : target;
       if (Math.abs(target - cur) < 0.0005) cur = target;
       render(cur);
       raf = cur === target ? 0 : requestAnimationFrame(tick);
+      // Held still: let the browser re-raster the zoomed front sharp, then promote it again on the next move.
+      if (!raf) { clearTimeout(idle); idle = window.setTimeout(() => set(camera, 'will-change', 'auto'), 150); }
     };
-    const kick = () => { target = read(); if (!raf) { prev = 0; raf = requestAnimationFrame(tick); } };
-    addEventListener('wheel', () => { smooth = true; }, { passive: true });
-    addEventListener('touchstart', () => { smooth = false; }, { passive: true });
-    addEventListener('keydown', () => { smooth = false; });
-    addEventListener('pointerdown', () => { smooth = false; }, { passive: true });
+    const kick = () => {
+      const n = read();
+      if (n === target && n === cur && !raf) return; // outside the scene or nothing changed: no work
+      target = n; clearTimeout(idle); set(camera, 'will-change', 'transform');
+      if (!raf) { prev = performance.now() - 16; raf = requestAnimationFrame(tick); }
+    };
+    addEventListener('wheel', (e) => { smooth = e.deltaMode !== 0 || Math.abs(e.deltaY) >= 50; }, { passive: true });
+    for (const ev of ['touchstart', 'keydown', 'pointerdown', 'hashchange']) addEventListener(ev, () => { smooth = false; }, { passive: true });
     addEventListener('scroll', kick, { passive: true });
-    new ResizeObserver(() => { measure(); kick(); }).observe(stage);
-    kick();
+    // Re-measure on real size changes, keeping your place in the scene (rotation, header change).
+    // Touch screens ignore the small height changes of the URL bar showing and hiding.
+    let lastW = innerWidth, lastH = innerHeight;
+    const remeasure = () => {
+      const coarse = matchMedia('(pointer: coarse)').matches;
+      if (coarse && innerWidth === lastW && Math.abs(innerHeight - lastH) < 120) return;
+      lastW = innerWidth; lastH = innerHeight;
+      const keep = cur, oldLen = len;
+      measure();
+      if (keep > 0 && keep < 1 && Math.abs(len - oldLen) > 50) scrollTo({ top: secTop - bar + keep * len, behavior: 'instant' });
+      cur = -1; target = -1; kick();
+    };
+    new ResizeObserver(remeasure).observe(stage);
+    new ResizeObserver(() => { secTop = section.getBoundingClientRect().top + scrollY; kick(); }).observe(document.body);
+    addEventListener('pageshow', (e) => { if (e.persisted) { measure(); cur = -1; target = -1; kick(); } });
+    cur = -1; target = -1; kick();
   }
 </script>
