@@ -8,7 +8,7 @@ import { Image } from 'astro:assets';
 import { getBranches } from '../../lib/site-data';
 import facade from '../../assets/images/covent-garden/front/facade.webp';
 import door from '../../assets/images/covent-garden/front/door.webp';
-import room from '../../assets/images/covent-garden/gallery-04.jpg';
+import room from '../../assets/images/covent-garden/interior-bar.jpg';
 
 const cg = (await getBranches()).find((b) => b.id === 'covent-garden');
 const street = cg?.address.street ?? '6 Maiden Lane';
@@ -20,7 +20,7 @@ const name = 'Fatt Pundit';
   <div class="stage">
     <div class="camera" data-camera aria-hidden="true">
       <div class="room-wrap" data-room-wrap>
-        <Image src={room} alt="" class="room" widths={[800, 1400, 2000]} sizes="(min-aspect-ratio: 1/1) 60vw, 100vw" data-room />
+        <Image src={room} alt="" class="room" widths={[1000, 1800, 2800]} sizes="(min-aspect-ratio: 1/1) 90vw, 140vw" data-room />
       </div>
       <div class="dim" data-dim></div>
       <Image src={facade} alt="" class="facade" widths={[1200, 2000, 2800, 4096]} sizes="(min-aspect-ratio: 1/1) max(100vw, 133svh), 100vw" loading="lazy" />
@@ -64,7 +64,8 @@ const name = 'Fatt Pundit';
   /* Tall screens: 140% wide, framed from the door to the side door (the brick ends crop). */
   @media (max-aspect-ratio: 3/4) { .camera { width: 140%; left: 0; translate: -13% -42%; } }
   .room-wrap { position: absolute; inset: 18% 4% 2% 4%; overflow: hidden; transform-origin: var(--door-x) var(--door-y); will-change: transform; }
-  .room { width: 100%; height: 100%; object-fit: cover; }
+  /* Frame the bar and tables behind the left door (door centre ≈ 23% 63% of this box). */
+  .room { width: 100%; height: 100%; object-fit: cover; transform: translate(-19.5%, 13%) scale(1.5); }
   .dim, .facade, .door-img { position: absolute; }
   /* Night inside until the lamps come on (opacity only: compositor). */
   .dim { inset: 22% 12% 8% 12%; background: #0d0b09; opacity: 0.78; will-change: opacity; }
