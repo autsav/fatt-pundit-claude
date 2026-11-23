@@ -25,9 +25,17 @@
   .fp-caps { font-family: var(--font-label); font-size: var(--step-tag); font-weight: 700; line-height: 1.2; letter-spacing: var(--tracking-tag); text-transform: uppercase; }
   .fp-prose { max-width: var(--measure); font-size: var(--step-body); line-height: var(--lh-body); }
   .fp-prose > * { margin: 0 0 var(--space-4); }
+  .fp-prose ul { list-style: disc; padding-left: 1.2em; }
+  .fp-prose ol { list-style: decimal; padding-left: 1.4em; }
+  .fp-prose li + li { margin-top: var(--space-2); }
+  .fp-prose :is(p, li) { font-family: var(--font-note); line-height: 1.6; max-width: 66ch; }
   .fp-prose > :is(h2, h3) { margin-top: var(--space-7); font-size: var(--step-h4); line-height: var(--lh-h4); letter-spacing: var(--tracking-copy); text-transform: none; }
+  .fp-prose h2 { margin: var(--space-7) 0 var(--space-2); font-family: var(--font-display); font-size: var(--step-h3); font-weight: 300; }
   .fp-prose a { color: var(--fp-link); font-weight: 700; text-underline-offset: 0.18em; }
-  .fp-prose a:hover { color: var(--fp-link-hover); text-decoration-thickness: 2px; }
+  @media (hover: hover) {.fp-prose a:hover { color: var(--fp-link-hover); text-decoration-thickness: 2px; }}
+
+  /* Sheet: a paper form/card with a hard offset shadow (the look of private dining's enquiry sheet). */
+  .fp-sheet { padding: var(--space-6); border: 1px solid rgb(26 23 20 / 0.2); background: var(--color-paper); box-shadow: 8px 8px 0 rgb(26 23 20 / 0.12); }
 
   /* ---------------------------------------------------------------- Layout */
   .fp-container { box-sizing: border-box; width: 100%; max-width: calc(var(--grid-max) + 2 * var(--grid-margin)); margin-inline: auto; padding-inline: var(--grid-margin); }
@@ -83,10 +91,13 @@
     cursor: pointer; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     transition: transform var(--dur-spring) var(--curve-spring), box-shadow var(--dur-fast) var(--curve-out), background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), border-color var(--dur-fast) var(--curve-out);
   }
-  .fp-btn--primary { --btn-bg: var(--fp-action-bg); --btn-fg: var(--fp-action-fg); --btn-border: var(--fp-action-bg); --btn-hover-bg: var(--btn-bg); --btn-hover-fg: var(--btn-fg); }
+  .fp-btn--primary { --btn-bg: var(--fp-action-bg); --btn-fg: var(--fp-action-fg); --btn-border: var(--fp-action-bg); --btn-hover-bg: color-mix(in srgb, var(--fp-action-bg) 90%, black); --btn-hover-fg: var(--btn-fg); }
+  .fp-btn--primary:is(:active, [data-force~='active']) { background: color-mix(in srgb, var(--fp-action-bg) 80%, black); }
   .fp-btn--text { --btn-border: transparent; --btn-hover-bg: transparent; --btn-hover-fg: var(--fp-link-hover); min-width: 0; min-height: var(--target-min); padding-inline: 0; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
-  .fp-btn:is(:hover, [data-force~='hover']) { transform: translateY(-2px); box-shadow: 0 4px 0 var(--fp-shadow); background: var(--btn-hover-bg); color: var(--btn-hover-fg); }
-  .fp-btn--text:is(:hover, [data-force~='hover']) { transform: none; box-shadow: none; text-decoration-thickness: 3px; }
+  .fp-btn:is([data-force~='hover']) { transform: translateY(-2px); box-shadow: 0 4px 0 var(--fp-shadow); background: var(--btn-hover-bg); color: var(--btn-hover-fg); }
+  @media (hover: hover) {  .fp-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 0 var(--fp-shadow); background: var(--btn-hover-bg); color: var(--btn-hover-fg); }}
+  .fp-btn--text:is([data-force~='hover']) { transform: none; box-shadow: none; text-decoration-thickness: 3px; }
+  @media (hover: hover) {  .fp-btn--text:hover { transform: none; box-shadow: none; text-decoration-thickness: 3px; }}
   .fp-btn:is(:active, [data-force~='active']) { transform: translateY(1px) scale(0.98); box-shadow: none; transition-duration: var(--dur-press); }
   .fp-btn[data-force~='focus'] { outline: var(--ring-width) solid var(--fp-ring); outline-offset: var(--ring-offset); }
   .fp-btn--sm { min-height: var(--btn-h-sm); padding-inline: var(--space-4); font-size: var(--step-btn-sm); }
@@ -107,19 +118,23 @@
   .fp-btn[data-state='done']::before { content: ''; flex: none; width: 0.32em; height: 0.66em; margin: -0.25em 0.15em 0 0; border: solid currentColor; border-width: 0 0.14em 0.14em 0; rotate: 45deg; }
 
   /* ---------------------------------------------------------------- Links */
-  .fp-link { color: var(--fp-link); text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; transition: color var(--dur-fast) var(--curve-out), text-decoration-thickness var(--dur-fast) var(--curve-out); }
-  .fp-link:is(:hover, [data-force~='hover']) { color: var(--fp-link-hover); text-decoration-thickness: 2px; }
+  .fp-link { color: var(--fp-link); text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; transition: color var(--dur-fast) var(--curve-out), text-decoration-thickness var(--dur-fast) var(--curve-out); }
+  .fp-link:is([data-force~='hover']) { color: var(--fp-link-hover); text-decoration-thickness: 2px; }
+  @media (hover: hover) {  .fp-link:hover { color: var(--fp-link-hover); text-decoration-thickness: 2px; }}
   .fp-link:is(:active, [data-force~='active']) { color: var(--fp-fg); }
   .fp-link--quiet { color: inherit; }
-  .fp-link--quiet:is(:hover, [data-force~='hover']) { color: inherit; }
+  .fp-link--quiet:is([data-force~='hover']) { color: inherit; }
+  @media (hover: hover) {  .fp-link--quiet:hover { color: inherit; }}
   /* Standalone action link (Call, Directions): bold, full tap height. */
   .fp-link--strong { display: inline-flex; align-items: center; min-height: var(--target-min); color: inherit; font-weight: 700; text-decoration-thickness: 2px; text-underline-offset: 5px; white-space: nowrap; }
-  .fp-link--strong:is(:hover, [data-force~='hover']) { color: inherit; text-decoration-thickness: 3px; }
+  .fp-link--strong:is([data-force~='hover']) { color: inherit; text-decoration-thickness: 3px; }
+  @media (hover: hover) {  .fp-link--strong:hover { color: inherit; text-decoration-thickness: 3px; }}
   .fp-link[data-force~='focus'], .fp-nav-link[data-force~='focus'] { outline: var(--ring-width) solid var(--fp-ring); outline-offset: var(--ring-offset); }
   /* Navigation: numbered like the sections; the current page is underlined in the label colour. */
   .fp-nav-link { display: inline-flex; align-items: baseline; gap: var(--space-2); min-height: var(--target-min); padding-block: 0.65em; box-sizing: border-box; color: inherit; font-weight: 400; text-decoration: underline 2px transparent; text-underline-offset: 6px; transition: text-decoration-color var(--dur-fast) var(--curve-out); }
   .fp-nav-link .fp-section-no { font-size: 0.75em; font-weight: 700; }
-  .fp-nav-link:is(:hover, [data-force~='hover']) { text-decoration-color: currentColor; }
+  .fp-nav-link:is([data-force~='hover']) { text-decoration-color: currentColor; }
+  @media (hover: hover) {  .fp-nav-link:hover { text-decoration-color: currentColor; }}
   .fp-nav-link[aria-current='page'] { text-decoration-color: var(--fp-label); }
 
   /* ---------------------------------------------------------------- Forms */
@@ -142,7 +157,8 @@
   .fp-input::placeholder { color: var(--fp-fg-muted); opacity: 1; }
   textarea.fp-input { min-height: 7.5rem; resize: vertical; line-height: var(--lh-body); }
   /* Hover thickens the edge inward (no layout shift); focus draws the surface ring outside. */
-  .fp-input:where(:not(:disabled, [readonly])):is(:hover, [data-force~='hover']) { outline: 1px solid var(--fp-control); outline-offset: -3px; }
+  .fp-input:where(:not(:disabled, [readonly])):is([data-force~='hover']) { outline: 1px solid var(--fp-control); outline-offset: -3px; }
+  @media (hover: hover) {  .fp-input:where(:not(:disabled, [readonly])):hover { outline: 1px solid var(--fp-control); outline-offset: -3px; }}
   /* Date and time fields keep the ring on :focus-within: Chromium drops :focus-visible (and :focus) on the
      host while Tab moves between their inner segments (day, month, year), so the ring vanished mid-field. */
   .fp-input:is(:focus-visible, [data-force~='focus']), .fp-input:is([type='date'], [type='time'], [type='datetime-local']):focus-within { outline: var(--ring-width) solid var(--fp-ring); outline-offset: 2px; }
@@ -176,7 +192,8 @@
   .fp-choice > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
   .fp-choice > span { box-sizing: border-box; display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-min); padding: 0 var(--space-4); border: var(--border-control) solid var(--fp-control); background: var(--fp-field-bg); color: var(--fp-field-fg); font-size: var(--step-small); font-weight: 700; line-height: 1.2; cursor: pointer; user-select: none; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
   .fp-choice > input[type='checkbox'] + span::before { content: ''; flex: none; box-sizing: border-box; width: 0.8em; height: 0.8em; border: 2px solid currentColor; }
-  .fp-choice:where(:not(:has(> input:disabled))):is(:hover, [data-force~='hover']) > span { outline: 1px solid var(--fp-control); outline-offset: -3px; }
+  .fp-choice:where(:not(:has(> input:disabled))):is([data-force~='hover']) > span { outline: 1px solid var(--fp-control); outline-offset: -3px; }
+  @media (hover: hover) {  .fp-choice:where(:not(:has(> input:disabled))):hover > span { outline: 1px solid var(--fp-control); outline-offset: -3px; }}
   .fp-choice:where(:not(:has(> input:disabled))):active > span { transform: translateY(1px) scale(0.98); transition-duration: var(--dur-press); }
   :is(.fp-choice > input:checked, .fp-choice[data-force~='checked'] > input) + span { border-color: var(--fp-selected-bg); background: var(--fp-selected-bg); color: var(--fp-selected-fg); }
   :is(.fp-choice > input:checked, .fp-choice[data-force~='checked'] > input)[type='checkbox'] + span::before { background: currentColor; }
@@ -189,7 +206,7 @@
   /* Stepper (guests): − value +. */
   .fp-stepper { display: inline-flex; align-items: stretch; border: var(--border-control) solid var(--fp-control); background: var(--fp-field-bg); color: var(--fp-field-fg); }
   .fp-stepper > button { display: grid; place-items: center; width: var(--icon-btn); min-height: var(--control-h); margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 1.5rem; line-height: 1; cursor: pointer; }
-  .fp-stepper > button:hover:not(:disabled) { outline: 1px solid var(--fp-control); outline-offset: -4px; }
+  @media (hover: hover) {.fp-stepper > button:hover:not(:disabled) { outline: 1px solid var(--fp-control); outline-offset: -4px; }}
   .fp-stepper > button:focus-visible { outline: var(--ring-width) solid var(--fp-ring); outline-offset: -6px; }
   .fp-stepper > button:disabled { opacity: 0.35; cursor: not-allowed; }
   .fp-stepper > output { display: grid; place-items: center; min-width: 3.5rem; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -205,8 +222,10 @@
   .fp-ledger-meta { justify-self: end; text-align: right; font-size: var(--step-small); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .fp-price { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
   a.fp-ledger-row { margin-inline: calc(-1 * var(--space-2)); padding-inline: var(--space-2); transition: background-color var(--dur-fast) var(--curve-out); }
-  a.fp-ledger-row:is(:hover, [data-force~='hover']) { background: var(--fp-hover-tint); }
-  a.fp-ledger-row:is(:hover, [data-force~='hover']) .fp-ledger-name { text-decoration: underline 2px; text-underline-offset: 4px; }
+  a.fp-ledger-row:is([data-force~='hover']) { background: var(--fp-hover-tint); }
+  @media (hover: hover) {  a.fp-ledger-row:hover { background: var(--fp-hover-tint); }}
+  a.fp-ledger-row:is([data-force~='hover']) .fp-ledger-name { text-decoration: underline 2px; text-underline-offset: 4px; }
+  @media (hover: hover) {  a.fp-ledger-row:hover .fp-ledger-name { text-decoration: underline 2px; text-underline-offset: 4px; }}
   a.fp-ledger-row:focus-visible { outline-offset: 0; }
 
   /* Hours: a real table. Today's row carries aria-current="date" and the word "today". */
@@ -254,7 +273,8 @@
 
   /* Postcard: paper with an airmail edge. As a link it lifts on hover. */
   .fp-postcard { display: grid; gap: var(--space-2); padding: 26px; border: 8px solid; border-image: repeating-linear-gradient(135deg, var(--color-tiger-deep) 0 12px, var(--color-paper) 12px 24px, var(--color-slate-deep) 24px 36px, var(--color-paper) 36px 48px) 8; background: var(--fp-bg); color: var(--fp-fg); text-decoration: none; transition: transform var(--dur-spring) var(--curve-spring), box-shadow var(--dur-fast) var(--curve-out); }
-  a.fp-postcard:is(:hover, [data-force~='hover']) { transform: translateY(-3px); box-shadow: var(--lift-2); }
+  a.fp-postcard:is([data-force~='hover']) { transform: translateY(-3px); box-shadow: var(--lift-2); }
+  @media (hover: hover) {  a.fp-postcard:hover { transform: translateY(-3px); box-shadow: var(--lift-2); }}
   a.fp-postcard:active { transform: translateY(1px); box-shadow: none; transition-duration: var(--dur-press); }
 
   /* ---------------------------------------------------------------- Dialogs

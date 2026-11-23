@@ -31,7 +31,7 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {hide && <meta name="robots" content="noindex, nofollow" />}
@@ -84,7 +84,7 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
          background once the guest hovers its link (desktop) or it sits on
          screen (phones). Other browsers ignore this and load normally. -->
     <script type="speculationrules" is:inline>
-      {"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"selector_matches":"[target=_blank], [download], [href*='#'], [rel~=nofollow]"}}]},"eagerness":"moderate"}]}
+      {"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/our-story/"}},{"not":{"selector_matches":"[target=_blank], [download], [href*='#'], [rel~=nofollow]"}}]},"eagerness":"moderate"},{"where":{"href_matches":"/our-story/"},"eagerness":"conservative"}]}
     </script>
   </head>
   <body>

@@ -85,7 +85,8 @@ const { branches, rainSrc, rainPoster } = Astro.props;
 
 <style>
   .hero { position: relative; display: grid; place-items: center; min-height: 100svh; overflow: hidden; background: var(--color-ink); color: var(--color-sand); }
-  .hero-glass { position: absolute; inset: 0; }
+  /* The glass dissolves into the street below over its last 20svh (no flat edge). */
+  .hero-glass { position: absolute; inset: 0; -webkit-mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); }
 
   /* The words float on the glass: they let drags through to it, only their links take pointers. */
   .hero-words { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: var(--space-5); width: 100%; max-width: 64rem; padding: var(--space-8) var(--space-5); text-align: center; pointer-events: none; }

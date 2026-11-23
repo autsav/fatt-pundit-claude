@@ -46,7 +46,7 @@ const items = await Promise.all(cards.map(async ([src, id]) => {
   .fp-print img { height: auto; aspect-ratio: 4 / 5; filter: sepia(0.14) saturate(0.93) contrast(1.03); }
   @media (max-width: 639px) { .fp-print { padding: var(--space-2); } }
   .dish-name { display: block; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(15px, 1.6vw, 20px); line-height: 1.1; text-wrap: balance; }
-  .dish-line { display: block; margin-top: 4px; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(15px, 1.4vw, 17px); line-height: 1.3; text-wrap: balance; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+  .dish-line { display: block; margin-top: 4px; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(15px, 1.4vw, 17px); line-height: 1.3; text-wrap: balance; }
   /* A hand-laid spread: one small fixed tilt per print. */
   li:nth-child(3n + 1) .fp-print { rotate: -1.5deg; }
   li:nth-child(3n + 2) .fp-print { rotate: 0.8deg; }

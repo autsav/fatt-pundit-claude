@@ -11,6 +11,8 @@ import InfoShell from '../../layouts/InfoPage.astro';
 import DishPassport from '../../components/site/DishPassport.astro';
 import { Image } from 'astro:assets';
 import { dishPhoto } from '../../lib/dish-photos';
+import type { ImageMetadata } from 'astro';
+import momosChutney from '../../assets/images/journey/04-momos-chutney.jpg';
 import { dish, getBranches, MENU_TABS, preTheatreText, priceOf, type Branch } from '../../lib/site-data';
 
 export const getStaticPaths = (async () => {
@@ -29,7 +31,8 @@ const menus = await Promise.all(
       kind: m.kind,
       allergyNote: m.allergyNote,
       sections: await Promise.all(
-        m.sections.map(async (sec) => ({
+        m.sections.map(async (sec, n) => ({
+          sid: `${id}-s${n}`,
           title: sec.title,
           note: sec.note,
           items: await Promise.all(
@@ -49,6 +52,10 @@ const groups = [
   { key: 'diet', label: 'For dietary needs', items: menus.filter((m) => m.kind === 'diet') },
 ].filter((g) => g.items.length > 0);
 const preTheatre = preTheatreText(b);
+// Banner: this room's photo (Soho has no approved room photo yet, so its momo shot) and the other rooms' menus.
+const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/{soho,covent-garden,dubai}/*.jpg', { eager: true });
+const bannerPhoto = (b.page.hero ? photos[`/src/assets/images/${b.id}/${b.page.hero}.jpg`]?.default : undefined) ?? (b.id === 'soho' ? momosChutney : undefined);
+const otherMenus = (await getBranches()).filter((o) => o.id !== b.id && o.status === 'open');
 const TAGS = [
   ['V', 'Vegetarian'],
   ['VG', 'Vegan'],
@@ -92,6 +99,11 @@ const ld = {
   }}
 >
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <div class="menu-banner">
+    {bannerPhoto && <Image class="mb-photo" src={bannerPhoto} alt="" width={96} height={64} loading="eager" />}
+    <p class="mb-name"><b>Fatt Pundit {b.shortName}</b> <span>{b.address.street}</span></p>
+    {otherMenus.length > 0 && <p class="mb-links">{otherMenus.map((o) => <a class="fp-link fp-link--strong" href={`/${o.id}/menu/`}>{o.shortName} menus →</a>)}</p>}
+  </div>
   <div class="menu-layout" data-menu-layout>
   <!-- One-menu mode starts before the tools are parsed, so a slow connection never paints the full chip
        list (or no menu button) first and then shifts (CLS 0.18 on slow 4G before this). -->
@@ -111,6 +123,7 @@ const ld = {
     <div class="menu-pickbar">
       <!-- Phones: one button names the menu you're reading and opens the list of menus. Shown by the script. -->
       <button type="button" class="menu-pick" data-menu-pick aria-expanded="false" aria-controls="menu-nav">Menu: <b data-menu-current>{menus[0]?.title}</b></button>
+      <button type="button" class="menu-filter-btn" data-menu-filter-btn aria-expanded="false" aria-controls="menu-filter">Filter<span data-menu-filter-n></span></button>
       <nav class="menu-jump" id="menu-nav" aria-label="Menus">
         {groups.map((g) => (
           <div class="mj-group">
@@ -122,7 +135,7 @@ const ld = {
         ))}
       </nav>
     </div>
-    <div class="menu-filter">
+    <div class="menu-filter" id="menu-filter" data-menu-filter>
     <label class="menu-search">
       <span class="tool-lab">Search all menus</span>
       <input class="fp-input" type="search" placeholder="momo, chilli, paneer" data-menu-q autocomplete="off" />
@@ -133,20 +146,27 @@ const ld = {
     </fieldset>
     <p class="menu-count" data-menu-count aria-live="polite"></p>
     <p class="menu-hint" data-menu-hint hidden>There's also a full <a href="#" data-menu-hint-link></a>.</p>
-    <p class="menu-passport-tip" data-pp-tip>Tap the stamp beside a dish to collect it: your passport becomes tonight's shortlist, ready to show your server or send to the table. <button type="button" class="fp-btn fp-btn--text tip-x" data-pp-tip-x>Got it</button></p>
-    <!-- Hidden before paint once dismissed, so the menu never jumps up. -->
-    <script is:inline>try{if(localStorage.getItem('fp-pp-tip'))document.currentScript.previousElementSibling.hidden=true}catch(e){}</script>
     </div>
   </div>
   <div class="menu-list">
+  <p class="menu-passport-tip" data-pp-tip>Tap the stamp beside a dish to collect it: your passport becomes tonight's shortlist, ready to show your server or send to the table. <button type="button" class="fp-btn fp-btn--text tip-x" data-pp-tip-x>Got it</button></p>
+  <!-- Once, inline above the first menu; hidden before paint when already seen, so the menu never jumps up. -->
+  <script is:inline>try{if(localStorage.getItem('fp-pp-tip'))document.currentScript.previousElementSibling.hidden=true}catch(e){}</script>
 
   {menus.map((m) => (
     <section class="menu-block" id={m.id} aria-labelledby={`${m.id}-h`} data-menu-block>
-      <h2 id={`${m.id}-h`}>{m.title}</h2>
+      <h2 id={`${m.id}-h`} tabindex="-1">{m.title}</h2>
+      <p class="menu-ask">Allergies? Ask us, or <a href="/allergens/">see allergens →</a></p>
+      <p class="menu-key"><span class="sr-only">Diet key: </span>{TAGS.map(([t, label], n) => <span><b>{t}</b> {label}{n < TAGS.length - 1 ? ' · ' : ''}</span>)}</p>
       {m.intro !== m.title && <p class="menu-intro">{m.intro}</p>}
       {m.kind === 'pre-theatre' && preTheatre && <p class="menu-intro">Seated between {preTheatre}.</p>}
+      {m.sections.length > 1 && (
+        <nav class="menu-chips" aria-label={`${m.title} sections`} data-menu-chips>
+          {m.sections.map((s) => <a href={`#${s.sid}`} data-chip={s.sid}>{s.title}</a>)}
+        </nav>
+      )}
       {m.sections.map((s) => (
-        <div class="menu-sec" data-menu-sec>
+        <div class="menu-sec" id={s.sid} data-menu-sec>
           <h3>{s.title}</h3>
           {s.note && <p class="menu-note">{s.note}</p>}
           <ul>
@@ -155,10 +175,10 @@ const ld = {
                 {i.photo && <Image class="mi-photo" src={i.photo} alt="" width={112} height={112} loading="lazy" />}
                 <div class:list={['mi-head', { 'mi-head--long': (i.price ?? '').length > 8 }]}>
                   <span class="mi-name">{i.name}{i.sig && <span class="mi-sig"> Born here</span>}</span>
-                  {i.tags.length > 0 && <span class="mi-tags"><span aria-hidden="true">{i.tags.join(' · ')}</span><span class="sr-only">{i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}</span></span>}
                   {i.price && <span class="mi-price">{i.price}</span>}
                 </div>
                 {i.desc && <p class="mi-desc">{i.desc}</p>}
+                {i.tags.length > 0 && <p class="mi-tags"><span aria-hidden="true">{i.tags.join(' · ')}</span><span class="sr-only">{i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}</span></p>}
               </li>
             ))}
           </ul>
@@ -180,6 +200,7 @@ const ld = {
     <p data-menu-empty-text>No dishes match.</p>
     <p class="menu-empty-acts"><button type="button" class="fp-btn fp-btn--sm" data-menu-clear>Clear filters</button><button type="button" class="fp-btn fp-btn--sm" data-menu-all>Search all menus</button></p>
   </div>
+  <p class="sr-only" role="status" aria-live="polite" data-menu-live></p>
   <DishPassport branch={b.id} name={b.shortName} />
   </div>
   </div>
@@ -204,8 +225,24 @@ const ld = {
   .menu-hint { margin: 0; font-size: var(--step-small); }
   .menu-hint a, .menu-empty a { color: var(--fp-link); font-weight: 700; }
   /* Body face, not Lora: its fallback is width-matched, so the tip keeps its line count when fonts land (D3). */
-  .menu-passport-tip { margin: 0; font-size: var(--step-small); color: var(--fp-fg-muted); }
-  .menu-pick { display: none; }
+  .menu-passport-tip { margin: 0 0 var(--space-5); font-size: var(--step-small); color: var(--fp-fg-muted); }
+  .menu-pick, .menu-filter-btn { display: none; }
+  .menu-banner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--fp-rule); font-size: var(--step-small); }
+  .mb-photo { width: 48px; height: 32px; object-fit: cover; border: 2px solid var(--color-ink); }
+  .menu-banner p { margin: 0; }
+  .mb-name span { color: var(--fp-fg-muted); }
+  .mb-links { display: flex; flex-wrap: wrap; gap: var(--space-1, 4px) var(--space-4); margin-inline-start: auto !important; }
+  .menu-ask, .menu-key { margin: 6px 0 0 !important; font-size: var(--step-small); }
+  .menu-ask a { color: var(--color-tiger-deep); font-weight: 700; }
+  .menu-key { font-size: var(--step-tag); letter-spacing: 0.04em; color: var(--fp-fg-muted); }
+  .menu-block h2:focus-visible { outline-offset: 4px; }
+  /* Section jump chips: one sticky strip under the picker; a sideways scroll-snap row on phones. */
+  .menu-chips { position: sticky; top: calc(var(--menu-bar, 56px) + 44px); z-index: 4; display: flex; gap: 6px; margin: var(--space-3) 0 0; padding: 6px 0; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; background: var(--color-paper-light); border-bottom: 1px solid var(--fp-rule); }
+  .menu-chips::-webkit-scrollbar { display: none; }
+  .menu-chips a { flex: none; scroll-snap-align: start; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 2px solid var(--color-ink); font-size: var(--step-small); font-weight: 700; text-decoration: none; color: var(--color-ink); white-space: nowrap; }
+  .menu-chips a[aria-current='true'] { background: var(--color-ink); color: var(--color-sand); }
+  .menu-chips a[hidden] { display: none; }
+  .menu-sec { scroll-margin-top: 170px; }
   /* One menu at a time (Phase 4 D2). Without JavaScript every menu shows, as before. */
   .js-one.js-ready [data-menu-block]:not(.is-sel):not(.is-match) { display: none; }
   /* While the page is still arriving, only the first menu shows (the chosen one is picked at the end). */
@@ -219,8 +256,13 @@ const ld = {
   @media (max-width: 899px) {
     .menu-tools { display: contents; }
     .menu-tools > * { margin-top: 10px; }
-    .js-one .menu-pickbar { position: sticky; top: var(--menu-bar, 56px); z-index: 6; margin: 10px calc(-1 * clamp(16px, 4vw, 40px)) 0; padding: 8px clamp(16px, 4vw, 40px); background: var(--color-sand); border-bottom: 2px solid var(--color-ink); }
-    .js-one .menu-pick { display: flex; width: 100%; align-items: center; gap: 8px; min-height: 48px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: 17px; cursor: pointer; }
+    .js-one .menu-pickbar { position: sticky; top: var(--menu-bar, 56px); z-index: 6; display: flex; gap: 8px; align-items: stretch; height: 44px; box-sizing: border-box; margin: 10px calc(-1 * clamp(16px, 4vw, 40px)) 0; padding: 0 clamp(16px, 4vw, 40px); background: var(--color-sand); box-shadow: 0 2px 0 var(--color-ink); }
+    .js-one .menu-pick { display: flex; flex: 1; min-width: 0; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: var(--step-body); cursor: pointer; }
+    .js-one .menu-filter-btn { display: inline-flex; flex: none; align-items: center; min-height: 44px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: var(--step-body); font-weight: 700; cursor: pointer; }
+    .js-one .menu-filter-btn[aria-expanded='true'] { background: var(--color-ink); color: var(--color-sand); }
+    .js-one .menu-filter { display: none; }
+    .js-one .menu-filter.is-open { display: grid; margin-top: 10px; }
+    .menu-chips { top: calc(var(--menu-bar, 56px) + 46px); }
     .js-one .menu-pick::after { content: ""; margin-left: auto; width: 8px; height: 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
     .js-one .menu-pick[aria-expanded='true']::after { transform: translateY(2px) rotate(-135deg); }
     /* The list unfolds under its button to its own height and folds back. Only where the browser can
@@ -236,45 +278,48 @@ const ld = {
     }
     .js-one .menu-jump .mj-group { display: block; }
     .js-one .menu-jump ul { display: grid; gap: 0; margin-top: 4px; }
-    .js-one .menu-jump a { width: 100%; border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); font-size: 17px; }
+    .js-one .menu-jump a { width: 100%; border: 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); font-size: var(--step-body); }
     .menu-block { scroll-margin-top: 140px; }
     .menu-list { margin-top: var(--space-5); }
   }
-  .menu-block { padding-top: 0; scroll-margin-top: 200px; }
+  .menu-block { padding-top: 0; scroll-margin-top: 200px; content-visibility: auto; contain-intrinsic-size: auto 1200px; }
   .menu-block + .menu-block { margin-top: var(--space-8); }
   .menu-block h2 { margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 3px double var(--color-ink); padding-bottom: 8px; }
   .menu-intro, .menu-note { font-family: var(--font-note); font-style: italic; }
-  .menu-sec h3 { margin: 22px 0 6px; font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-tiger-deep); }
+  .menu-sec h3 { margin: 22px 0 6px; font-size: var(--step-small); letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-tiger-deep); }
   .menu-sec ul { list-style: none; padding: 0; margin: 0; }
   .menu-item { padding: 10px 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); }
   /* Name | price | passport stamp on the first line (a grid, so a long name wraps inside its own column
      instead of pushing the stamp onto a line of its own); diet marks on the second line. */
   .menu-item { container-type: inline-size; }
-  .mi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'name price stamp' 'tags tags tags'; align-items: baseline; gap: 2px 12px; }
-  .mi-name { grid-area: name; font-weight: 700; font-size: 18px; }
-  .mi-sig { font-size: 12px; font-weight: 700; color: var(--color-tiger-deep); white-space: nowrap; }
-  .mi-tags { grid-area: tags; font-size: 13px; letter-spacing: 0.06em; color: var(--fp-fg-muted); }
+  .mi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'name price stamp'; align-items: baseline; gap: 2px 12px; }
+  .mi-name { grid-area: name; font-weight: 700; font-size: var(--step-h4); }
+  .mi-sig { font-size: var(--step-tag); font-weight: 700; color: var(--color-tiger-deep); white-space: nowrap; }
+  .mi-tags { margin: 2px 0 0 !important; font-size: var(--step-tag); letter-spacing: 0.06em; color: var(--fp-fg-muted); }
   .mi-price { grid-area: price; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .mi-head :global(.pp-stamp) { grid-area: stamp; align-self: center; }
+  /* The stamp says what it does: a heart-stamp over "Save" ("Saved" once collected), set apart from the price. */
+  .mi-head :global(.pp-stamp) { grid-area: stamp; align-self: center; width: auto; min-width: 44px; height: auto; min-height: 44px; margin: -8px 0 -8px 8px; padding: 2px 0 2px 12px; border-left: 1px dotted rgb(44 41 37 / 0.4); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+  .mi-head :global(.pp-stamp)::after { content: 'Save'; font-size: var(--step-tag); font-weight: 700; line-height: 1.1; }
+  .mi-head :global(.pp-stamp[aria-pressed='true'])::after { content: 'Saved'; }
   /* D1: a long price ("Veg £13, Chicken or beef £15") on a narrow row drops under the name, right-aligned,
      and may wrap, so the name never shrinks to a column of single letters. */
   @container (max-width: 560px) {
-    .mi-head--long { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name stamp' 'price .' 'tags tags'; }
+    .mi-head--long { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name stamp' 'price .'; }
     .mi-head--long .mi-price { justify-self: end; text-align: right; white-space: normal; }
   }
   .menu-item.has-photo { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 14px; align-items: start; }
   .menu-item.has-photo > :not(.mi-photo) { grid-column: 2; }
-  .mi-photo { grid-row: 1 / span 2; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-ink); }
-  .mi-desc { margin: 2px 0 0 !important; font-size: 16px; }
+  .mi-photo { grid-row: 1 / span 3; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-ink); }
+  .mi-desc { margin: 2px 0 0 !important; font-size: var(--step-small); }
   .tip-x { min-height: 32px; padding: 0 4px; font-style: normal; }
-  .menu-allergy { margin-top: 16px !important; font-size: 14px; }
+  .menu-allergy { margin-top: 16px !important; font-size: var(--step-fine); }
   .menu-allergy a { color: var(--color-tiger-deep); font-weight: 700; }
   .menu-empty { margin-top: 24px; padding: 16px 18px; border-left: 4px solid var(--color-tiger-deep); background: var(--color-paper); }
   .menu-empty p { margin: 0 0 10px !important; font-family: var(--font-note); font-style: italic; }
   .menu-empty .menu-empty-acts { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 !important; font-style: normal; }
   [hidden] { display: none !important; }
   /* Tablet landscape: the tools ride along under the header while you read. */
-  @media (min-width: 900px) and (max-width: 1023px) and (min-height: 700px) { .menu-tools { position: sticky; top: 66px; padding-block: var(--space-3); background: var(--color-sand); border-bottom: 2px solid var(--color-ink); } }
+  @media (min-width: 900px) and (max-width: 1023px) and (min-height: 700px) { .menu-tools { position: sticky; top: 66px; padding-block: var(--space-3); background: var(--color-sand); border-bottom: 2px solid var(--color-ink); } .menu-chips { position: static; } }
   .menu-filter { display: grid; gap: var(--space-3); min-width: 0; }
   @media (max-width: 899px) { .menu-filter { display: contents; } }
   /* Desktop: the menu index rides in the label rail like a contents list (3 of 12 columns); search and
@@ -297,10 +342,11 @@ const ld = {
     .menu-jump a[aria-current='true'] { background: none; color: var(--color-ink); box-shadow: inset 4px 0 0 var(--color-ink); padding-left: 12px; }
     .menu-list { max-width: 860px; }
     .menu-block { scroll-margin-top: 100px; }
+    .menu-chips { top: var(--header-h, 72px); }
     .menu-block h2 { font-size: 40px; }
   }
   @media print {
-    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), :global(.crumbs), .menu-tools, .menu-empty, :global([data-dock]) { display: none !important; }
+    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), :global(.crumbs), .menu-tools, .menu-empty, :global([data-dock]), .menu-chips, .menu-banner, .menu-ask, .menu-passport-tip { display: none !important; }
     :global(.info) { padding: 0 !important; background: none !important; }
     .menu-list { border: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
     .menu-block + .menu-block { break-before: page; }
@@ -327,6 +373,11 @@ const ld = {
   const pick = layout.querySelector<HTMLButtonElement>('[data-menu-pick]')!;
   const nav = layout.querySelector<HTMLElement>('#menu-nav')!;
   const current = layout.querySelector<HTMLElement>('[data-menu-current]')!;
+  const filterBtn = layout.querySelector<HTMLButtonElement>('[data-menu-filter-btn]')!;
+  const filterPanel = layout.querySelector<HTMLElement>('[data-menu-filter]')!;
+  const filterN = layout.querySelector<HTMLElement>('[data-menu-filter-n]')!;
+  const live = layout.querySelector<HTMLElement>('[data-menu-live]')!;
+  const chips = [...layout.querySelectorAll<HTMLAnchorElement>('[data-chip]')];
   const NAME = Object.fromEntries(links.map((a) => [a.hash.slice(1), a.textContent ?? '']));
   const DIET: Record<string, string> = { VG: 'vegan', GF: 'gluten-free', DF: 'dairy-free', H: 'halal' };
   let everyMenu = false;
@@ -348,6 +399,7 @@ const ld = {
       if (ok) { shown++; hit.add(blk.id); }
     }
     for (const sec of layout.querySelectorAll<HTMLElement>('[data-menu-sec]')) sec.hidden = !sec.querySelector('[data-dish]:not([hidden])');
+    for (const c of chips) c.hidden = document.getElementById(c.dataset.chip!)!.hidden;
     for (const blk of blocks) {
       blk.classList.toggle('is-sel', !all && blk.id === sel);
       blk.classList.toggle('is-match', all && hit.has(blk.id));
@@ -356,6 +408,8 @@ const ld = {
     for (const a of links) a.setAttribute('aria-current', String(!all && a.hash.slice(1) === sel));
     current.textContent = all ? 'All menus' : NAME[sel];
     const filtering = words.length > 0 || need.length > 0;
+    const nf = need.length + (words.length ? 1 : 0);
+    filterN.textContent = nf ? ` (${nf})` : '';
     count.textContent = !filtering ? '' : shown === 0 ? 'No dishes match' : all ? `${shown} dish${shown === 1 ? '' : 'es'} in ${hit.size} menu${hit.size === 1 ? '' : 's'}` : `${shown} dish${shown === 1 ? '' : 'es'}`;
     empty.hidden = shown > 0;
     emptyText.textContent = `No dishes match${words.length ? ` "${q.value.trim()}"` : ''}${need.length ? ` with ${need.join(', ')} on` : ''}${all ? '' : ` in the ${NAME[sel]} menu`}.`;
@@ -372,8 +426,39 @@ const ld = {
     history.pushState(null, '', `#${id}`);
     run();
     nav.classList.remove('is-open'); pick.setAttribute('aria-expanded', 'false');
+    // Focus follows the menu: the new H2 takes focus and a polite region says what is showing.
     document.getElementById(id)?.scrollIntoView({ block: 'start' });
+    document.getElementById(`${id}-h`)?.focus({ preventScroll: true });
+    live.textContent = `Showing the ${NAME[id] ?? id} menu`;
   };
+  // Section chips: jump to the section; the one in view is highlighted (a thin band under the sticky bars).
+  layout.addEventListener('click', (e) => {
+    const c = (e.target as Element).closest<HTMLAnchorElement>('[data-chip]');
+    if (!c) return;
+    e.preventDefault();
+    document.getElementById(c.dataset.chip!)?.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
+  if (chips.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const en of entries) {
+        if (!en.isIntersecting) continue;
+        const strip = en.target.closest('[data-menu-block]')!.querySelector<HTMLElement>('[data-menu-chips]');
+        if (!strip) continue;
+        for (const c of strip.querySelectorAll<HTMLAnchorElement>('[data-chip]')) {
+          const on = c.dataset.chip === en.target.id;
+          c.setAttribute('aria-current', String(on));
+          if (on) strip.scrollTo({ left: c.offsetLeft - strip.clientWidth / 2 + c.offsetWidth / 2, behavior: 'auto' });
+        }
+      }
+    }, { rootMargin: '-180px 0px -70% 0px' });
+    for (const c of chips) io.observe(document.getElementById(c.dataset.chip!)!);
+  }
+  filterBtn.addEventListener('click', () => {
+    const open = !filterPanel.classList.contains('is-open');
+    filterPanel.classList.toggle('is-open', open);
+    filterBtn.setAttribute('aria-expanded', String(open));
+    if (open) q.focus();
+  });
   layout.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('[data-menu-link], [data-menu-hint-link]');
     if (!a) return;
@@ -393,8 +478,9 @@ const ld = {
     const tip = layout.querySelector<HTMLElement>('[data-pp-tip]')!;
     try { localStorage.setItem('fp-pp-tip', '1'); } catch {}
     tip.hidden = true;
-    q.focus();
   });
+  // "Once": a guest who has seen the tip on this visit is not shown it again.
+  try { if (!layout.querySelector<HTMLElement>('[data-pp-tip]')!.hidden) localStorage.setItem('fp-pp-tip', '1'); } catch {}
   q.addEventListener('input', () => { if (!q.value) everyMenu = false; run(); });
   tags.forEach((t) => t.addEventListener('change', run));
   addEventListener('popstate', () => { everyMenu = false; run(); });

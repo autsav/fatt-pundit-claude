@@ -1,7 +1,8 @@
 ---
 import InfoPage from '../layouts/InfoPage.astro';
+const launched = import.meta.env.PUBLIC_LAUNCH === 'true';
 ---
-<InfoPage title="Accessibility" description="How the Fatt Pundit website works for everyone, and how to tell us when it doesn't." kicker="For every guest" heading="Accessibility"
+<InfoPage title="Accessibility" description="How the Fatt Pundit website works for everyone, and how to tell us when it doesn't." kicker="For every guest" heading="Accessibility" updated="23 November 2026"
   summary={[
     'This site aims to meet WCAG 2.2 at level AA: readable contrast, zoom to 200%, full keyboard use.',
     'Calm mode: if your device asks for less motion, nothing on the site moves.',
@@ -19,5 +20,5 @@ import InfoPage from '../layouts/InfoPage.astro';
   <p>Booking happens on our reservation partners' sites (OpenTable and SevenRooms), which have their own accessibility statements.</p>
   <h2>Tell us</h2>
   <p>If something on this site is hard to use, email <a href="mailto:reservations@fattpundit.co.uk">reservations@fattpundit.co.uk</a> and we'll fix it, and help you book in the meantime.</p>
-  <p class="todo">Visiting the restaurants (step-free access, toilets): details to be added by Fatt Pundit.</p>
+  {!launched && <p class="todo">Visiting the restaurants (step-free access, toilets): details to be added by Fatt Pundit.</p>}
 </InfoPage>

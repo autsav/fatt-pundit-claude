@@ -16,32 +16,22 @@ const stamp = await stampSrc(stampArt, 300);
 const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1];
 ---
 <div class="bill" data-bill>
+  <div class="sr-only">
+    <p>Opening hours</p>
+    <ul>
+      {branches.map((b) => <li>{b.shortName}: {b.hours ? hoursLines(b.hours).map((l) => `${l.days} ${l.text}`).join('; ') : 'Opening soon'}{b.phone ? `. Phone ${prettyPhone(b.phone)}` : ''}</li>)}
+    </ul>
+  </div>
   <div class="bill-pocket">
     <div class="receipt-slot" aria-hidden="true"></div>
     <div class="receipt-clip">
-      <div class="receipt" role="group" aria-label="Receipt with our opening hours">
+      <div class="receipt" aria-hidden="true">
         <p class="r-c r-big">Fatt Pundit</p>
         <p class="r-c">Hakka cooking from Tangra</p>
         <p class="r-c r-date" data-receipt-date>&nbsp;</p>
         <p class="r-rule" aria-hidden="true"></p>
-        {branches.map((b) => (
-          <div class="r-branch">
-            <p class="r-name">{b.shortName}</p>
-            {b.hours ? (
-              <dl>
-                {hoursLines(b.hours).map((l) => (
-                  <div><dt>{l.days}</dt><dd>{l.text}</dd></div>
-                ))}
-              </dl>
-            ) : (
-              <p>Opening soon</p>
-            )}
-            {b.phone && <p class="r-phone">{prettyPhone(b.phone)}</p>}
-          </div>
-        ))}
-        <p class="r-rule" aria-hidden="true"></p>
-        <p class="r-row"><span>Table</span><span>Yours</span></p>
-        <p class="r-row r-total"><span>Total</span><span>One good night</span></p>
+        <p class="r-row"><span>Table</span><span>For you</span></p>
+        <p class="r-row r-total"><span>Total</span><span>A good night</span></p>
         <p class="r-rule" aria-hidden="true"></p>
         <p class="r-c">Thank you for travelling with Fatt Pundit</p>
         <svg class="r-bars" viewBox="0 0 90 18" preserveAspectRatio="none" aria-hidden="true">
@@ -90,7 +80,7 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   /* Two panels of --p must fit a 320px phone with its 16px gutters, or the page scrolls sideways. */
   .bill { --p: clamp(min(160px, 50vw - 24px), 20vw, 240px); position: relative; width: calc(var(--p) * 2); margin-inline: auto; perspective: 1600px; transition: translate var(--dur-story) var(--curve-panel); }
   .bill.is-closed { translate: calc(var(--p) * -0.5) 0; }
-  .bill-pocket { position: relative; margin-left: var(--p); width: var(--p); min-height: calc(var(--p) * 1.9); padding: 26px 12px 18px; border-radius: 3px; box-sizing: border-box;
+  .bill-pocket { position: relative; margin-left: var(--p); width: var(--p); aspect-ratio: 4 / 5; max-height: 60svh; padding: 26px 12px 18px; border-radius: 3px; box-sizing: border-box;
     background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgb(0 0 0 / 0.3) 0 1px, transparent 1px 3px), #141210;
     box-shadow: 0 30px 60px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(203 160 82 / 0.25); }
   /* The slot the receipt prints out of. */
@@ -108,10 +98,6 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   .r-big { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
   .r-date { margin-top: 4px !important; }
   .r-rule { height: 0; margin: 8px 0 !important; border-top: 1.5px dashed var(--ink); }
-  .r-branch { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
-  .r-name { font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
-  .r-branch dl div { display: flex; flex-direction: column; }
-  .r-branch dd { margin: 0 0 2px; padding-left: 8px; }
   .r-row { display: flex; justify-content: space-between; gap: 8px; text-transform: uppercase; }
   .r-total { font-weight: 700; }
   .r-bars { display: block; width: 100%; height: 22px; margin-top: 10px; fill: var(--ink); }

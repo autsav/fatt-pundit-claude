@@ -1,6 +1,9 @@
 ---
 import InfoPage from '../layouts/InfoPage.astro';
 import { getBranches } from '../lib/site-data';
+const launched = import.meta.env.PUBLIC_LAUNCH === 'true';
+const ALLERGENS = ['Celery', 'Cereals containing gluten', 'Crustaceans', 'Eggs', 'Fish', 'Lupin', 'Milk', 'Molluscs', 'Mustard', 'Tree nuts', 'Peanuts', 'Sesame', 'Soya', 'Sulphites'];
+const MARKS = [['V', 'Vegetarian'], ['VG', 'Vegan'], ['GF', 'Gluten free'], ['DF', 'Dairy free'], ['H', 'Halal']];
 const open = (await getBranches()).filter((b) => b.status === 'open');
 ---
 <InfoPage
@@ -8,6 +11,7 @@ const open = (await getBranches()).filter((b) => b.status === 'open');
   description="How to eat safely at Fatt Pundit: the 14 major allergens, our menu marks, and who to ask."
   kicker="Before you order"
   heading="Allergens and dietary needs"
+  updated="23 November 2026"
   summary={[
     'Tell your server about any allergy or intolerance before you order, every visit.',
     'Every menu marks V, VG, GF, DF and H, and there are full vegan, gluten-free, dairy-free and halal menus.',
@@ -15,14 +19,28 @@ const open = (await getBranches()).filter((b) => b.status === 'open');
   ]}
   questions={{ related: open.map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` })) }}
 >
-  <p>Please tell your server about any allergy or intolerance <strong>before you order</strong>, every time you visit. Recipes and suppliers change, and the team will check each dish with the kitchen for you.</p>
+  <p>Recipes and suppliers change, so the team checks each dish with the kitchen for you. Mention any allergy or intolerance <strong>before you order</strong>, on every visit.</p>
   <h2>The 14 major allergens</h2>
-  <p>Our team can tell you which of the 14 major allergens are in every dish: celery, cereals containing gluten, crustaceans, eggs, fish, lupin, milk, molluscs, mustard, tree nuts, peanuts, sesame, soya and sulphites.</p>
-  <h2>Marks on our menus</h2>
-  <ul>
-    <li><strong>V</strong> vegetarian, <strong>VG</strong> vegan, <strong>GF</strong> gluten free, <strong>DF</strong> dairy free, <strong>H</strong> halal.</li>
+  <p>Our team can tell you which of these are in every dish.</p>
+  <ul class="allergen-grid" role="list">
+    {ALLERGENS.map((a) => <li>{a}</li>)}
   </ul>
+  <h2>Marks on our menus</h2>
+  <dl class="marks">
+    {MARKS.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+  </dl>
   <p>On each menu page, "Show only" keeps just the dishes with the marks you choose.</p>
   <p>Our kitchens are busy and share woks, fryers and steamers, so we can't promise any dish is completely free of traces of an allergen.</p>
-  <p class="todo">Draft wording, to be confirmed by Fatt Pundit's kitchen team before launch.</p>
+  {!launched && <p class="todo">Draft wording, to be confirmed by Fatt Pundit's kitchen team before launch.</p>}
 </InfoPage>
+
+<style>
+  /* Two columns of plain list items (no markers: each is one allergen on its own line). */
+  .allergen-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2) var(--space-5); margin: 0 0 var(--space-5); padding: 0; list-style: none; max-width: 36rem; }
+  .allergen-grid li { padding: var(--space-2) 0; border-bottom: 1.5px solid var(--fp-fg-muted); }
+  /* Menu marks: same chip look as the menu's diet filters. */
+  .marks { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 var(--space-5); padding: 0; }
+  .marks div { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-min, 44px); padding: 0 var(--space-4); border: var(--border-control, 2px) solid var(--fp-control, currentColor); background: var(--fp-field-bg, transparent); }
+  .marks dt { font-weight: 700; }
+  .marks dd { margin: 0; }
+</style>

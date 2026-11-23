@@ -117,7 +117,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
               <img src={room.src} alt={room.alt} className="fp-photo absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
               <img src={prints[0].src} alt={prints[0].alt} className="fp-photo bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
               <img src={prints[1].src} alt={prints[1].alt} className="fp-photo bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
-              <div className="bar-dark-veil pointer-events-none absolute inset-0" aria-hidden="true" />
+              <div className="bar-dark-veil pointer-events-none absolute inset-0" style={touch ? { opacity: 0.45 } : undefined} aria-hidden="true" />
             </div>
             <figcaption className="font-note text-[16px] italic text-sand/80">
               {calm ? 'The bar at Covent Garden, lit for the evening.' : touch ? 'Tap the bar to move the light.' : 'Move your light across the bar.'}
@@ -132,10 +132,10 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
               {drinks.map((d) => (
                 <li key={d.id} className="flex items-baseline justify-between gap-4 border-b border-dashed border-sand/35 py-3.5 last:border-b-0">
                   <div className="min-w-0">
-                    <p className="m-0 text-[17px] font-bold uppercase tracking-[0.08em]">{d.name}</p>
+                    <p className="m-0 text-[17px] font-bold uppercase tracking-[0.06em] [text-wrap:balance]">{d.name}</p>
                     {d.description && <p className="m-0 mt-1 font-note text-[15px] italic leading-snug text-sand/80">{d.description}</p>}
                   </div>
-                  {d.price && <span className="max-w-[42%] shrink-0 text-right font-bold text-tiger-bright">{d.price}</span>}
+                  {d.price && <span className="min-w-[7ch] max-w-[42%] shrink-0 text-right font-bold text-tiger-bright">{d.price}</span>}
                 </li>
               ))}
             </ul>

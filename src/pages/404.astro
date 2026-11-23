@@ -13,13 +13,18 @@ const branches = await getBranches();
       <h1 class="tag-head">Lost luggage</h1>
       <p class="tag-code">404</p>
       <p class="tag-line">This page went missing somewhere between Guangdong and London.</p>
-      <!-- Every task one tap away (ux-structure.md W8): the rooms, their menus, booking, home. -->
+      <p class="did-you-mean" data-suggest hidden></p>
+      <!-- Every task one tap away (ux-structure.md W8), in two short groups. -->
+      <h2 class="tag-group">Rooms</h2>
+      <ul class="tag-go">
+        {branches.map((b) => <li><a href={`/${b.id}/`}>{b.shortName}<span aria-hidden="true">›</span></a></li>)}
+      </ul>
+      <h2 class="tag-group">Do something</h2>
       <ul class="tag-go">
         {[
-          ...branches.map((b) => ({ href: `/${b.id}/`, label: b.shortName })),
-          ...branches.filter((b) => b.status === 'open').map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` })),
           { href: '/book/', label: 'Book a table' },
-          { href: '/', label: 'Back to the start' },
+          { href: '/soho/menu/', label: 'Menus' },
+          { href: '/our-story/', label: 'Our story' },
         ].map((d) => <li><a href={d.href}>{d.label}<span aria-hidden="true">›</span></a></li>)}
       </ul>
       <p class="fortune" data-fortune hidden></p>
@@ -28,10 +33,50 @@ const branches = await getBranches();
   <SiteFooter branches={branches} />
 </Base>
 
+<script>
+  const fortunes = [
+    'Wrong door. The momos are this way.',
+    'He who takes the wrong turn still finds dumplings.',
+    'The page is lost. The chilli chicken is not.',
+    'A wise guest books ahead. A wiser one checks the URL.',
+    'This door leads nowhere. The next one leads to dinner.',
+  ];
+  const f = document.querySelector<HTMLElement>('[data-fortune]');
+  if (f) { f.textContent = fortunes[Math.floor(Math.random() * fortunes.length)]; f.hidden = false; }
+
+  // "Did you mean": nearest known route by edit distance (a prefix match counts as close).
+  const routes = ['/', '/soho/', '/covent-garden/', '/dubai/', '/soho/menu/', '/covent-garden/menu/', '/book/', '/private-dining/', '/our-story/', '/allergens/', '/accessibility/', '/privacy/', '/booking-terms/'];
+  const dist = (a: string, b: string) => {
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = cur;
+    }
+    return prev[b.length];
+  };
+  const here = location.pathname.toLowerCase().replace(/\/?$/, '/');
+  let best = '';
+  let score = Infinity;
+  for (const r of routes) {
+    if (r === '/') continue;
+    const d = here.startsWith(r) && r.length > 4 ? 0 : dist(here, r);
+    if (d < score) { score = d; best = r; }
+  }
+  const box = document.querySelector<HTMLElement>('[data-suggest]');
+  if (box && best && score <= 3) {
+    const a = document.createElement('a');
+    a.href = best;
+    a.textContent = best;
+    box.append('Did you mean ', a, '?');
+    box.hidden = false;
+  }
+</script>
+
 <style>
   .lost { min-height: 72svh; display: grid; place-items: center; padding: var(--section-pad) 16px; background: var(--color-ink); border-bottom: 1px solid rgb(203 160 82 / 0.35); }
   /* The tag is the page's one object. Its shadow is a lift, not tiger (tiger means "press me"). */
-  .tag { position: relative; width: min(520px, 100%); box-sizing: border-box; background: var(--color-sand); color: var(--color-ink); padding: 48px 32px 32px; border: 2px solid var(--color-ink); box-shadow: var(--lift-3); transform: rotate(-1.5deg); text-align: center; }
+  .tag { position: relative; width: min(520px, 100% - 32px); box-sizing: border-box; background: var(--color-sand); color: var(--color-ink); padding: 48px 32px 32px; border: 2px solid var(--color-ink); box-shadow: var(--lift-3); transform: rotate(-1.5deg); text-align: center; }
   @media (prefers-reduced-motion: reduce) { .tag { transform: none; } }
   .tag::before { content: ''; position: absolute; top: 16px; left: 50%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--color-ink); box-shadow: 0 0 0 5px var(--color-gold); }
   .tag-head { font-size: inherit; line-height: inherit; margin: 18px 0 0; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-tiger-deep); }
@@ -40,5 +85,9 @@ const branches = await getBranches();
   .tag-go { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--color-ink); text-align: left; }
   .tag-go a { display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 4px; border-bottom: 1px solid var(--color-ink); color: var(--color-ink); font-weight: 700; text-decoration: none; }
   .tag-go a:hover { background: var(--color-paper-light); text-decoration: underline; text-underline-offset: 4px; }
+  .tag-group { margin: 20px 0 6px; font-size: 14px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; text-align: left; color: var(--color-tiger-deep); }
+  .tag-line + .tag-group, .did-you-mean + .tag-group { margin-top: 0; }
+  .did-you-mean { margin: -8px 0 16px; font-weight: 700; }
+  .did-you-mean a { color: var(--color-ink); }
   .fortune { margin: 24px 0 0; font-family: var(--font-note); font-style: italic; }
 </style>

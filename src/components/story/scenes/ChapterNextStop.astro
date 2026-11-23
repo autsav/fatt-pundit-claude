@@ -147,13 +147,17 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
     .ns-dunes { left: -35vw; width: 170vw; }
     /* Phones: sat to the right, so the Burj Khalifa behind them stays in view. */
     .ns-travellers { right: -3%; bottom: calc(var(--floor) + 2%); width: 48vw; }
-    .story-scenes { --tw: 86vw; --tb: calc(var(--floor) + 22%); }
+    /* The set stands lower, so the floor isn't an empty band under it. */
+    .story-scenes { --tw: 104vw; --tb: calc(var(--floor) + 12%); }
     .ns-garland-l { top: 19%; width: 60%; left: -12%; }
     .ns-garland-r { top: 23%; width: 60%; right: -14%; }
     .ns-puff { top: calc(100% - var(--tb) - var(--tw) * 0.5); }
     /* Phones: the two stand in front of the table on the left (the cast tier), 52vw wide. */
-    .ns-tigers { left: 2%; bottom: calc(var(--tb) - 4%); width: 52vw; }
-    .ns-bubble2 { --bx: 60%; --by: 4%; }
+    /* They stand in front of the table, so they are drawn over the momo plate on it (never the plate over a head). */
+    .ns-tigers { left: 0; bottom: calc(var(--tb) - 9%); width: 54vw; z-index: var(--z-prop-front); }
+    .ns-photo { z-index: var(--z-cast); }
+    /* Above Pundit's head, clear of the plate on the table. */
+    .ns-bubble2 { --bx: 72%; --by: -118%; }
     .ns-ding { display: none; } /* no room on a phone: it would sit on the garland */
   }
 </style>

@@ -66,6 +66,8 @@ const CLOSE = 360;
 // closest zoom, but drawn once instead of every frame).
 const seaScale = (k: number) => Math.min(k, 3200 / (SEA.w * (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1)));
 const SHIP_PX = 64;
+/** Mountain art at 0.55x, about its own centre (the Calcutta stop was a void with oversized peaks). */
+const MTN = { transformBox: 'fill-box', transformOrigin: 'center', transform: 'scale(0.55)' } as const;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -105,6 +107,15 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   const [port, setPort] = useState(0);
   const [leg, setLeg] = useState(-1);
   const [reached, setReached] = useState(0);
+
+  const ticketRef = useRef<HTMLElement>(null);
+
+  // Phones: the ticket strip scrolls sideways; keep the current stop in view (no page scroll).
+  useEffect(() => {
+    const nav = ticketRef.current;
+    const here = nav?.querySelectorAll<HTMLElement>('.voyage-hole')[port];
+    if (nav && here && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: nav.scrollLeft + here.getBoundingClientRect().left - nav.getBoundingClientRect().left - (nav.clientWidth - here.offsetWidth) / 2, behavior: isCalm() ? 'auto' : 'smooth' });
+  }, [port]);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
 
@@ -319,9 +330,9 @@ export default function Voyage({ art }: { art: VoyageArt }) {
             </mask>
           </defs>
           <g ref={camRef} style={{ transform: `translate(0px, 0px) scale(1)` }}>
-          <image href={art.mountainsB} x={world.mountains.himalaya[0] - 150} y={world.mountains.himalaya[1] - 70} width="260" opacity="0.85" />
-          <image href={art.mountainA} x={world.mountains.alps[0] - 70} y={world.mountains.alps[1] - 40} width="150" opacity="0.85" />
-          <image href={art.mountainsC} x={world.mountains.caucasus[0] - 60} y={world.mountains.caucasus[1] - 34} width="130" opacity="0.85" />
+          <image href={art.mountainsB} x={world.mountains.himalaya[0] - 150} y={world.mountains.himalaya[1] - 70} width="260" opacity="0.7" style={MTN} />
+          <image href={art.mountainA} x={world.mountains.alps[0] - 70} y={world.mountains.alps[1] - 40} width="150" opacity="0.7" style={MTN} />
+          <image href={art.mountainsC} x={world.mountains.caucasus[0] - 60} y={world.mountains.caucasus[1] - 34} width="130" opacity="0.7" style={MTN} />
           <image href={art.compass} x={world.compass[0] - 70} y={world.compass[1] - 100} width="140" className="voyage-compass" />
           {/* The course ahead: gold dots. */}
           {LEGS.map((d, i) => (
@@ -343,7 +354,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
           {PORTS.map((pt, i) => (
             <g key={pt.id} transform={`translate(${pt.at[0]} ${pt.at[1]})`} className={`voyage-port ${i <= reached ? 'is-reached' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
               <g className="voyage-mk">
-                <circle r="13" className="voyage-ring" />
+                <circle r="13" className="voyage-ring" style={i === port && !calm ? { animationIterationCount: 3 } : undefined} />
                 <circle r="6" className="voyage-dot" />
                 <text x={pt.anchor === 'end' ? -pt.dx - 6 : pt.dx + 6} y={pt.dy} textAnchor={pt.anchor} className="voyage-name">
                   {pt.name}
@@ -368,10 +379,10 @@ export default function Voyage({ art }: { art: VoyageArt }) {
 
         {/* Ticket strip: one hole punched per port; each hole jumps there. */}
         <div className="absolute inset-x-0 top-3 z-10 flex justify-center px-3">
-          <nav aria-label="Ports on the voyage" className="voyage-ticket flex items-center gap-1 bg-sand px-3 py-1.5 text-ink sm:gap-3 sm:px-5">
+          <nav ref={ticketRef} aria-label="Ports on the voyage" className="voyage-ticket flex max-w-full snap-x snap-mandatory items-center gap-1 overflow-x-auto bg-sand px-3 py-1.5 text-ink [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,transparent,#000_14px,#000_calc(100%-14px),transparent)] sm:gap-3 sm:snap-none sm:overflow-visible sm:px-5">
             <span className="hidden font-label text-[12px] font-bold uppercase tracking-[0.24em] text-tiger-deep sm:inline">Admit one</span>
             {PORTS.map((pt, i) => (
-              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex min-h-11 items-center gap-1.5 px-1 font-label text-[12px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i <= reached ? 'is-punched' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
+              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex shrink-0 snap-center min-h-11 items-center gap-1.5 px-1 font-label text-[12px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i <= reached ? 'is-punched' : ''} ${i === port && !calm ? 'is-here' : ''}`}>
                 <span className="voyage-punch" aria-hidden="true" />
                 <span>{pt.name}</span>
               </button>
@@ -379,7 +390,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
           </nav>
         </div>
         {!calm && (
-          <p key={leg} className={`voyage-sea-note absolute inset-x-0 top-[72px] z-10 m-0 text-center font-note text-[clamp(15px,1.6vw,19px)] italic text-sand ${leg >= 0 ? 'is-on' : ''}`} aria-hidden={leg < 0}>
+          <p className={`voyage-sea-note absolute inset-x-0 top-[72px] z-10 m-0 text-center font-note text-[clamp(15px,1.6vw,19px)] italic text-sand ${leg >= 0 ? 'is-on' : ''}`} aria-hidden={leg < 0}>
             {leg >= 0 ? AT_SEA[leg] : ''}
           </p>
         )}
@@ -430,7 +441,7 @@ function Postcard({ i, art, live, still = false }: { i: number; art: VoyageArt; 
         <>
           <img src={art.map} alt="The hand-drawn map from the Fatt Pundit menu: southern China, the Bay of Bengal and India" className="voyage-pic" width={1295} height={1320} loading="lazy" />
           <MarkerText as="p" className={text} show={live || still}>
-            They make a new home in Calcutta. In <Mark type="circle">Tangra</Mark>, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, <Mark type="underline">new, yet familiar</Mark>.
+            They make a new home in Calcutta. In <Mark type="circle" className="px-1.5">Tangra</Mark>, its Chinatown, the wok meets Indian spice: Indo-Chinese food is born, <Mark type="underline">new, yet familiar</Mark>.
           </MarkerText>
         </>
       )}

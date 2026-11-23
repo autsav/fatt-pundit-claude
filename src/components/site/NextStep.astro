@@ -41,7 +41,7 @@ const { label = 'Next', title, line, actions, photo, focus = '50% 50%' } = Astro
       <p class="fp-next-acts">
         {actions.map((a) => a.print
           ? <button type="button" class="fp-btn fp-btn--text" onclick="print()">{a.label}</button>
-          : <a class:list={['fp-btn', a.primary ? 'fp-btn--primary' : 'fp-btn--text']} href={a.href} data-book={a.book} {...(a.external ? { target: '_blank', rel: 'noopener' } : {})}>{a.label}{a.external && <span class="sr-only"> (opens in a new tab)</span>}</a>)}
+          : <a class:list={['fp-btn', a.primary ? 'fp-btn--primary' : 'fp-btn--text']} href={a.href} data-book={a.book} {...(a.external ? { rel: 'noopener', ...(a.book === undefined ? { target: '_blank' } : {}) } : {})}>{a.label}{a.external && a.book === undefined && <><span aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></>}</a>)}
       </p>
     </div>
   </div>

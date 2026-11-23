@@ -102,7 +102,8 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
   .story-scenes { --sky: #f6dfb0; --ground: #ecb15a; --glow: #e8811f; }
 
   /* The title lifts away, then the wok scene builds behind it. */
-  .sn-title { --o1: 0; --y1: -8%; --from: 1%; --to: 8%; }
+  /* Bottom safe area: the card never reaches the floor line, so it cannot clip mid-transition. */
+  .sn-title { padding-bottom: calc(var(--floor, 0px) + 24px); box-sizing: border-box; --o1: 0; --y1: -8%; --from: 1%; --to: 8%; }
   /* The momos slide in opaque over the wok (36-40), which is then removed under them (40-41): a cut, no ghost. */
   .sn-wok-out { inset: 0; --o0: 1; --o1: 0; --from: 40%; --to: 40.5%; }
   /* The painted Calcutta street at night fades in (8-14); the overlay only darkens the top a little for the captions. */

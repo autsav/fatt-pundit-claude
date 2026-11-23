@@ -223,16 +223,37 @@ const orgLd = {
 
   /* Room. Wide screens: the words (head, then the rating) beside the contact sheet, both from the top rule. */
   .room-words { display: grid; gap: var(--space-7); align-content: start; }
+  #room { position: relative; background-image: none; }
+  #room > .wrap { position: relative; z-index: 1; }
+  /* The halftone dots fade in over the first 15% of the section, and ink melts into the sand above them. */
+  #room::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background-image: radial-gradient(rgb(44 41 37 / 0.16) 1.1px, transparent 1.4px); background-size: 6px 6px;
+    -webkit-mask-image: linear-gradient(transparent, #000 15%); mask-image: linear-gradient(transparent, #000 15%); }
+  #room::before { content: ''; position: absolute; inset: 0 0 auto; height: 112px; z-index: 0; pointer-events: none; background: linear-gradient(#171513, transparent); }
+
+  /* Soft bands in place of hard ink/sand cuts: story to menu, menu to bar. */
+  :global(#menu)::before, :global(#menu)::after { content: ''; position: absolute; inset-inline: 0; height: 112px; pointer-events: none; }
+  :global(#menu)::before { top: 0; background: linear-gradient(var(--color-ink), transparent); }
+  :global(#menu)::after { bottom: 0; background: linear-gradient(transparent, #171513); }
+  :global(#menu) { padding-top: calc(var(--section-pad) + 48px); padding-bottom: calc(var(--section-pad) + 48px); }
+  /* Doors' sand melts into the voyage's ink. */
+  :global(.voyage)::before { content: ''; position: absolute; inset: 0 0 auto; height: 25svh; z-index: 5; pointer-events: none; background: linear-gradient(var(--color-sand), transparent); }
+  /* The postcard's Tangra circle sits behind the words. */
+  :global(.voyage-card svg.z-10) { z-index: -1; }
+  /* The passes end in a band of gold melting into the footer's ink. */
+  #tables { position: relative; padding-bottom: calc(var(--section-pad) + 120px); }
+  #tables::after { content: ''; position: absolute; inset: auto 0 0; height: 120px; pointer-events: none; background: linear-gradient(var(--color-gold), #171513); }
   .room-head { display: grid; gap: var(--space-4); }
   @media (min-width: 1100px) {
     #room > .wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: clamp(32px, 4vw, 64px); align-items: start; }
     #room > .wrap > .room-words { grid-column: 1; }
     #room > .wrap :global(.room-sheet) { grid-column: 2; grid-row: 1; }
+    /* The words are the short column: they follow the tall film sheet down the page. */
+    #room > .wrap > .room-words { position: sticky; top: calc(var(--header-h, 72px) + 24px); }
   }
   /* The rating as a ledger fact: the figure in the headline face, its source right under it. */
   .rating { display: grid; gap: var(--space-2); margin: 0; padding-block: var(--space-4); border-block: var(--border-rule) solid var(--fp-rule-strong); max-width: 30em; }
-  .rating-n { font-weight: 300; font-size: clamp(44px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.02em; }
-  .rating-of { font-size: 0.45em; letter-spacing: 0; }
+  .rating-n { font-weight: 300; font-size: clamp(44px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: lining-nums; }
+  .rating-of { font-size: var(--step-h3); letter-spacing: 0; vertical-align: baseline; }
   .rating-src { font-size: var(--step-small); line-height: var(--lh-small); }
   .tables-note { margin: var(--space-7) 0 0; max-width: 46em; font-size: var(--step-small); line-height: var(--lh-small); }
 </style>

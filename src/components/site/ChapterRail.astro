@@ -84,12 +84,14 @@ const { chapters, after = 0.8 } = Astro.props;
 <style>
   /* Story rail */
   .rail { position: fixed; z-index: 30; right: 18px; top: 50%; translate: 0 -50%; display: none; flex-direction: column; gap: 2px; padding: 6px;
-    background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity var(--dur-panel) var(--curve-out); }
+    background: rgb(44 41 37 / 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgb(203 160 82 / 0.45); opacity: 0; pointer-events: none; transition: opacity var(--dur-panel) var(--curve-out); }
   /* From 1024px, tucked to the edge and narrow (28px targets inside the 41px+ page gutter, so it never sits
      on content); from 1320px, where the margin beside the 1240 column can hold it, the roomy 44px rail. */
   @media (min-width: 1024px) { .rail { display: flex; right: 0; padding: 4px 2px; } }
   @media (min-width: 1320px) { .rail { right: 18px; padding: 6px; } }
   .rail.is-on { opacity: 1; pointer-events: auto; }
+  /* The rail carries the place at these widths, so the reading hairline under the header steps aside. */
+  @media (min-width: 1024px) { :global(html:has(.rail.is-on) .read-line) { display: none; } }
   /* 28x44 targets (44 square from 1320px); the dashed line joins one dot to the next. */
   .rail a { position: relative; display: grid; place-items: center; width: 28px; height: 44px; text-decoration: none; }
   @media (min-width: 1320px) { .rail a { width: 44px; } }
