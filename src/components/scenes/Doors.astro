@@ -1,51 +1,51 @@
 ---
-// Scene 2: the doors. Pinned while you scroll: the two tiger doors swing
-// open on heavy hinges, the camera pushes through, and warm light floods in
-// until the screen turns to sand (the next scene's paper).
+// Scene 2: the front door at Covent Garden. The street comes into view, the three brass
+// lamps flick on, the sign lights up letter by letter, then the door swings in and the
+// camera walks through it until warm light floods the screen (the next scene's paper).
+// Art: covent-garden/front/*.webp, the real shopfront redrawn (Higgsfield GPT Image 2.6 +
+// upscale, 23 Nov 2026), glass keyed out so the room photo shows through; the door is its own layer.
 import { Image } from 'astro:assets';
-import { stampSrc } from '../../lib/stamp';
-import tigerLeft from '../../assets/images/brand/tiger-head-left.png';
-import tigerRight from '../../assets/images/brand/tiger-head-right.png';
+import { getBranches } from '../../lib/site-data';
+import facade from '../../assets/images/covent-garden/front/facade.webp';
+import door from '../../assets/images/covent-garden/front/door.webp';
 import room from '../../assets/images/covent-garden/gallery-04.jpg';
 
-// Used only as masks (alpha), so a palette PNG is all they need.
-const tL = { src: await stampSrc(tigerLeft, 480) };
-const tR = { src: await stampSrc(tigerRight, 480) };
+const cg = (await getBranches()).find((b) => b.id === 'covent-garden');
+const street = cg?.address.street ?? '6 Maiden Lane';
+const houseNo = street.match(/^\d+/)?.[0];
+const address = `${street.replace(/\bLane\b/, 'Ln')}, ${cg?.address.locality ?? 'Covent Garden'}`;
+const name = 'Fatt Pundit';
 ---
-<section class="doors" data-doors aria-label="Step inside">
+<section class="doors" data-doors aria-label={`Step inside Fatt Pundit, ${street}, Covent Garden`}>
   <div class="stage">
-    <div class="camera" data-camera>
-      <Image src={room} alt="" class="room" widths={[800, 1400, 2000]} sizes="100vw" data-room />
-      <div class="dim" data-dim></div>
-      <div class="glow" data-glow></div>
-      <div class="frame">
-        <div class="leaf left" data-leaf="l">
-          <div class="panel">
-            <span class="tiger" style={`-webkit-mask-image:url(${tL.src});mask-image:url(${tL.src})`}></span>
-            <span class="plaque">Calcutta</span>
-            <span class="handle"></span>
-          </div>
-          <span class="shade" data-shade></span>
-        </div>
-        <div class="leaf right" data-leaf="r">
-          <div class="panel">
-            <span class="tiger" style={`-webkit-mask-image:url(${tR.src});mask-image:url(${tR.src})`}></span>
-            <span class="plaque">Guangdong</span>
-            <span class="handle"></span>
-          </div>
-          <span class="shade" data-shade></span>
-        </div>
+    <div class="camera" data-camera aria-hidden="true">
+      <div class="room-wrap" data-room-wrap>
+        <Image src={room} alt="" class="room" widths={[800, 1400, 2000]} sizes="(min-aspect-ratio: 1/1) 60vw, 100vw" data-room />
       </div>
+      <div class="dim" data-dim></div>
+      <Image src={facade} alt="" class="facade" widths={[1200, 2000, 2800, 4096]} sizes="(min-aspect-ratio: 1/1) max(100vw, 133svh), 100vw" loading="lazy" />
+      <div class="door" data-door>
+        <Image src={door} alt="" class="door-img" widths={[400, 712]} sizes="(min-aspect-ratio: 1/1) 25vw, 18vw" loading="lazy" />
+        <span class="door-shade" data-door-shade></span>
+      </div>
+      <!-- The lamps and the sign: drawn in code so they can light up. -->
+      {[0, 1, 2].map((i) => <span class="lamp" data-lamp style={`--x:${[33.9, 50.9, 68.2][i]}%`}></span>)}
+      <p class="sign">
+        <span class="sign-name">{[...name].map((ch) => <span class="ch" data-ch>{ch === ' ' ? ' ' : ch}</span>)}</span>
+        <span class="sign-sub" data-sub>From Guangdong to Calcutta</span>
+        <span class="sign-addr" data-sub>{address}</span>
+      </p>
+      {houseNo && <span class="house-no" data-sub>{houseNo}</span>}
     </div>
     <div class="below" data-comein>
       <p class="come-in">Come in.</p>
       <a class="skip-story" href="#tables" data-skip-story>Skip the story: choose your table</a>
     </div>
     <div class="flood" data-flood>
-      <!-- The light past the doors is where the story starts: the voyage picks it up next. -->
+      <!-- The light past the door is where the story starts: the voyage picks it up next. -->
       <div class="opening">
         <p class="o-label"><span class="o-no">01</span> Our story</p>
-        <p class="o-line">From Guangdong<br />to Calcutta</p>
+        <h2 class="o-line">From Guangdong<br />to Calcutta</h2>
         <p class="o-sub">Hakka families sailed from southern China with their recipes, and met the spices of India in Tangra, Calcutta's Chinatown.</p>
         <p class="o-cue" aria-hidden="true">Keep scrolling to follow the ship</p>
       </div>
@@ -54,43 +54,46 @@ const tR = { src: await stampSrc(tigerRight, 480) };
 </section>
 
 <style>
-  /* 140vh (was 190): the swing reads the same, the guest reaches the story sooner (Phase 4 S-A). */
-  .doors { position: relative; height: 140vh; background: var(--color-ink); --bar: 72px; --fb: clamp(10px, 1.6vw, 18px); }
-  /* Soft drop shadow drawn once as a still gradient behind the frame (a 120px
-     blur box-shadow inside the scaling camera cost a repaint per frame). */
-  /* The frame fits the space below the sticky header with room for the line beneath it
-     (it was sized to the full screen height, so the header clipped its top and its foot ran off screen). */
-  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; align-items: center; padding: calc(var(--bar) + 16px) 16px 16px; box-sizing: border-box; }
-  .camera { position: relative; container-type: inline-size; width: min(92vw, calc((100svh - var(--bar) - 112px) * 5 / 6)); aspect-ratio: 5 / 6; transform-origin: 50% 46%; will-change: transform; }
-  /* Room, dark layer and glow start exactly where the door panels start (border + padding);
-     at 4.5% they showed as a dark strip down both door edges. */
-  .room { position: absolute; inset: calc(var(--fb) + 3.2cqw); width: calc(100% - 2 * (var(--fb) + 3.2cqw)); height: calc(100% - 2 * (var(--fb) + 3.2cqw)); object-fit: cover; }
-  /* Darkness is a layer that fades (opacity = compositor only); a brightness
-     filter here forced a full repaint of the photo every scroll frame. */
-  .dim { position: absolute; inset: calc(var(--fb) + 3.2cqw); background: #000; opacity: 0.65; will-change: opacity; }
-  .glow { position: absolute; inset: calc(var(--fb) + 3.2cqw); background: radial-gradient(60% 55% at 50% 50%, rgb(203 160 82 / 0.42), transparent 70%); opacity: 0; will-change: opacity; }
-  /* A hard offset shadow, like the site's other objects (the soft radial glow behind it read as a muddy halo). */
-  .frame { position: absolute; inset: 0; border: var(--fb) solid var(--color-gold); box-shadow: inset 0 0 0 3px var(--color-ink), 12px 12px 0 rgb(0 0 0 / 0.35); perspective: 1600px; display: flex; padding: 3.2%; box-sizing: border-box; }
-  .leaf { position: relative; flex: 1 1 50%; transform-style: preserve-3d; will-change: transform; }
-  .leaf.left { transform-origin: left center; }
-  .leaf.right { transform-origin: right center; }
-  .panel { position: absolute; inset: 0; background: var(--color-sand); border: 3px solid var(--color-ink); box-shadow: inset 0 0 0 10px var(--color-sand), inset 0 0 0 12px rgb(44 41 37 / 0.35); display: grid; place-items: center; backface-visibility: hidden; }
-  .tiger { width: 78%; aspect-ratio: 3 / 4; background: var(--color-ink); -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
-  /* Brass plaques: which kitchen each tiger stands for (an object, so capitals are allowed). */
-  .plaque { position: absolute; bottom: 7%; left: 50%; translate: -50% 0; padding: 0.35em 0.9em; background: var(--color-gold); color: var(--color-ink); border: 2px solid var(--color-ink); box-shadow: 3px 3px 0 rgb(44 41 37 / 0.35); font-family: var(--font-display); font-weight: 700; font-size: clamp(11px, 3.4cqw, 18px); letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; }
-  .handle { position: absolute; top: 55%; width: 10px; height: 54px; background: var(--color-gold); box-shadow: 0 2px 0 rgb(0 0 0 / 0.3); }
-  .left .handle { right: 14px; } .right .handle { left: 14px; }
-  /* Shade on the opening edge sells the weight of the door. */
-  .shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 40%, rgb(0 0 0 / 0.55)); opacity: 0; will-change: opacity; }
-  .right .shade { background: linear-gradient(270deg, transparent 40%, rgb(0 0 0 / 0.55)); }
-  /* Below the doors, on ink: gold reads at about 6:1 here (it was gold on the sand doors, about 1.6:1, split by the door gap). */
-  .below { display: grid; justify-items: center; gap: 4px; padding-top: 12px; will-change: opacity; }
+  /* 220svh: the street rises into view (first 100svh), then 120svh pinned for the walk in. */
+  .doors { position: relative; height: 220svh; background: var(--color-ink); --bar: 72px; --door-x: 25.56%; --door-y: 68.07%; }
+  .stage { position: sticky; top: var(--bar); height: calc(100svh - var(--bar)); overflow: hidden; display: grid; place-items: center; }
+  /* Landscape: the shopfront covers the stage like a street seen straight on (sides and sky crop).
+     Portrait: the whole front fits the width, the line under it sits in the space below. */
+  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: 100%; aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 2200px; perspective-origin: var(--door-x) var(--door-y); will-change: transform; }
+  @media (min-aspect-ratio: 1/1) { .camera { width: max(100%, calc((100svh - var(--bar)) * 4096 / 3089)); } }
+  /* Tall screens: 140% wide, framed from the door to the side door (the brick ends crop). */
+  @media (max-aspect-ratio: 3/4) { .camera { width: 140%; left: 0; translate: -13% -42%; } }
+  .room-wrap { position: absolute; inset: 18% 4% 2% 4%; overflow: hidden; transform-origin: var(--door-x) var(--door-y); will-change: transform; }
+  .room { width: 100%; height: 100%; object-fit: cover; }
+  .dim, .facade, .door-img { position: absolute; }
+  /* Night inside until the lamps come on (opacity only: compositor). */
+  .dim { inset: 22% 12% 8% 12%; background: #0d0b09; opacity: 0.78; will-change: opacity; }
+  .facade { inset: 0; width: 100%; height: 100%; }
+  /* The door leaf, hinged on the left (the handle is on the right), opening inward. */
+  .door { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
+  .door-img { inset: 0; width: 100%; height: 100%; }
+  .door-shade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.6)); opacity: 0; will-change: opacity; }
+  /* A lamp: the warm pool under each brass shade; unlit until it flicks on. */
+  .lamp { position: absolute; left: var(--x); top: 17.6%; width: 13cqw; height: 9cqw; translate: -50% -22%; background: radial-gradient(50% 50% at 50% 30%, rgb(255 214 140 / 0.85), rgb(255 170 70 / 0.35) 35%, transparent 70%); opacity: 0; transition: opacity var(--dur-fast) linear; pointer-events: none; }
+  .lamp.is-on { opacity: 1; animation: lamp-flick 520ms steps(1, end); }
+  @keyframes lamp-flick { 0% { opacity: 0.7; } 18% { opacity: 0.1; } 34% { opacity: 0.9; } 46% { opacity: 0.3; } 60%, 100% { opacity: 1; } }
+  /* The sign: gold slab capitals on the red fascia, as on Maiden Lane. */
+  .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #5e2219; text-align: center; line-height: 1; }
+  .sign-name { font-weight: 700; font-size: 4.3cqw; letter-spacing: 0.1em; }
+  .ch { display: inline-block; white-space: pre; transition: color var(--dur-fast) linear, text-shadow var(--dur-fast) linear; }
+  .ch.is-on { color: #f2c15c; text-shadow: 0 0 0.25em rgb(255 190 90 / 0.65), 0 0.04em 0 rgb(60 20 10 / 0.6); }
+  .sign-sub { font-weight: 700; font-size: 1.15cqw; letter-spacing: 0.16em; }
+  .sign-addr { font-weight: 700; font-size: 0.85cqw; letter-spacing: 0.14em; }
+  .house-no { position: absolute; left: 71.6%; top: 50%; translate: -50% 0; font-family: var(--font-display); font-weight: 700; font-size: 2.2cqw; color: #2b2522; }
+  [data-sub] { transition: color var(--dur-panel) linear, text-shadow var(--dur-panel) linear; }
+  .sign-sub.is-on, .sign-addr.is-on { color: #f2c15c; text-shadow: 0 0 0.3em rgb(255 190 90 / 0.5); }
+  .below { position: absolute; left: 0; right: 0; bottom: 16px; display: grid; justify-items: center; gap: 4px; padding: 10px 16px 0; background: linear-gradient(transparent, rgb(23 21 19 / 0.85) 40%); will-change: opacity; }
   .come-in { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: clamp(18px, 2vw, 24px); }
   .skip-story { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-sand); font-size: 15px; text-decoration: underline; text-underline-offset: 4px; }
   .skip-story:hover { color: var(--color-gold); }
-  .flood { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: 0; pointer-events: none; will-change: opacity; }
+  .flood { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: 0; visibility: hidden; will-change: opacity; }
   .opening { display: grid; justify-items: center; gap: clamp(14px, 2vw, 22px); max-width: min(100%, 1000px); text-align: center; color: var(--color-ink); }
-  .opening p { margin: 0; }
+  .opening p, .opening h2 { margin: 0; }
   /* Chapter 01: the same numbered label (rule above, number, plain words) as the home chapters that follow. */
   .o-label { display: inline-flex; gap: var(--space-2); padding-top: var(--space-3); border-top: var(--border-rule) solid var(--color-ink); font-size: var(--step-label); font-weight: 700; line-height: 1.3; }
   .o-no { color: var(--color-tiger-deep); font-variant-numeric: tabular-nums; }
@@ -98,17 +101,19 @@ const tR = { src: await stampSrc(tigerRight, 480) };
   .o-sub { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.5; max-width: 44ch; }
   .o-cue { font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
 
-  @media (max-width: 700px) { .doors { height: 130vh; } }
-  /* Phones: keep the line under the doors clear of the fixed dock. */
-  @media (max-width: 640px) { .doors { --bar: 64px; } .stage { padding-bottom: calc(68px + env(safe-area-inset-bottom)); } }
+  /* Phones: keep the line under the front clear of the fixed dock. */
+  @media (max-width: 640px) { .doors { --bar: 64px; height: 200svh; } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
   @media (min-width: 641px) and (max-height: 700px) { .doors { --bar: 58px; } }
   @media (prefers-reduced-motion: reduce) {
+    /* Calm: the front is lit and the door stands open; the story opening simply follows. */
     .doors { height: auto; }
-    .stage { position: relative; height: 80svh; }
-    /* No swing in calm mode: the light past the doors (and the opening of the story) is simply there. */
-    .flood { opacity: 1; }
+    .stage { position: relative; top: 0; height: auto; aspect-ratio: auto; display: block; }
+    .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; }
+    .lamp { opacity: 1; } .ch, .sign-sub, .sign-addr { color: #f2c15c; }
+    .dim { opacity: 0.15; } .door { transform: rotateY(-62deg); }
+    .below { position: relative; bottom: 0; background: none; padding-block: 16px; }
+    .flood { position: relative; opacity: 1; visibility: visible; padding-block: 64px; }
     .o-cue { display: none; }
-    .left { transform: rotateY(-62deg); } .right { transform: rotateY(62deg); } .dim { opacity: 0; }
   }
 </style>
 
@@ -125,49 +130,73 @@ const tR = { src: await stampSrc(tigerRight, 480) };
   // Heavy door: slow start, then swings, then settles.
   const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-  // Decode the room photo before it is needed, so its first draw doesn't
+  // Decode the room and the front before they are needed, so their first draw doesn't
   // land in the middle of a scroll frame.
-  const room = section?.querySelector<HTMLImageElement>('[data-room]');
-  if (section && room) {
+  if (section) {
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      room.loading = 'eager';
-      room.decode().catch(() => {});
+      for (const img of section.querySelectorAll('img')) { img.loading = 'eager'; img.decode().catch(() => {}); }
     }, { rootMargin: '150% 0px' });
     io.observe(section);
   }
 
   if (section && camera && stage && !calm) {
-    // Write transform/opacity straight onto each element. Custom properties on
-    // the camera made every child recalc style each frame.
+    // Write transform/opacity straight onto each element (custom properties on the
+    // camera made every child recalc style each frame).
     const q = <T extends Element>(sel: string) => [...section.querySelectorAll<T>(sel)];
-    const [leafL, leafR] = q<HTMLElement>('[data-leaf]');
-    const shades = q<HTMLElement>('[data-shade]');
+    const lamps = q<HTMLElement>('[data-lamp]');
+    const chars = q<HTMLElement>('[data-ch]');
+    const subs = q<HTMLElement>('[data-sub]');
+    const door = section.querySelector<HTMLElement>('[data-door]')!;
+    const doorShade = section.querySelector<HTMLElement>('[data-door-shade]')!;
+    const roomWrap = section.querySelector<HTMLElement>('[data-room-wrap]')!;
     const dim = section.querySelector<HTMLElement>('[data-dim]')!;
-    const glow = section.querySelector<HTMLElement>('[data-glow]')!;
     const comein = section.querySelector<HTMLElement>('[data-comein]')!;
     const flood = section.querySelector<HTMLElement>('[data-flood]')!;
+
+    // Where the doorway sits relative to the stage centre: the push walks the camera there.
+    // Measured on resize only (never inside the scroll frame).
+    let toX = 0, toY = 0;
+    const measure = () => {
+      const s = stage.getBoundingClientRect();
+      const t = camera.style.transform; camera.style.transform = 'none';
+      const c = camera.getBoundingClientRect();
+      camera.style.transform = t;
+      // The doorway's centre (see --door-x/--door-y) to the middle of the stage.
+      toX = s.left + s.width / 2 - (c.left + c.width * 0.2556);
+      toY = s.top + s.height * 0.55 - (c.top + c.height * 0.6807);
+    };
+    measure();
+    new ResizeObserver(measure).observe(stage);
+
+    // Lights switch at thresholds (a lamp clicks on; it isn't dimmed up), so they are classes.
+    const setOn = (els: HTMLElement[], n: number) => els.forEach((el, i) => el.classList.toggle('is-on', i < n));
     let last = -1;
     scroll(
       (p: number) => {
-        if (Math.abs(p - last) < 0.0005) return;
+        if (Math.abs(p - last) < 0.0004) return;
         last = p;
-        const open = ease(range(p, 0.04, 0.55));
-        const push = ease(range(p, 0.3, 0.92));
-        camera.style.transform = `scale(${(1 + push * 1.6).toFixed(4)})`;
-        leafL.style.transform = `rotateY(${(open * -112).toFixed(2)}deg)`;
-        leafR.style.transform = `rotateY(${(open * 112).toFixed(2)}deg)`;
-        const shade = Math.min(1, open * 1.4).toFixed(3);
-        for (const s of shades) s.style.opacity = shade;
-        dim.style.opacity = (0.65 * (1 - range(p, 0.08, 0.6))).toFixed(3);
-        glow.style.opacity = range(p, 0.2, 0.7).toFixed(3);
-        const below = Math.max(0, 1 - open * 4);
+        setOn(lamps, Math.ceil(range(p, 0.16, 0.3) * lamps.length));
+        setOn(chars, Math.ceil(range(p, 0.26, 0.42) * chars.length));
+        setOn(subs, p >= 0.44 ? subs.length : 0);
+        dim.style.opacity = (0.78 - 0.62 * range(p, 0.28, 0.55)).toFixed(3);
+        const open = ease(range(p, 0.5, 0.72));
+        door.style.transform = `rotateY(${(open * -96).toFixed(2)}deg)`;
+        doorShade.style.opacity = Math.min(1, open * 1.4).toFixed(3);
+        const push = ease(range(p, 0.55, 0.97));
+        const s = 1 + push * 3.4;
+        camera.style.transform = `translate(${(toX * push).toFixed(1)}px, ${(toY * push).toFixed(1)}px) scale(${s.toFixed(4)})`;
+        // The room sits deeper than the front: it grows less, so the walk has depth.
+        roomWrap.style.transform = `scale(${(1 / (1 + push * 0.5)).toFixed(4)})`;
+        const below = Math.max(0, 1 - range(p, 0.48, 0.56));
         comein.style.opacity = below.toFixed(3);
         comein.style.visibility = below > 0.05 ? 'visible' : 'hidden';
-        flood.style.opacity = ease(range(p, 0.72, 0.98)).toFixed(3);
+        const f = ease(range(p, 0.84, 0.99));
+        flood.style.opacity = f.toFixed(3);
+        flood.style.visibility = f > 0.01 ? 'visible' : 'hidden';
       },
-      { target: section, offset: ['start start', 'end end'] },
+      { target: section, offset: ['start end', 'end end'] },
     );
   }
 </script>
