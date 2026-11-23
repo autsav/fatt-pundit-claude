@@ -51,12 +51,16 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
           <span class="sign-addr" data-sub={lit ? '' : undefined}>{address}</span>
         </p>
       ))}
+      <!-- One pass of light across the gilt once the sign is fully lit. -->
+      <p class="sign sign-shine" aria-hidden="true" data-shine><span class="sign-name">{name}</span></p>
       {houseNo && <span class="house-no">{houseNo}</span>}
     </div>
     <!-- Past the door frame: the room opens out from the doorway and you drift in toward the bar. -->
     <div class="inside" data-inside aria-hidden="true">
       <div class="inside-move" data-inside-move><Picture {...roomImg} class="inside-img" /></div>
     </div>
+    <!-- One grade for the whole scene: a fine film grain over painted front and photo alike. -->
+    <span class="grain" aria-hidden="true"></span>
     <div class="below" data-comein>
       <p class="come-in">Come in.</p>
       <a class="skip-story" href="#tables" data-skip-story>Skip the story: choose your table</a>
@@ -103,6 +107,8 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
   /* Night inside until the lamps come on (opacity only: compositor). */
   .dim { inset: 22% 12% 8% 12%; background: #0d0b09; opacity: 0.78; will-change: opacity; }
   .spill { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; background: linear-gradient(90deg, rgb(255 196 120 / 0.42), rgb(255 170 90 / 0.12) 55%, transparent 80%), linear-gradient(transparent 70%, rgb(255 190 110 / 0.3)); opacity: 0; will-change: opacity; }
+  /* Grade: the painted front pulled toward the real, weathered vermilion and the photo's softer blacks. */
+  .facade, .door-img { filter: saturate(0.86) contrast(0.95) brightness(0.98); }
   .facade { inset: 0; width: 100%; height: 100%; }
   /* The door leaf, hinged on the left (the handle is on the right), opening inward, with a painted edge. */
   .door { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
@@ -116,21 +122,34 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
   .lamp.is-on { opacity: 1; animation: lamp-flick 520ms steps(1, end); }
   @keyframes lamp-flick { 0% { opacity: 0.7; } 18% { opacity: 0.1; } 34% { opacity: 0.9; } 46% { opacity: 0.3; } 60%, 100% { opacity: 1; } }
   /* The sign: gold slab capitals on the red fascia, as on Maiden Lane. */
-  .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #5e2219; text-align: center; line-height: 1; }
+  .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #6f5228; text-align: center; line-height: 1; text-shadow: 0 0.03em 0 rgb(40 10 6 / 0.55); }
   .sign-name { font-weight: 700; font-size: 4.3cqw; letter-spacing: 0.1em; }
   .ch { display: inline-block; white-space: pre; }
-  .sign-sub { font-weight: 700; font-size: max(1.15cqw, 9px); letter-spacing: 0.16em; }
-  .sign-addr { font-weight: 700; font-size: max(0.85cqw, 8px); letter-spacing: 0.14em; }
+  /* As on Maiden Lane: the lines under the name are white sans, not gold slab. */
+  .sign-sub, .sign-addr { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-stretch: 87.5%; font-weight: 700; color: rgb(236 230 220 / 0.42); text-shadow: none; }
+  .sign-sub { font-size: max(1.2cqw, 9px); letter-spacing: 0.08em; }
+  .sign-addr { font-size: max(0.88cqw, 8px); letter-spacing: 0.08em; }
   /* The lit copy: each letter flicks on (opacity only). */
-  .sign-lit { color: #f2c15c; text-shadow: 0 0 0.25em rgb(255 190 90 / 0.6), 0 0.04em 0 rgb(60 20 10 / 0.6); }
+  /* Lit: gilt leaf (a vertical bevel of golds) with a thin dark keyline; the lamps' glow on the fascia. */
+  .sign-lit { text-shadow: none; filter: drop-shadow(0 0 0.35cqw rgb(255 190 90 / 0.45)); }
+  .sign-lit .ch { background: linear-gradient(180deg, #fbe4a4 0%, #e6b85e 42%, #a97629 56%, #ecc571 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 0.012em rgb(60 22 10 / 0.6); }
+  .sign-lit .sign-sub, .sign-lit .sign-addr { color: #f6f1e8; }
+  /* The shine: a pale band wiped across the name once (mask moves; plays one time). */
+  .sign-shine { color: #fff6dc; text-shadow: none; opacity: 0; -webkit-mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; }
+  .sign-shine.is-on { animation: sign-shine 1400ms var(--curve-out, ease-out) 200ms 1 both; }
+  @keyframes sign-shine { from { opacity: 0.85; -webkit-mask-position: 150% 0; mask-position: 150% 0; } to { opacity: 0.85; -webkit-mask-position: -50% 0; mask-position: -50% 0; } }
   .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 0; }
   .sign-lit .is-on { opacity: 1; animation: lamp-flick 300ms steps(1, end); }
   .sign-lit [data-sub].is-on { animation: none; transition: opacity var(--dur-panel) var(--curve-out, ease-out); }
   .house-no { position: absolute; left: 71.6%; top: 50%; translate: -50% 0; font-family: var(--font-display); font-weight: 700; font-size: 2.2cqw; color: #2b2522; }
-  .below { position: absolute; left: 0; right: 0; bottom: 16px; display: grid; justify-items: center; gap: 4px; padding: 10px 16px 0; background: linear-gradient(transparent, rgb(23 21 19 / 0.85) 40%); }
-  .come-in { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: clamp(18px, 2vw, 24px); }
-  .skip-story { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-sand); font-size: 15px; text-decoration: underline; text-underline-offset: 4px; }
-  .skip-story:hover { color: var(--color-gold); }
+  /* "Come in.": small tracked capitals over a soft pool of shadow, not a strip. */
+  .below { position: absolute; left: 0; right: 0; bottom: 4vh; display: grid; justify-items: center; gap: 2px; padding: 28px 16px 0; background: radial-gradient(60% 100% at 50% 100%, rgb(13 11 9 / 0.62), transparent 70%); }
+  .come-in { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.32em; color: var(--color-gold); font-size: 14px; }
+  .skip-story { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; color: rgb(218 199 181 / 0.78); font-size: 13px; text-decoration: none; }
+  .skip-story:hover, .skip-story:focus-visible { color: var(--color-gold); text-decoration: underline; text-underline-offset: 4px; }
+  .grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.07; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  /* While the scene is pinned the page chrome steps back (rail and header button). */
+  :global(html[data-door-scene] .rail.is-on), :global(html[data-door-scene] .nav-book) { opacity: 0.35; }
   /* The room past the door, revealed by a clip from the doorway out to the full stage. */
   .inside { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
   /* The clip sits on .inside; the room moves inside it, so the opening always matches the doorway. */
@@ -157,7 +176,7 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
     .doors { height: auto; }
     .stage { position: relative; top: 0; height: auto; aspect-ratio: auto; display: block; }
     .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; height: auto; }
-    .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; }
+    .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; } .sign-shine { display: none; }
     .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .spill { opacity: 0.6; } .door { transform: rotateY(-62deg); }
     .inside { display: none; }
     .below { position: relative; bottom: 0; background: none; padding-block: 16px; }
@@ -211,6 +230,8 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
     const comein = $('[data-comein]'), flood = $('[data-flood]'), inside = $('[data-inside]');
     const opening = flood.querySelector<HTMLElement>('.opening')!;
     const insideMove = $('[data-inside-move]');
+    const shine = $('[data-shine]');
+    const root = document.documentElement;
 
     // Layout, read on resize only (never inside a frame).
     let bar = 72, len = 1, toX = 0, toY = 0;
@@ -247,6 +268,9 @@ const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3
       setOn(lamps, Math.ceil(range(t, 0.02, 0.1) * lamps.length));
       setOn(chars, Math.ceil(range(t, 0.06, 0.18) * chars.length));
       setOn(subs, t >= 0.2 ? subs.length : 0);
+      shine.classList.toggle('is-on', t >= 0.2);
+      const pinned = t > 0 && t < 1;
+      if (pinned !== root.hasAttribute('data-door-scene')) root.toggleAttribute('data-door-scene', pinned);
       const lit = range(t, 0.07, 0.27);
       dim.style.opacity = (0.78 - 0.62 * lit).toFixed(3);
       const r = (0.9 - 0.65 * lit).toFixed(3);
