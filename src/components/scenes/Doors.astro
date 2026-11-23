@@ -1,10 +1,13 @@
 ---
-// Scene 2: the front door at Covent Garden. The street comes into view, the three brass
-// lamps flick on, the sign lights up letter by letter, then the door swings in and the
-// camera walks through it until warm light floods the screen (the next scene's paper).
+// Scene 2: the front door at Covent Garden. The street comes into view; once it is pinned the
+// three brass lamps flick on, the sign lights letter by letter and the glass clears, then the
+// door swings in, the camera walks to it and the room opens out from the doorway. A slow drift
+// toward the bar, then the bar light blooms into the story (the voyage's paper).
 // Art: covent-garden/front/*.webp, the real shopfront redrawn (Higgsfield GPT Image 2.6 +
-// upscale, 23 Nov 2026), glass keyed out so the room photo shows through; the door is its own layer.
-import { Image } from 'astro:assets';
+// upscale, 23 Nov 2026), glass keyed out so the room shows through; the door is its own layer.
+// Plan and review: docs/qa/DOOR-SCENE-PLAN.md (phase 1).
+import { Picture } from 'astro:assets';
+import type { ImageOutputFormat } from 'astro';
 import { getBranches } from '../../lib/site-data';
 import facade from '../../assets/images/covent-garden/front/facade.webp';
 import door from '../../assets/images/covent-garden/front/door.webp';
@@ -18,40 +21,48 @@ const street = cg?.address.street ?? '6 Maiden Lane';
 const houseNo = street.match(/^\d+/)?.[0];
 const address = `${street.replace(/\bLane\b/, 'Ln')}, ${cg?.address.locality ?? 'Covent Garden'}`;
 const name = 'Fatt Pundit';
+const formats: ImageOutputFormat[] = ['avif', 'webp'];
+// One srcset for both room images so the browser fetches it once.
+const roomImg = { src: room, alt: '', formats, widths: [828, 1280, 1920, 2800, 3600], sizes: '100vw', loading: 'lazy' as const, fetchpriority: 'low' as const };
 ---
 <section class="doors" data-doors aria-label={`Step inside Fatt Pundit, ${street}, Covent Garden`}>
   <div class="stage">
     <div class="camera" data-camera aria-hidden="true">
       <div class="room-wrap" data-room-wrap>
-        <Image src={room} alt="" class="room" widths={[1000, 1800, 2800, 3600]} sizes="100vw" data-room />
+        <Picture {...roomImg} class="room" />
       </div>
       <div class="dim" data-dim></div>
-      <Image src={facade} alt="" class="facade" widths={[1200, 2000, 2800, 4096]} sizes="(min-aspect-ratio: 1/1) max(100vw, 133svh), 100vw" loading="lazy" />
-      <Image src={reflectFront} alt="" class="reflect" widths={[1000, 2048]} sizes="(min-aspect-ratio: 1/1) 100vw, 140vw" loading="lazy" data-reflect />
+      <!-- Warm light from the room spilling through the opening door. -->
+      <span class="spill" data-spill></span>
+      <Picture src={facade} alt="" formats={formats} class="facade" widths={[900, 1400, 2000, 2800]} sizes="(max-aspect-ratio: 3/4) 200vw, (min-aspect-ratio: 1/1) max(100vw, 133svh), 100vw" loading="lazy" fetchpriority="low" />
+      <Picture src={reflectFront} alt="" formats={formats} class="reflect" widths={[1000, 2048]} sizes="(max-aspect-ratio: 3/4) 200vw, 100vw" loading="lazy" fetchpriority="low" data-reflect />
       <div class="door" data-door>
-        <Image src={door} alt="" class="door-img" widths={[400, 712]} sizes="(min-aspect-ratio: 1/1) 25vw, 18vw" loading="lazy" />
-        <Image src={reflectDoor} alt="" class="reflect" widths={[356, 712]} sizes="(min-aspect-ratio: 1/1) 25vw, 18vw" loading="lazy" data-reflect />
+        <Picture src={door} alt="" formats={formats} class="door-img" widths={[400, 712]} sizes="(max-aspect-ratio: 3/4) 40vw, 25vw" loading="lazy" fetchpriority="low" />
+        <Picture src={reflectDoor} alt="" formats={formats} class="reflect" widths={[356, 712]} sizes="(max-aspect-ratio: 3/4) 40vw, 25vw" loading="lazy" fetchpriority="low" data-reflect />
         <span class="door-shade" data-door-shade></span>
       </div>
-      <!-- The lamps and the sign: drawn in code so they can light up. -->
+      <!-- The lamps and the sign: drawn in code so they can light up. The lit sign is a second
+           copy on top, shown letter by letter, so lighting it never repaints the scaled front. -->
       {[0, 1, 2].map((i) => <span class="lamp" data-lamp style={`--x:${[33.9, 50.9, 68.2][i]}%`}></span>)}
-      <p class="sign">
-        <span class="sign-name">{[...name].map((ch) => <span class="ch" data-ch>{ch === ' ' ? ' ' : ch}</span>)}</span>
-        <span class="sign-sub" data-sub>From Guangdong to Calcutta</span>
-        <span class="sign-addr" data-sub>{address}</span>
-      </p>
-      {houseNo && <span class="house-no" data-sub>{houseNo}</span>}
+      {[false, true].map((lit) => (
+        <p class:list={['sign', { 'sign-lit': lit }]} aria-hidden={lit ? 'true' : undefined}>
+          <span class="sign-name">{[...name].map((ch) => <span class="ch" data-ch={lit ? '' : undefined}>{ch === ' ' ? ' ' : ch}</span>)}</span>
+          <span class="sign-sub" data-sub={lit ? '' : undefined}>From Guangdong to Calcutta</span>
+          <span class="sign-addr" data-sub={lit ? '' : undefined}>{address}</span>
+        </p>
+      ))}
+      {houseNo && <span class="house-no">{houseNo}</span>}
     </div>
-    <!-- Past the door frame: the room opens up to the full view and you drift in toward the bar. -->
+    <!-- Past the door frame: the room opens out from the doorway and you drift in toward the bar. -->
     <div class="inside" data-inside aria-hidden="true">
-      <Image src={room} alt="" class="inside-img" widths={[1000, 1800, 2800, 3600]} sizes="100vw" loading="lazy" />
+      <div class="inside-move" data-inside-move><Picture {...roomImg} class="inside-img" /></div>
     </div>
     <div class="below" data-comein>
       <p class="come-in">Come in.</p>
       <a class="skip-story" href="#tables" data-skip-story>Skip the story: choose your table</a>
     </div>
     <div class="flood" data-flood>
-      <!-- The light past the door is where the story starts: the voyage picks it up next. -->
+      <!-- The bar light past the door is where the story starts: the voyage picks it up next. -->
       <div class="opening">
         <p class="o-label"><span class="o-no">01</span> Our story</p>
         <h2 class="o-line">From Guangdong<br />to Calcutta</h2>
@@ -62,52 +73,74 @@ const name = 'Fatt Pundit';
   </div>
 </section>
 
+<noscript>
+  <!-- No script: show the calm version (lit front, open door, story opening below). -->
+  <style is:inline>
+    html .doors { height: auto !important; } html .doors .stage { position: relative !important; top: 0 !important; height: auto !important; display: block !important; }
+    html .doors .camera { position: relative !important; left: 0 !important; top: 0 !important; translate: none !important; width: 100% !important; height: auto !important; }
+    html .doors .lamp, html .doors .sign-lit [data-ch], html .doors .sign-lit [data-sub], html .doors .opening { opacity: 1 !important; }
+    html .doors .dim { opacity: 0.15 !important; } html .doors .reflect { opacity: 0.3 !important; } html .doors .door { transform: rotateY(-62deg) !important; }
+    html .doors .below { position: relative !important; bottom: 0 !important; background: none !important; padding-block: 16px !important; }
+    html .doors .flood { position: relative !important; opacity: 1 !important; padding-block: 64px !important; background: var(--color-sand) !important; }
+    html .doors .o-cue { display: none !important; }
+  </style>
+</noscript>
+
 <style>
-  /* 320svh: the street rises into view (first 100svh), 120svh pinned for the walk in, 100svh inside. */
-  .doors { position: relative; height: 320svh; background: var(--color-ink); --bar: 72px; --door-x: 25.56%; --door-y: 68.07%; }
+  /* 290svh: the street rises into view (first 100svh), then 190svh pinned for the walk in. */
+  .doors { position: relative; height: 290svh; background: var(--color-ink); --bar: 72px; --door-x: 25.56%; --door-y: 68.07%; }
   .stage { position: sticky; top: var(--bar); height: calc(100svh - var(--bar)); overflow: hidden; display: grid; place-items: center; }
-  /* Landscape: the shopfront covers the stage like a street seen straight on (sides and sky crop).
-     Portrait: the whole front fits the width, the line under it sits in the space below. */
-  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: 100%; aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 2200px; perspective-origin: var(--door-x) var(--door-y); will-change: transform; }
+  /* Landscape: the shopfront covers the stage like a street seen straight on (sides and sky crop). */
+  .camera { position: absolute; left: 50%; top: 42%; translate: -50% -42%; width: 100%; aspect-ratio: 4096 / 3089; container-type: inline-size; transform-origin: var(--door-x) var(--door-y); perspective: 1200px; perspective-origin: var(--door-x) var(--door-y); will-change: transform; }
   @media (min-aspect-ratio: 1/1) { .camera { width: max(100%, calc((100svh - var(--bar)) * 4096 / 3089)); } }
-  /* Tall screens: 140% wide, framed from the door to the side door (the brick ends crop). */
-  @media (max-aspect-ratio: 3/4) { .camera { width: 140%; left: 0; translate: -13% -42%; } }
+  /* Tall screens: sized by height and centred on the sign (the brick ends and the side door crop). */
+  @media (max-aspect-ratio: 3/4) { .camera { width: auto; height: 62%; top: 40%; translate: -50% -46%; } }
+  .camera :global(picture) { display: contents; }
   .room-wrap { position: absolute; inset: 18% 4% 2% 4%; overflow: hidden; transform-origin: var(--door-x) var(--door-y); will-change: transform; }
   /* Put the bar (≈52% 50% of the photo) behind the left door (≈23% 63% of this box). */
   .room { width: 100%; height: 100%; object-fit: cover; transform: translate(-30.4%, 13%) scale(1.7); }
   .dim, .facade, .door-img { position: absolute; }
   /* Night inside until the lamps come on (opacity only: compositor). */
   .dim { inset: 22% 12% 8% 12%; background: #0d0b09; opacity: 0.78; will-change: opacity; }
+  .spill { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; background: linear-gradient(90deg, rgb(255 196 120 / 0.42), rgb(255 170 90 / 0.12) 55%, transparent 80%), linear-gradient(transparent 70%, rgb(255 190 110 / 0.3)); opacity: 0; will-change: opacity; }
   .facade { inset: 0; width: 100%; height: 100%; }
-  /* The door leaf, hinged on the left (the handle is on the right), opening inward. */
+  /* The door leaf, hinged on the left (the handle is on the right), opening inward, with a painted edge. */
   .door { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
+  .door::after { content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 1cqw; transform-origin: right center; transform: rotateY(-90deg); background: linear-gradient(90deg, #3d0f0b, #6e1d15 40%, #4a120d); }
   .door-img { inset: 0; width: 100%; height: 100%; }
-  /* Glass reflection: screen-blended so it reads as light on the glass; fades as the room lights up. */
-  .reflect { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: screen; opacity: 0.85; pointer-events: none; will-change: opacity; }
-  .door-shade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.6)); opacity: 0; will-change: opacity; }
+  /* Glass reflection (blend baked into the file); fades as the room lights up. */
+  .reflect { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.9; pointer-events: none; will-change: opacity; }
+  .door-shade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.55)); opacity: 0; will-change: opacity; }
   /* A lamp: the warm pool under each brass shade; unlit until it flicks on. */
-  .lamp { position: absolute; left: var(--x); top: 17.6%; width: 13cqw; height: 9cqw; translate: -50% -22%; background: radial-gradient(50% 50% at 50% 30%, rgb(255 214 140 / 0.85), rgb(255 170 70 / 0.35) 35%, transparent 70%); opacity: 0; transition: opacity var(--dur-fast) linear; pointer-events: none; }
+  .lamp { position: absolute; left: var(--x); top: 17.6%; width: 13cqw; height: 9cqw; translate: -50% -22%; background: radial-gradient(50% 50% at 50% 30%, rgb(255 214 140 / 0.85), rgb(255 170 70 / 0.35) 35%, transparent 70%); opacity: 0; pointer-events: none; will-change: opacity; }
   .lamp.is-on { opacity: 1; animation: lamp-flick 520ms steps(1, end); }
   @keyframes lamp-flick { 0% { opacity: 0.7; } 18% { opacity: 0.1; } 34% { opacity: 0.9; } 46% { opacity: 0.3; } 60%, 100% { opacity: 1; } }
   /* The sign: gold slab capitals on the red fascia, as on Maiden Lane. */
   .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #5e2219; text-align: center; line-height: 1; }
   .sign-name { font-weight: 700; font-size: 4.3cqw; letter-spacing: 0.1em; }
-  .ch { display: inline-block; white-space: pre; transition: color var(--dur-fast) linear, text-shadow var(--dur-fast) linear; }
-  .ch.is-on { color: #f2c15c; text-shadow: 0 0 0.25em rgb(255 190 90 / 0.65), 0 0.04em 0 rgb(60 20 10 / 0.6); }
-  .sign-sub { font-weight: 700; font-size: 1.15cqw; letter-spacing: 0.16em; }
-  .sign-addr { font-weight: 700; font-size: 0.85cqw; letter-spacing: 0.14em; }
+  .ch { display: inline-block; white-space: pre; }
+  .sign-sub { font-weight: 700; font-size: max(1.15cqw, 9px); letter-spacing: 0.16em; }
+  .sign-addr { font-weight: 700; font-size: max(0.85cqw, 8px); letter-spacing: 0.14em; }
+  /* The lit copy: each letter flicks on (opacity only). */
+  .sign-lit { color: #f2c15c; text-shadow: 0 0 0.25em rgb(255 190 90 / 0.6), 0 0.04em 0 rgb(60 20 10 / 0.6); }
+  .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 0; }
+  .sign-lit .is-on { opacity: 1; animation: lamp-flick 300ms steps(1, end); }
+  .sign-lit [data-sub].is-on { animation: none; transition: opacity var(--dur-panel) var(--curve-out, ease-out); }
   .house-no { position: absolute; left: 71.6%; top: 50%; translate: -50% 0; font-family: var(--font-display); font-weight: 700; font-size: 2.2cqw; color: #2b2522; }
-  [data-sub] { transition: color var(--dur-panel) linear, text-shadow var(--dur-panel) linear; }
-  .sign-sub.is-on, .sign-addr.is-on { color: #f2c15c; text-shadow: 0 0 0.3em rgb(255 190 90 / 0.5); }
-  .below { position: absolute; left: 0; right: 0; bottom: 16px; display: grid; justify-items: center; gap: 4px; padding: 10px 16px 0; background: linear-gradient(transparent, rgb(23 21 19 / 0.85) 40%); will-change: opacity; }
+  .below { position: absolute; left: 0; right: 0; bottom: 16px; display: grid; justify-items: center; gap: 4px; padding: 10px 16px 0; background: linear-gradient(transparent, rgb(23 21 19 / 0.85) 40%); }
   .come-in { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-gold); font-size: clamp(18px, 2vw, 24px); }
   .skip-story { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-sand); font-size: 15px; text-decoration: underline; text-underline-offset: 4px; }
   .skip-story:hover { color: var(--color-gold); }
-  .inside { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transform-origin: 52% 50%; will-change: transform, opacity; }
-  .inside::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(13 11 9 / 0.55)); }
+  /* The room past the door, revealed by a clip from the doorway out to the full stage. */
+  .inside { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
+  /* The clip sits on .inside; the room moves inside it, so the opening always matches the doorway. */
+  .inside-move { position: absolute; inset: 0; transform-origin: 52% 50%; }
+  .inside :global(picture) { display: contents; }
+  .inside::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(13 11 9 / 0.5)); }
   .inside-img { width: 100%; height: 100%; object-fit: cover; object-position: 52% 50%; }
-  .flood { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 50% 46%, var(--color-sand) 0 30%, var(--color-gold) 70%); opacity: 0; visibility: hidden; will-change: opacity; }
-  .opening { display: grid; justify-items: center; gap: clamp(14px, 2vw, 22px); max-width: min(100%, 1000px); text-align: center; color: var(--color-ink); }
+  /* The bar light blooms into the story's paper; a trace of the room stays under it. */
+  .flood { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 52% 40%, #fff4dc 0, #f1dcb6 26%, var(--color-sand) 62%); opacity: 0; pointer-events: none; }
+  .opening { display: grid; justify-items: center; gap: clamp(14px, 2vw, 22px); max-width: min(100%, 1000px); text-align: center; color: var(--color-ink); opacity: 0; }
   .opening p, .opening h2 { margin: 0; }
   /* Chapter 01: the same numbered label (rule above, number, plain words) as the home chapters that follow. */
   .o-label { display: inline-flex; gap: var(--space-2); padding-top: var(--space-3); border-top: var(--border-rule) solid var(--color-ink); font-size: var(--step-label); font-weight: 700; line-height: 1.3; }
@@ -117,116 +150,164 @@ const name = 'Fatt Pundit';
   .o-cue { font-family: var(--font-note); font-style: italic; font-size: 16px; color: var(--color-gold-deep); }
 
   /* Phones: keep the line under the front clear of the fixed dock. */
-  @media (max-width: 640px) { .doors { --bar: 64px; height: 290svh; } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
+  @media (max-width: 640px) { .doors { --bar: 64px; height: 270svh; } .below { bottom: calc(68px + env(safe-area-inset-bottom)); } }
   @media (min-width: 641px) and (max-height: 700px) { .doors { --bar: 58px; } }
   @media (prefers-reduced-motion: reduce) {
     /* Calm: the front is lit and the door stands open; the story opening simply follows. */
     .doors { height: auto; }
     .stage { position: relative; top: 0; height: auto; aspect-ratio: auto; display: block; }
-    .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; }
-    .lamp { opacity: 1; } .ch, .sign-sub, .sign-addr { color: #f2c15c; }
-    .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .door { transform: rotateY(-62deg); }
+    .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; height: auto; }
+    .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; }
+    .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .spill { opacity: 0.6; } .door { transform: rotateY(-62deg); }
+    .inside { display: none; }
     .below { position: relative; bottom: 0; background: none; padding-block: 16px; }
-    .flood { position: relative; opacity: 1; visibility: visible; padding-block: 64px; }
+    .flood { position: relative; opacity: 1; padding-block: 64px; background: var(--color-sand); }
+    .opening { opacity: 1; }
     .o-cue { display: none; }
   }
 </style>
 
 <script>
-  import { scroll } from 'motion';
-
   const section = document.querySelector<HTMLElement>('[data-doors]');
   const camera = section?.querySelector<HTMLElement>('[data-camera]');
   const stage = section?.querySelector<HTMLElement>('.stage');
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const clamp = (v: number) => Math.min(1, Math.max(0, v));
-  const range = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
-  // Heavy door: slow start, then swings, then settles.
-  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const range = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+  // Heavy door: slow start, swing, settle.
+  const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const outQuart = (t: number) => 1 - Math.pow(1 - t, 4);
+  const inQuad = (t: number) => t * t;
 
-  // Decode the room and the front before they are needed, so their first draw doesn't
-  // land in the middle of a scroll frame.
-  if (section) {
+  const MAX_ZOOM = 2.6; // past this the painted front goes soft; the room photo takes over
+  const DOOR = { l: 0.1687, t: 0.4678, w: 0.1738, h: 0.4257 }; // the doorway, as a fraction of the camera
+  const ORIGIN = { x: 0.2556, y: 0.6807 }; // --door-x / --door-y
+
+  // Decode the front and the room shortly before they are needed (not at page load: the hero's LCP comes first).
+  if (section && !calm) {
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      for (const img of section.querySelectorAll('img')) { img.loading = 'eager'; img.decode().catch(() => {}); }
-    }, { rootMargin: '150% 0px' });
+      for (const img of section.querySelectorAll<HTMLImageElement>('.facade, .room, .door-img')) { img.loading = 'eager'; img.decode().catch(() => {}); }
+      const rest = () => section.querySelectorAll<HTMLImageElement>('img').forEach((img) => { img.loading = 'eager'; });
+      ('requestIdleCallback' in window ? requestIdleCallback : setTimeout)(rest);
+    }, { rootMargin: '50% 0px' });
     io.observe(section);
   }
 
   if (section && camera && stage && !calm) {
     // Write transform/opacity straight onto each element (custom properties on the
     // camera made every child recalc style each frame).
-    const all = <T extends Element>(sel: string) => [...section.querySelectorAll<T>(sel)];
-    const lamps = all<HTMLElement>('[data-lamp]');
-    const chars = all<HTMLElement>('[data-ch]');
-    const subs = all<HTMLElement>('[data-sub]');
-    const door = section.querySelector<HTMLElement>('[data-door]')!;
-    const doorShade = section.querySelector<HTMLElement>('[data-door-shade]')!;
-    const roomWrap = section.querySelector<HTMLElement>('[data-room-wrap]')!;
-    const dim = section.querySelector<HTMLElement>('[data-dim]')!;
-    const reflects = all<HTMLElement>('[data-reflect]');
-    const comein = section.querySelector<HTMLElement>('[data-comein]')!;
-    const flood = section.querySelector<HTMLElement>('[data-flood]')!;
-    const inside = section.querySelector<HTMLElement>('[data-inside]')!;
-    // Section height over the walk-in's (320svh vs 220svh; phones 290 vs 200), so q = 1 where the push used to end.
-    const K = window.matchMedia('(max-width: 640px)').matches ? 290 / 200 : 320 / 220;
+    const $ = <T extends HTMLElement>(sel: string) => section.querySelector<T>(sel)!;
+    const all = (sel: string) => [...section.querySelectorAll<HTMLElement>(sel)];
+    const lamps = all('[data-lamp]');
+    const chars = all('[data-ch]');
+    const subs = all('[data-sub]');
+    const reflects = all('[data-reflect]');
+    const door = $('[data-door]'), doorShade = $('[data-door-shade]'), spill = $('[data-spill]');
+    const roomWrap = $('[data-room-wrap]'), dim = $('[data-dim]');
+    const comein = $('[data-comein]'), flood = $('[data-flood]'), inside = $('[data-inside]');
+    const opening = flood.querySelector<HTMLElement>('.opening')!;
+    const insideMove = $('[data-inside-move]');
 
-    // Where the doorway sits relative to the stage centre: the push walks the camera there.
-    // Measured on resize only (never inside the scroll frame).
-    let toX = 0, toY = 0;
+    // Layout, read on resize only (never inside a frame).
+    let bar = 72, len = 1, toX = 0, toY = 0;
+    let stageW = 1, stageH = 1, cam = { l: 0, t: 0, w: 1, h: 1 };
     const measure = () => {
       const s = stage.getBoundingClientRect();
-      const t = camera.style.transform; camera.style.transform = 'none';
+      const tf = camera.style.transform; camera.style.transform = 'none';
       const c = camera.getBoundingClientRect();
-      camera.style.transform = t;
-      // The doorway's centre (see --door-x/--door-y) to the middle of the stage.
-      toX = s.left + s.width / 2 - (c.left + c.width * 0.2556);
-      toY = s.top + s.height * 0.55 - (c.top + c.height * 0.6807);
+      camera.style.transform = tf;
+      stageW = s.width; stageH = s.height;
+      cam = { l: c.left - s.left, t: c.top - s.top, w: c.width, h: c.height };
+      // The doorway's centre to just below the middle of the stage.
+      toX = stageW / 2 - (cam.l + cam.w * ORIGIN.x);
+      toY = stageH * 0.55 - (cam.t + cam.h * ORIGIN.y);
+      // Pinned stretch: from the stage sticking under the bar to the section's end.
+      bar = parseFloat(getComputedStyle(section).getPropertyValue('--bar')) || 72;
+      len = Math.max(1, section.offsetHeight - stage.offsetHeight);
     };
     measure();
-    new ResizeObserver(measure).observe(stage);
 
     // Lights switch at thresholds (a lamp clicks on; it isn't dimmed up), so they are classes.
     const setOn = (els: HTMLElement[], n: number) => els.forEach((el, i) => el.classList.toggle('is-on', i < n));
-    let last = -1;
-    scroll(
-      (p: number) => {
-        if (Math.abs(p - last) < 0.0004) return;
-        last = p;
-        // Beats are timed in the walk-in's own units (q); the room dwell runs past 1.
-        const q = p * K;
-        setOn(lamps, Math.ceil(range(q, 0.16, 0.3) * lamps.length));
-        setOn(chars, Math.ceil(range(q, 0.26, 0.42) * chars.length));
-        setOn(subs, q >= 0.44 ? subs.length : 0);
-        const lit = range(q, 0.28, 0.55);
-        dim.style.opacity = (0.78 - 0.62 * lit).toFixed(3);
-        const r = (0.85 - 0.6 * lit).toFixed(3);
-        reflects.forEach((el) => (el.style.opacity = r));
-        const open = ease(range(q, 0.5, 0.72));
-        door.style.transform = `rotateY(${(open * -96).toFixed(2)}deg)`;
-        doorShade.style.opacity = Math.min(1, open * 1.4).toFixed(3);
-        const push = ease(range(q, 0.55, 0.9));
-        const s = 1 + push * 3.4;
-        camera.style.transform = `translate(${(toX * push).toFixed(1)}px, ${(toY * push).toFixed(1)}px) scale(${s.toFixed(4)})`;
-        // The room sits deeper than the front: it grows less, so the walk has depth.
-        roomWrap.style.transform = `scale(${(1 / (1 + push * 0.5)).toFixed(4)})`;
-        const below = Math.max(0, 1 - range(q, 0.48, 0.56));
-        comein.style.opacity = below.toFixed(3);
-        comein.style.visibility = below > 0.05 ? 'visible' : 'hidden';
-        // Through the frame: the doorway crop widens into the whole room, then a slow drift in.
-        const enter = ease(range(q, 0.74, 0.9));
-        const drift = range(q, 0.9, K);
-        inside.style.opacity = enter.toFixed(3);
-        inside.style.visibility = enter > 0.01 ? 'visible' : 'hidden';
-        inside.style.transform = `scale(${(1.9 - 0.9 * enter + 0.08 * drift).toFixed(4)})`;
-        const f = ease(range(q, K - 0.16, K - 0.01));
-        flood.style.opacity = f.toFixed(3);
-        flood.style.visibility = f > 0.01 ? 'visible' : 'hidden';
-      },
-      { target: section, offset: ['start end', 'end end'] },
-    );
+
+    // Where the doorway sits on screen for a camera scale/shift, as clip insets of the stage.
+    const doorInsets = (s: number, k: number) => {
+      const ox = cam.l + cam.w * ORIGIN.x, oy = cam.t + cam.h * ORIGIN.y;
+      const map = (fx: number, fy: number) => [ox + (cam.l + cam.w * fx - ox) * s + toX * k, oy + (cam.t + cam.h * fy - oy) * s + toY * k];
+      const [x0, y0] = map(DOOR.l, DOOR.t), [x1, y1] = map(DOOR.l + DOOR.w, DOOR.t + DOOR.h);
+      return [Math.max(0, y0), Math.max(0, stageW - x1), Math.max(0, stageH - y1), Math.max(0, x0)];
+    };
+
+    // Beat sheet in pinned progress t (0 = stage pins, 1 = section ends). See docs/qa/DOOR-SCENE-PLAN.md.
+    const render = (t: number) => {
+      setOn(lamps, Math.ceil(range(t, 0.02, 0.1) * lamps.length));
+      setOn(chars, Math.ceil(range(t, 0.06, 0.18) * chars.length));
+      setOn(subs, t >= 0.2 ? subs.length : 0);
+      const lit = range(t, 0.07, 0.27);
+      dim.style.opacity = (0.78 - 0.62 * lit).toFixed(3);
+      const r = (0.9 - 0.65 * lit).toFixed(3);
+      reflects.forEach((el) => (el.style.opacity = r));
+
+      const below = 1 - range(t, 0.16, 0.22);
+      comein.style.opacity = below.toFixed(3);
+      comein.style.visibility = below > 0.02 ? 'visible' : 'hidden';
+
+      const open = inOut(range(t, 0.22, 0.4));
+      door.style.transform = `rotateY(${(open * -78).toFixed(2)}deg)`;
+      doorShade.style.opacity = Math.min(1, open * 1.3).toFixed(3);
+      spill.style.opacity = open.toFixed(3);
+
+      // Walk to the door: scale grows evenly in log space (reads as steady speed), a short ease-in to start.
+      const w = range(t, 0.27, 0.56);
+      const wk = w < 0.1 ? (w * w) / 0.2 : w - 0.05;
+      const s = Math.exp(lerp(0, Math.log(MAX_ZOOM), wk / 0.95));
+      const k = (s - 1) / (MAX_ZOOM - 1);
+      camera.style.transform = `translate(${(toX * k).toFixed(1)}px, ${(toY * k).toFixed(1)}px) scale(${s.toFixed(4)})`;
+      // The room sits deeper than the front: it grows less, so the walk has depth.
+      roomWrap.style.transform = `scale(${(1 / (1 + k * 0.3)).toFixed(4)})`;
+
+      // Through the doorway: the room opens out from the door's rectangle to the whole stage.
+      const wipe = outQuart(range(t, 0.47, 0.6));
+      const drift = range(t, 0.6, 0.86);
+      if (t >= 0.47) {
+        const [it, ir, ib, il] = doorInsets(s, k).map((v) => (v * (1 - wipe)).toFixed(1));
+        inside.style.visibility = 'visible';
+        inside.style.clipPath = `inset(${it}px ${ir}px ${ib}px ${il}px)`;
+        insideMove.style.transform = `translateX(${(-1.5 * drift).toFixed(2)}%) scale(${(1.25 - 0.25 * wipe + 0.06 * drift).toFixed(4)})`;
+      } else inside.style.visibility = 'hidden';
+      // Once the room fills the stage the front is behind us: stop compositing it.
+      camera.style.visibility = wipe >= 1 ? 'hidden' : 'visible';
+
+      // The bar light blooms into the story's paper and holds there for the hand-off.
+      const bloom = inQuad(range(t, 0.78, 0.93));
+      flood.style.opacity = (0.93 * bloom).toFixed(3);
+      opening.style.opacity = range(t, 0.86, 0.95).toFixed(3);
+    };
+
+    // Wheel steps are smoothed toward the scroll position (~90ms); touch and keys follow 1:1
+    // (native momentum is already smooth). The page itself still scrolls natively.
+    let target = 0, cur = -1, raf = 0, prev = 0, smooth = false;
+    // Read the section's live position (one rect read per scroll event, not per frame), so
+    // fonts or images loading above it can't knock the timeline out of step.
+    const read = () => clamp((bar - section.getBoundingClientRect().top) / len);
+    const tick = (now: number) => {
+      const dt = Math.min(64, now - (prev || now)); prev = now;
+      cur = smooth && cur >= 0 ? cur + (target - cur) * (1 - Math.exp(-dt / 90)) : target;
+      if (Math.abs(target - cur) < 0.0005) cur = target;
+      render(cur);
+      raf = cur === target ? 0 : requestAnimationFrame(tick);
+    };
+    const kick = () => { target = read(); if (!raf) { prev = 0; raf = requestAnimationFrame(tick); } };
+    addEventListener('wheel', () => { smooth = true; }, { passive: true });
+    addEventListener('touchstart', () => { smooth = false; }, { passive: true });
+    addEventListener('keydown', () => { smooth = false; });
+    addEventListener('pointerdown', () => { smooth = false; }, { passive: true });
+    addEventListener('scroll', kick, { passive: true });
+    new ResizeObserver(() => { measure(); kick(); }).observe(stage);
+    kick();
   }
 </script>
