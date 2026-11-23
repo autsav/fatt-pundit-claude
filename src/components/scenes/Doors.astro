@@ -9,6 +9,9 @@ import { getBranches } from '../../lib/site-data';
 import facade from '../../assets/images/covent-garden/front/facade.webp';
 import door from '../../assets/images/covent-garden/front/door.webp';
 import room from '../../assets/images/covent-garden/interior-door-view.jpg';
+// The street opposite (striped arches), mirrored in the glass: you see the reflection first, the room once it's lit.
+import reflectFront from '../../assets/images/covent-garden/front/reflect-front.webp';
+import reflectDoor from '../../assets/images/covent-garden/front/reflect-door.webp';
 
 const cg = (await getBranches()).find((b) => b.id === 'covent-garden');
 const street = cg?.address.street ?? '6 Maiden Lane';
@@ -24,8 +27,10 @@ const name = 'Fatt Pundit';
       </div>
       <div class="dim" data-dim></div>
       <Image src={facade} alt="" class="facade" widths={[1200, 2000, 2800, 4096]} sizes="(min-aspect-ratio: 1/1) max(100vw, 133svh), 100vw" loading="lazy" />
+      <Image src={reflectFront} alt="" class="reflect" widths={[1000, 2048]} sizes="(min-aspect-ratio: 1/1) 100vw, 140vw" loading="lazy" data-reflect />
       <div class="door" data-door>
         <Image src={door} alt="" class="door-img" widths={[400, 712]} sizes="(min-aspect-ratio: 1/1) 25vw, 18vw" loading="lazy" />
+        <Image src={reflectDoor} alt="" class="reflect" widths={[356, 712]} sizes="(min-aspect-ratio: 1/1) 25vw, 18vw" loading="lazy" data-reflect />
         <span class="door-shade" data-door-shade></span>
       </div>
       <!-- The lamps and the sign: drawn in code so they can light up. -->
@@ -73,6 +78,8 @@ const name = 'Fatt Pundit';
   /* The door leaf, hinged on the left (the handle is on the right), opening inward. */
   .door { position: absolute; left: 16.87%; top: 46.78%; width: 17.38%; height: 42.57%; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
   .door-img { inset: 0; width: 100%; height: 100%; }
+  /* Glass reflection: screen-blended so it reads as light on the glass; fades as the room lights up. */
+  .reflect { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: screen; opacity: 0.85; pointer-events: none; will-change: opacity; }
   .door-shade { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, rgb(0 0 0 / 0.6)); opacity: 0; will-change: opacity; }
   /* A lamp: the warm pool under each brass shade; unlit until it flicks on. */
   .lamp { position: absolute; left: var(--x); top: 17.6%; width: 13cqw; height: 9cqw; translate: -50% -22%; background: radial-gradient(50% 50% at 50% 30%, rgb(255 214 140 / 0.85), rgb(255 170 70 / 0.35) 35%, transparent 70%); opacity: 0; transition: opacity var(--dur-fast) linear; pointer-events: none; }
@@ -111,7 +118,7 @@ const name = 'Fatt Pundit';
     .stage { position: relative; top: 0; height: auto; aspect-ratio: auto; display: block; }
     .camera { position: relative; left: 0; top: 0; translate: none; width: 100%; }
     .lamp { opacity: 1; } .ch, .sign-sub, .sign-addr { color: #f2c15c; }
-    .dim { opacity: 0.15; } .door { transform: rotateY(-62deg); }
+    .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .door { transform: rotateY(-62deg); }
     .below { position: relative; bottom: 0; background: none; padding-block: 16px; }
     .flood { position: relative; opacity: 1; visibility: visible; padding-block: 64px; }
     .o-cue { display: none; }
@@ -153,6 +160,7 @@ const name = 'Fatt Pundit';
     const doorShade = section.querySelector<HTMLElement>('[data-door-shade]')!;
     const roomWrap = section.querySelector<HTMLElement>('[data-room-wrap]')!;
     const dim = section.querySelector<HTMLElement>('[data-dim]')!;
+    const reflects = q<HTMLElement>('[data-reflect]');
     const comein = section.querySelector<HTMLElement>('[data-comein]')!;
     const flood = section.querySelector<HTMLElement>('[data-flood]')!;
 
@@ -181,7 +189,10 @@ const name = 'Fatt Pundit';
         setOn(lamps, Math.ceil(range(p, 0.16, 0.3) * lamps.length));
         setOn(chars, Math.ceil(range(p, 0.26, 0.42) * chars.length));
         setOn(subs, p >= 0.44 ? subs.length : 0);
-        dim.style.opacity = (0.78 - 0.62 * range(p, 0.28, 0.55)).toFixed(3);
+        const lit = range(p, 0.28, 0.55);
+        dim.style.opacity = (0.78 - 0.62 * lit).toFixed(3);
+        const r = (0.85 - 0.6 * lit).toFixed(3);
+        reflects.forEach((el) => (el.style.opacity = r));
         const open = ease(range(p, 0.5, 0.72));
         door.style.transform = `rotateY(${(open * -96).toFixed(2)}deg)`;
         doorShade.style.opacity = Math.min(1, open * 1.4).toFixed(3);
