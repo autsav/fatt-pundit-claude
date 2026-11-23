@@ -1,7 +1,8 @@
 ---
 /**
- * Stage 0 of the story: the title on a torn-paper card over the harbour at dawn. Scrolling on, the
- * letters lift away, the card fades and the sun climbs, handing over to chapter one. Engine and range
+ * Stage 0 of the story: the title on a torn-paper card over the harbour at dawn; it is also chapter one's title
+ * (Canton has no title screen of its own). Scrolling on, the letters lift away and the card fades, handing over to
+ * chapter one's story. Engine and range
  * vocabulary: global.css "Story scenes"; the gate (supports view(), no reduced motion, not the comic) is
  * there too, so this stage exists only where the scenes play.
  *
@@ -13,38 +14,30 @@ import StoryScene from './StoryScene.astro';
 import SceneArt from './SceneArt.astro';
 import { STORY_TITLE, STORY_LEDE } from '../../data/story';
 
-// Each letter lifts on its own course. Offsets come from the letter's index (no randomness), so every build is the same.
+// Each letter lifts on its own course, staggered from its index (--i of --n; the engine's .tl). No randomness, so every build is the same.
+const total = STORY_TITLE.replace(/ /g, '').length;
 let n = 0;
 const words = STORY_TITLE.split(' ').map((word) =>
   [...word].map((ch) => {
     const i = n++;
-    const style = [
-      `--from:${4 + ((i * 7) % 12)}%`,
-      `--to:${34 + ((i * 11) % 22)}%`,
-      `--y1:-${22 + ((i * 37) % 40)}vh`,
-      `--x1:${((i * 29) % 21) - 10}vw`,
-      `--r1:${((i * 41) % 61) - 30}deg`,
-      '--o1:0',
-    ].join(';');
+    const style = [`--i:${i}`, `--n:${total}`, `--from:${4 + ((i * 7) % 12)}%`, `--to:${34 + ((i * 11) % 13)}%`, `--y1:-${22 + ((i * 37) % 40)}vh`].join(';');
     return { ch, style };
   }),
 );
 ---
 
 <div class="story-scenes">
-  <StoryScene label="The tale begins" sr="A harbour at dawn, with the title of the story on a torn piece of paper." h="170vh" hPhone="150vh">
+  <StoryScene label="The tale begins" sr="A harbour at dawn, with the title of the story on a torn piece of paper." h="120vh" hPhone="110vh">
     <div class="layer op-sky" aria-hidden="true"></div>
     <!-- The approved style frame (docs/STORY-AWARD-PLAN.md B1) as one painted backdrop, slowly pushing in. -->
-    <SceneArt name="opening-harbour" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer fx op-harbour" />
-    <!-- The first screen's picture (LCP): fetch it at once, but only where the scenes play (calm and comic readers never see it). -->
-    <script is:inline>(function(){var i=document.currentScript.previousElementSibling;try{if(CSS.supports("animation-timeline: view()")&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&document.documentElement.dataset.story!=="comic"&&i&&i.tagName==="IMG"){i.loading="eager";i.fetchPriority="high";}}catch(e){}})();</script>
+    <SceneArt name="opening-harbour" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer fx op-harbour" priority />
     <div class="layer op-wrap" aria-hidden="true">
       <div class="op-card fx">
         <p class="op-title">
           {words.map((w, wi) => (
             <>
               {wi > 0 && ' '}
-              <span class="op-word">{w.map((l) => <span class="op-letter fx" style={l.style}>{l.ch}</span>)}</span>
+              <span class="op-word">{w.map((l) => <span class="op-letter tl fx" style={l.style}>{l.ch}</span>)}</span>
             </>
           ))}
         </p>
@@ -61,6 +54,8 @@ const words = STORY_TITLE.split(' ').map((word) =>
   /* A slow push-in toward the harbour; will-change keeps the bitmap scaling cheap. */
   .op-harbour { inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 60% 50%; transform-origin: 60% 60%; will-change: transform;
     --s1: 1.14; --y1: -2%; }
+  /* The largest source is 2688w: cap the push-in where the screen needs more pixels than that (no 3840 master yet). */
+  @media (min-width: 1920px), (min-width: 1200px) and (min-resolution: 1.5dppx) { .op-harbour { --s1: 1.06; } }
 
   /* The title card: torn paper (a static jagged clip), tilted with `rotate` because the animation owns `transform`. */
   .op-wrap { inset: 0; z-index: 3; display: grid; place-content: center; padding: 0 var(--gutter); pointer-events: none; }
@@ -68,7 +63,7 @@ const words = STORY_TITLE.split(' ').map((word) =>
     background: var(--color-paper-light); color: var(--color-ink); border-top: 3px solid var(--color-gold);
     clip-path: polygon(0 3%, 5% 0, 11% 2.5%, 18% 0.5%, 26% 3%, 34% 0, 43% 2%, 52% 0, 61% 3%, 70% 0.5%, 79% 2.5%, 88% 0, 95% 2%, 100% 0.5%,
       100% 96%, 94% 99%, 87% 96.5%, 78% 100%, 69% 97%, 60% 99.5%, 51% 96.5%, 42% 100%, 33% 97%, 24% 99%, 15% 96.5%, 7% 100%, 0 97%);
-    --o1: 0; --y1: -6%; --from: 30%; --to: 60%; }
+    --o1: 0; --y1: -6%; --from: 42%; --to: 58%; }
   .op-title { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title);
     font-size: clamp(34px, 7vw, 92px); line-height: 1; text-wrap: balance; }
   .op-word { display: inline-block; white-space: nowrap; }

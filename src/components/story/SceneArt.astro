@@ -21,9 +21,11 @@ interface Props {
    *  these as their scene comes near, and only where the scenes can play (never in calm or comic mode). */
   warm?: boolean;
   quality?: number;
+  /** A chapter's first backdrop: fetched at once, at high priority. */
+  priority?: boolean;
 }
 // rest carries the parent's scope attribute, so the chapter component's styles reach this element.
-const { name, fallback, note, widths = [480, 960, 1600, 2400], sizes, class: cls, warm = false, quality = 72, ...rest } = Astro.props;
+const { name, fallback, note, widths = [480, 960, 1600, 2400], sizes, class: cls, warm = false, quality = 72, priority = false, ...rest } = Astro.props;
 
 const layers = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/layers/*.{png,webp}', { eager: true });
 const drawn = Object.entries(layers).find(([path]) => path.split('/').pop()!.replace(/\.\w+$/, '') === name)?.[1].default;
@@ -47,7 +49,8 @@ if (src) {
     width={img.w}
     height={img.h}
     alt=""
-    loading="lazy"
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : undefined}
     data-warm={warm ? '' : undefined}
     decoding="async"
     data-art={drawn ? 'drawn' : 'fallback'}

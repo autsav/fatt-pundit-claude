@@ -3,12 +3,11 @@
  * The last chapter, "Next stop", as one scene on one pinned stage: Dubai at dusk, then your table.
  * Layers and their motion; the engine is global.css "Story scenes" (docs/STORY-MOTION-PLAN.md).
  * Each moving layer's score (range and start/end) is in the style block below. It ends on your table; the
- * finale map (StoryMap) then tears in over it.
+ * #end section then tears in over it.
  */
 import StoryScene from '../StoryScene.astro';
 import SceneArt from '../SceneArt.astro';
 import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
-import RouteChart from '../RouteChart.astro';
 // The real Fatt Pundit momos (owner's photo, the plate cut out along its rim), shot from the table's own angle.
 import momos from '../../../assets/images/story/food/momos-plate.png';
 import chilliRed from '../../../assets/images/story/layers/chilli-red.webp';
@@ -21,7 +20,8 @@ const table = panelOf(chapter, 'p13-your-table');
 // A chilli garland strung across each top corner (the Tangra market's, come along): chillies hung along the rope's sag.
 const garlands = [{ cls: 'ns-garland-l' }, { cls: 'ns-garland-r' }];
 const hang = [0.1, 0.24, 0.38, 0.52, 0.66, 0.8, 0.92].map((t, i) => ({ x: t * 100, y: ((2 + 40 * t * (1 - t)) / 20) * 100, src: (i % 2 ? chilliGreen : chilliRed).src, a: (i % 3) * 8 - 8 }));
-const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
+const total = [...chapter.title].filter((c) => c !== ' ').length;
+const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => ({ ch, style: `--i:${n++};--n:${total}` }))); })();
 ---
 
 <div class="story-scenes">
@@ -33,13 +33,16 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
       </header>
     </div>
     <div class="layer fx fx-fade fx-then-out ns-sky" aria-hidden="true"></div>
-    <!-- London to Dubai on the night chart (world.toDubai): the noodle draws 10-26, Dubai's stamp lands at 28, out 36-37. -->
-    <RouteChart id="dubai" legs={[{ lane: 'toDubai', from: 6, to: 22 }]}
-      places={[{ at: 'london', name: 'London', lands: 8, side: 'left', sidePhone: 'right' }, { at: 'dubai', name: 'Dubai', lands: 24, side: 'left' }]}
-      focus={[368, 650]} zoom={0.8993} zoomMaxH={1.439} y={50} zoomPhone={1.554} yPhone={42} focusPhone={[414, 602]} out={[36, 37]} />
+    <!-- Where we are going, as a luggage tag stamped "London to Dubai" (the route map is drawn in the chapters before; no repeat here). -->
+    <div class="layer fx fx-pop fx-then-out ns-tag" aria-hidden="true"><span class="ns-tag-to">London <b>&rarr;</b> Dubai</span><span class="ns-tag-sub">Fatt &amp; Pundit, two bags</span></div>
     <SceneArt name="dubai-skyline" note="Dubai skyline at dusk, a tall spire" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 190vw, 100vw" class="layer fx fx-fade fx-then-out ns-skyline" />
     <SceneArt name="dubai-dunes" note="Gold dunes, low buildings, palms" widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 170vw, 100vw" class="layer fx fx-fade fx-then-out ns-dunes" />
-    <SceneArt name="dubai-travellers" note="Fatt and Pundit with stamped suitcases, looking out" widths={[480, 800, 1200]} sizes="(max-width: 599px) 52vw, min(24vw, 360px)" class="layer fx fx-fade fx-then-out fx-puppet ns-travellers" warm />
+    <div class="cast layer fx fx-fade fx-then-out ns-travellers">
+      <SceneArt name="dubai-travellers" note="Fatt and Pundit with stamped suitcases, looking out" widths={[480, 800, 1200]} sizes="(max-width: 599px) 52vw, min(24vw, 360px)" class="cast-art fx-rock" warm />
+      {dubai.bubbles?.slice(0, 1).map((b) => (
+        <p class="bubble scene-bubble tail-right fx fx-pop fx-then-out ns-bubble1"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+      ))}
+    </div>
 
     <div class="layer fx fx-fade ns-floor" aria-hidden="true"></div>
     <div class="layer fx fx-fade ns-garlands" aria-hidden="true">
@@ -51,7 +54,12 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
       ))}
     </div>
     <SceneArt name="your-table" note="A laid table, an empty chair turned to the reader" sizes="100vw" class="layer fx fx-fade ns-table" />
-    <SceneArt name="table-tigers" note="Fatt and Pundit waving the reader in" widths={[480, 800, 1200]} sizes="(max-width: 599px) 60vw, 34vw" class="layer fx fx-fade-up fx-puppet ns-tigers" />
+    <div class="cast cast-flip layer fx fx-fade-up ns-tigers">
+      <SceneArt name="table-tigers" note="Fatt and Pundit waving the reader in" widths={[480, 800, 1200]} sizes="(max-width: 599px) 52vw, 34vw" class="cast-art fx-rock" />
+      {table.bubbles?.slice(0, 1).map((b) => (
+        <p class="bubble scene-bubble tail-left fx fx-pop fx-then-out ns-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+      ))}
+    </div>
     <SceneArt name="table-momos" fallback={momos} widths={[300, 612]} sizes="(max-width: 599px) 26vw, 260px" class="layer fx fx-fade-up ns-photo" />
     <p class="layer fx fx-pop ns-reserved" aria-hidden="true">Reserved</p>
     <div class="layer fx fx-fade ns-steam" aria-hidden="true">
@@ -66,12 +74,6 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
       <p class="cap fx fx-fade-up fx-then-out ns-cap1">{dubai.caption}</p>
       <p class="cap fx fx-fade-up fx-then-out ns-cap2">{table.caption}</p>
     </div>
-    {dubai.bubbles?.slice(0, 1).map((b) => (
-      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out ns-bubble1"><span class="sr-only">{b.who} says: </span>{b.text}</p>
-    ))}
-    {table.bubbles?.slice(0, 1).map((b) => (
-      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out ns-bubble2"><span class="sr-only">{b.who} says: </span>{b.text}</p>
-    ))}
   </StoryScene>
 </div>
 
@@ -79,36 +81,44 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   /* Colour: desert gold. The dusk sky burns from ink down through the glow to gold; the table's stage is warm sand-gold. */
   .story-scenes { --sky: #f1dca5; --ground: #e8c26a; --glow: #e8892b; --tw: min(74vw, 96svh); --tb: calc(var(--floor) + 9%); }
 
-  /* 0-12 the title lifts. 5-54 Dubai at dusk: the noodle road chart (RouteChart; out 36-37, under the opaque skyline), skyline rises, travellers slide in. */
+  /* 0-8 the title lifts. 6-20 the luggage tag (London to Dubai) stamps on the dusk sky. 22-48 Dubai at dusk: skyline rises, travellers slide in.
+     48-49 Dubai is gone in one cut and 49-51 your table lands on the plain sand stage (no cross-fade, so no double exposure). */
   .ns-title { --o1: 0; --y1: -8%; --from: 1%; --to: 8%; }
   .ns-sky { inset: 0; background: linear-gradient(180deg, var(--color-ink) 0%, var(--color-ink) 30%, var(--glow) 80%, var(--ground) 100%);
-    --o0: 1; --from: 0%; --to: 3%; --out-from: 45%; --out-to: 50%; }
+    --o0: 1; --from: 0%; --to: 3%; --out-from: 48%; --out-to: 49%; }
+  /* A paper luggage tag, string hole at the top, tilted; it sits where the route map used to. Out before the skyline rises. */
+  .ns-tag { left: 50%; top: 40%; translate: -50% -50%; rotate: -5deg; display: grid; gap: 0.3em; justify-items: center; padding: calc(var(--u) * 5) calc(var(--u) * 4) calc(var(--u) * 2.4); background: var(--color-paper-light); color: var(--color-ink);
+    border: 3px solid var(--color-ink); box-shadow: 5px 5px 0 var(--glow); clip-path: polygon(14% 0, 86% 0, 100% 18%, 100% 100%, 0 100%, 0 18%); z-index: 2; --from: 6%; --to: 10%; --out-from: 18%; --out-to: 20%; }
+  .ns-tag::before { content: ''; position: absolute; top: calc(var(--u) * 1.6); left: 50%; width: calc(var(--u) * 2.4); aspect-ratio: 1; translate: -50% 0; border-radius: 50%; background: var(--color-ink); }
+  .ns-tag-to { font: 700 clamp(26px, calc(var(--u) * 5), 72px) / 1 var(--font-display, Georgia, serif); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+  .ns-tag-to b { color: var(--color-tiger, #e8811f); }
+  .ns-tag-sub { font: italic 500 clamp(15px, calc(var(--u) * 1.8), 24px) / 1.2 var(--font-note, Georgia, serif); }
   /* Paper-cut panoramas, bottom-aligned, full width; the dunes are nearer so they rise a little faster (bigger --y0, same score). */
-  .ns-skyline { left: 0; bottom: calc(var(--floor) + 8vw); width: 100%; height: auto; max-width: none; --y0: 32vh; --from: 20%; --to: 36%; --out-from: 45%; --out-to: 50%; }
-  .ns-dunes { left: 0; bottom: var(--floor); width: 100%; height: auto; max-width: none; --y0: 40vh; --from: 20%; --to: 36%; --out-from: 45%; --out-to: 50%; }
+  .ns-skyline { left: 0; bottom: calc(var(--floor) + 8vw); width: 100%; height: auto; max-width: none; --y0: 32vh; --from: 22%; --to: 36%; --out-from: 48%; --out-to: 49%; }
+  .ns-dunes { left: 0; bottom: var(--floor); width: 100%; height: auto; max-width: none; --y0: 40vh; --from: 22%; --to: 36%; --out-from: 48%; --out-to: 49%; }
   /* The travellers card stays a quiet placeholder; the suitcases slide in beside it, on the same score. */
   /* Fatt and Pundit from behind, on their stamped suitcases (the wok roped on top), sat on the dunes, looking at the skyline. */
-  .ns-travellers { right: 14%; bottom: calc(var(--floor) + 3%); width: min(24vw, 360px); height: auto; aspect-ratio: 1554 / 1642; max-width: none;
-    --x0: 24vw; --from: 24%; --to: 38%; --out-from: 45%; --out-to: 50%; --rock-from: 38%; --rock-to: 46%; --rock-a: 0.4; }
+  .ns-travellers { right: 14%; bottom: calc(var(--floor) + 3%); width: calc(var(--u) * 24); aspect-ratio: 1554 / 1642;
+    --x0: 24vw; --from: 24%; --to: 38%; --out-from: 48%; --out-to: 49%; --rock-from: 38%; --rock-to: 46%; --rock-a: 0.4; }
   /* Captions: in over 3%, each holds until the next replaces it; the last holds to the end. */
-  .ns-cap1 { --from: 9%; --to: 12%; --out-from: 47%; --out-to: 50%; }
-  /* Over the travellers' heads: anchored to their foot + their height (aspect 1554 / 1642). */
-  .ns-bubble1 { left: auto; top: auto; right: calc(14% + min(24vw, 360px) * 0.3); bottom: calc(var(--floor) + 3% + min(24vw, 360px) * 1.06 + 14px); --from: 30%; --to: 33%; --out-from: 44%; --out-to: 47%; }
+  .ns-cap1 { --from: 9%; --to: 12%; --out-from: 46%; --out-to: 48%; }
+  /* Over the travellers' heads: a cast bubble, its tail at 62% across and 6% down their box. */
+  .ns-bubble1 { --bx: 62%; --by: 6%; --from: 30%; --to: 33%; --out-from: 44%; --out-to: 46%; }
 
   /* 50-90 your table, on paper again; it holds to the end of the track. */
   /* The table (1980 x 1508, transparent) is the hero, centred and bottom-aligned; --tw is its width, --tb its bottom offset.
      In the picture the steamer sits 37% across and from 34% down, the cloth's front drape is 60-82% down, the top right is empty. */
-  .ns-table { left: 50%; bottom: var(--tb); translate: -50% 0; width: var(--tw); height: auto; max-width: none; --y0: 6%; --from: 45%; --to: 50%; }
+  .ns-table { left: 50%; bottom: var(--tb); translate: -50% 0; width: var(--tw); height: auto; max-width: none; --y0: 6%; --from: 49%; --to: 51%; }
   /* The momo photo is a small print lying on the cloth's front drape. */
   /* The real momos on their board, set on the tabletop in front of the steamer: squashed to the table's angle
      (scale, not transform, so the engine's rise still works), with a soft contact shadow. */
   .ns-photo { left: calc(50% - var(--tw) * 0.13); bottom: calc(var(--tb) + var(--tw) * 0.25); translate: -50% 0; width: calc(var(--tw) * 0.21); height: auto; aspect-ratio: 612 / 416; max-width: none;
-    filter: drop-shadow(0 6px 5px rgb(44 41 37 / 0.4)); --y0: 40vh; --from: 46%; --to: 56%; }
+    filter: drop-shadow(0 6px 5px rgb(44 41 37 / 0.4)); --y0: 40vh; --from: 50%; --to: 58%; z-index: var(--z-prop-front); }
   /* A warm pool of lamplight on the floor round the table, and the table's own soft shadow: the set stands on something. */
   .ns-floor { inset: 0; background: radial-gradient(calc(var(--tw) * 0.75) calc(var(--tw) * 0.16) at 50% calc(100% - var(--tb) + var(--tw) * 0.02), rgb(92 52 24 / 0.32), transparent 72%),
-    radial-gradient(calc(var(--tw) * 1.1) calc(var(--tw) * 0.5) at 46% calc(100% - var(--tb) - var(--tw) * 0.2), rgb(255 238 200 / 0.7), transparent 70%); --from: 44%; --to: 48%; }
+    radial-gradient(calc(var(--tw) * 1.1) calc(var(--tw) * 0.5) at 46% calc(100% - var(--tb) - var(--tw) * 0.2), rgb(255 238 200 / 0.7), transparent 70%); --from: 49%; --to: 51%; }
   /* Chilli garlands across the top corners, under the caption, dropping in with the table. */
-  .ns-garlands { inset: 0; pointer-events: none; --y0: -8vh; --from: 46%; --to: 54%; }
+  .ns-garlands { inset: 0; pointer-events: none; --y0: -8vh; --from: 49%; --to: 56%; }
   .ns-garland { position: absolute; aspect-ratio: 5 / 1; }
   .ns-garland-l { left: -4%; top: 17%; width: 36%; }
   .ns-garland-r { right: -4%; top: 21%; width: 38%; }
@@ -116,7 +126,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .ns-rope path { fill: none; stroke: #6b4a2b; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
   .ns-hang { position: absolute; width: clamp(28px, 3.4vw, 52px); height: auto; translate: -50% 0; transform-origin: 50% 0; }
   /* The tent card on the empty chair: the reader's seat. Lands as the caption says so. */
-  .ns-reserved { left: calc(50% + var(--tw) * 0.33); bottom: calc(var(--tb) + var(--tw) * 0.24); translate: -50% 0; z-index: 3; margin: 0; padding: 0.3em 0.8em;
+  .ns-reserved { left: calc(50% + var(--tw) * 0.33); bottom: calc(var(--tb) + var(--tw) * 0.24); translate: -50% 0; z-index: var(--z-prop-front); margin: 0; padding: 0.3em 0.8em;
     font: 700 clamp(12px, 1.3vw, 17px) / 1.2 var(--font-display, Georgia, serif); letter-spacing: 0.08em; text-transform: uppercase; rotate: -4deg;
     color: var(--color-ink); background: var(--color-paper); border: 2px solid var(--color-ink); box-shadow: 3px 3px 0 var(--color-tiger, #e8811f); --from: 52%; --to: 56%; }
   .ns-steam { inset: 0; pointer-events: none; --from: 50%; --to: 54%; }
@@ -125,26 +135,25 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .ns-puff2 { left: calc(50% - var(--tw) * 0.13); --from: 54%; --to: 66%; }
   .ns-puff3 { left: calc(50% - var(--tw) * 0.10); --from: 58%; --to: 70%; }
   .ns-puff4 { left: calc(50% - var(--tw) * 0.145); --from: 62%; --to: 74%; }
-  .ns-cap2 { --from: 47%; --to: 50%; --out-from: 97%; --out-to: 100%; }
+  .ns-cap2 { --from: 49%; --to: 51%; --out-from: 97%; --out-to: 100%; }
   /* Fatt and Pundit beside the table, waving the reader in; mirrored so Pundit's open paw points to the empty chair. */
-  .ns-tigers { left: calc(50% - var(--tw) * 0.78); bottom: calc(var(--tb) - 2%); width: calc(var(--tw) * 0.6); height: auto; aspect-ratio: 1815 / 1424; max-width: none; scale: -1 1; z-index: 3; --y0: 30vh; --from: 58%; --to: 66%; --rock-from: 66%; --rock-to: 100%; --rock-a: 0.8; }
-  .ns-bubble2 { left: calc(50% - var(--tw) * 0.62); top: 28%; --from: 62%; --to: 65%; --out-from: 80%; --out-to: 83%; }
+  .ns-tigers { left: calc(50% - var(--tw) * 0.78); bottom: calc(var(--tb) - 2%); width: calc(var(--tw) * 0.6); aspect-ratio: 1815 / 1424; --y0: 30vh; --from: 58%; --to: 66%; --rock-from: 66%; --rock-to: 100%; --rock-a: 0.8; }
+  .ns-bubble2 { --bx: 42%; --by: 8%; --from: 62%; --to: 65%; --out-from: 80%; --out-to: 83%; }
   /* The bell as "Your table is ready." lands: below the bubble, right of the photo, clear of the caption (top left). */
-  .ns-ding { right: 4%; top: 40%; rotate: 7deg; --from: 64%; --to: 69%; --out-from: 78%; --out-to: 81%; }
+  .ns-ding { left: calc(50% - var(--tw) * 0.05); top: 24%; translate: -50% 0; font-size: clamp(28px, calc(var(--u) * 4.5), 64px); rotate: 7deg; --from: 64%; --to: 69%; --out-from: 78%; --out-to: 81%; }
 
   @media (max-width: 599px) {
     .ns-skyline { left: -45vw; width: 190vw; bottom: calc(var(--floor) + 20vw); }
     .ns-dunes { left: -35vw; width: 170vw; }
     /* Phones: sat to the right, so the Burj Khalifa behind them stays in view. */
     .ns-travellers { right: -3%; bottom: calc(var(--floor) + 2%); width: 48vw; }
-    .ns-bubble1 { right: 14%; bottom: calc(var(--floor) + 2% + 48vw * 1.06 + 10px); }
-    .story-scenes { --tw: 98vw; --tb: calc(var(--floor) + 22%); }
+    .story-scenes { --tw: 86vw; --tb: calc(var(--floor) + 22%); }
     .ns-garland-l { top: 19%; width: 60%; left: -12%; }
     .ns-garland-r { top: 23%; width: 60%; right: -14%; }
     .ns-puff { top: calc(100% - var(--tb) - var(--tw) * 0.5); }
-    /* Phones: the table fills the width, so the two stand behind it (z-index below the table), waving over it. */
-    .ns-tigers { left: 4%; bottom: calc(var(--tb) + var(--tw) * 0.22); width: 64vw; z-index: -1; }
-    .ns-bubble2 { left: 36%; top: 26%; }
-    .ns-ding { right: 6%; top: 46%; }
+    /* Phones: the two stand in front of the table on the left (the cast tier), 52vw wide. */
+    .ns-tigers { left: 2%; bottom: calc(var(--tb) - 4%); width: 52vw; }
+    .ns-bubble2 { --bx: 60%; --by: 4%; }
+    .ns-ding { display: none; } /* no room on a phone: it would sit on the garland */
   }
 </style>

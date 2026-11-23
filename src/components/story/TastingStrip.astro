@@ -1,70 +1,61 @@
 ---
 /**
- * "Come and taste the rest": real dishes and drinks, each cut along its plate, gliding sideways as the page scrolls.
- * Photos: the owner's own (src/assets/images/story/food/, cut from assets/). A label appears only when a dish of that
- * name is on the menu (src/data/dishes.json); otherwise the plate has none. Decorative: alt="", one sr-only line says what is shown.
- * Where scroll timelines run, the row glides (global.css-style gate, as "Story scenes"); everywhere else it is a scrollable, snapping row.
+ * "Come and taste the rest": six dishes as a menu-card grid of uniform 4:5 photo prints (.fp-print: paper border),
+ * cropped from the original dish photos (src/assets/images/story/menu-cards/, cut with sharp from assets/images/).
+ * Names and one-liners come from src/data/dishes.json via site-data, so they stay true to the menu.
+ * Static tilt per card; one rise as each card scrolls in (gated like global.css "Story scenes"); no scroller, no glide.
  */
 import { getImage } from 'astro:assets';
-import dishes from '../../data/dishes.json';
-import crab from '../../assets/images/story/food/crunchy-pepper-crab.png';
-import hakka from '../../assets/images/story/food/vegetable-hakka-noodles.png';
-import rabbit from '../../assets/images/story/food/rabbit-wontons.png';
-import sticky from '../../assets/images/story/food/sticky-sesame-vegetables.png';
-import mock from '../../assets/images/story/food/bombay-chilli-mock-chicken.png';
-import kenny from '../../assets/images/story/food/lady-kenny.png';
-import brownie from '../../assets/images/story/food/sizzling-brownie.png';
-import tea from '../../assets/images/story/food/saffron-masala-tea.png';
-import cocktails from '../../assets/images/story/food/alchemist-cocktails.png';
+import { dish } from '../../lib/site-data';
+import crab from '../../assets/images/story/menu-cards/crunchy-pepper-crab.webp';
+import kenny from '../../assets/images/story/menu-cards/lady-kenny.webp';
+import rabbit from '../../assets/images/story/menu-cards/rabbit-wontons.webp';
+import hakka from '../../assets/images/story/menu-cards/vegetable-hakka-noodles.webp';
+import brownie from '../../assets/images/story/menu-cards/sizzling-brownie.webp';
+import tea from '../../assets/images/story/menu-cards/saffron-masala-tea.webp';
 
-// [photo, label shown if a menu dish carries that name]. The cocktail pair has no confirmed names: no label.
-const plates: [ImageMetadata, string?][] = [
-  [crab, 'Crunchy pepper crab'], [kenny, 'Lady Kenny'], [rabbit, 'Rabbit wontons'], [cocktails],
-  [hakka, 'Vegetable Hakka noodles'], [brownie, 'Sizzling brownie'], [sticky, 'Sticky sesame vegetables'],
-  [tea, 'Saffron masala tea'], [mock, 'Bombay chilli mock chicken'],
+const cards: [ImageMetadata, string][] = [
+  [crab, 'crunchy-pepper-crab'], [kenny, 'lady-kenny'], [rabbit, 'rabbit-wontons'],
+  [hakka, 'vegetable-hakka-noodles'], [brownie, 'snowflake-gelato-sizzling-brownie'], [tea, 'saffron-masala-tea'],
 ];
-const onMenu = (l: string) => dishes.some((d) => d.name.toLowerCase().includes(l.toLowerCase()));
-const items = await Promise.all(plates.map(async ([src, label]) => {
-  const [a, b] = await Promise.all([300, 600].map((width) => getImage({ src, width, format: 'webp', quality: 80 })));
-  return { src: a.src, srcset: `${a.src} 300w, ${b.src} 600w`, w: src.width, h: src.height, label: label && onMenu(label) ? label : undefined };
+// Never wider than the source (Lady Kenny's crop is 600 px, the brownie's 740).
+const items = await Promise.all(cards.map(async ([src, id]) => {
+  const d = await dish(id);
+  const widths = [360, 720, 960].filter((w) => w <= src.width);
+  const imgs = await Promise.all(widths.map((width) => getImage({ src, width, format: 'webp', quality: 80 })));
+  return { name: d.name, text: d.description, src: imgs[0].src, srcset: imgs.map((i, n) => `${i.src} ${widths[n]}w`).join(', ') };
 }));
-const names = items.flatMap((i) => (i.label ? [i.label] : [])).join(', ');
 ---
 
-<div class="taste">
-  <p class="sr-only">A taste of the menu: {names}.</p>
-  <ul class="strip" style={`--n:${items.length}`} aria-label="A taste of the menu">
-    {items.map((it) => (
-      <li class="plate">
-        <span class="disc"><img src={it.src} srcset={it.srcset} sizes="(max-width: 599px) 220px, 300px" width={it.w} height={it.h} alt="" loading="lazy" decoding="async" /></span>
-        {it.label && <span class="note">{it.label}</span>}
-      </li>
-    ))}
-  </ul>
-</div>
+<ul class="menu-cards" aria-label="A taste of the menu">
+  {items.map((it) => (
+    <li>
+      <figure class="dish">
+        <div class="fp-print"><img src={it.src} srcset={it.srcset} sizes="(max-width: 899px) 45vw, 360px" width="4" height="5" alt="" loading="lazy" decoding="async" /></div>
+        <figcaption><span class="dish-name">{it.name}</span>{it.text && <span class="dish-line">{it.text}</span>}</figcaption>
+      </figure>
+    </li>
+  ))}
+</ul>
 
 <style>
-  .taste { --w: clamp(200px, 24vw, 300px); --g: clamp(28px, 5vw, 72px); width: 100vw; margin-inline: calc(50% - 50vw); view-timeline: --taste block; }
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  /* The static row: scrolls sideways, snaps plate by plate. */
-  .strip { display: flex; gap: var(--g); margin: 0; padding: 24px max(24px, 5vw) 32px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: max(24px, 5vw); }
-  .plate { flex: none; width: var(--w); display: flex; flex-direction: column; align-items: center; gap: 14px; scroll-snap-align: start; }
-  /* The disc is a fixed square; each cut-out sits on its floor, with a soft contact shadow under it. */
-  .disc { position: relative; display: flex; align-items: flex-end; justify-content: center; width: var(--w); height: var(--w); }
-  .disc::after { content: ''; position: absolute; z-index: 0; bottom: -2%; left: 10%; right: 10%; height: 12%; border-radius: 50%; background: radial-gradient(closest-side, rgb(44 41 37 / 0.38), transparent); }
-  .disc img { position: relative; z-index: 1; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
-  .note { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 17px; line-height: 1.3; text-align: center; text-wrap: balance; color: var(--fp-fg); }
-
-  /* The glide: only where scroll timelines run, motion is welcome and the comic is not chosen (the gate of global.css "Story scenes").
-     The row passes through its section: scroll is the clock, translateX only, linear. Plates counter-rotate a few degrees. */
+  .menu-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); align-items: start; width: min(1120px, calc(100vw - 2 * var(--gutter, 16px))); margin: var(--space-4) 0; padding: 0; list-style: none; }
+  @media (min-width: 900px) { .menu-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-7) clamp(var(--space-6), 4vw, 64px); } }
+  .dish { margin: 0; display: grid; gap: var(--space-3); text-align: center; }
+  .fp-print { padding: var(--space-3); }
+  .fp-print img { height: auto; aspect-ratio: 4 / 5; filter: sepia(0.14) saturate(0.93) contrast(1.03); }
+  @media (max-width: 639px) { .fp-print { padding: var(--space-2); } }
+  .dish-name { display: block; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(15px, 1.6vw, 20px); line-height: 1.1; text-wrap: balance; }
+  .dish-line { display: block; margin-top: 4px; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(15px, 1.4vw, 17px); line-height: 1.3; text-wrap: balance; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+  /* A hand-laid spread: one small fixed tilt per print. */
+  li:nth-child(3n + 1) .fp-print { rotate: -1.5deg; }
+  li:nth-child(3n + 2) .fp-print { rotate: 0.8deg; }
+  li:nth-child(3n) .fp-print { rotate: -0.6deg; }
+  /* One rise as each card scrolls in: only where scroll timelines run, motion is welcome and the comic is not chosen. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      :global(:root:not([data-story='comic'])) .strip { overflow: visible; scroll-snap-type: none; width: max-content; animation: taste-glide linear both; animation-timeline: --taste; }
-      :global(:root:not([data-story='comic'])) .disc img { animation: taste-turn linear both; animation-timeline: --taste; }
-      :global(:root:not([data-story='comic'])) .plate:nth-child(even) .disc img { animation-direction: reverse; }
+      :global(:root:not([data-story='comic'])) .dish { animation: dish-rise linear both; animation-timeline: view(block); animation-range: entry 0% entry 60%; }
     }
   }
-  @keyframes taste-glide { from { transform: translateX(0); } to { transform: translateX(min(0px, calc(100vw - var(--n) * var(--w) - (var(--n) - 1) * var(--g) - 2 * max(24px, 5vw)))); } }
-  @keyframes taste-turn { from { rotate: -4deg; } to { rotate: 4deg; } }
-  :global(.story-end) { overflow-x: clip; }
+  @keyframes dish-rise { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
 </style>

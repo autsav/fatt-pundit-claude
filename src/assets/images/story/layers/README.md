@@ -26,7 +26,14 @@ trimmed and converted to WebP. No person or character appears in any of them.
 | wok-street-night.webp | Calcutta street at night, lanterns, fire glow (opaque) | empty street |
 | wok.webp | wok with noodles and chillies flying up | no hands |
 | steamer-lid.webp | woven bamboo steamer lid | lid only |
-| soho-night.webp | Soho street in the rain, red shopfront with a blank sign (opaque) | no people, no lettering |
+| soho-night.webp | RETIRED (no longer used by any scene; replaced by storefront/*). Was a Soho street in the rain (opaque) | no people, no lettering |
+| storefront/s0-sky.webp | wet slate night sky, Soho rooftops, lit windows (opaque, 2752x1536) | no lettering |
+| storefront/s1-neighbours.webp | brick buildings far left and far right, lamp post, bollards, empty middle gap (3168x1319) | no people; sign blank |
+| storefront/s2-interior.webp | warm amber paper-cut restaurant interior: pendant lamps, bar, tables (opaque, 2400x1340) | no people; seen through the glass and as the room |
+| storefront/s3-facade.webp | shopfront: grey upper storey, empty sign fascia, ox-blood timber front, transparent openings (2400x1792) | no lettering; openings at x 564-1138 and 1646-2218, y 744-1392; door 1286-1504 x 960-1390 |
+| storefront/s5-door.webp | glazed ox-blood door with brass handle, for the central opening (1200x2370) | single piece, hinged left in CSS |
+| storefront/s7-awning.webp | striped scalloped canvas awning (2400x794) | no lettering |
+| storefront/s10-pavement.webp | wet flagstone pavement and kerb (3168x511) | no people |
 | dubai-skyline.webp | dusk skyline with a tall spire | no logos |
 | dubai-dunes.webp | dunes, low buildings, palms | no people |
 | dubai-suitcases.webp | two stickered suitcases with a wok tied on | stickers without writing |

@@ -9,7 +9,6 @@ import SiteFooter from '../components/site/SiteFooter.astro';
 import ChapterRail from '../components/site/ChapterRail.astro';
 import StoryComic from '../components/story/StoryComic.astro';
 import StoryOpening from '../components/story/StoryOpening.astro';
-import StoryMap from '../components/story/StoryMap.astro';
 import ChooseTiger from '../components/story/ChooseTiger.astro';
 import TastingStrip from '../components/story/TastingStrip.astro';
 import ChapterCanton from '../components/story/scenes/ChapterCanton.astro';
@@ -73,8 +72,6 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
       })}
     </div>
 
-    <StoryMap branches={branches} />
-
     <section id="end" class="sec gold-bg story-end" aria-labelledby="end-title">
       <div class="wrap narrow stack center">
         <p class="kicker">The end, or rather the start</p>
@@ -127,31 +124,18 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
     text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
   .story-mode button[aria-pressed='true'] { text-decoration-style: solid; font-weight: 600; }
   .story-mode button:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
+  /* The last scene hands over to #end by tearing in over it, as every stage does (global.css "Between stages"). */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      :global(:root:not([data-story='comic'])) .story-end { position: relative; margin-top: calc(-1 * var(--edge-h));
+        -webkit-mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat;
+        mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat; }
+    }
+  }
   .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
 </style>
 
 <script>
-  // Smooth wheel scrolling (Lenis) while the scenes play: the wheel's steps are eased into a glide, so the scroll-driven
-  // scenes move evenly instead of in notches. It drives the page's real scroll, so sticky stages and the CSS scroll
-  // timelines are untouched. Touch and keyboard stay native. Off for reduced motion and in comic mode.
-  import Lenis from 'lenis';
-  import 'lenis/dist/lenis.css';
-  const scenesPlay = () => CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches && document.documentElement.dataset.story !== 'comic';
-  let lenis: Lenis | null = null;
-  const syncLenis = () => {
-    if (scenesPlay() && !lenis) {
-      lenis = new Lenis({ autoRaf: true, lerp: 0.09, smoothWheel: true, syncTouch: false, anchors: true, stopInertiaOnNavigate: true, allowNestedScroll: true });
-      (window as unknown as { fpLenis?: Lenis }).fpLenis = lenis;
-    } else if (!scenesPlay() && lenis) {
-      lenis.destroy();
-      lenis = null;
-      (window as unknown as { fpLenis?: Lenis }).fpLenis = undefined;
-    }
-  };
-  syncLenis();
-  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', syncLenis);
-  new MutationObserver(syncLenis).observe(document.documentElement, { attributes: true, attributeFilter: ['data-story'] });
-
   // "Read as a comic": only offered where the scenes can play. Swaps them for the comic and remembers it.
   const wrap = document.querySelector<HTMLElement>('[data-story-mode]');
   const btn = document.querySelector<HTMLButtonElement>('[data-story-toggle]');
