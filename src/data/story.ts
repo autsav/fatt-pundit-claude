@@ -62,7 +62,7 @@ export const chapters: Chapter[] = [
         size: 'wide',
         short: true,
         sketch: 'mountains',
-        caption: 'Guangdong, southern China. Fatt is a Hakka cook, and the Hakka have always been on the move.',
+        caption: 'Guangdong, China. Fatt is a Hakka cook, and the Hakka have always moved on.',
         scene: 'Dawn over a busy Guangdong harbour. Fatt, a young Hakka cook, stands on the quay with a wok strapped to his bundle, looking out at a waiting ship.',
         bubbles: [{ who: 'Fatt', text: 'Wherever we land, someone will need dinner.', x: 56, y: 14, tail: 'left' }],
       },

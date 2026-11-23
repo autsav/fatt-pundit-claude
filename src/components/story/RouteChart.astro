@@ -10,8 +10,9 @@
  * does not push the route into the strip below), and `focus` (map px) sits at x 50%, `y`% of the stage.
  * Scroll ranges (`from`, `to`, `lands`, `out`) are % of the scene track, like --from/--to in the engine.
  * `finished`: the base (ungated) state is the finished chart (noodle fully drawn, ship parked at the end of the
- * last leg, names and stamps shown), for a section that is also read still (the finale). Scenes leave it off.
+ * last leg, names and stamps shown), for a section that is also read still. Scenes leave it off.
  * The default slot is overlay content in the map box, positioned in % of the box (--x/--y), above the ship.
+ * The `ship` slot rides the token: its children hang from the token's centre (a speech bubble, say).
  * It can read --rc-x/--rc-y (focus, % of the box), --rc-ty (stage y of the focus, in svh) and the -p phone twins.
  */
 import { getImage } from 'astro:assets';
@@ -25,10 +26,10 @@ import tokenTwoArt from '../../assets/images/brand/token-tigers.png';
 type Lane = 'leg1' | 'leg2' | 'dubai' | 'toDubai';
 type Side = 'left' | 'right';
 interface Props {
-  /** Unique on the page: names the masks, keyframes and the gated style. */
+  /** Unique on the page: names the keyframes and the gated style. */
   id: string;
   /** Draw order. The ship rides the head of each; `face` is the way the ship looks (default: the way the lane runs). */
-  legs: { lane: Lane; from: number; to: number; face?: Side }[];
+  legs: { lane: Lane; from: number; to: number; face?: Side; /** Already complete: the noodle is drawn from the first frame (no mask, no scroll draw). The ship still rides by from/to. */ drawn?: boolean }[];
   /** `lands`: the scroll % the stamp slams at (the name fades up over 4% before it). `side`: which side of the dot the name sits. */
   places: { at: keyof typeof world.points; name: string; lands: number; side?: Side; sidePhone?: Side }[];
   /** Map px put at the frame's horizontal centre and at `y` % of the stage height. */
@@ -53,13 +54,20 @@ const { id, legs, places, focus, focusPhone = focus, zoom, zoomPhone, zoomMaxH, 
 
 const { w: W, h: H, sea: SEA } = world;
 const pct = (v: number, of: number) => +((v / of) * 100).toFixed(2);
-const sea = await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 });
+const seaWs = [1600, 2400, 3200].filter((w) => w <= voyageSea.width);
+const seaImgs = await Promise.all(seaWs.map((w) => getImage({ src: voyageSea, width: w, format: 'avif', quality: 50 })));
+const sea = seaImgs[seaImgs.length - 1];
+const seaSrcset = seaImgs.map((m, i) => `${m.src} ${seaWs[i]}w`).join(', ');
 const tokOne = await getImage({ src: tokenOneArt, width: 200, format: 'webp', quality: 82 });
 const tokTwo = await getImage({ src: tokenTwoArt, width: 260, format: 'webp', quality: 82 });
 // Which token shows: one head on leg 1, two on every later lane; where both ride, they swap as leg 2 sets off.
 const pairFrom = legs.findIndex((l) => l.lane !== 'leg1');
 const hasOne = legs[0].lane === 'leg1';
 const hasTwo = pairFrom >= 0;
+// The sea's drawn width = the map box (zoom x stage, capped by zoomMaxH x stage height) x the sea's share of the map.
+const seaShare = SEA.w / W;
+const seaSize = (z: number, maxH?: number) => (maxH ? `min(${pct(z * seaShare, 1)}vw, ${pct(maxH * seaShare, 1)}svh)` : `${pct(z * seaShare, 1)}vw`);
+const seaSizes = `(max-width: 599px) ${seaSize(zoomPhone, zoomMaxHPhone)}, ${seaSize(zoom, zoomMaxH)}`;
 const seaStyle = `left:${pct(SEA.x, W)}%;top:${pct(SEA.y, H)}%;width:${pct(SEA.w, W)}%;height:${pct(SEA.h, H)}%`;
 const at = ([x, yy]: number[]) => `left:${pct(x, W)}%;top:${pct(yy, H)}%`;
 const width = (z: number, maxH?: number) => (maxH ? `min(${pct(z, 1)}%, ${pct(maxH, 1)}svh)` : `${pct(z, 1)}%`);
@@ -125,29 +133,31 @@ const sideCls = (p: (typeof places)[number]) => {
 <Fragment set:html={`<style>${css}</style>`} />
 <div class:list={['layer', 'rc', `rcid-${id}`, finished && 'rc-done', out && 'fx fx-then-out']} style={`${box}${out ? `;--out-from:${out[0]}%;--out-to:${out[1]}%` : ''}`}>
   <div class="layer rc-map" style={`aspect-ratio:${W} / ${H}`}>
-    <img class="rc-sea" src={sea.src} width={SEA.w} height={SEA.h} alt="" style={seaStyle} loading="lazy" decoding="async" />
-    <svg class="layer rc-svg" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+    <img class="rc-sea" src={sea.src} srcset={seaSrcset} sizes={seaSizes} width={SEA.w} height={SEA.h} alt="" style={seaStyle} loading="lazy" decoding="async" />
+    <svg class="layer rc-svg rc-svg-dots" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+      {legs.map((l) => <path class="rc-dots" d={world[l.lane]} />)}
+    </svg>
+    {/* The noodle (revealed through a mask, which repaints as it draws) is its own compositor layer, so the sea never re-rasters with it. */}
+    <svg class="layer rc-svg rc-svg-draw" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
       <defs>
-        {legs.map((l, i) => (
+        {legs.map((l, i) => !l.drawn && (
           <mask id={`rcid-${id}-m${i}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
             <path class="fx fx-draw rc-mask" d={world[l.lane]} pathLength="1" style={`--from:${l.from}%;--to:${l.to}%`} />
           </mask>
         ))}
       </defs>
       {legs.map((l, i) => (
-        <>
-          <path class="rc-dots" d={world[l.lane]} />
-          <g mask={`url(#rcid-${id}-m${i})`}>
-            <path class="rc-ink" d={world[l.lane]} />
-            <path class="rc-body" d={world[l.lane]} />
-            <path class="rc-shine" d={world[l.lane]} />
-          </g>
-        </>
+        <g mask={l.drawn ? undefined : `url(#rcid-${id}-m${i})`}>
+          <path class="rc-ink" d={world[l.lane]} />
+          <path class="rc-body" d={world[l.lane]} />
+          <path class="rc-shine" d={world[l.lane]} />
+        </g>
       ))}
     </svg>
     <div class="layer rc-ship" style={parked} aria-hidden="true">
       {hasOne && <span class="rc-tok-one" style={hasTwo && finished ? 'opacity:0' : undefined}><img class="rc-ship-img" src={tokOne.src} width={tokOne.attributes.width} height={tokOne.attributes.height} alt="" style={`scale:${shipFace}`} loading="lazy" decoding="async" /></span>}
       {hasTwo && <span class="rc-tok-two" style={hasOne && !finished ? 'opacity:0' : undefined}><img class="rc-ship-img rc-ship-two" src={tokTwo.src} width={tokTwo.attributes.width} height={tokTwo.attributes.height} alt="" style={`scale:${shipFace}`} loading="lazy" decoding="async" /></span>}
+      <slot name="ship" />
     </div>
     {places.map((p) => (
       <>
@@ -155,7 +165,7 @@ const sideCls = (p: (typeof places)[number]) => {
         <div class="rc-stamp fx fx-pop" data-at={p.at} aria-hidden="true" style={`${at(world.points[p.at])};--from:${p.lands - 3}%;--to:${p.lands}%`}><span style={`--n:${p.name.length}`}>{p.name}</span></div>
       </>
     ))}
-    <!-- Not aria-hidden: callers put interactive content here (the finale's branch pins). -->
+    <!-- Not aria-hidden: callers may put interactive content here (pins). -->
     <div class="layer rc-slot"><slot /></div>
   </div>
 </div>
@@ -167,8 +177,10 @@ const sideCls = (p: (typeof places)[number]) => {
   .rc { inset: 0; z-index: 0; overflow: clip; background: var(--color-ink); pointer-events: none; }
   /* The map box: `zoom` x the stage wide, its focus point at the frame centre (translate % is of the box itself). */
   .rc-map { left: 50%; top: var(--rc-top); width: var(--rc-w); translate: calc(var(--rc-x) * -1) calc(var(--rc-y) * -1); }
-  .rc-sea { position: absolute; max-width: none; }
+  /* Static art on its own composited layer so the noodle's repaints never re-raster the 3200px sea. */
+  .rc-sea { position: absolute; max-width: none; will-change: transform; contain: paint; }
   .rc-svg { inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .rc-svg-draw { will-change: transform; }
   /* Non-scaling strokes are in screen px: the road ahead as dots, the noodle as ink edge, cream body and a thin shine. */
   .rc-svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
   .rc-dots { stroke: var(--color-sand); stroke-opacity: 0.6; stroke-width: 4px; stroke-dasharray: 0.1 10; }

@@ -6,64 +6,61 @@
  */
 import StoryScene from '../StoryScene.astro';
 import SceneArt from '../SceneArt.astro';
-import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/story-scenes';
+import { chapterOf, panelOf, firstSentence } from '../../../lib/story-scenes';
 import ship from '../../../assets/images/brand/ship.png';
 import mountainsB from '../../../assets/images/brand/mountains-b.png';
 import mountainsC from '../../../assets/images/brand/mountains-c.png';
 import compass from '../../../assets/images/brand/compass.png';
 import RouteChart from '../RouteChart.astro';
 
-const { chapter, index } = chapterOf('canton');
+const { chapter } = chapterOf('canton');
 const harbour = panelOf(chapter, 'p01-harbour');
 const packing = panelOf(chapter, 'p02-packing');
 const atSea = panelOf(chapter, 'p03-at-sea');
 const shipSizes = '(max-width: 599px) 86vw, min(44vw, 620px)';
-// The title as letters, each with its own deterministic scatter (the h2 keeps one sr-only copy of the text).
-const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [...w].map((ch) => { const i = n++; return { ch, style: `--x1:${(((i * 37) % 17) - 8) * 0.6}vw;--y1:${-(((i * 23) % 11) + 3)}vh;--r1:${((i * 29) % 21) - 10}deg` }; })); })();
 ---
 
 <div class="story-scenes">
   <StoryScene label={chapter.label} sr={firstSentence(harbour.scene)} h="260vh" hPhone="220vh">
-    <div class="layer fx scene-title sh-title">
-      <header class="ch-head">
-        <p class="ch-no">Chapter {NUMBER_WORDS[index]}</p>
-        <h2 id={`${chapter.id}-scenes-title`} class="ch-title"><span class="sr-only">{chapter.title}</span><span aria-hidden="true">{words.map((w, wi) => <>{wi > 0 && ' '}<span class="tl-word">{w.map((l) => <span class="fx tl" style={l.style}>{l.ch}</span>)}</span></>)}</span></h2>
-      </header>
-    </div>
+    <!-- The opening card is chapter one's title (StoryOpening); the heading stays for the outline and screen readers. -->
+    <h2 id={`${chapter.id}-scenes-title`} class="sr-only">{chapter.title}</h2>
     <div class="layer fx sh-sun" aria-hidden="true"></div>
     <SceneArt name="harbour-hills-far" fallback={mountainsC} widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 170vw, 112vw" class="layer fx sh-hills sh-mtn-c" />
     <SceneArt name="harbour-hills-near" fallback={mountainsB} widths={[800, 1400, 2000, 2688]} sizes="(max-width: 599px) 180vw, 108vw" class="layer fx sh-hills sh-mtn-b" />
     <SceneArt name="harbour-water" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer scene-sea" />
-    <!-- The junk sails in with Fatt on its foredeck, facing the way it sails; one moving group, so he rides with it. -->
+    <!-- The junk sails in with Fatt on its foredeck, facing the way it sails; one moving group, so he, his bubble and the horn ride with it. -->
     <div class="layer fx scene-ship sh-ship">
       <SceneArt name="harbour-ship" fallback={ship} widths={[320, 640, 1078]} sizes={shipSizes} class="sh-ship-art" warm />
-      <SceneArt name="harbour-fatt" note="Fatt on deck, his wok strapped to his bundle" widths={[400, 700, 1000]} sizes="(max-width: 599px) 20vw, min(10vw, 150px)" class="layer fx fx-fade-up fx-puppet sh-fatt" />
+      <div class="cast cast-flip layer fx fx-fade-up sh-fatt">
+        <SceneArt name="harbour-fatt" note="Fatt on deck, his wok strapped to his bundle" widths={[400, 700, 1000]} sizes="(max-width: 599px) 26vw, min(12vw, 180px)" class="cast-art fx-rock sh-fatt-art" />
+        {harbour.bubbles?.slice(0, 1).map((b) => (
+          <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out sh-bubble" style="--bx:55%;--by:6%"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+        ))}
+      </div>
+      <p class="scene-sfx fx fx-pop fx-then-out sh-sfx" aria-hidden="true">Hooonk!</p>
     </div>
     <SceneArt name="harbour-compass" fallback={compass} widths={[90]} sizes="110px" class="layer fx sh-compass" warm />
-    <p class="scene-sfx fx fx-pop fx-then-out sh-sfx" aria-hidden="true">Hooonk!</p>
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out sh-cap1">{harbour.caption}</p>
       <p class="cap fx fx-fade-up fx-then-out sh-cap2">{packing.caption}</p>
     </div>
-    {harbour.bubbles?.slice(0, 1).map((b) => (
-      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out sh-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
-    ))}
   </StoryScene>
 
   <StoryScene label="At sea" sr={firstSentence(atSea.scene)} h="240vh" hPhone="205vh">
     <!-- Leg 1 on the night chart, framed above the harbour-water strip: the noodle draws Guangdong to Calcutta. -->
     <RouteChart id="canton" legs={[{ lane: 'leg1', from: 12, to: 80 }]}
       places={[{ at: 'canton', name: 'Guangdong', lands: 12, side: 'right', sidePhone: 'left' }, { at: 'kolkata', name: 'Calcutta', lands: 84, side: 'left' }]}
-      focus={[1000, 855]} zoom={1.7} zoomMaxH={2.72} y={48} zoomPhone={3.453} yPhone={46} focusPhone={[1020, 855]} />
-    <SceneArt name="harbour-water" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer scene-sea" />
-    <div class="layer fx fx-fade ss-night" aria-hidden="true"></div>
+      focus={[1000, 855]} zoom={1.7} zoomMaxH={2.72} y={48} zoomPhone={3.453} yPhone={46} focusPhone={[1020, 855]}>
+      <!-- The line comes from the token riding the noodle (Pundit and Fatt), so it is never from nobody. -->
+      {atSea.bubbles?.slice(0, 1).map((b) => (
+        <p slot="ship" class="bubble tail-left scene-bubble fx fx-pop fx-then-out ss-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
+      ))}
+    </RouteChart>
+    <SceneArt name="harbour-water" widths={[800, 1400, 2000, 2688]} sizes="100vw" class="layer fx scene-sea ss-water" />
     <SceneArt name="at-sea-compass" fallback={compass} widths={[90]} sizes="96px" class="layer fx ss-compass" warm />
     <div class="scene-text">
       <p class="cap fx fx-fade-up fx-then-out ss-cap">{atSea.caption}</p>
     </div>
-    {atSea.bubbles?.slice(0, 1).map((b) => (
-      <p class="bubble tail-left scene-bubble fx fx-pop fx-then-out ss-bubble"><span class="sr-only">{b.who} says: </span>{b.text}</p>
-    ))}
   </StoryScene>
 </div>
 
@@ -71,8 +68,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   /* Colour: jade mist over the harbour (the stage backdrop), the dawn sun is the glow; at sea it turns ink night. */
   .story-scenes { --sky: #dcebe2; --ground: #a9cdbd; --glow: var(--color-gold); }
 
-  /* Scene 1, the harbour at dawn: the title lifts, sun up, hills drift (far ones slower), the ship comes in, then the words. */
-  .sh-title { --o1: 0; --y1: -8%; --from: 1%; --to: 8%; }
+  /* Scene 1, the harbour at dawn: sun up, hills drift (far ones slower), the ship comes in, then the words. */
   .sh-sun { left: 60%; top: 26%; width: clamp(110px, 16vw, 230px); aspect-ratio: 1; border-radius: 50%;
     background: radial-gradient(circle at 40% 38%, rgb(255 255 255 / 0.25), transparent 55%), var(--glow); box-shadow: 0 0 60px 18px color-mix(in srgb, var(--glow) 35%, transparent);
     --y0: 45%; --y1: -25%; }
@@ -83,38 +79,38 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .sh-mtn-b { left: 0; width: 108vw; --x1: -7vw; }
   /* A bigger junk here, so the cast on deck reads. The group is the ship's box (1078 x 821); Fatt stands at the bow, in front
      of the sails, his feet on the foredeck (the quay plank he was drawn on is clipped off), mirrored to face the way it sails. */
-  .story-scenes { --ship-w: min(44vw, 620px); }
+  .story-scenes { --ship-w: min(calc(44 * var(--u)), 620px); }
   .sh-ship { left: 50%; bottom: calc(var(--sea-top) - var(--ship-w) * 0.22); translate: -50% 0; aspect-ratio: 1078 / 821; height: auto; --x0: 60vw; --to: 40%; }
   .sh-ship-art { position: relative; display: block; width: 100%; height: auto; max-width: none; }
   .sh-compass { left: var(--gutter); bottom: calc(var(--sea-top) + 16px); width: clamp(64px, 7vw, 110px); height: auto; --o0: 0; --x0: -30vw; --from: 62%; --to: 80%; }
   /* Captions: in over 3%, each holds until the next replaces it; the last holds to the end of the track. */
-  .sh-cap1 { --from: 9%; --to: 12%; --out-from: 52%; --out-to: 55%; }
+  .sh-cap1 { --from: 4%; --to: 7%; --out-from: 52%; --out-to: 55%; }
   .sh-cap2 { --from: 52%; --to: 55%; --out-from: 97%; --out-to: 100%; }
-  /* Speech above the ship's mast, tail down-left at it. */
-  /* Fatt on the quay at the water's edge, looking out at the ship; his line sits by his head. */
-  .sh-fatt { left: 3%; bottom: 22%; width: 22%; height: auto; aspect-ratio: 1411 / 2017; max-width: none; scale: -1 1; clip-path: inset(0 0 9% 0); --from: 10%; --to: 18%; --rock-from: 18%; --rock-to: 100%; --rock-a: 0.6; }
-  .sh-bubble { left: calc(50% - var(--ship-w) * 0.36); bottom: calc(var(--sea-top) + var(--ship-w) * 0.36); --from: 40%; --to: 43%; --out-from: 56%; --out-to: 59%; }
-
-  /* The ship's horn as the ship arrives (45%), just right of the sun, clear of the caption and the bubble. */
-  .sh-sfx { right: var(--gutter); top: 25%; rotate: 6deg; --from: 36%; --to: 41%; --out-from: 50%; --out-to: 53%; }
+  /* Fatt at the bow, in front of the sails, feet on the foredeck (the quay plank he was drawn on is clipped off). The cast box is
+     a share of the junk, so he rides and scales with it; his line sits above his head, tail down-left at him. */
+  .sh-fatt { left: 1%; bottom: 20%; width: 27%; aspect-ratio: 1411 / 2017; --from: 10%; --to: 18%; --rock-from: 18%; --rock-to: 100%; --rock-a: 0.6; }
+  .sh-fatt-art { clip-path: inset(0 0 9% 0); }
+  .sh-bubble { --from: 40%; --to: 43%; --out-from: 56%; --out-to: 59%; }
+  /* The ship's horn, over the stern (the group's top right), as the ship arrives. */
+  .sh-sfx { right: -34%; top: -16%; rotate: 6deg; --from: 36%; --to: 41%; --out-from: 50%; --out-to: 53%; }
 
   /* Scene 2, at sea: night falls, the noodle draws leg 1 from Guangdong to Calcutta (12-80) with the small ship at its head, and Calcutta's stamp lands at 84. */
-  /* The chart (RouteChart, leg 1) is the night; only the harbour-water strip below it needs darkening as night falls. */
-  .ss-night { left: 0; right: 0; bottom: 0; height: var(--sea-top); background: var(--color-ink); --o1: 0.9; --to: 30%; }
+  /* The chart (RouteChart, leg 1) is the night; the harbour-water strip below it fades out as night falls, so the chart fills the stage. */
+  .ss-water { --o0: 1; --o1: 0; --from: 10%; --to: 30%; }
   .ss-compass { right: var(--gutter); top: calc(var(--top) + 8px); width: clamp(56px, 6vw, 96px); height: auto; --r1: 180deg; }
   /* Caption: in over 3%, holds to the end of the track. */
   .ss-cap { --from: 4%; --to: 7%; --out-from: 97%; --out-to: 100%; }
-  /* No big junk any more (see RouteChart): the crew's shout comes from the water, low left, clear of the chart. */
-  .ss-bubble { left: var(--gutter); bottom: calc(var(--sea-top) + 14px); --from: 30%; --to: 33%; --out-from: 46%; --out-to: 49%; }
+  /* Rides the route token (RouteChart's ship slot): the crew's shout comes from the little ship itself. */
+  .ss-bubble { left: 0; top: 0; translate: -32px calc(-100% - max(32px, 3vw) - 8px); --from: 30%; --to: 33%; --out-from: 46%; --out-to: 49%; }
 
   @media (max-width: 599px) {
-    /* Phones: the caption plate is taller, so Fatt stands up on the shoreline, clear of it. */
-    .story-scenes { --ship-w: 86vw; }
-    .sh-bubble { left: calc(50% - var(--ship-w) * 0.42); }
+    .sh-sfx { right: -4%; top: -6%; }
+    /* Phones: the compass moves to the right edge, above the water, clear of the bow and Fatt (left of the ship). */
+    .sh-compass { left: auto; right: var(--gutter); bottom: calc(var(--sea-top) + 26vw); --x0: 30vw; }
+    .story-scenes { --ship-w: calc(86 * var(--u)); }
     .sh-sun { left: 58%; top: 34%; }
-    .sh-sfx { right: 4%; top: 30%; }
-    /* Phones: the compass sits below the top caption band. */
-    .ss-compass { top: calc(var(--top) + 150px); }
+    /* Phones: the compass sits bottom right, clear of the route's first stop. */
+    .ss-compass { top: auto; bottom: calc(var(--sea-top) + 14px); }
     .sh-mtn-c { left: -30vw; width: 170vw; }
     .sh-mtn-b { left: -70vw; width: 180vw; }
   }

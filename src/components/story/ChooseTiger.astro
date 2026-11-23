@@ -35,7 +35,7 @@ const tigers = Object.values(TIGERS);
     border: var(--border-control) solid var(--fp-rule-strong); background: var(--fp-field-bg); color: var(--fp-field-fg); text-decoration: none;
     transition: transform var(--dur-spring) var(--curve-spring), box-shadow var(--dur-fast) var(--curve-out), background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out); }
   /* The heads are black ink, so a chosen card keeps its paper and gets a thick ink frame instead of going dark. */
-  .tp-card[aria-current='true'] { box-shadow: 0 0 0 4px var(--fp-rule-strong), var(--lift-2); }
+  .tp-card[aria-pressed='true'] { box-shadow: 0 0 0 4px var(--fp-rule-strong), var(--lift-2); }
   .tp-card:hover { transform: translateY(-3px); box-shadow: var(--lift-2); }
   .tp-card:active { transform: translateY(1px); box-shadow: none; transition-duration: var(--dur-press); }
   .tp-card:focus-visible { outline: var(--ring-width) solid var(--fp-ring); outline-offset: var(--ring-offset); }
@@ -64,12 +64,15 @@ const tigers = Object.values(TIGERS);
     let url = '';
     let text = '';
     for (const c of cards) {
+      // With script the links act as toggle buttons; without it they stay plain links to the share pages.
+      c.setAttribute('role', 'button');
+      c.setAttribute('aria-pressed', 'false');
+      c.addEventListener('keydown', (e) => { if (e.key === ' ') { e.preventDefault(); c.click(); } });
       c.addEventListener('click', (e) => {
         // Let new-tab / modified clicks go to the share page as normal.
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
         e.preventDefault();
-        for (const o of cards) if (o !== c) o.removeAttribute('aria-current');
-        c.setAttribute('aria-current', 'true');
+        for (const o of cards) o.setAttribute('aria-pressed', String(o === c));
         url = new URL(c.getAttribute('href')!, location.origin).href;
         text = `You're a ${c.dataset.name}. ${c.dataset.line}`;
         msg.textContent = text;

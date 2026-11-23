@@ -166,6 +166,8 @@
 :where(.comic, .story-scenes) .bubble::after { content: ''; position: absolute; bottom: -14px; width: 20px; height: 16px; background: inherit; border: inherit; border-top: 0; border-radius: 0 0 0 100%; }
 :where(.comic, .story-scenes) .tail-left::after { left: 22px; border-right: 0; border-radius: 0 0 0 100%; transform: skewX(18deg); }
 :where(.comic, .story-scenes) .tail-right::after { right: 22px; border-left: 0; border-radius: 0 0 100% 0; transform: skewX(-18deg); }
+/* In the scenes the bubble scales with the set (--u, defined on .story-scenes), not in px. */
+:where(.story-scenes) .bubble { font-size: clamp(15px, calc(var(--u) * 1.5), 26px); max-width: max(calc(var(--u) * 28), min(60vw, 220px)); text-wrap: balance; }
 
 /* Story scenes: the paper puppet theatre (StoryScene.astro, SceneArt.astro, story/scenes/*.astro).
    docs/STORY-MOTION-PLAN.md. Every scene is a tall track (.story-scene) that names the view timeline
@@ -217,7 +219,15 @@
     :root:not([data-story='comic']) .story-body:has(> .story-chapter[data-scenes]:last-child) { padding-bottom: 0; }
     .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
     .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
-    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out, fx-gone; animation-fill-mode: both, both, forwards;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    /* Opt-in, cheaper exit: the move keeps its transform only, so opacity has one animation (.fx-solo-out + .fx-then-out). */
+    .story-scene .fx.fx-then-out.fx-solo-out { animation-name: fx-move-t, fx-out, fx-gone; }
+    /* Opt-in, hidden until its range: .fx-late is visibility:hidden until --from, so it is not rastered early. */
+    .story-scene .fx.fx-late { visibility: hidden; animation-name: fx-move, fx-show; animation-fill-mode: both, forwards;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--from, 0%) contain 100%; }
+    .story-scene .fx.fx-late.fx-then-out { animation-name: fx-move, fx-out, fx-show, fx-gone; animation-fill-mode: both, both, forwards, forwards;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--from, 0%) contain 100%, contain var(--out-from, 100%) contain var(--out-to, 100%); }
     .story-scene .fx.fx-draw { animation-name: fx-draw; }
     /* Easing by role. Scroll-coupled motion (camera, parallax, the route, the ship) stays linear: the scroll is the
        clock. What arrives lands softly (ease-out-quart), what pops overshoots and settles like a stamp, and what
@@ -230,8 +240,14 @@
        --rock-a scales the swing). `rotate`, so it composes with the engine's transform. */
     .story-scene .fx.fx-puppet { transform-origin: 50% 100%; animation-name: fx-move, fx-rock; animation-timing-function: var(--ease-land), ease-in-out;
       animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
-    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
+    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock, fx-gone; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out, linear; animation-fill-mode: both, both, both, forwards;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    /* Cast: the rock sits on .cast-art, so the group's transform and opacity stay uncluttered (and the bubble does not rock). */
+    .story-scene .cast > .cast-art.fx-rock { transform-origin: 50% 100%; animation: fx-rock ease-in-out both; animation-timeline: --scene; animation-range: contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
+    /* Captions hand over in turn: the old one is gone by the middle of the shared window, the new one starts after it,
+       so two are never legible at once. Same --from/--to/--out-* as any .fx; the first half of a window is the exit. */
+    .story-scene .scene-text :is(.cap, .cap-t).fx { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%); }
+    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
     /* Between stages: each stage overlaps the last by its torn top edge, so a scene change reads as a fresh sheet of
        paper laid over the last one: no ruler-straight seam, no screen of blank paper. The edge hides under the
        header while the stage is pinned. The wrappers lose their sand fill so the overlap shows the scene beneath. */
@@ -242,17 +258,24 @@
   }
 }
 @keyframes fx-rock {
-  0% { rotate: calc(var(--rock-a, 1) * -3deg); }
-  22% { rotate: calc(var(--rock-a, 1) * 4deg); }
-  46% { rotate: calc(var(--rock-a, 1) * -2.5deg); }
-  72% { rotate: calc(var(--rock-a, 1) * 3deg); }
+  0% { rotate: calc(var(--rock-a, 0.4) * -3deg); }
+  22% { rotate: calc(var(--rock-a, 0.4) * 4deg); }
+  46% { rotate: calc(var(--rock-a, 0.4) * -2.5deg); }
+  72% { rotate: calc(var(--rock-a, 0.4) * 3deg); }
   100% { rotate: 0deg; }
 }
 @keyframes fx-move {
   from { transform: translate(var(--x0, 0), var(--y0, 0)) rotate(var(--r0, 0deg)) scale(var(--s0, 1)); opacity: var(--o0, 1); }
   to { transform: translate(var(--x1, 0), var(--y1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); opacity: var(--o1, 1); }
 }
+@keyframes fx-move-t {
+  from { transform: translate(var(--x0, 0), var(--y0, 0)) rotate(var(--r0, 0deg)) scale(var(--s0, 1)); }
+  to { transform: translate(var(--x1, 0), var(--y1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); }
+}
 @keyframes fx-out { to { opacity: 0; } }
+/* visibility is visible through the range and hidden at its end: a layer that has faded out stops being rastered. */
+@keyframes fx-gone { from { visibility: visible; } to { visibility: hidden; } }
+@keyframes fx-show { from, to { visibility: visible; } }
 @keyframes fx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
 /* Scene layout shared by every chapter. :where() keeps it at one class so each chapter's own placement
@@ -261,7 +284,23 @@
 :root { --edge-h: clamp(24px, 4vw, 56px); --torn-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 60' preserveAspectRatio='none'%3E%3Cpath d='M0 60 L0 34 L18 28 L31 38 L52 22 L70 30 L96 14 L121 27 L140 20 L168 36 L190 25 L214 33 L236 10 L262 24 L281 30 L309 18 L333 35 L360 21 L384 29 L402 8 L431 26 L455 19 L478 34 L506 24 L529 31 L552 12 L580 27 L601 33 L627 17 L652 30 L679 22 L702 37 L726 15 L749 28 L775 20 L798 33 L826 9 L850 25 L873 32 L901 19 L925 30 L951 14 L976 28 L1000 22 L1000 60 Z'/%3E%3C/svg%3E"); }
 :where(.story-scenes) { --ease-land: cubic-bezier(.165, .84, .44, 1); --ease-stamp: linear(0, .62 22%, 1.07 48%, .98 72%, 1); --ease-leave: cubic-bezier(.55, .055, .675, .19);
   --gutter: clamp(16px, 4vw, 48px); --top: 96px; --ship-w: min(26vw, 300px); --sea-h: 26%; --floor: 0px;
-  --sea-top: calc(var(--floor) + var(--sea-h)); background: var(--color-sand); }
+  --sea-top: calc(var(--floor) + var(--sea-h)); background: var(--color-sand);
+  /* The scene unit: 1% of the width, or of a 16:9 frame's width on tall windows. Size the cast and props in
+     --u and backdrops as max(112vw, calc(112 * var(--u))), so the set and the cast keep their proportions. */
+  --u: min(1vw, calc(100svh / 56.25)); --header-h: 68px;
+  /* Layer tiers, back to front. Tag layers with .z-prop (behind the cast), .cast, .z-prop-front; no source-order tricks. */
+  --z-prop: 1; --z-cast: 2; --z-prop-front: 3; --z-bubble: 4; --z-cap: 20; }
+:where(.story-scenes) .z-prop { z-index: var(--z-prop); }
+:where(.story-scenes) .z-prop-front { z-index: var(--z-prop-front); }
+/* Cast: a character and its bubble as one group. Size the group (width in calc(N * var(--u))), put the
+   art in .cast-art, and the bubble as a child: --bx/--by are where its tail points, in % of the group
+   (the character's box). The bubble's own tail-left / tail-right (from story.ts `tail`) picks the side;
+   .cast-flip mirrors the art only. Rock the art with .fx-rock on .cast-art. */
+:where(.story-scenes) .cast { position: absolute; z-index: var(--z-cast); }
+:where(.story-scenes) .cast-art { display: block; width: 100%; height: auto; max-width: none; }
+:where(.story-scenes) .cast-flip > .cast-art { scale: -1 1; }
+:where(.story-scenes) .cast > .bubble { z-index: var(--z-bubble); left: var(--bx, 50%); top: var(--by, 0%); width: max-content; translate: -32px calc(-100% - 14px); }
+:where(.story-scenes) .cast > .bubble.tail-right { translate: calc(-100% + 32px) calc(-100% - 14px); }
 :where(.story-scenes) .ch-head { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; }
 :where(.story-scene) { position: relative; height: var(--h, 220vh); }
 :where(.story-scene) .scene-stage { position: sticky; top: 0; height: 100svh; overflow: clip; contain: paint; background: linear-gradient(180deg, var(--sky, var(--color-paper)), var(--ground, var(--color-paper))); }
@@ -273,9 +312,14 @@
    2 lines, sand on an ink plate. Above the phone dock (--floor), under the sticky header. Captions take turns in one grid cell. */
 /* Narrator captions sit centred at the top of the frame, above the cast (owner's rule: a caption never covers a
    character; film subtitles may sit top or bottom). One at a time: they stack in one grid cell. */
-:where(.story-scenes) .scene-text { position: absolute; top: calc(var(--top) - 6px); left: var(--gutter); right: var(--gutter); display: grid; justify-items: center; z-index: 2; pointer-events: none; }
-:where(.story-scenes) .scene-text .cap { grid-area: 1 / 1; align-self: start; max-width: min(42ch, 100%); text-align: center; font-size: clamp(18px, 2vw, 26px); line-height: 1.35; background: rgb(44 41 37 / 0.9); }
-:where(.story-scenes) .scene-bubble { z-index: 2; transform-origin: 18% 100%; max-width: min(34vw, 300px); }
+:where(.story-scenes) .scene-text { position: absolute; top: calc(var(--header-h) + clamp(8px, 1.5svh, 20px)); left: var(--gutter); right: var(--gutter); display: grid; justify-items: center; align-items: start; z-index: var(--z-cap); pointer-events: none; }
+:where(.story-scenes) .scene-text .cap { grid-area: 1 / 1; align-self: start; max-width: min(36ch, 100%); padding: 0.5em 0.9em; text-align: center; font-size: clamp(17px, 0.9vw + 0.9svh, 28px); line-height: 1.35; text-wrap: balance; background: rgb(44 41 37 / 0.9); }
+/* Caption plate (opt-in): one ink plate per scene, its lines (.cap-t, each an .fx) stacked in one cell, so the plate
+   is as tall as the tallest line and never changes size or position mid-swap. */
+:where(.story-scenes) .scene-text .cap-plate { grid-area: 1 / 1; display: grid; justify-items: center; max-width: min(36ch, 100%); padding: 0.5em 0.9em; background: rgb(44 41 37 / 0.9); color: var(--color-sand); box-shadow: 4px 4px 0 var(--color-gold);
+  font-size: clamp(17px, 0.9vw + 0.9svh, 28px); line-height: 1.35; text-align: center; text-wrap: balance; }
+:where(.story-scenes) .scene-text .cap-t { grid-area: 1 / 1; margin: 0; }
+:where(.story-scenes) .scene-bubble { z-index: 2; transform-origin: 18% 100%; max-width: max(calc(var(--u) * 28), min(60vw, 220px)); }
 /* A place name on a chart or a photo: sand on an ink halo, readable on dark and light. */
 :where(.story-scenes) .scene-place { position: absolute; z-index: 1; margin: 0; display: flex; align-items: center; gap: 8px; translate: -9px -50%;
   font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(20px, 2.2vw, 30px); color: var(--color-sand);
@@ -296,9 +340,10 @@
 /* Colour arc: each chapter sets --sky and --ground (the stage's backdrop, top to foot) and --glow (its light:
    sun, fire, neon) on its .story-scenes root; layers read them. Captions and bubbles keep their own colours. */
 /* Kinetic title: the h2 holds a sr-only copy plus aria-hidden letters. Each letter is an .fx that scatters
-   over the title's lift (--x1 --y1 --r1 are set per letter in the component). */
+   outward and lifts, staggered, from --i/--n (set per letter in the component; inline --x1 etc. still win). Never sideways into neighbours. */
 :where(.story-scenes) .tl-word { display: inline-block; white-space: nowrap; }
-:where(.story-scenes) .tl { display: inline-block; --from: 1%; --to: 8%; }
+:where(.story-scenes) .tl { display: inline-block; --from: calc(5% + var(--i, 0) * 0.25%); --to: calc(9% + var(--i, 0) * 0.25%); --o1: 0;
+  --x1: calc((var(--i, 0) - var(--n, 0) / 2) * 0.5vw); --y1: calc(-3vh - var(--i, 0) * 0.15vh); --r1: calc((var(--i, 0) - var(--n, 0) / 2) * 1deg); }
 /* Sound word: lettering on the stage, aria-hidden. Tiger with an ink outline; tilt it with `rotate`, pop it with .fx fx-pop. */
 :where(.story-scenes) .scene-sfx { position: absolute; z-index: 2; margin: 0; pointer-events: none; white-space: nowrap; font-family: var(--font-display); font-weight: 700; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase;
   font-size: clamp(40px, 8vw, 110px); color: var(--color-tiger); -webkit-text-stroke: 3px var(--color-ink); paint-order: stroke fill; text-shadow: 4px 4px 0 var(--color-ink), 0 0 18px rgb(203 160 82 / 0.5); }
@@ -314,9 +359,6 @@
 /* Ambient layers, gradients only, moved by the scroll like any other layer. */
 /* Steam: one puff per span; stagger their ranges so they rise one after another (--y1 negative, --o1: 0). */
 :where(.story-scenes) .puff { width: clamp(70px, 9vw, 140px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.35) 40%, transparent 70%); --o0: 0.9; }
-/* Rain: a sheet twice the stage's height that slides down (--y1: 50%). */
-:where(.story-scenes) .scene-rain { left: -10%; right: -10%; top: -100%; height: 200%; pointer-events: none;
-  background: repeating-linear-gradient(104deg, transparent 0 22px, rgb(237 229 216 / 0.28) 22px 23.5px, transparent 23.5px 47px) 0 0 / 100% 140px; }
 /* Flame: a hot ellipse that grows from its base (--s0 small, --s1 large). */
 :where(.story-scenes) .scene-flame { transform-origin: 50% 100%; aspect-ratio: 1 / 1.3; border-radius: 50% 50% 45% 45%;
   background: radial-gradient(ellipse at 50% 80%, rgb(255 236 170 / 0.95), var(--color-gold) 30%, var(--color-tiger) 58%, transparent 72%); }
