@@ -109,3 +109,69 @@ Phase 1, then 2, then 3, with a commit per phase on PR #2. After each phase:
 - frames at 1440×900, 375×812 and 390×844
 - reduced motion
 - one throttled mid-range Android profile, to check frame drops on the push
+
+---
+
+## Phase 5: velvet curtain + POV entry (planned 23 Nov 2026)
+
+**Owner's brief.** A large red velvet curtain hangs inside the door so the street can't see in. Keep it:
+- With the door closed, the glass shows velvet.
+- When the door opens, the doorway still shows the same velvet.
+- Stepping in, the curtain slides aside and the room is revealed POV-style, as a guest walks in.
+
+This replaces the doorway rectangle wipe, which reads as a picture-in-picture rather than entering.
+
+Three agents worked on it: web research, technical design, and art direction.
+
+### What sells "I just walked in" (research, ranked)
+1. The doorframe edges pass the lens: the near plane grows fastest and slides off screen.
+2. Depth planes move at different rates: frame about 3×, curtain about 1.6×, room 1→1.14.
+3. A brief warm exposure bloom at the threshold, like eyes adjusting.
+4. A dolly that eases in, with a tiny sway (≤0.35°). No cartoon bob.
+5. A vignette that tightens in the doorway, then opens.
+6. Motion blur, faked or skipped. No live `filter` changes on phones.
+
+References: GSAP "Keyhole/Portal zoom" and "Dolly zoom"; Apple's image-sequence scrubs; Igloo Inc and Lusion (portal pushes with an exposure flash); curtains.js and CSS two-panel curtains for the drape.
+
+### Design (technical agent)
+- **One velvet layer for the whole sequence, under the camera.** It is stage-sized, so it is one GPU screen.
+  - A doorway-shaped hole (about 6% oversize, hidden by the jambs) is cut in the room and dim layers.
+  - The windows still show the room; the door glass and the open doorway show the velvet.
+  - Each frame, the velvet is placed to track the doorway's on-screen rectangle, scaling at `s^0.8` because it sits deeper than the frame.
+  - So the curtain behind the glass, in the doorway and filling the screen is the same element: there is no handoff to hide.
+- **The frame passes the lens.** A short push from 2.6× to about 6× (accelerating), with the camera fading out over the last part while the velvet reaches full screen and the vignette closes.
+  - Fallback if the jamb looks soft: a sharp jamb close-up plate used only for the sweep.
+- **The curtain slide.** One panel gathering toward the right edge (translateX, scaleX 1→0.18, slight skew), with a fold-shadow gradient and a warm light leak riding its moving edge. A generated "gathered" stack crossfades in over the last 30% so the folds bunch rather than squash.
+- **The room.** It is already full-screen beneath, and dollies 1.0→1.14 with a tiny sway and an exposure bloom as the curtain clears, then continues into the existing drift and bloom into the story.
+- **Performance.** About 7 composited layers at peak, transform and opacity only, and `.spill`, the per-frame clip-path and `doorInsets` are removed. Each layer is hidden outside its range.
+- **Reduced motion and no-JS:** a static curtain in the open doorway, with a soft leak at its edge. No pin.
+
+### Beat sheet (pinned t; section 330svh, phones 310svh)
+
+| Beat | t | Motion |
+|---|---|---|
+| Seam, lamps, sign, shine, glass clears | 0–.27 | As now. The velvet behind the door glass warms as the lights come on |
+| Door | .22–.38 | Opens onto velvet; a warm rim rises on the curtain |
+| Walk | .26–.48 | Camera 1→2.6× (log), velvet tracks the doorway |
+| Push / threshold | .48–.56 | Camera 2.6→6× and fades; velvet fills the screen; vignette closes |
+| Curtain slides | .56–.70 | Panel gathers right; fold shadow; light leak; room visible under it |
+| Pass | .60–.74 | Room dolly 1→1.14, 0.35° sway, exposure bloom; gathered stack slides off the edge |
+| Drift | .72–.86 | As now |
+| Bloom into story | .80–.95 | As now |
+
+### Assets (art agent) · about 6.5–9.5 Higgsfield credits
+
+| Asset | Use | Spec | Credits |
+|---|---|---|---|
+| A · curtain, flat | Behind the glass, in the doorway, full screen | 3:2, deep crimson velvet (shadows #3A0A0E, mids #7E1419, highlights #B8262E), backlit by warm 2700K, rim glow on the fold crests; generated, then 4K upscale | 3.5 |
+| B · curtain, gathered | The bunched stack at the edge | 1:2, made from A as a reference, keyed to alpha (luma matte if the green key fringes) | 1.5 |
+| C · brass rail and rings | Stays fixed while the fabric slides | 8:1 strip, alpha | 1.5 |
+| E · jamb close-up (only if needed) | Sharp frame edge sweeping past the lens | 9:16, alpha | 1.5 |
+| Retry reserve | | | 1.5 |
+
+The light leak, the exposure bloom and the vignette are CSS gradients, not generated images.
+
+### Open questions for the owner
+1. Is it the door only? The plan curtains only the door; the shop windows keep showing the room.
+2. Which way does it pull? The default is to the right, away from the door's hinge, so the door and the curtain don't fight.
+3. A photo of the real curtain would let us match its colour, fabric and rail exactly. In the photos we have, it isn't visible behind the door glass.
