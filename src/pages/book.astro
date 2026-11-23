@@ -25,9 +25,14 @@ const no = () => String(++n).padStart(2, '0');
   <form class="desk-when" data-desk-when hidden aria-label="When and how many">
     <label class="fp-field"><span class="fp-label">Day</span><select class="fp-input" data-desk-day></select></label>
     <label class="fp-field"><span class="fp-label">Time</span><select class="fp-input" data-desk-time></select></label>
-    <label class="fp-field"><span class="fp-label">Guests</span><input class="fp-input" type="number" min="1" max="20" value="2" inputmode="numeric" data-desk-size /></label>
+    <label class="fp-field"><span class="fp-label">Guests</span><select class="fp-input" data-desk-size>{[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option value={n} selected={n === 2}>{n}</option>)}<option value="9">9 or more</option></select></label>
   </form>
   <script is:inline>document.currentScript.previousElementSibling.hidden = false;</script>
+  <ul class="desk-assure" role="list">
+    <li>Confirmed by the restaurant</li>
+    <li>Changes by phone or email</li>
+    <li><a class="fp-link" href="/booking-terms/">See booking terms →</a></li>
+  </ul>
   <ol class="fp-ledger desk" role="list">
     {open.map((b) => (
       <li class="desk-row" id={`book-${b.id}`} data-desk-room={JSON.stringify({ id: b.id, name: b.shortName, tz: b.timezone, hours: b.hours, provider: b.booking!.provider, url: b.booking!.url, widgetId: b.booking!.widgetId, max: b.groups?.onlineMax ?? 8 })}>
@@ -39,7 +44,8 @@ const no = () => String(++n).padStart(2, '0');
           <p class="desk-note" data-desk-fit>Books online with {BOOKING_NAMES[b.booking!.provider]} for up to {b.groups?.onlineMax ?? 8} guests.</p>
         </div>
         <div class="desk-acts">
-          <a class="fp-btn" href={b.booking!.url} data-book={b.id} data-desk-go target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a>
+          <a class="fp-btn fp-btn--primary" href={b.booking!.url} data-book={b.id} data-desk-go target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a>
+          <a class="fp-link fp-link--strong" href="/private-dining/" data-desk-group hidden>Plan a group →</a>
           {b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
         </div>
       </li>
@@ -76,8 +82,11 @@ const no = () => String(++n).padStart(2, '0');
   .desk-when .fp-field:first-child { grid-column: 1 / -1; }
   @media (min-width: 640px) { .desk-when { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); } .desk-when .fp-field:first-child { grid-column: auto; } }
   .desk-when select, .desk-when input { width: 100%; }
+  .desk-assure { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-5); margin: 0 0 var(--space-5); padding: 0; list-style: none; font-size: var(--step-small); color: var(--fp-fg-muted); }
+  .desk-acts [hidden] { display: none !important; }
   /* The line under each room says what its button will do for the chosen time and party. */
-  .desk-note.is-off { color: var(--color-tiger-deep); }
+  /* Neutral, never red: the desk only knows opening hours, not whether a table is free. */
+  .desk-note.is-off { display: inline-block; justify-self: start; padding: 2px var(--space-3); border: 1.5px solid var(--fp-fg-muted); background: var(--color-paper-light); color: var(--color-ink); }
   .desk-row { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); gap: var(--space-3) var(--space-3); padding-block: var(--space-6); }
   .desk-no { padding-top: 0.55em; }
   .desk-main { display: grid; gap: var(--space-1); }
@@ -132,7 +141,7 @@ const no = () => String(++n).padStart(2, '0');
   if (when && rows.length) {
     const daySel = when.querySelector<HTMLSelectElement>('[data-desk-day]')!;
     const timeSel = when.querySelector<HTMLSelectElement>('[data-desk-time]')!;
-    const sizeIn = when.querySelector<HTMLInputElement>('[data-desk-size]')!;
+    const sizeIn = when.querySelector<HTMLSelectElement>('[data-desk-size]')!;
     const today = local(rows[0].r.tz).ymd;
     const longDay = (ymd: string) => new Date(`${ymd}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
     for (let i = 0; i < 21; i++) {
@@ -140,13 +149,16 @@ const no = () => String(++n).padStart(2, '0');
       const short = new Date(`${ymd}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
       daySel.add(new Option(i === 0 ? `Today, ${short}` : i === 1 ? `Tomorrow, ${short}` : short, ymd));
     }
-    const size = () => Math.min(20, Math.max(1, Math.round(Number(sizeIn.value)) || 2));
+    const size = () => Math.min(9, Math.max(1, Math.round(Number(sizeIn.value)) || 2));
     const fillTimes = () => {
       const keep = timeSel.value;
-      const all = [...new Set(rows.flatMap(({ r }) => slots(r.hours, r.tz, daySel.value)))].sort((a, b) => a - b);
+      const per = rows.map(({ r }) => slots(r.hours, r.tz, daySel.value));
+      const all = [...new Set(per.flat())].sort((a, b) => a - b);
       timeSel.replaceChildren(...all.map((m) => new Option(prettyMin(m), hhmm(m))));
-      if (!all.length) timeSel.add(new Option('No tables that day', ''));
-      const pick = all.find((m) => m >= 19 * 60) ?? all[0];
+      if (!all.length) timeSel.add(new Option('Closed that day', ''));
+      // Default: a time every open room offers (7pm or later if possible), else the best any room has.
+      const both = all.filter((m) => per.every((p) => !p.length || p.includes(m)));
+      const pick = both.find((m) => m >= 19 * 60) ?? both[0] ?? all.find((m) => m >= 19 * 60) ?? all[0];
       timeSel.value = all.some((m) => hhmm(m) === keep) ? keep : pick !== undefined ? hhmm(pick) : '';
     };
     const paint = () => {
@@ -161,19 +173,24 @@ const no = () => String(++n).padStart(2, '0');
           go.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`;
           go.removeAttribute('target');
         } else if (!ok) {
-          fit.textContent = time ? `No tables at ${r.name} at ${timeSel.selectedOptions[0]?.text} ${when$}. Try another time.` : `${r.name} is closed ${when$}.`;
+          const s = openStatus(r.hours as Hours, r.tz);
+          const none = !slots(r.hours, r.tz, day).length;
+          fit.textContent = none ? (day === today && !s.open && s.opens ? `Closed today · ${statusLine('', s).replace(/^Opens/, 'opens')}` : `Closed ${when$}`) : 'Outside opening hours';
           go.href = r.url; go.target = '_blank';
         } else {
           fit.textContent = `${PROVIDER[r.provider] ?? 'The booking page'} opens with ${n} guest${n === 1 ? '' : 's'}, ${longDay(day)}, ${timeSel.selectedOptions[0]?.text}.`;
           go.href = providerLink(r, day, time, n); go.target = '_blank';
         }
-        fit.classList.toggle('is-off', n > r.max || !ok);
+        // 9 or more: no room booking button, just the way to plan a group.
+        const grp = el.querySelector<HTMLAnchorElement>('[data-desk-group]')!;
+        go.hidden = n >= 9; grp.hidden = n < 9;
+        if (n >= 9) { fit.textContent = `${r.name} books online for up to ${r.max}. For ${n} or more, plan a group.`; grp.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`; }
+        fit.classList.toggle('is-off', n < r.max + 1 && !ok);
       }
     };
     daySel.addEventListener('change', () => { fillTimes(); paint(); });
     timeSel.addEventListener('change', paint);
-    sizeIn.addEventListener('input', paint);
-    sizeIn.addEventListener('change', () => { sizeIn.value = String(size()); paint(); });
+    sizeIn.addEventListener('change', paint);
     // A room's Book button goes straight to its filled-in page (the drawer is for the ?branch= hand-off).
     for (const { el, r } of rows) el.querySelector<HTMLAnchorElement>('[data-desk-go]')!.addEventListener('click', (e) => {
       if (viaParam) return;

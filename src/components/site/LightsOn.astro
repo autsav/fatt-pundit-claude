@@ -88,11 +88,22 @@ const { src, off, lit, litSet, label, lamps, ratio, place } = Astro.props;
     // main thread; this script then only decides when the lamps come on.
     const cssDusk = CSS.supports('animation-timeline: view()');
     let raf = 0;
+    // Measure the frame's document position when the layout changes, not in the scroll frame.
+    let docTop = 0;
+    let frameH = 0;
+    const measure = () => {
+      const r = frame.getBoundingClientRect();
+      docTop = r.top + window.scrollY;
+      frameH = r.height;
+    };
+    measure();
+    window.addEventListener('resize', measure, { passive: true });
+    window.addEventListener('load', measure);
+    new ResizeObserver(measure).observe(document.body);
     const update = () => {
       raf = 0;
-      const r = frame.getBoundingClientRect();
       const vh = window.innerHeight;
-      const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.35 + r.height * 0.5)));
+      const p = Math.min(1, Math.max(0, (vh - (docTop - window.scrollY)) / (vh * 0.35 + frameH * 0.5)));
       if (!cssDusk) fig.style.setProperty('--dusk', p.toFixed(3));
       if (p >= 1 && state === 'off') on();
     };

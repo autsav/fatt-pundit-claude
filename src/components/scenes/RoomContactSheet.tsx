@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MS } from '@/lib/motion-tokens';
+import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
 /**
  * Scene 7: the room, as a photographer's contact sheet on a halftone print.
@@ -18,6 +19,14 @@ export interface SheetFrame {
 const FIRST = 12;
 /** The strip is four frames across, two on phones (global.css .room-strip); the wrap tops out at 1240 px. */
 const THUMB_SIZES = '(min-width: 761px) 310px, 50vw';
+/** The lead frame is the first one, large; the rest follow as the strip. Class names are local to the sheet. */
+const CSS = `
+.room-sheet{display:grid;gap:clamp(16px,2.5vw,28px)}
+.room-sheet .room-lead{width:100%;background-color:#1b1917;box-shadow:0 20px 50px rgb(44 41 37 / .35)}
+@media (min-width:761px){.room-sheet .room-lead{width:60%}}
+.room-sheet .room-lead .room-shot{aspect-ratio:3/2}
+.room-sheet .room-pick{inset:-10px;width:calc(100% + 20px);height:calc(100% + 20px)}
+`;
 
 export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame[]; picks: number[] }) {
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -51,6 +60,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
     setOpen(i);
     dialogRef.current?.showModal();
     document.documentElement.style.overflow = 'hidden';
+    lockScroll();
   };
   const close = () => dialogRef.current?.close();
   const step = useCallback((d: number) => setOpen((i) => (i === null ? i : (i + d + frames.length) % frames.length)), [frames.length]);
@@ -60,6 +70,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
     if (!dlg) return;
     const onClose = () => {
       document.documentElement.style.overflow = '';
+      unlockScroll();
       opener.current?.focus();
       // The photo stays while the dark room fades out (global.css .room-lightbox); the guest is not held.
       unmount.current = window.setTimeout(() => setOpen(null), MS.fast);
@@ -79,34 +90,41 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
 
   const cur = open === null ? null : frames[open];
 
+  const frame = (f: SheetFrame, i: number, lead = false) => (
+    <li key={f.thumb} className={`room-frame ${lead ? 'room-lead' : ''}`}>
+      <span className="room-edge" aria-hidden="true">
+        FATT PUNDIT 400 <span className="room-edge-n">▸{FIRST + i}</span>
+      </span>
+      <button type="button" className="room-shot" onClick={(e) => show(i, e.currentTarget)} aria-label={`Open photo ${i + 1} of ${frames.length}: ${f.alt}`}>
+        {lead ? (
+          <img className="fp-photo" src={f.full} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <img className="fp-photo" src={f.thumb} srcSet={f.thumbSet} sizes={f.thumbSet ? THUMB_SIZES : undefined} alt="" loading="lazy" decoding="async" />
+        )}
+      </button>
+      <span className="room-edge" aria-hidden="true">
+        <span className="room-edge-n">{FIRST + i}A</span> ◂
+      </span>
+      {picks.includes(i) && (
+        <svg className="room-pick" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M24 74 C18 30 92 12 150 20 C196 28 198 98 150 118 C96 138 20 124 12 84 C6 52 46 30 92 24" pathLength="1" />
+        </svg>
+      )}
+    </li>
+  );
+
   return (
     <>
       <div ref={sheetRef} className="room-sheet" data-drawn={drawn || undefined}>
-        <ol className="room-strip m-0 list-none p-0">
-          {frames.map((f, i) => (
-            <li key={f.thumb} className="room-frame">
-              <span className="room-edge" aria-hidden="true">
-                FATT PUNDIT 400 <span className="room-edge-n">▸{FIRST + i}</span>
-              </span>
-              <button type="button" className="room-shot" onClick={(e) => show(i, e.currentTarget)} aria-label={`Open photo ${i + 1} of ${frames.length}: ${f.alt}`}>
-                <img className="fp-photo" src={f.thumb} srcSet={f.thumbSet} sizes={f.thumbSet ? THUMB_SIZES : undefined} alt="" loading="lazy" decoding="async" />
-              </button>
-              <span className="room-edge" aria-hidden="true">
-                <span className="room-edge-n">{FIRST + i}A</span> ◂
-              </span>
-              {picks.includes(i) && (
-                <svg className="room-pick" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M24 74 C18 30 92 12 150 20 C196 28 198 98 150 118 C96 138 20 124 12 84 C6 52 46 30 92 24" pathLength="1" />
-                </svg>
-              )}
-            </li>
-          ))}
-        </ol>
+        <style dangerouslySetInnerHTML={{ __html: CSS }} />
+        {frames[0] && <ol className="m-0 list-none p-0">{frame(frames[0], 0, true)}</ol>}
+        {frames.length > 1 && <ol className="room-strip m-0 list-none p-0">{frames.slice(1).map((f, k) => frame(f, k + 1))}</ol>}
       </div>
 
       <dialog
         ref={dialogRef}
         className="room-lightbox"
+        data-lenis-prevent
         aria-label="Photo of the room"
         onClick={(e) => e.target === e.currentTarget && close()}
         onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}

@@ -11,7 +11,7 @@ const { branch, name } = Astro.props;
   <button type="button" class="pp-open" data-pp-open aria-haspopup="dialog">
     <span class="pp-icon" aria-hidden="true">✦</span> Your passport <span class="pp-n" data-pp-n>0</span>
   </button>
-  <dialog class="pp-dlg" data-pp-dlg aria-labelledby="pp-h">
+  <dialog class="pp-dlg" data-pp-dlg data-lenis-prevent aria-labelledby="pp-h">
     <div class="pp-sheet">
       <p class="pp-kicker">Fatt Pundit {name}</p>
       <h2 id="pp-h" class="pp-title">Your dish passport</h2>
@@ -60,6 +60,7 @@ const { branch, name } = Astro.props;
 </style>
 
 <script>
+  import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
   const root = document.querySelector<HTMLElement>('[data-passport]');
   if (root) {
     // Lift the floating button out of the page's paper so nothing can sit over it.
@@ -113,10 +114,10 @@ const { branch, name } = Astro.props;
       li.querySelector('.mi-head')?.append(b);
     }
 
-    btnOpen.addEventListener('click', () => { done.textContent = ''; dlg.showModal(); });
+    btnOpen.addEventListener('click', () => { done.textContent = ''; dlg.showModal(); lockScroll(); });
     root.querySelector('[data-pp-close]')!.addEventListener('click', () => dlg.close());
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-    dlg.addEventListener('close', () => { render(); btnOpen.focus(); });
+    dlg.addEventListener('close', () => { unlockScroll(); render(); btnOpen.focus(); });
     root.querySelector('[data-pp-clear]')!.addEventListener('click', () => { save([]); sync(); });
     root.querySelector('[data-pp-share]')!.addEventListener('click', async () => {
       const text = `Tonight at Fatt Pundit ${root.dataset.name}:\n${mine().map((id) => `• ${nameOf(id)}`).join('\n')}`;

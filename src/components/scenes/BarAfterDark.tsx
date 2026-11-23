@@ -4,7 +4,7 @@ import { isCalm } from '@/lib/motion-tokens';
 /**
  * Scene 6: the bar after dark. Black apron weave, "THE BAR" embroidered in sand.
  * The bar is in darkness; a warm spotlight follows the cursor and reveals the room and the drinks.
- * Phones: the light sweeps by itself; tap to move it there. Calm mode: fully lit, no light moving.
+ * Phones: a still light in the middle; tap to move it there. Calm mode: fully lit, no light moving.
  * The drinks are on a leather apron card with a debossed tiger; names and prices come from the data.
  */
 
@@ -34,51 +34,69 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
     const coarse = window.matchMedia('(hover: none)').matches;
     setTouch(coarse);
 
-    // Light position in % of the stage, eased towards a target every frame.
-    const pos = { x: 30, y: 45 };
-    const target = { x: 30, y: 45 };
-    let mode: 'sweep' | 'follow' = coarse ? 'sweep' : 'follow';
-    let tapUntil = 0;
+    // Light position in stage px, eased towards a target. The veil layer is moved by transform only,
+    // and the loop stops once it settles (restarts on pointermove / tap). Touch: static light, tap to move it.
+    const veil = stage.querySelector<HTMLElement>('.bar-dark-veil');
+    if (!veil) return;
+    const pos = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
     let raf = 0;
-    let t0 = performance.now();
-
-    const frame = (now: number) => {
-      if (mode === 'sweep' && now > tapUntil && document.documentElement.dataset.motion !== 'paused') {
-        // A slow figure-of-eight across the bar.
-        const t = (now - t0) / 1000;
-        target.x = 50 + 34 * Math.sin(t * 0.45);
-        target.y = 50 + 20 * Math.sin(t * 0.9);
+    let visible = false;
+    const place = () => {
+      veil.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0)`;
+    };
+    const frame = () => {
+      raf = 0;
+      const dx = target.x - pos.x;
+      const dy = target.y - pos.y;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+        pos.x = target.x;
+        pos.y = target.y;
+        place();
+        return;
       }
-      pos.x += (target.x - pos.x) * 0.09;
-      pos.y += (target.y - pos.y) * 0.09;
-      stage.style.setProperty('--lx', `${pos.x.toFixed(2)}%`);
-      stage.style.setProperty('--ly', `${pos.y.toFixed(2)}%`);
+      pos.x += dx * 0.09;
+      pos.y += dy * 0.09;
+      place();
       raf = requestAnimationFrame(frame);
     };
-    const at = (e: PointerEvent) => {
+    const kick = () => {
+      if (!raf && visible) raf = requestAnimationFrame(frame);
+    };
+    const home = () => {
+      pos.x = target.x = stage.clientWidth * 0.5;
+      pos.y = target.y = stage.clientHeight * 0.5;
+      place();
+    };
+    const to = (e: PointerEvent) => {
       const r = stage.getBoundingClientRect();
-      return { x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 };
+      target.x = e.clientX - r.left;
+      target.y = e.clientY - r.top;
+      kick();
     };
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== 'mouse') return;
-      mode = 'follow';
-      Object.assign(target, at(e));
+      if (e.pointerType === 'mouse') to(e);
     };
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType === 'mouse') return;
-      Object.assign(target, at(e));
-      tapUntil = performance.now() + 3500;
-      t0 = performance.now() + 3500; // after the tap, the sweep restarts from the middle
+      if (e.pointerType !== 'mouse') to(e);
     };
+    home();
     stage.addEventListener('pointermove', onMove);
     stage.addEventListener('pointerdown', onDown);
     const io = new IntersectionObserver(([e]) => {
-      cancelAnimationFrame(raf);
-      if (e.isIntersecting) raf = requestAnimationFrame(frame);
+      visible = e.isIntersecting;
+      if (!visible) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else kick();
     });
     io.observe(stage);
+    // A rotation or resize moves the stage: bring the light back to it.
+    const ro = new ResizeObserver(home);
+    ro.observe(stage);
     return () => {
       io.disconnect();
+      ro.disconnect();
       cancelAnimationFrame(raf);
       stage.removeEventListener('pointermove', onMove);
       stage.removeEventListener('pointerdown', onDown);
@@ -117,7 +135,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
               <img src={room.src} alt={room.alt} className="fp-photo absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
               <img src={prints[0].src} alt={prints[0].alt} className="fp-photo bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
               <img src={prints[1].src} alt={prints[1].alt} className="fp-photo bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
-              <div className="bar-dark-veil pointer-events-none absolute inset-0" aria-hidden="true" />
+              <div className="bar-dark-veil" style={touch ? { opacity: 0.45 } : undefined} aria-hidden="true" />
             </div>
             <figcaption className="font-note text-[16px] italic text-sand/80">
               {calm ? 'The bar at Covent Garden, lit for the evening.' : touch ? 'Tap the bar to move the light.' : 'Move your light across the bar.'}
@@ -132,10 +150,10 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
               {drinks.map((d) => (
                 <li key={d.id} className="flex items-baseline justify-between gap-4 border-b border-dashed border-sand/35 py-3.5 last:border-b-0">
                   <div className="min-w-0">
-                    <p className="m-0 text-[17px] font-bold uppercase tracking-[0.08em]">{d.name}</p>
+                    <p className="m-0 text-[17px] font-bold uppercase tracking-[0.06em] [text-wrap:balance]">{d.name}</p>
                     {d.description && <p className="m-0 mt-1 font-note text-[15px] italic leading-snug text-sand/80">{d.description}</p>}
                   </div>
-                  {d.price && <span className="max-w-[42%] shrink-0 text-right font-bold text-tiger-bright">{d.price}</span>}
+                  {d.price && <span className="min-w-[7ch] max-w-[42%] shrink-0 text-right font-bold text-tiger-bright">{d.price}</span>}
                 </li>
               ))}
             </ul>

@@ -89,6 +89,32 @@ const sample = (d: string): [number, number][] => {
   }
   return pts;
 };
+// The noodle draws in pieces: each cubic is cut into a few short segments that fade in one after another along
+// the route (opacity per segment, no mask: the old stroke-draw mask repainted on the main thread every frame).
+type Pt = [number, number];
+const bez = (p: Pt[], t: number): Pt => { const m = 1 - t; return [0, 1].map((i) => m ** 3 * p[0][i] + 3 * m * m * t * p[1][i] + 3 * m * t * t * p[2][i] + t ** 3 * p[3][i]) as Pt; };
+const cut = (p: Pt[], a: number, b: number): Pt[] => {
+  // Sub-curve between a and b (exact, by Hermite handles).
+  const d = (t: number): Pt => { const m = 1 - t; return [0, 1].map((i) => 3 * m * m * (p[1][i] - p[0][i]) + 6 * m * t * (p[2][i] - p[1][i]) + 3 * t * t * (p[3][i] - p[2][i])) as Pt; };
+  const k = (b - a) / 3, pa = bez(p, a), pb = bez(p, b), da = d(a), db = d(b);
+  return [pa, [pa[0] + da[0] * k, pa[1] + da[1] * k], [pb[0] - db[0] * k, pb[1] - db[1] * k], pb];
+};
+const pieces = (dd: string, target = 36) => {
+  const n = dd.match(/-?\d+\.?\d*/g)!.map(Number);
+  const curves: Pt[][] = [];
+  let cur: Pt = [n[0], n[1]];
+  for (let i = 2; i + 5 < n.length; i += 6) { const e: Pt = [n[i + 4], n[i + 5]]; curves.push([cur, [n[i], n[i + 1]], [n[i + 2], n[i + 3]], e]); cur = e; }
+  const K = Math.max(1, Math.ceil(target / curves.length));
+  const segs = curves.flatMap((c) => Array.from({ length: K }, (_, j) => cut(c, j / K, (j + 1) / K)));
+  const len = segs.map((c) => Math.hypot(c[3][0] - c[0][0], c[3][1] - c[0][1]));
+  const total = len.reduce((a, b) => a + b, 0);
+  let acc = 0;
+  return segs.map((c, i) => {
+    const f0 = acc / total; acc += len[i];
+    const f = (q: Pt) => `${+q[0].toFixed(1)},${+q[1].toFixed(1)}`;
+    return { d: `M${f(c[0])}C${f(c[1])},${f(c[2])},${f(c[3])}`, f0, f1: acc / total };
+  });
+};
 const S0 = legs[0].from;
 const S1 = legs[legs.length - 1].to;
 const scroll = (s: number) => (((s - S0) / (S1 - S0)) * 100).toFixed(2);
@@ -137,22 +163,15 @@ const sideCls = (p: (typeof places)[number]) => {
     <svg class="layer rc-svg rc-svg-dots" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
       {legs.map((l) => <path class="rc-dots" d={world[l.lane]} />)}
     </svg>
-    {/* The noodle (revealed through a mask, which repaints as it draws) is its own compositor layer, so the sea never re-rasters with it. */}
+    {/* The noodle is its own compositor layer, so the sea never re-rasters with it. It draws as short segments fading in along the route. */}
     <svg class="layer rc-svg rc-svg-draw" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
-      <defs>
-        {legs.map((l, i) => !l.drawn && (
-          <mask id={`rcid-${id}-m${i}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
-            <path class="fx fx-draw rc-mask" d={world[l.lane]} pathLength="1" style={`--from:${l.from}%;--to:${l.to}%`} />
-          </mask>
-        ))}
-      </defs>
-      {legs.map((l, i) => (
-        <g mask={l.drawn ? undefined : `url(#rcid-${id}-m${i})`}>
-          <path class="rc-ink" d={world[l.lane]} />
-          <path class="rc-body" d={world[l.lane]} />
-          <path class="rc-shine" d={world[l.lane]} />
-        </g>
-      ))}
+      {legs.map((l) => l.drawn
+        ? <g><path class="rc-ink" d={world[l.lane]} /><path class="rc-body" d={world[l.lane]} /><path class="rc-shine" d={world[l.lane]} /></g>
+        : pieces(world[l.lane]).map((g) => (
+          <g class="fx fx-fade" style={`--from:${(l.from + (l.to - l.from) * g.f0).toFixed(2)}%;--to:${(l.from + (l.to - l.from) * g.f1).toFixed(2)}%`}>
+            <path class="rc-ink" d={g.d} /><path class="rc-body" d={g.d} /><path class="rc-shine" d={g.d} />
+          </g>
+        )))}
     </svg>
     <div class="layer rc-ship" style={parked} aria-hidden="true">
       {hasOne && <span class="rc-tok-one" style={hasTwo && finished ? 'opacity:0' : undefined}><img class="rc-ship-img" src={tokOne.src} width={tokOne.attributes.width} height={tokOne.attributes.height} alt="" style={`scale:${shipFace}`} loading="lazy" decoding="async" /></span>}
@@ -161,7 +180,8 @@ const sideCls = (p: (typeof places)[number]) => {
     </div>
     {places.map((p) => (
       <>
-        <p class:list={['scene-place', 'rc-name', 'fx', 'fx-fade-up', sideCls(p)]} data-at={p.at} style={`${at(world.points[p.at])};--from:${p.lands - 4}%;--to:${p.lands}%`} aria-hidden="true">{p.name}</p>
+        <!-- The stamp carries the name; this is only the dot on the route. -->
+        <p class:list={['rc-name', 'fx', 'fx-fade-up']} data-at={p.at} style={`${at(world.points[p.at])};--from:${p.lands - 4}%;--to:${p.lands}%`} aria-hidden="true"></p>
         <div class="rc-stamp fx fx-pop" data-at={p.at} aria-hidden="true" style={`${at(world.points[p.at])};--from:${p.lands - 3}%;--to:${p.lands}%`}><span style={`--n:${p.name.length}`}>{p.name}</span></div>
       </>
     ))}
@@ -187,14 +207,12 @@ const sideCls = (p: (typeof places)[number]) => {
   .rc-ink { stroke: var(--color-ink); stroke-width: 11px; }
   .rc-body { stroke: var(--color-sand); stroke-width: 7px; }
   .rc-shine { stroke: var(--color-paper-light); stroke-opacity: 0.6; stroke-width: 2px; }
-  /* The mask reveals the noodle as its stroke is drawn (the engine's .fx-draw); 48 map units is wider than the noodle at any zoom. */
-  .rc-svg .rc-mask { stroke: #fff; stroke-width: 48; stroke-dasharray: 1 2; stroke-dashoffset: 1; vector-effect: none; }
+  /* Segments meet end to end on a smooth curve: butt caps, so one segment's ink cap never overlays its neighbour's body. */
+  .rc-svg-draw path { stroke-linecap: butt; }
   /* The ship: the full-size overlay is what travels (translate % is of the map box); the ship hangs from its top-left corner. */
   .rc-ship { inset: 0; }
   /* Overlay for the section's own content (pins): its children turn pointer events back on. */
   .rc-slot { inset: 0; z-index: 3; }
-  /* Finished base state: the whole noodle drawn (the scroll animation, when it plays, overrides this). */
-  .rc-done .rc-svg .rc-mask { stroke-dashoffset: 0; }
   .rc-ship-img { position: absolute; left: 0; top: 0; width: clamp(60px, 6vw, 96px); height: auto; max-width: none; translate: -50% -50%;
     /* A game token: the logo's tiger head on a sand disc with an ink rim and a gold ring, so the eye can follow it. */
     box-sizing: border-box; padding: 6px; border-radius: 50%; background: var(--color-sand); border: 2px solid var(--color-ink); box-shadow: 0 0 0 4px rgb(203 160 82 / 0.7); }
@@ -205,7 +223,6 @@ const sideCls = (p: (typeof places)[number]) => {
   .rc-name { position: absolute; z-index: 1; margin: 0; display: flex; align-items: center; gap: 8px; translate: -9px -50%;
     font-family: var(--font-note); font-style: italic; font-weight: 500; color: var(--color-sand); font-size: clamp(20px, 2.4vw, 34px); text-shadow: 0 0 2px var(--color-ink), 0 0 6px var(--color-ink), 0 0 12px var(--color-ink), 0 1px 0 var(--color-ink); }
   .rc-name::before { content: ''; width: 14px; height: 14px; flex: none; border-radius: 50%; background: var(--color-tiger); box-shadow: 0 0 0 3px rgb(237 229 216 / 0.6); }
-  .rc-l { flex-direction: row-reverse; translate: calc(-100% + 9px) -50%; }
   .rc-stamp { position: absolute; z-index: 1; display: grid; place-items: center; box-sizing: border-box; width: clamp(76px, 8vw, 120px); aspect-ratio: 1; padding: 6px; translate: -50% calc(-100% - 22px);
     border: 3px double var(--color-tiger); border-radius: 50%; background: var(--color-sand); color: var(--color-ink); text-align: center;
     --s0: 1.6; --r0: -18deg; --r1: -6deg; }
@@ -219,7 +236,6 @@ const sideCls = (p: (typeof places)[number]) => {
     .rc-ink { stroke-width: 8px; }
     .rc-body { stroke-width: 5px; }
     .rc-shine { stroke-width: 1.5px; }
-    .rc-pl { flex-direction: row-reverse; translate: calc(-100% + 9px) -50%; }
     .rc-pr { flex-direction: row; translate: -9px -50%; }
     .rc-stamp { width: 64px; padding: 3px; border-width: 2px; }
     .rc-stamp span { font-size: min(8px, calc(64px * 1.35 / (var(--n, 6) + 2))); letter-spacing: 0.02em; }

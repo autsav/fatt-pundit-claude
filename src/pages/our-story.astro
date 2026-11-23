@@ -76,9 +76,6 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
       <div class="wrap narrow stack center">
         <p class="kicker">The end, or rather the start</p>
         <h2 id="end-title" class="h2">Come and taste the rest</h2>
-        <p>The story is best told by the food. Come and taste where it went.</p>
-        <TastingStrip />
-        <ChooseTiger />
         <div class="end-actions">
           {open.map((b) => (
             <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book at {b.shortName}</a>
@@ -87,7 +84,10 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
             <a class="fp-btn" href={listCta(b).href}>{listCta(b).label}</a>
           ))}
         </div>
-        <p class="small">Or <a href="/#menu">read the menus</a> first.</p>
+        <p class="small">Or read the menus first: {open.map((b, i) => <>{i > 0 && ' · '}<a href={`/${b.id}/menu/`}>{b.shortName}</a></>)}.</p>
+        <p>The story is best told by the food. Come and taste where it went.</p>
+        <TastingStrip />
+        <ChooseTiger />
       </div>
     </section>
   </main>
@@ -133,6 +133,8 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
     }
   }
   .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+  /* Equal-width buttons: each takes the same share, never narrower than its label. */
+  .end-actions > .fp-btn { flex: 1 1 14rem; max-width: 20rem; justify-content: center; text-align: center; }
 </style>
 
 <script>

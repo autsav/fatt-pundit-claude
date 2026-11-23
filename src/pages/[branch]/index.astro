@@ -7,6 +7,8 @@
  */
 import type { GetStaticPaths, ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
+import NextStep from '../../components/site/NextStep.astro';
+import OpenNowPill from '../../components/scenes/OpenNowPill.tsx';
 import { stampSrc } from '../../lib/stamp';
 import Base from '../../layouts/Base.astro';
 import SiteHeader from '../../components/site/SiteHeader.astro';
@@ -126,14 +128,17 @@ const menuArt = { stampGold: await stampSrc(stampGoldArt, 220) };
 const specials = open ? (await loadSpecials()).filter((r) => !r.demo && (r.branch === b.id || r.branch === 'all')) : [];
 const others = branches.filter((o) => o.id !== b.id);
 const words = open ? [b.shortName] : [b.shortName, 'The Hangout', 'Boarding soon'];
+const pillOf = (o: Branch) => ({ shortName: o.shortName, timezone: o.timezone, hours: o.hours, status: o.status });
 const pill = { shortName: b.shortName, timezone: b.timezone, hours: b.hours, status: b.status };
 const hours = b.hours ? hoursLines(b.hours) : [];
 // The Visit heading says how often we're open, so it doesn't repeat the address from the strip.
 const daysOpen = b.hours ? (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const).filter((d) => (b.hours?.[d] ?? []).length > 0).length : 0;
 const openDays = daysOpen === 7 ? 'Open every day.' : daysOpen > 0 ? `Open ${['', 'one', 'two', 'three', 'four', 'five', 'six'][daysOpen]} days a week.` : 'Opening hours.';
 const rules = groupRules(b);
-// The Dubai list sends through a form-to-email service once the Dubai address is verified (CLIENT-INPUTS #5, #10).
+// The Dubai list posts to a form-to-email service once PUBLIC_DUBAI_LIST_ENDPOINT is set (CLIENT-INPUTS #5, #10).
+// Until then the form opens an email to the Dubai address, or the group's reservations address, and says so.
 const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
+const listEmail = b.email ?? '';
 
 const showRoom = open || gallery.length > 0;
 
@@ -160,12 +165,12 @@ const ld = {
     : {}),
 };
 const title = open ? `Fatt Pundit ${b.shortName} · Indo-Chinese Hakka restaurant · ${b.address.street}` : `Fatt Pundit ${b.shortName} · Opening soon at ${b.address.street}`;
-const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : (listEndpoint ? 'Join the list for opening news.' : 'Follow us on Instagram for the opening date.')}`;
+const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddress(b)}.` : 'Join the list for opening news.'}`;
 ---
 <Base title={title} description={description} og={b.id}>
-  {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="(min-width: 1024px) 62vw, 100vw" fetchpriority="high" />}
+  {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="100vw" fetchpriority="high" />}
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <a class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : listEndpoint ? 'Skip to the waiting list' : 'Skip to the opening news'}</a>
+  <a class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
   <SiteHeader branches={branches} current={b} />
 
   <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
@@ -175,7 +180,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <div class={`arrival-media ${heroImg ? 'is-photo' : 'is-art'}`}>
         {heroImg ? (
           <>
-            <img class="arrival-bg" src={heroImg.src} srcset={heroSet} sizes="(min-width: 1024px) 62vw, 100vw" alt={heroAlt} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
+            <img class="arrival-bg" src={heroImg.src} srcset={heroSet} sizes="100vw" alt={heroAlt} width={heroImg.attributes.width} height={heroImg.attributes.height} fetchpriority="high" />
             {b.id === 'covent-garden' && <LoopVideo src={boothsLoop} poster={heroPoster!} label={heroAlt} class="arrival-bg" />}
             {b.id === 'soho' && <div class="street-sign" aria-hidden="true"><span class="sign-name">Berwick Street</span><span class="sign-code">W1</span><span class="sign-city">City of Westminster</span></div>}
           </>
@@ -186,7 +191,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <div class="arrival-shade" aria-hidden="true"></div>
       <div class="wrap arrival-in">
         <h1 id="branch-title" class="sr-only">Fatt Pundit {b.shortName}</h1>
-        <div aria-hidden="true" class="board-slot"><BranchArrival client:idle words={words} branch={pill} pill={false} /></div>
+        <div class="board-slot"><BranchArrival client:idle words={words} branch={pill} pill={false} address={open ? b.address.street : undefined} /></div>
         <!-- Local time only where it's news: a room in another time zone. -->
         {b.geo && b.timezone !== 'Europe/London' && <p class="branch-clock" data-branch-clock data-tz={b.timezone} data-lat={b.geo.lat} data-lng={b.geo.lng} data-name={b.shortName}></p>}
         {open && (
@@ -199,24 +204,22 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         {!open && (
           <div id="waitlist" class="hero-list" role="group" aria-labelledby="wl-title">
             <h2 id="wl-title" class="hero-list-h">Be first through the door</h2>
-            {listEndpoint ? (
-              <>
-                <form class="fp-form wl-form" data-waitlist data-list={b.id} action={listEndpoint} method="post" novalidate>
-                  <input type="hidden" name="list" value={`${b.shortName} opening`} />
-                  <div class="fp-field">
-                    <label for="wl-email" class="fp-label">Email address</label>
-                    <div class="wl-row">
-                      <input id="wl-email" class="fp-input" name="email" type="email" required placeholder="you@example.com" autocomplete="email" aria-describedby="wl-email-msg" />
-                      <button class="fp-btn fp-btn--primary" type="submit">Join the list</button>
-                    </div>
-                    <p id="wl-email-msg" data-wl-msg hidden></p>
-                  </div>
-                </form>
-                <p class="fp-small">We'll only email you about the Dubai opening. Unsubscribe any time.</p>
-              </>
-            ) : (
-              <p class="hero-list-note">The list opens soon. For the opening date, follow <a class="fp-link" href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">@fattpundit on Instagram<span class="sr-only"> (opens in a new tab)</span></a>.</p>
-            )}
+            {(listEndpoint || listEmail) ? (<form class="fp-form wl-form" data-waitlist-form data-list={b.id} data-email={listEmail} action={listEndpoint ?? `mailto:${listEmail}`} method="post" enctype={listEndpoint ? undefined : 'text/plain'} novalidate>
+              <input type="hidden" name="list" value={`${b.shortName} opening`} />
+              <!-- Honeypot: people never see or fill this; bots do. -->
+              <div class="wl-hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+              <div class="fp-field">
+                <label for="wl-name" class="fp-label">Your name</label>
+                <input id="wl-name" class="fp-input" name="name" type="text" required autocomplete="name" aria-describedby="wl-msg" />
+              </div>
+              <div class="fp-field">
+                <label for="wl-email" class="fp-label">Email address</label>
+                <input id="wl-email" class="fp-input" name="email" type="email" required placeholder="you@example.com" autocomplete="email" aria-describedby="wl-msg" />
+              </div>
+              <button class="fp-btn fp-btn--primary" type="submit">Notify me</button>
+              <p id="wl-msg" data-wl-msg hidden></p>
+            </form>) : null}
+            <p class="fp-small">{listEndpoint ? "We'll only email you about the Dubai opening. Unsubscribe any time." : listEmail ? <>"Notify me" opens an email to {listEmail} for you to send, and we add you by hand.</> : <>The list opens soon. For the opening date, follow <a class="fp-link" href="https://www.instagram.com/fattpundit/" target="_blank" rel="noopener">@fattpundit on Instagram<span class="sr-only"> (opens in a new tab)</span></a>.</>}</p>
           </div>
         )}
       </div>
@@ -310,7 +313,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             {b.id === 'covent-garden' && (
               <>
                 <LightsOn src={lightsOnClip} off={wallOff} lit={wallLit} litSet={wallLitSet} label={ALTS['gallery-02']} lamps={WALL_LAMPS} ratio={1760 / 1176} place="Maiden Lane" />
-                <p class="wall-intro">Now turn the plates over: each one hides something from the kitchen.</p>
+                <p class="wall-intro fp-h3">Now turn the plates over: each one hides something from the kitchen.</p>
                 <PlateWall client:visible dishes={plates} />
               </>
             )}
@@ -331,6 +334,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
       <section id="visit" class="chapter visit" aria-labelledby="visit-title">
         <div class="wrap">
           <header class="b-head">
+            <p class="fp-section-label b-kicker">Visit · Hours</p>
             <h2 id="visit-title" class="fp-h2"><span class="sr-only">Visit: </span>{openDays}</h2>
           </header>
           <div class="chapter-body visit-grid">
@@ -359,6 +363,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             </div>
             {b.booking && (
               <div class="visit-book">
+                <p class="visit-book-h fp-section-label">Reserve</p>
                 <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
                 <p class="visit-via">Online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>
                 {rating && (
@@ -376,6 +381,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
                   <span class="fp-small">{o.status === 'open' ? o.address.city : 'Opening soon'}</span>
                   <span class="other-name">{o.shortName}</span>
                   <span class="fp-body">{o.address.street}</span>
+                  <span class="other-pill"><OpenNowPill client:visible branches={[pillOf(o)]} nameless /></span>
                   <span class="other-go">{o.status === 'open' ? `Visit ${o.shortName}` : `See ${o.shortName}`}</span>
                 </a>
               ))}
@@ -397,14 +403,25 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
                   <span class="fp-small">{o.address.city}</span>
                   <span class="other-name">{o.shortName}</span>
                   <span class="fp-body">{o.address.street}</span>
+                  <span class="other-pill"><OpenNowPill client:visible branches={[pillOf(o)]} nameless /></span>
                   <span class="other-go">Visit {o.shortName}</span>
                 </a>
               ))}
             </div>
-            <p class="london-book"><a class="fp-btn fp-btn--primary" href="/book/">Book in London</a></p>
           </div>
         </div>
       </section>
+    )}
+    {open ? (
+      <NextStep label="Ready?" title={`Book at ${b.shortName}.`} line={b.address.street} photo={dishPhoto('crispy-okra-salt-n-pepper')} actions={[
+        ...(b.booking ? [{ href: b.booking.url, label: `Book at ${b.shortName}`, primary: true, book: b.id, external: true }] : []),
+        { href: `/${b.id}/menu/`, label: 'See the menus' },
+      ]} />
+    ) : (
+      <NextStep label="Meanwhile" title="Book in London." line="Two rooms are open now, while Dubai gets ready." photo={dishPhoto('crispy-okra-salt-n-pepper')} actions={[
+        { href: '/book/', label: 'Book in London', primary: true },
+        ...others.map((o) => ({ href: `/${o.id}/`, label: `Visit ${o.shortName}` })),
+      ]} />
     )}
   </main>
 
@@ -437,9 +454,51 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
     const word = row.querySelector<HTMLElement>('.hours-today');
     if (word) word.hidden = false;
   }
-  // The Dubai list: real states once PUBLIC_DUBAI_LIST_ENDPOINT is set (no form is rendered before that).
-  import { bindWaitlists } from '../../lib/waitlist';
-  bindWaitlists();
+  // The Dubai list: posts to the endpoint when there is one, otherwise opens an email to us (said on the page).
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlist-form]')) {
+    const msg = form.querySelector<HTMLElement>('[data-wl-msg]')!;
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const hasEndpoint = !form.action.startsWith('mailto:');
+    const say = (text: string, kind: 'error' | 'success', role: 'alert' | 'status') => {
+      msg.textContent = text;
+      msg.className = `fp-msg fp-msg--${kind}`;
+      msg.setAttribute('role', role);
+      msg.hidden = false;
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '').trim();
+      const email = String(data.get('email') ?? '').trim();
+      const nameEl = form.elements.namedItem('name') as HTMLInputElement;
+      const emailEl = form.elements.namedItem('email') as HTMLInputElement;
+      nameEl.setAttribute('aria-invalid', String(!name));
+      emailEl.setAttribute('aria-invalid', String(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)));
+      if (!name) { say('Enter your name.', 'error', 'alert'); nameEl.focus(); return; }
+      if (emailEl.getAttribute('aria-invalid') === 'true') { say('Enter an email address like name@example.com', 'error', 'alert'); emailEl.focus(); return; }
+      if (data.get('website')) { say("You're on the list.", 'success', 'status'); return; } // honeypot filled: a bot, say nothing useful
+      if (btn.getAttribute('aria-busy') === 'true') return;
+      if (!hasEndpoint) {
+        const to = form.dataset.email!;
+        const body = `Please tell me when Fatt Pundit Dubai opens.\n\nName: ${name}\nEmail: ${email}`;
+        location.href = `mailto:${to}?subject=${encodeURIComponent('Dubai opening list')}&body=${encodeURIComponent(body)}`;
+        say(`Your email app should open with a message to ${to}. Send it to join the list: nothing is saved until you do. No email app? Write to ${to}.`, 'success', 'status');
+        return;
+      }
+      btn.setAttribute('aria-busy', 'true');
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        say(`You're on the list. We'll email ${email} when Dubai takes bookings.`, 'success', 'status');
+        form.reset();
+        window.dispatchEvent(new CustomEvent('fp:waitlist-joined', { detail: { list: form.dataset.list } }));
+      } catch {
+        say("We couldn't add you. Try again in a moment.", 'error', 'alert');
+      } finally {
+        btn.removeAttribute('aria-busy');
+      }
+    });
+  }
 </script>
 
 <style>
@@ -447,70 +506,39 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .branch :global(p) { margin: 0; }
   .lead-text { color: var(--lead-text); }
 
-  /* Arrival. Phones: a media band, then the name and the actions on ink (the facts strip ends inside the
-     first screen). 900px and up: media fills, text sits on a dark fade. 1024px and up: a desk spread. */
-  .arrival { position: relative; display: flex; flex-direction: column; color: var(--color-sand); background: var(--color-ink); overflow: hidden; }
-  .arrival-media { position: relative; overflow: hidden; }
-  .arrival-media.is-photo { aspect-ratio: 16 / 9; }
-  .arrival-media.is-art { aspect-ratio: 16 / 9; }
+  /* Arrival: the photo fills the hero on every screen and the name sits bottom-left on a bottom shade.
+     Phones: about 60svh (a 4:5 crop). 900px and up: taller. 1024px and up: the full screen under the header. */
+  .arrival { position: relative; display: grid; align-items: end; min-height: min(60svh, 125vw); color: var(--color-sand); background: var(--color-ink); overflow: hidden; }
+  .arrival-media { position: absolute; inset: 0; overflow: hidden; }
   .arrival :global(.arrival-bg) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .arrival-shade { display: none; }
-  .arrival-in { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); padding-block: 28px 40px; width: 100%; }
+  .arrival-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgb(44 41 37 / 0.94) 0%, rgb(44 41 37 / 0.78) 28%, rgb(44 41 37 / 0.25) 58%, transparent 80%); }
+  .arrival-media.is-art + .arrival-shade { background: linear-gradient(0deg, rgb(44 41 37 / 0.85), transparent 70%); }
+  .arrival-in { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); padding-block: 96px 32px; width: 100%; }
+  .arrival-in > * { max-width: 640px; }
   /* Full column width so the name board can size itself to it (container units). */
   .board-slot { min-height: 1.2em; align-self: stretch; container-type: inline-size; }
   /* The board name is the page's one bold thing (Phase 8): up to 112px tiles, as wide as the column allows. */
   .branch :global(.arrival-flap) { font-size: min(clamp(52px, 8vw, 112px), calc(100cqw / (var(--n, 13) * 0.8))); }
   /* A real board's hinge is a hairline gap, not a bar through the letters. */
   .branch :global(.arrival-flap [data-hinge]) { height: 1px; background: rgb(26 23 20 / 0.9); }
+  .branch :global(.arrival-line) { margin-top: calc(-1 * var(--space-2)); }
   .arrival-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-6); }
   .arrival-menus { color: var(--color-sand); }
   .hero-list { display: grid; gap: var(--space-3); width: 100%; max-width: 34rem; margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-gold); --fp-fg: var(--color-sand); --fp-link: var(--color-gold); }
   .hero-list-h { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3vw, 36px); line-height: 1.1; text-transform: none; letter-spacing: var(--tracking-display); color: var(--color-sand); }
-  .hero-list-note { margin: 0; font-size: 17px; line-height: 1.5; color: var(--color-sand); }
   .hero-list .fp-link { color: var(--color-gold); }
-  @media (min-width: 900px) {
-    /* D4: top-aligned, so a slow first paint can't slide the words up as the rest of the hero arrives. */
-    .arrival { display: grid; align-items: start; min-height: min(88svh, 860px); }
-    .arrival-media, .arrival-media.is-photo, .arrival-media.is-art { position: absolute; inset: 0; aspect-ratio: auto; }
-    .arrival-shade { display: block; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(44 41 37 / 0.94) 0%, rgb(44 41 37 / 0.82) 34%, rgb(44 41 37 / 0.2) 64%, transparent 80%), linear-gradient(0deg, rgb(44 41 37 / 0.7), transparent 40%); }
-    .arrival-in { padding-block: 64px; }
-    .arrival-in > * { max-width: 560px; }
-  }
-  .arrival-media.is-art + .arrival-shade { background: linear-gradient(90deg, rgb(44 41 37 / 0.85), transparent 60%); }
-
-  /* 1024px and up: a desk spread on the 12-column grid (design-direction.md §3).
-     Photo hero: the photo bleeds off the left edge (to the end of col 7); the name card overlaps it (cols 7–12).
-     Art hero (Dubai): words on the left (cols 1–5), the art bleeds off the right edge (col 6 on). */
-  @media (min-width: 1024px) {
-    .arrival {
-      grid-template-columns: minmax(var(--grid-margin), 1fr) repeat(12, minmax(0, calc((var(--grid-max) - 11 * var(--grid-gutter)) / 12))) minmax(var(--grid-margin), 1fr);
-      column-gap: var(--grid-gutter);
-      align-items: center;
-      min-height: 0;
-      padding-block: var(--space-8);
-    }
-    .arrival-shade { display: none; }
-    .arrival-media, .arrival-media.is-photo, .arrival-media.is-art { position: relative; inset: auto; grid-row: 1; height: min(76svh, 720px); min-height: 520px; }
-    .arrival-media.is-photo { grid-column: 1 / 9; }
-    .arrival-media.is-art { grid-column: 7 / -1; }
-    .arrival-in { grid-row: 1; max-width: none; margin: 0; padding: 0; z-index: 1; gap: var(--space-6); }
-    .arrival-in > * { max-width: none; }
-    .arrival-media.is-photo ~ .arrival-in { grid-column: 8 / 14; padding: var(--space-8) var(--space-7); background: var(--color-ink); border: 1px solid var(--color-gold); }
-    .arrival-media.is-art ~ .arrival-in { grid-column: 2 / 7; }
-  }
-  /* Small laptops: the card takes one more column and less padding so the actions stay above the fold. */
-  @media (min-width: 1024px) and (max-width: 1439px) {
-    .arrival-media.is-photo { grid-column: 1 / 8; }
-    .arrival-media.is-photo ~ .arrival-in { grid-column: 7 / 14; padding: var(--space-7) var(--space-6); }
-  }
+  .wl-form { display: grid; gap: var(--space-3); justify-items: start; }
+  .wl-form .fp-field { width: 100%; }
+  .wl-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  @media (min-width: 900px) { .arrival { min-height: min(80svh, 860px); } .arrival-in { padding-block: 120px 56px; } }
+  @media (min-width: 1024px) { .arrival { min-height: 560px; height: calc(100svh - var(--header-h, 72px)); } }
 
   /* Soho: the Westminster street sign, screwed to the wall in the corner of the photo, at sign scale. */
-  .street-sign { position: absolute; z-index: 1; left: clamp(16px, 4vw, 72px); bottom: clamp(14px, 3vw, 48px); display: grid; grid-template-columns: auto auto; gap: 2px 14px; align-items: end; background: #fbfaf6; color: #1b1b1b; padding: 12px 18px 10px; border: 2px solid #1b1b1b; outline: 4px solid #fbfaf6; transform: rotate(-2deg); box-shadow: 0 18px 40px rgb(0 0 0 / 0.5); font-family: system-ui, sans-serif; }
+  .street-sign { position: absolute; z-index: 1; right: clamp(16px, 4vw, 72px); top: clamp(16px, 3vw, 48px); display: grid; grid-template-columns: auto auto; gap: 2px 14px; align-items: end; background: #fbfaf6; color: #1b1b1b; padding: 12px 18px 10px; border: 2px solid #1b1b1b; outline: 4px solid #fbfaf6; transform: rotate(-2deg); box-shadow: 0 18px 40px rgb(0 0 0 / 0.5); font-family: var(--font-display); }
   .sign-name, .sign-code { font-size: clamp(18px, 2.2vw, 34px); font-weight: 700; line-height: 1; }
   .sign-name { letter-spacing: 0.01em; text-transform: uppercase; }
   .sign-code { color: #c8102e; }
   .sign-city { grid-column: 1 / -1; font-size: clamp(8px, 0.75vw, 11px); letter-spacing: 0.3em; text-transform: uppercase; }
-  @media (min-width: 900px) and (max-width: 1023px) { .street-sign { left: auto; right: 4vw; } }
 
   /* Dubai: a departure gate in slate and gold. */
   .art-gate { background: radial-gradient(70% 60% at 70% 30%, rgb(203 160 82 / 0.28), transparent 70%), linear-gradient(160deg, #5f6e79, #2c2925 75%); display: grid; place-items: center end; padding-right: 6vw; }
@@ -518,7 +546,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .gate-code { font-size: clamp(90px, 22vw, 320px); font-weight: 700; letter-spacing: 0.06em; color: transparent; -webkit-text-stroke: 2px rgb(203 160 82 / 0.7); line-height: 1; }
   .art-gate::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(180deg, transparent, rgb(44 41 37 / 0.9)); }
   @media (min-width: 1024px) {
-    .art-gate { place-items: center; padding: 0 var(--grid-margin) 0 var(--space-7); }
+    .art-gate { place-items: center end; padding: 0 var(--grid-margin); }
     .gate-code { font-size: clamp(160px, 17vw, 260px); }
   }
 
@@ -528,7 +556,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   /* Sections on the same surface share one gap, not two paddings. */
   .chapter:not(.ink, .gold-bg):has(.chapter-body) + .chapter:not(.ink, .gold-bg) { padding-top: 0; }
   .b-head { display: grid; gap: var(--space-3); margin-bottom: var(--section-gap); }
-  .b-head .fp-h2 { font-size: clamp(34px, 4.4vw, 56px); line-height: 1.05; }
+  .b-head .fp-h2 { font-size: var(--step-h2); line-height: 1.05; }
   /* The light cut breaks up on ink: regular weight there (Phase 8, flaw 6). */
   .ink .b-head .fp-h2 { font-weight: 400; }
   .b-head :is(.fp-spoken, .chapter-intro) { max-width: 36em; }
@@ -539,7 +567,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .room-spoken { color: var(--fp-fg-muted); }
   .room:has(.room-walk) .b-head { margin-bottom: 0; }
   .room-wall { display: grid; gap: var(--space-6); }
-  .wall-intro { font-size: var(--step-body); font-weight: 700; }
 
   /* What to eat: the ticket (the one object) beside its story. */
   .sig { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 34rem); gap: clamp(32px, 6vw, 80px); align-items: center; }
@@ -597,13 +624,15 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .ledger-note { flex-basis: 100%; font-size: var(--step-small); color: var(--fp-fg-muted); }
 
   /* Visit and book: hours with the map, email and delivery links; the one Book with its proof beside it. */
-  .visit-grid { display: grid; gap: var(--space-8); align-items: start; }
+  .visit-grid { display: grid; gap: var(--space-8); align-items: stretch; }
   @media (min-width: 900px) { .visit-grid { grid-template-columns: minmax(0, 34rem) minmax(0, 24rem); justify-content: space-between; } }
   .visit-hours { display: grid; gap: var(--space-5); }
   .visit-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
   .visit-home { font-size: var(--step-small); }
   .hours-today { font-weight: 400; }
-  .visit-book { display: grid; gap: var(--space-4); justify-items: start; }
+  .visit-book { display: grid; gap: var(--space-4); justify-items: start; align-content: start; padding: var(--space-6); border: 2px solid var(--color-ink); background: var(--color-paper-light); }
+  .visit-book .visit-book-h { width: 100%; border-top: 0; padding-top: 0; }
+  .visit-proof { width: 100%; }
   .visit-via { font-size: var(--step-small); color: var(--fp-fg-muted); }
   .visit-proof { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1, 4px) var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--fp-rule); }
   .proof-n { font-family: var(--font-display); font-weight: 300; font-size: clamp(40px, 4vw, 56px); line-height: 1; letter-spacing: -0.02em; }
@@ -616,13 +645,8 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   .other-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: var(--grid-gutter); }
   .other-name { font-size: clamp(30px, 3.2vw, 46px); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
   .other-go { margin-top: var(--space-2); font-weight: 700; color: var(--fp-fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+  .other-pill { justify-self: start; background: var(--color-ink); border-radius: 999px; }
   #london .others { margin-top: 0; }
-  .london-book { padding-top: var(--space-6); } /* padding: the page's p reset beats a single-class margin */
-
-  /* The Dubai list: the system's field. */
-  .wl-row { display: flex; gap: var(--space-2); }
-  .wl-row > .fp-input { flex: 1; min-width: 0; }
-  @media (max-width: 420px) { .wl-row { flex-direction: column; } }
 
   .branch-clock { display: inline-flex; align-items: center; gap: 8px; margin: 0; min-height: 1.4em; font-size: var(--step-small); color: var(--color-sand); }
   .branch-clock :global(svg) { color: var(--color-gold); flex: none; }

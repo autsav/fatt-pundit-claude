@@ -29,7 +29,7 @@ const book: Act = current?.booking
   : current
     ? { href: onBranchHome ? '#waitlist' : listCta(current).href, label: listCta(current).short, short: listCta(current).short, external: false, list: true }
     : { href: '/book/', label: 'Book a table', short: 'Book a table', external: false, book: '' };
-const bookAttrs = { 'data-book': book.book, 'data-focus-list': book.list ? '' : undefined, ...(book.external ? { target: '_blank', rel: 'noopener' } : {}) };
+const bookAttrs = { 'data-book': book.book, 'data-focus-list': book.list ? '' : undefined, ...(book.external ? { rel: 'noopener' } : {}) };
 const here = (p: string) => (path.startsWith(p) ? 'page' : undefined);
 // Phase 8: on a room's own page the hero holds the one Book; the header's Book and the phone dock
 // appear once the hero has scrolled away (data-hero, set below; without JavaScript they always show).
@@ -52,17 +52,18 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
           ))}
         </ul>
       </details>
+      <a href="/our-story/" aria-current={here('/our-story/')}>Our story</a>
       <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
       <a class="fp-btn fp-btn--primary fp-btn--sm nav-book" href={book.href} {...bookAttrs} {...afterHero}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span></a>
     </nav>
-    <a class="idx" href="#site-index" data-index-open aria-haspopup="dialog">Index</a>
+    <a class="idx" href="#site-index" data-index-open aria-haspopup="dialog" aria-label="Site menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>Menu</a>
   </div>
 </header>
 <BookDrawer />
 
-<dialog class="index" data-index aria-labelledby="index-title">
+<dialog class="index" data-index data-lenis-prevent aria-labelledby="index-title">
   <div class="index-head">
-    <h2 id="index-title">Index</h2>
+    <h2 id="index-title">Menu</h2>
     <button type="button" class="index-close" data-sheet-close>Close</button>
   </div>
   <ol class="index-list">
@@ -77,7 +78,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
           {b.status === 'open' && b.booking ? (
             <>
               <a href={`/${b.id}/menu/`}>Menus<span class="sr-only"> at {b.shortName}</span></a>
-              <a href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book<span class="sr-only"> at {b.shortName}</span></a>
+              <a href={b.booking.url} data-book={b.id} rel="noopener">Book<span class="sr-only"> at {b.shortName}</span></a>
             </>
           ) : (
             <a href={listCta(b).href} data-focus-list>{listCta(b).short}<span class="sr-only"> for {b.shortName}</span></a>
@@ -101,7 +102,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
   </ol>
 </dialog>
 
-<dialog class="index index-menus" data-menus aria-labelledby="menus-title">
+<dialog class="index index-menus" data-menus data-lenis-prevent aria-labelledby="menus-title">
   <div class="index-head">
     <h2 id="menus-title">Which restaurant's menus?</h2>
     <button type="button" class="index-close" data-sheet-close>Close</button>
@@ -126,18 +127,20 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
       {current.phone && <a href={`tel:${current.phone}`} aria-label={`Call ${current.shortName}`}>Call</a>}
     </>
   ) : current ? (
-    <a href="#site-index" data-index-open aria-haspopup="dialog">Rooms</a>
+    <a href="/private-dining/">Groups</a>
   ) : (
     <>
       <a href="#footer-menus" data-menus-open aria-haspopup="dialog">Menus</a>
-      <a href="#site-index" data-index-open aria-haspopup="dialog">Rooms</a>
+      <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
     </>
   )}
-  <a class="dock-book" href={book.href} {...bookAttrs}>{book.list ? book.short : 'Book'}</a>
+  <a class="dock-book" href={book.href} {...bookAttrs} aria-current={path === '/book/' ? 'page' : undefined}>{book.list ? book.short : 'Book'}</a>
 </nav>
 
 <script>
+  import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
   const sheets = { index: document.querySelector<HTMLDialogElement>('[data-index]'), menus: document.querySelector<HTMLDialogElement>('[data-menus]') };
+  for (const d of Object.values(sheets)) d?.addEventListener('close', unlockScroll);
   const pop = document.querySelector<HTMLDetailsElement>('[data-menus-pop]');
   document.addEventListener('click', (e) => {
     const t = e.target as Element;
@@ -145,6 +148,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
     if (opener) {
       e.preventDefault();
       (opener.hasAttribute('data-menus-open') ? sheets.menus : sheets.index)?.showModal();
+      lockScroll();
       return;
     }
     for (const d of Object.values(sheets)) {
@@ -162,12 +166,42 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
     }
   });
   // Room pages: the header's Book and the dock wait until the hero (which has its own Book) is gone.
-  const hero = document.querySelector('section[data-room-hero]');
-  if (hero && document.querySelector('[data-after-hero]')) {
-    new IntersectionObserver(([e]) => { document.documentElement.dataset.hero = e.isIntersecting ? 'in' : 'out'; }, { rootMargin: '-68px 0px 0px 0px' }).observe(hero);
+  // The swap happens when the hero's own Book passes under the header's bottom edge.
+  const heroSection = document.querySelector('section[data-room-hero]');
+  const hero = heroSection?.querySelector('.arrival-actions') ?? heroSection;
+  const bar = document.querySelector<HTMLElement>('.bar');
+  if (hero && bar && document.querySelector('[data-after-hero]')) {
+    const h = Math.round(bar.getBoundingClientRect().height);
+    // Not intersecting but below the header line (e.g. under the fold) still counts as "in".
+    new IntersectionObserver(([e]) => { document.documentElement.dataset.hero = e.isIntersecting || e.boundingClientRect.top > h ? 'in' : 'out'; }, { rootMargin: `-${h}px 0px 0px 0px` }).observe(hero);
   } else delete document.documentElement.dataset.hero;
+
+  // Phone dock: away on scroll down (12px threshold), back on scroll up, away while a field has focus.
+  const dock = document.querySelector<HTMLElement>('[data-dock]');
+  if (dock) {
+    const root = document.documentElement;
+    const field = 'input, select, textarea';
+    let last = scrollY;
+    addEventListener('scroll', () => {
+      const y = scrollY;
+      if (Math.abs(y - last) < 12) return;
+      dock.toggleAttribute('data-away', y > last && y > 80);
+      last = y;
+    }, { passive: true });
+    addEventListener('focusin', (e) => { if ((e.target as Element).matches?.(field)) dock.setAttribute('data-typing', ''); });
+    addEventListener('focusout', (e) => { if ((e.target as Element).matches?.(field)) dock.removeAttribute('data-typing'); });
+  }
   // The Menus dropdown: Escape closes it and returns focus to its button.
   pop?.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && pop.open) { pop.open = false; pop.querySelector('summary')?.focus(); }
   });
 </script>
+
+<style>
+  .idx { gap: 8px; text-decoration: none; }
+  @media (max-width: 640px) {
+    .dock[data-dock] { transition: translate var(--dur-panel) var(--curve-panel), transform var(--dur-panel) var(--curve-panel), visibility var(--dur-panel); }
+    .dock[data-away], .dock[data-typing] { translate: 0 100%; }
+    .dock:focus-within { translate: 0 0; }
+  }
+</style>

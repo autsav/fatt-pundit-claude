@@ -37,6 +37,10 @@ export interface MenuPlace {
   soon?: { dishes: string[]; href: string; label: string };
 }
 const PLACE_KEY = 'fp-menu-at';
+/** One choice/tab look for the branch toggle and the book's bookmarks. */
+const CHOICE = 'min-h-11 border-2 px-4 font-label text-[15px] font-bold tracking-[0.02em]';
+const CHOICE_ON = 'bg-ink text-sand border-ink';
+const CHOICE_OFF = 'bg-paper-light text-ink border-ink/50';
 /** A dish for the signature page that opens the à la carte menu (home page). */
 export interface SignatureDish {
   name: string;
@@ -384,8 +388,29 @@ export default function MenuBook({
     return out;
   }, [menu, art, z, place, signatures]);
 
+  // Decode ahead: a lazy picture one and a half screens away loads and decodes now, so no frame stalls when it arrives.
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const img = e.target as HTMLImageElement;
+          io.unobserve(img);
+          img.loading = 'eager';
+          img.decode?.().catch(() => {});
+        }
+      },
+      { rootMargin: '150% 0px' },
+    );
+    root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => io.observe(img));
+    return () => io.disconnect();
+  }, [menu?.id, place?.id, opened, pages]);
+
   return (
-    <section id="menu" className="relative overflow-hidden bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
+    <section ref={sectionRef} id="menu" className="relative overflow-hidden bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="wrap relative flex flex-col items-center">
         {/* Chapter head (the home page's numbered chapters), then one toolbar: which room's book, or the list. */}
@@ -411,27 +436,27 @@ export default function MenuBook({
                         tabIndex={on ? 0 : -1}
                         onClick={() => choose(p.id)}
                         onKeyDown={(e) => onTagKey(e, i)}
-                        className={`menu-tag ${on ? 'is-on' : ''}`}
+                        className={`${on ? CHOICE_ON : CHOICE_OFF} ${CHOICE}`}
                       >
                         {p.name}
                       </button>
                     );
                   })}
+                  {soon.map((p) => (
+                    <button key={p.id} type="button" disabled className={`${CHOICE_OFF} ${CHOICE} cursor-not-allowed opacity-60`}>
+                      {p.name} · soon
+                    </button>
+                  ))}
                 </div>
-                {soon.map((p) => (
-                  <p key={p.id} className="m-0 text-[16px]">
-                    {p.name}: the menu comes with the opening. <a className="fp-link" href={p.soon!.href}>{p.soon!.label}</a>
-                  </p>
-                ))}
               </div>
             )}
             {lists && lists.length > 0 && (
-              <div className="menu-toolbar-group">
-                <p className="menu-toolbar-label">Or read them as a list, with search and diet filters</p>
-                <div className="flex flex-wrap gap-2 sm:gap-3">
+              <details className="menu-toolbar-group">
+                <summary className="menu-toolbar-label cursor-pointer font-bold">List view &amp; diet filters</summary>
+                <div className="mt-3 flex flex-wrap gap-2 sm:gap-3">
                   {lists.map((l) => <a key={l.href} className="fp-btn fp-btn--sm" href={l.href}>{l.label}</a>)}
                 </div>
-              </div>
+              </details>
             )}
             {!places && <p className="m-0 fp-body">The menu you'll be handed at the table. Pick yours from the bookmarks.</p>}
           </div>
@@ -457,7 +482,7 @@ export default function MenuBook({
         <div className="mx-auto mt-7 w-full max-w-[1000px]">
           {/* Bookmarks: paper tabs standing up from the top edge of the book. */}
           {/* Bookmarks: one paper style, the open one in ink (no colour without meaning). */}
-          <div role="tablist" aria-label="Menus" className="relative z-10 flex items-end gap-[6px] overflow-x-auto px-4 [scrollbar-width:none] sm:flex-wrap sm:justify-center sm:overflow-visible">
+          <div role="tablist" aria-label="Menus" className="relative z-10 flex snap-x snap-mandatory items-end gap-[6px] overflow-x-auto px-4 [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)] sm:flex-wrap sm:justify-center sm:snap-none sm:overflow-visible">
             {shown.map((m, i) => {
               const on = m.id === menu.id;
               const firstDiet = m.diet && !shown[i - 1]?.diet && i > 0;
@@ -474,7 +499,7 @@ export default function MenuBook({
                     setActive(m.id);
                     setOpened(true);
                   }}
-                  className={`${on ? 'bg-ink text-sand border-ink' : 'bg-paper-light text-ink border-ink/50'} min-h-11 shrink-0 whitespace-nowrap border-2 border-b-0 px-4 font-label text-[15px] font-bold tracking-[0.02em] shadow-[0_-2px_6px_rgb(0_0_0/0.10)] [transition:padding_var(--dur-fast)_var(--curve-out),transform_var(--dur-spring)_var(--curve-spring)] ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 hover:translate-y-0'}`}
+                  className={`${on ? CHOICE_ON : CHOICE_OFF} ${CHOICE} snap-start shrink-0 whitespace-nowrap !border-b-0 shadow-[0_-2px_6px_rgb(0_0_0/0.10)] [transition:padding_var(--dur-fast)_var(--curve-out),transform_var(--dur-spring)_var(--curve-spring)] ${on ? 'pb-4 pt-3' : 'translate-y-1 pb-2 pt-2 hover:translate-y-0'}`}
                 >
                   {m.tab}
                 </button>
@@ -484,13 +509,23 @@ export default function MenuBook({
           </div>
           {/* Sized from the viewport height so the open book fits one screen, with a floor: on a phone on its
               side (390px tall) the height rule alone gave a 75px book with 2px type. Past the floor it scrolls. */}
-          <div className="relative mx-auto drop-shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))' }}>
+          <div className="relative mx-auto shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))' }}>
             <PageFlip key={`${place?.id}-${menu.id}-${opened ? 'open' : 'shut'}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
           </div>
         </div>
+        {menu.id === 'a-la-carte' && signatures && signatures.length > 1 && (
+          <ul className="m-0 mt-5 grid w-full max-w-[420px] list-none grid-cols-2 gap-3 p-0 sm:hidden" aria-label="Signature dishes">
+            {signatures.slice(0, 2).map((d) => (
+              <li key={d.name} className="flex flex-col gap-1.5">
+                {d.image && <img src={d.image} alt={d.alt ?? ''} className="fp-photo aspect-[4/3] w-full object-cover" loading="lazy" decoding="async" />}
+                <p className="m-0 text-[14px] font-bold uppercase leading-tight tracking-[0.05em]">{d.name}{d.price && <span className="font-normal"> | {d.price}</span>}</p>
+              </li>
+            ))}
+          </ul>
+        )}
         <p className="m-0 mt-5 text-center font-note text-[16px] italic text-ink/80 sm:hidden">Swipe sideways or tap a page edge to turn</p>
         {place?.book && (
-          <a href={place.book.href} target="_blank" rel="noopener" className="fp-btn fp-btn--primary mt-6">
+          <a href={place.book.href} data-book={place.id} className="fp-btn fp-btn--primary mt-6">
             {place.book.label}
           </a>
         )}

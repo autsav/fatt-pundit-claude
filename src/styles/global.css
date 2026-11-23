@@ -59,8 +59,14 @@
     color: var(--color-ink);
     font-family: var(--font-body);
     letter-spacing: var(--tracking-copy);
-    -webkit-font-smoothing: antialiased;
+    scroll-padding-top: calc(var(--header-h, 72px) + 16px);
+    scrollbar-gutter: stable;
   }
+  /* Grey antialiasing thins dark-on-light text; keep it for light-on-dark only. */
+  :is(.surface-night, .surface-deep, .bg-ink, .ink, .bar, .foot, .bar-dark, .tonight, .rail, .voyage, .rain, .arrival, .doors, .room-lightbox) { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  :where(h1, h2, h3, h4) { text-wrap: balance; }
+  :where(p, li, dd, blockquote) { text-wrap: pretty; }
+  ::selection { background: var(--color-gold); color: var(--color-ink); }
   h1, h2, h3 {
     font-family: var(--font-display);
     font-weight: 700;
@@ -219,15 +225,15 @@
     :root:not([data-story='comic']) .story-body:has(> .story-chapter[data-scenes]:last-child) { padding-bottom: 0; }
     .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
     .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
-    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out, fx-gone; animation-fill-mode: both, both, forwards;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-fill-mode: both, both;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
     /* Opt-in, cheaper exit: the move keeps its transform only, so opacity has one animation (.fx-solo-out + .fx-then-out). */
-    .story-scene .fx.fx-then-out.fx-solo-out { animation-name: fx-move-t, fx-out, fx-gone; }
+    .story-scene .fx.fx-then-out.fx-solo-out { animation-name: fx-move-t, fx-out; }
     /* Opt-in, hidden until its range: .fx-late is visibility:hidden until --from, so it is not rastered early. */
     .story-scene .fx.fx-late { visibility: hidden; animation-name: fx-move, fx-show; animation-fill-mode: both, forwards;
       animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--from, 0%) contain 100%; }
-    .story-scene .fx.fx-late.fx-then-out { animation-name: fx-move, fx-out, fx-show, fx-gone; animation-fill-mode: both, both, forwards, forwards;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--from, 0%) contain 100%, contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-late.fx-then-out { animation-name: fx-move, fx-out, fx-show; animation-fill-mode: both, both, forwards;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--from, 0%) contain 100%; }
     .story-scene .fx.fx-draw { animation-name: fx-draw; }
     /* Easing by role. Scroll-coupled motion (camera, parallax, the route, the ship) stays linear: the scroll is the
        clock. What arrives lands softly (ease-out-quart), what pops overshoots and settles like a stamp, and what
@@ -240,14 +246,14 @@
        --rock-a scales the swing). `rotate`, so it composes with the engine's transform. */
     .story-scene .fx.fx-puppet { transform-origin: 50% 100%; animation-name: fx-move, fx-rock; animation-timing-function: var(--ease-land), ease-in-out;
       animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
-    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock, fx-gone; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out, linear; animation-fill-mode: both, both, both, forwards;
-      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%); }
+    .story-scene .fx.fx-puppet.fx-then-out { animation-name: fx-move, fx-out, fx-rock; animation-timing-function: var(--ease-land), var(--ease-leave), ease-in-out; animation-fill-mode: both, both, both;
+      animation-range: contain var(--from, 0%) contain var(--to, 100%), contain var(--out-from, 100%) contain var(--out-to, 100%), contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
     /* Cast: the rock sits on .cast-art, so the group's transform and opacity stay uncluttered (and the bubble does not rock). */
     .story-scene .cast > .cast-art.fx-rock { transform-origin: 50% 100%; animation: fx-rock ease-in-out both; animation-timeline: --scene; animation-range: contain var(--rock-from, 0%) contain var(--rock-to, 100%); }
     /* Captions hand over in turn: the old one is gone by the middle of the shared window, the new one starts after it,
        so two are never legible at once. Same --from/--to/--out-* as any .fx; the first half of a window is the exit. */
     .story-scene .scene-text :is(.cap, .cap-t).fx { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%); }
-    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
+    .story-scene .scene-text :is(.cap, .cap-t).fx.fx-then-out { animation-range: contain calc((var(--from, 0%) + var(--to, 100%)) / 2) contain var(--to, 100%), contain var(--out-from, 100%) contain calc((var(--out-from, 100%) + var(--out-to, 100%)) / 2); }
     /* Between stages: each stage overlaps the last by its torn top edge, so a scene change reads as a fresh sheet of
        paper laid over the last one: no ruler-straight seam, no screen of blank paper. The edge hides under the
        header while the stage is pinned. The wrappers lose their sand fill so the overlap shows the scene beneath. */
@@ -273,8 +279,6 @@
   to { transform: translate(var(--x1, 0), var(--y1, 0)) rotate(var(--r1, 0deg)) scale(var(--s1, 1)); }
 }
 @keyframes fx-out { to { opacity: 0; } }
-/* visibility is visible through the range and hidden at its end: a layer that has faded out stops being rastered. */
-@keyframes fx-gone { from { visibility: visible; } to { visibility: hidden; } }
 @keyframes fx-show { from, to { visibility: visible; } }
 @keyframes fx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
@@ -362,7 +366,7 @@
 /* Flame: a hot ellipse that grows from its base (--s0 small, --s1 large). */
 :where(.story-scenes) .scene-flame { transform-origin: 50% 100%; aspect-ratio: 1 / 1.3; border-radius: 50% 50% 45% 45%;
   background: radial-gradient(ellipse at 50% 80%, rgb(255 236 170 / 0.95), var(--color-gold) 30%, var(--color-tiger) 58%, transparent 72%); }
-@media (max-width: 640px) { :where(.story-scenes) { --floor: calc(60px + env(safe-area-inset-bottom)); } }
+@media (max-width: 640px) { :where(.story-scenes) { --floor: calc(var(--dock-h, 60px) + env(safe-area-inset-bottom)); } }
 @media (max-width: 599px) {
   :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }
   :where(.story-scene) { height: var(--h-phone, var(--h, 180vh)); }
@@ -486,7 +490,7 @@
 .walk-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-6); padding-bottom: var(--space-5); }
 .walk-nav { display: flex; align-items: center; gap: var(--space-4); font-family: var(--font-body); font-style: normal; }
 .walk-btn { min-height: 44px; padding: 0 18px; border: 2px solid var(--color-sand); background: none; color: var(--color-sand); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
-.walk-btn:hover:not([aria-disabled='true']) { background: var(--color-sand); color: var(--color-ink); }
+@media (hover: hover) { .walk-btn:hover:not([aria-disabled='true']) { background: var(--color-sand); color: var(--color-ink); } }
 .walk-btn[aria-disabled='true'] { opacity: 0.4; cursor: default; }
 .walk-count { min-width: 4.5em; text-align: center; font-size: var(--step-small); color: var(--color-sand); font-variant-numeric: tabular-nums; }
 .walk-stop { margin: 0; font-size: var(--step-label); font-weight: 700; line-height: 1.3; color: var(--color-gold); font-variant-numeric: tabular-nums; }
@@ -508,13 +512,14 @@
 .bar-embroidery { font-family: var(--font-display); font-size: 128px; font-weight: 700; letter-spacing: 0.12em; }
 .bar-stitch { fill: none; stroke: #f3e7d6; stroke-width: 2; stroke-dasharray: 7 4; stroke-linecap: round; }
 .bar-print { position: absolute; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 6px solid var(--color-paper); box-shadow: 0 16px 34px rgb(0 0 0 / 0.55); }
-.bar-stage { --lx: 30%; --ly: 45%; border: 2px solid var(--color-gold); cursor: none; touch-action: pan-y; }
+.bar-stage { border: 2px solid var(--color-gold); cursor: none; touch-action: pan-y; }
 @media (hover: none) { .bar-stage { cursor: auto; } }
-/* Darkness with a warm hole where the light is. */
-.bar-dark-veil { background:
-    radial-gradient(circle clamp(130px, 22vw, 260px) at var(--lx) var(--ly), rgb(255 190 110 / 0.16), transparent 70%),
-    radial-gradient(circle clamp(150px, 26vw, 320px) at var(--lx) var(--ly), transparent 0, rgb(12 10 8 / 0.5) 45%, rgb(12 10 8 / 0.95) 80%); }
-.bar-stage.is-lit .bar-dark-veil { background: linear-gradient(180deg, rgb(12 10 8 / 0.05), rgb(12 10 8 / 0.25)); }
+/* Darkness with a warm hole. The veil is twice the stage each way, centred on the light (left/top -100% puts its middle at the stage's corner),
+   so one transform: translate3d(x, y, 0) moves the hole with no gradient repaint. */
+.bar-dark-veil { position: absolute; left: -100%; top: -100%; width: 200%; height: 200%; pointer-events: none; will-change: transform; transform: translate3d(0, 0, 0); background:
+    radial-gradient(circle clamp(130px, 22vw, 260px) at 50% 50%, rgb(255 190 110 / 0.16), transparent 70%),
+    radial-gradient(circle clamp(150px, 26vw, 320px) at 50% 50%, transparent 0, rgb(12 10 8 / 0.5) 45%, rgb(12 10 8 / 0.95) 80%); }
+.bar-stage.is-lit .bar-dark-veil { left: 0; top: 0; width: 100%; height: 100%; transform: none !important; will-change: auto; background: linear-gradient(180deg, rgb(12 10 8 / 0.05), rgb(12 10 8 / 0.25)); }
 /* Leather apron: brown hide, stitched edge, a tiger pressed into it. */
 .bar-apron { padding: clamp(22px, 3vw, 36px); border-radius: 6px; overflow: hidden;
   background: radial-gradient(120% 90% at 30% 20%, #6a4631, #43291c 70%), #43291c;
@@ -538,7 +543,8 @@
 .room-edge-n { color: var(--color-sand); }
 .room-shot { display: block; padding: 0; border: 0; background: #000; cursor: zoom-in; aspect-ratio: 3 / 2; overflow: hidden; }
 .room-shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-fast) var(--curve-out); }
-.room-shot:hover img, .room-shot:focus-visible img { transform: scale(1.04); }
+@media (hover: hover) { .room-shot:hover img { transform: scale(1.04); } }
+.room-shot:focus-visible img { transform: scale(1.04); }
 .room-shot:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 2px; }
 .room-pick { position: absolute; inset: 4px -6px; width: calc(100% + 12px); height: calc(100% - 8px); overflow: visible; pointer-events: none; }
 .room-pick path { fill: none; stroke: var(--color-gold); stroke-width: 5; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 0.5px #8a6a2c); }
@@ -557,14 +563,15 @@
 .room-lb-prev { left: 12px; }
 .room-lb-next { right: 12px; }
 @media (max-width: 760px) { .room-lb-prev, .room-lb-next { top: auto; bottom: 16px; translate: none; } .room-lb-prev { left: calc(50% - 60px); } .room-lb-next { right: calc(50% - 60px); } .room-lightbox { padding-bottom: 80px; } }
-.room-lb-btn:hover, .room-lb-btn:focus-visible { background: var(--color-tiger); border-color: var(--color-tiger); }
+@media (hover: hover) { .room-lb-btn:hover { background: var(--color-tiger); border-color: var(--color-tiger); } }
+.room-lb-btn:focus-visible { background: var(--color-tiger); border-color: var(--color-tiger); }
 @media (prefers-reduced-motion: reduce) { .room-pick path { stroke-dashoffset: 0; } }
 
 /* Menu by location: the restaurant choice, as the system's option chips (sentence case; chosen = ink, not tiger,
    which is kept for actions). */
 .menu-tag { position: relative; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink);
   font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
-.menu-tag:hover { transform: translateY(-2px); }
+@media (hover: hover) { .menu-tag:hover { transform: translateY(-2px); } }
 .menu-tag:active { transform: translateY(1px) scale(0.98); transition-duration: var(--dur-press); }
 .menu-tag.is-on { background: var(--color-ink); color: var(--color-sand); }
 .menu-tag:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 3px; }

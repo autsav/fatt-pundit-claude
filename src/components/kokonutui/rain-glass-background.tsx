@@ -585,9 +585,14 @@ export default function RainGlassBackground({
     let slowAvg = 16;
     let tick = 0;
     let skip = false;
+    let half = false;
+    // While the page scrolls the loop is parked (no canvas uploads competing with the compositor);
+    // it resumes 150 ms after the last scroll event.
+    let scrolling = false;
+    let scrollTimer = 0;
     const frame = (now: number) => {
       raf = 0;
-      if (!visible) {
+      if (!visible || scrolling) {
         return;
       }
       const dt = Math.min((now - (last || now - 16)) / 1000, 1 / 20);
@@ -629,12 +634,13 @@ export default function RainGlassBackground({
         clear.fillStyle = "white";
         fogClock = 0;
       }
-      render();
+      // Textures go up every other frame; the drops still step each frame.
+      if ((half = !half)) render();
       raf = requestAnimationFrame(frame);
     };
     const start = () => {
       if (!woken) return;
-      if (!raf && visible && !reduceMotion && document.documentElement.dataset.motion !== "paused") {
+      if (!raf && visible && !scrolling && !reduceMotion && document.documentElement.dataset.motion !== "paused") {
         last = 0;
         raf = requestAnimationFrame(frame);
       }
@@ -691,6 +697,15 @@ export default function RainGlassBackground({
       } else start();
     };
     window.addEventListener("fp:motion", onMotion);
+    const onScroll = () => {
+      scrolling = true;
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => {
+        scrolling = false;
+        start();
+      }, 150);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     const colorTimer = window.setInterval(() => {
       if (!visible) {
         return;
@@ -762,6 +777,8 @@ export default function RainGlassBackground({
       intersection.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("fp:motion", onMotion);
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(scrollTimer);
       root.removeEventListener("pointerdown", onDown);
       root.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);

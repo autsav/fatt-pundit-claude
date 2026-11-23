@@ -39,8 +39,10 @@ interface Props {
   questions?: { related?: { href: string; label: string }[] };
   /** The page-end strip (Phase 7 §3.7). Default: book or see the menus. `false` leaves it out. */
   next?: ComponentProps<typeof NextStep> | false;
+  /** When the facts on this page were last checked, e.g. "23 November 2026". */
+  updated?: string;
 }
-const { title, description, kicker, heading, noindex, wide, intro, branch, crumbs, summary, questions } = Astro.props;
+const { title, description, kicker, heading, noindex, wide, intro, branch, crumbs, summary, questions, updated } = Astro.props;
 const next = Astro.props.next ?? {
   title: 'Hungry yet?',
   line: 'Two rooms in London, open tonight.',
@@ -83,6 +85,7 @@ const showContents = contents.length > 4;
         <p class="fp-section-label">{kicker}</p>
         <h1 class="fp-h2">{heading}</h1>
         {intro && <p class="chapter-intro">{intro}</p>}
+        {updated && <p class="info-updated">Last reviewed {updated}</p>}
       </header>
 
       <div class="info-desk">
@@ -108,7 +111,7 @@ const showContents = contents.length > 4;
             <h2 id="questions-h" class="fp-h4">Questions?</h2>
             <ul class="fp-ledger q-rooms" role="list">
               {branches.filter((b) => b.status === 'open').map((b) => (
-                <li><strong>{b.shortName}</strong>{b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}{b.email && <a class="fp-link q-mail" href={`mailto:${b.email}`}>{b.email}</a>}</li>
+                <li><strong>{b.shortName}</strong>{b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>{prettyPhone(b.phone)}</a>}{b.email && <a class="fp-link q-mail" href={`mailto:${b.email}`}>Email {b.shortName}</a>}</li>
               ))}
             </ul>
             {questions.related && <p class="fp-cluster q-related">{questions.related.map((r) => <a class="fp-btn fp-btn--sm" href={r.href}>{r.label}</a>)}</p>}
@@ -166,5 +169,6 @@ const showContents = contents.length > 4;
   .q-rooms li { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); align-items: baseline; padding-block: var(--space-2); }
   .q-rooms strong { min-width: 8em; }
   .q-mail { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; overflow-wrap: anywhere; }
+  .info-updated { margin: var(--space-2) 0 0; font-size: var(--step-small); color: var(--fp-fg-muted); }
   .q-related { margin: var(--space-4) 0 0; }
 </style>

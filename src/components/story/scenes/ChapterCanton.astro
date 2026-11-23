@@ -104,7 +104,8 @@ const shipSizes = '(max-width: 599px) 86vw, min(44vw, 620px)';
   .ss-bubble { left: 0; top: 0; translate: -32px calc(-100% - max(32px, 3vw) - 8px); --from: 30%; --to: 33%; --out-from: 46%; --out-to: 49%; }
 
   @media (max-width: 599px) {
-    .sh-sfx { right: -4%; top: -6%; }
+    /* Phones: the horn rides above the sails, clear of Fatt's bubble (the bubble sits over the bow, left). */
+    .sh-sfx { right: 2%; top: -38%; }
     /* Phones: the compass moves to the right edge, above the water, clear of the bow and Fatt (left of the ship). */
     .sh-compass { left: auto; right: var(--gutter); bottom: calc(var(--sea-top) + 26vw); --x0: 30vw; }
     .story-scenes { --ship-w: calc(86 * var(--u)); }

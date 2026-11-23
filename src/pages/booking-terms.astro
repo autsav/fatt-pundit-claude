@@ -1,6 +1,7 @@
 ---
 import InfoPage from '../layouts/InfoPage.astro';
 import { BOOKING_NAMES, getBranches, groupRules, prettyPhone } from '../lib/site-data';
+const launched = import.meta.env.PUBLIC_LAUNCH === 'true';
 const open = (await getBranches()).filter((b) => b.status === 'open');
 // Deposit and group rules are the same at both rooms today; printed once from the first room's data.
 const rules = groupRules(open[0]);
@@ -32,5 +33,5 @@ const rules = groupRules(open[0]);
   )}
   <h2>Changes and lateness</h2>
   <p>Plans change: please let us know as early as you can, using the link in your confirmation or by phone, so we can give the table to someone else.</p>
-  <p class="todo">Draft: hold time for late arrivals to be confirmed by Fatt Pundit.</p>
+  {!launched && <p class="todo">Draft: hold time for late arrivals to be confirmed by Fatt Pundit.</p>}
 </InfoPage>

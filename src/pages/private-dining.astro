@@ -14,11 +14,11 @@ import { Image } from 'astro:assets';
 import { getBranches, groupRules, prettyPhone } from '../lib/site-data';
 const open = (await getBranches()).filter((b) => b.status === 'open' && b.email);
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
-const today = new Date().toISOString().slice(0, 10);
+const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
 ---
 <InfoPage title="Groups and private dining" description="Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups and private dining" layout="full"
   intro="Big tables, set feasts and whole-room bookings for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible."
-  next={{ label: 'See the rooms', title: 'Two rooms in London.', line: 'Long banquettes at Covent Garden, the bar and the kitchen at Soho.', actions: [{ href: '#enquiry-title', label: 'Send an enquiry', primary: true }, ...open.map((b) => ({ href: `/${b.id}/`, label: b.shortName }))], photo: tables }}>
+  next={{ label: 'See the rooms', title: 'Two rooms in London.', line: 'Long banquettes at Covent Garden, the bar and the kitchen at Soho.', actions: [...open.map((b) => ({ href: `/${b.id}/`, label: b.shortName }))], photo: tables }}>
   <figure class="pd-photo">
     <Image src={setTable} alt="A pink booth against a green plaster wall, glasses set for dinner" widths={[480, 800, 1200, 1600]} sizes="(min-width: 1240px) 1160px, 100vw" loading="eager" />
     <figcaption>Covent Garden, set for dinner.</figcaption>
@@ -59,25 +59,26 @@ const today = new Date().toISOString().slice(0, 10);
       <legend class="fp-legend">Which restaurant?</legend>
       <div class="fp-choices">
         {open.map((b, i) => (
-          <label class="fp-choice"><input type="radio" name="restaurant" value={b.shortName} data-id={b.id} data-email={b.email} checked={i === 0} /><span>{b.shortName}</span></label>
+          <label class="fp-choice"><input type="radio" name="restaurant" value={b.shortName} data-id={b.id} data-email={b.email} data-phone={b.phone} data-phone-pretty={b.phone ? prettyPhone(b.phone) : undefined} data-tz={b.timezone} data-hours={JSON.stringify(b.hours)} checked={i === 0} /><span>{b.shortName}</span></label>
         ))}
       </div>
     </fieldset>
     <div class="fp-form-row">
       <div class="fp-field">
         <label class="fp-label" for="eq-date">Date</label>
-        <input class="fp-input" id="eq-date" name="date" type="date" min={today} required aria-describedby="eq-date-msg" />
+        <select class="fp-input" id="eq-date" name="date" required aria-describedby="eq-date-msg" data-eq-day><option value="">Choose a day</option></select>
         <p class="fp-msg fp-msg--error" id="eq-date-msg" hidden></p>
       </div>
       <div class="fp-field">
         <label class="fp-label" for="eq-guests">Guests</label>
-        <input class="fp-input" id="eq-guests" name="guests" type="number" inputmode="numeric" min="2" max="200" required aria-describedby="eq-guests-msg" />
+        <input class="fp-input" id="eq-guests" name="guests" type="number" inputmode="numeric" min="5" max="200" required aria-describedby="eq-guests-msg eq-guests-hint" />
+        <p class="fp-hint" id="eq-guests-hint">{setFrom} or more: set feast</p>
         <p class="fp-msg fp-msg--error" id="eq-guests-msg" hidden></p>
       </div>
     </div>
     <div class="fp-field">
       <label class="fp-label" for="eq-time">Time (optional)</label>
-      <input class="fp-input" id="eq-time" name="time" type="time" step="900" />
+      <select class="fp-input" id="eq-time" name="time" data-eq-time><option value="">Any time</option></select>
     </div>
     <div class="fp-form-row">
       <div class="fp-field">
@@ -91,6 +92,7 @@ const today = new Date().toISOString().slice(0, 10);
         <p class="fp-msg fp-msg--error" id="eq-email-msg" hidden></p>
       </div>
     </div>
+    <div class="eq-trap" aria-hidden="true"><label>Leave this empty<input name="company" tabindex="-1" autocomplete="off" data-eq-trap /></label></div>
     <div class="fp-field">
       <label class="fp-label" for="eq-phone">Phone (optional)</label>
       <input class="fp-input" id="eq-phone" name="phone" type="tel" autocomplete="tel" />
@@ -135,12 +137,14 @@ const today = new Date().toISOString().slice(0, 10);
   .pd-sheet { display: grid; gap: var(--space-5); min-width: 0; padding: clamp(20px, 4vw, 48px); border: 2px solid var(--color-ink); box-shadow: 8px 8px 0 var(--color-ink); }
   @media (max-width: 639px) { .pd-sheet { box-shadow: 5px 5px 0 var(--color-ink); } }
   .pd-sheet-h { margin: 0; font-size: var(--step-h3); font-weight: 300; text-transform: none; line-height: 1.1; letter-spacing: var(--tracking-display); }
+  .eq-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .status-slot:empty { display: none; }
   .status-slot :global(ul) { margin: 6px 0 0 !important; padding-left: 1.2em; }
   .status-slot :global(a) { color: inherit !important; }
 </style>
 
 <script>
+  import { addDays, hhmm, local, prettyMin, slots, type Span } from '../lib/booking';
   const form = document.querySelector<HTMLFormElement>('[data-enquiry]')!;
   const top = document.querySelector<HTMLElement>('[data-enquiry-top]')!;
   const send = form.querySelector<HTMLButtonElement>('[data-enquiry-send]')!;
@@ -151,12 +155,34 @@ const today = new Date().toISOString().slice(0, 10);
   const q = new URLSearchParams(location.search);
   const room = q.get('branch');
   if (room) form.querySelectorAll<HTMLInputElement>('input[name="restaurant"]').forEach((r) => (r.checked = r.dataset.id === room));
-  for (const k of ['date', 'guests', 'time']) { const v = q.get(k); if (v) field(k).value = v; }
+  const picked = () => form.querySelector<HTMLInputElement>('input[name="restaurant"]:checked')!;
+
+  // Date: the next 60 days as "Sat 29 Nov" (en-GB), submitted as YYYY-MM-DD.
+  const daySel = form.querySelector<HTMLSelectElement>('[data-eq-day]')!;
+  const timeSel = form.querySelector<HTMLSelectElement>('[data-eq-time]')!;
+  const today = local(picked().dataset.tz!).ymd;
+  for (let i = 0; i < 60; i++) {
+    const ymd = addDays(today, i);
+    daySel.add(new Option(new Date(`${ymd}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }), ymd));
+  }
+  // Time: the chosen room's opening hours that day, every half hour.
+  const fillTimes = () => {
+    const keep = timeSel.value, r = picked();
+    const hours = JSON.parse(r.dataset.hours || 'null') as Record<string, Span[]> | null;
+    const all = hours && daySel.value ? slots(hours, r.dataset.tz!, daySel.value) : [];
+    timeSel.replaceChildren(new Option(daySel.value && !all.length ? 'Closed that day' : 'Any time', ''), ...all.map((m) => new Option(prettyMin(m), hhmm(m))));
+    if (all.some((m) => hhmm(m) === keep)) timeSel.value = keep;
+  };
+  daySel.addEventListener('change', fillTimes);
+  form.querySelectorAll('input[name="restaurant"]').forEach((r) => r.addEventListener('change', fillTimes));
+  for (const k of ['date', 'guests']) { const v = q.get(k); if (v) field(k).value = v; }
+  fillTimes();
+  { const v = q.get('time'); if (v) timeSel.value = v; }
 
   // Messages say what to do. Checked on submit, then re-checked as the guest types (never on blur: lesson 63).
   const RULES: [string, (i: HTMLInputElement) => string][] = [
-    ['date', (i) => (!i.value ? 'Choose a date' : i.value < i.min ? 'Choose today or a later date' : '')],
-    ['guests', (i) => (!i.value ? 'Enter how many guests' : Number(i.value) < 2 ? 'Enter 2 or more guests' : '')],
+    ['date', (i) => (!i.value ? 'Choose a day' : '')],
+    ['guests', (i) => (!i.value ? 'Enter how many guests' : Number(i.value) < 5 ? 'Enter 5 or more guests (for fewer, book a table)' : '')],
     ['name', (i) => (!i.value.trim() ? 'Enter your name' : '')],
     ['email', (i) => (!i.value.trim() ? 'Enter your email address' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.value.trim()) ? 'Enter an email address like name@example.com' : '')],
   ];
@@ -186,10 +212,10 @@ const today = new Date().toISOString().slice(0, 10);
       status('error', `<strong>${bad.length === 1 ? '1 thing' : `${bad.length} things`} to fix</strong><ul>${bad.map(([n, m]) => `<li><a href="#eq-${n}">${esc(m)}</a></li>`).join('')}</ul>`, 'alert');
       return;
     }
-    const pick = form.querySelector<HTMLInputElement>('input[name="restaurant"]:checked')!;
+    const pick = picked();
     const d = new FormData(form);
     const date = new Date(`${d.get('date')}T12:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const summary = `${pick.value} · ${date}${d.get('time') ? ` at ${d.get('time')}` : ''} · ${d.get('guests')} guests`;
+    const summary = `${pick.value} · ${date}${d.get('time') ? ` at ${timeSel.selectedOptions[0].text}` : ''} · ${d.get('guests')} guests`;
     const subject = `Group enquiry: ${d.get('guests')} guests on ${date} at ${pick.value}`;
     if (!usesService) {
       const body = [`Restaurant: ${pick.value}`, `Date: ${date}`, `Time: ${d.get('time') || '-'}`, `Guests: ${d.get('guests')}`, `Name: ${d.get('name')}`, `Email: ${d.get('email')}`, `Phone: ${d.get('phone') || '-'}`, '', `${d.get('notes') || ''}`].join('\n');
@@ -197,6 +223,8 @@ const today = new Date().toISOString().slice(0, 10);
       status('info', `<strong>Your email app should open now</strong>Everything is filled in, addressed to ${esc(pick.value)}. If nothing opens, email <a href="mailto:${esc(pick.dataset.email!)}">${esc(pick.dataset.email!)}</a>.`, 'status');
       return;
     }
+    // Honeypot: a bot fills the hidden field; it sees "sent" and nothing is delivered.
+    if (d.get('company')) { form.hidden = true; status('success', '<strong>Enquiry sent</strong>', 'status'); return; }
     form.querySelector<HTMLInputElement>('[data-subject]')!.value = subject;
     d.set('_subject', subject);
     d.set('to', pick.dataset.email!);
@@ -205,7 +233,8 @@ const today = new Date().toISOString().slice(0, 10);
       const res = await fetch(form.action, { method: 'POST', body: d, headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error(String(res.status));
       form.hidden = true;
-      status('success', `<strong>Enquiry sent</strong>${esc(summary)}. We'll reply to ${esc(String(d.get('email')))} as soon as we can.`, 'status');
+      const call = pick.dataset.phone ? `<p>Need an answer sooner? <a href="tel:${esc(pick.dataset.phone)}">Call ${esc(pick.dataset.phonePretty ?? pick.dataset.phone)}</a>.</p>` : '';
+      status('success', `<strong>Enquiry sent</strong><span>You sent: ${esc(summary)}.</span> <span>We'll reply by email to ${esc(String(d.get('email')))}.</span>${call}`, 'status');
       window.dispatchEvent(new CustomEvent('fp:enquiry-sent', { detail: { branch: pick.dataset.id } }));
     } catch {
       status('error', `<strong>We couldn't send this</strong>Everything you typed is still here. Try again, or email <a href="mailto:${esc(pick.dataset.email!)}">${esc(pick.dataset.email!)}</a>.`, 'alert');

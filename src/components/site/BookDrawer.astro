@@ -32,7 +32,7 @@ const data = branches.map((b) => ({
   preText: preTheatreText(b),
 }));
 ---
-<dialog class="book" data-book-drawer aria-labelledby="book-title">
+<dialog class="book" data-book-drawer data-lenis-prevent aria-labelledby="book-title">
   <form method="dialog" class="book-sheet" data-book-form>
     <div class="book-head">
       <p class="book-kicker">Your table</p>
@@ -165,6 +165,7 @@ const data = branches.map((b) => ({
 </style>
 
 <script>
+  import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
   import { KEYS, PROVIDER, local, addDays, wd, toMin, hhmm, prettyMin, slots as slotsFor, providerLink, type Span } from '@/lib/booking';
   interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
   const dlg = document.querySelector<HTMLDialogElement>('[data-book-drawer]');
@@ -306,7 +307,7 @@ const data = branches.map((b) => ({
       form$.hidden = true; done.hidden = false;
       done.querySelector<HTMLElement>('[data-book-done-title]')!.focus();
     });
-    dlg.addEventListener('close', () => opener?.focus());
+    dlg.addEventListener('close', () => { opener?.focus(); unlockScroll(); });
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 
     // Any [data-book] link opens the drawer; its value picks the restaurant
@@ -324,6 +325,7 @@ const data = branches.map((b) => ({
       if (drawn !== `${want}@${local(b.tz).ymd}`) pick(want);
       showForm();
       dlg.showModal();
+      lockScroll();
     });
     // Drawing the 21 day chips and the times on the tap cost 250 ms at 4x CPU (scripts/tap-timing.mjs);
     // draw the likely room (this page's, else the last picked) once the page is idle instead.
