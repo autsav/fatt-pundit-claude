@@ -88,14 +88,20 @@ const clampLead = (l: Lenis, dy: number, max: number) => {
   const room = (dy > 0 ? max : -max) - (l.targetScroll - l.animatedScroll);
   return dy > 0 ? Math.max(0, Math.min(dy, room)) : Math.min(0, Math.max(dy, room));
 };
-let zones: Array<[number, number]> = [];
+// The home voyage paces the wheel only: touch there stays native (compositor-driven), as docs/MOTION.md
+// promises. Taking a phone's swipe over in JS left the screen trailing the finger and stuttered the scene.
+const TOUCH_NATIVE = 'section.voyage';
+let zones: Array<[number, number, boolean]> = [];
 const measureZones = () => {
   zones = [...document.querySelectorAll(PACED)].map((el) => {
     const r = el.getBoundingClientRect();
-    return [r.top + scrollY, r.bottom + scrollY] as [number, number];
+    return [r.top + scrollY, r.bottom + scrollY, !el.matches(TOUCH_NATIVE)] as [number, number, boolean];
   });
 };
-const inStory = (y: number) => { const mid = y + innerHeight / 2; return zones.some(([a, b]) => mid >= a && mid <= b); };
+const inStory = (y: number, touch = false) => {
+  const mid = y + innerHeight / 2;
+  return zones.some(([a, b, t]) => mid >= a && mid <= b && (!touch || t));
+};
 
 // Every wheel and trackpad gesture is smoothed (sideways swipes stay native so horizontal strips scroll).
 // Touch stays native outside the stories; inside them we take over touchmove ourselves (Lenis would follow
@@ -106,7 +112,7 @@ const gate = (data: { deltaX: number; deltaY: number; event: Event }) => {
   const l = window.__lenis;
   if (!l) return false;
   if (event.type.startsWith('touch')) {
-    if (!inStory(l.animatedScroll)) return false;
+    if (!inStory(l.animatedScroll, true)) return false;
     if (event.type === 'touchend') {
       // The flick glides on at the finger's own speed and eases to a stop over its stopping distance
       // (v^2 / 2a): no long lerp tail creeping a pixel at a time at the end.
