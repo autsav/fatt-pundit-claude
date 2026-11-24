@@ -74,3 +74,14 @@ Audit only. No src/ changes. Commit only audit/ + tasks/. Stop for approval at t
 - [x] P1-8 Design review: scores per page × category; references; what "premium" means here — proof: AUDIT.md §Scores, §UX; refs in audit/refs/ (local)
 - [x] P1-9 Two redesign directions with annotated mocks (audit/mocks/) — proof: audit/mocks/direction-{a,b}--{1280,375}.jpg
 - [x] P1-10 audit/AUDIT.md in the brief's structure; commit audit/ + tasks/; STOP for approval — proof: audit/AUDIT.md; commit on redesign/premium-audit
+
+## Premium audit — Phase 2 (bug fixes) and Phase 3 prep
+- [x] P2-0 Test tooling: Vitest + Playwright configs, `npm test` runs Vitest — proof: 4d6657d
+- [x] P2-1 P0 B-01 and P1 B-02, B-03, B-04, B-07 fixed test-first; B-06 comment fixed (list needs client) — proof: audit/AUDIT.md "Phase 2: fix status"
+- [x] P2-2 A11y P2 B-09, B-10, B-11, B-19, B-25; correctness P2 B-12, B-13, B-14, B-17, B-18, B-20, B-21 — proof: same table, one commit each
+- [x] P2-3 Reviewer pass on the diff; 4 follow-ups fixed (b6eeb28, 9d259d5, d65425d, e2651e7)
+- [x] P2-4 verify green, Vitest 8/8, Playwright 88/88, smoke 8/8, perf:taps green, axe sweep + links re-run — proof: audit/data/sweep-after-*.json, links.json, lighthouse-after.json
+- [ ] P2-5 Client/owner: B-06 + B-16 form service (#5, #10, #41), B-08 story art provenance
+- [x] P3-0 Direction C motion storyboard for sign-off — proof: audit/storyboard/index.html (+ storyboard-part1..5.jpg)
+- [ ] P3-1 Storyboard signed off by the client/owner
+- [ ] P3-2 Build scenes one at a time (arrival → … → page transitions), before/after 375 + 1280, recording, audit/CHANGELOG.md line each; B-22, B-23, B-26 land here

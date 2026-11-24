@@ -15,23 +15,23 @@ Known capture limit: full-page screenshots draw the pinned scroll scenes (doors,
 
 <!-- LH-BEFORE-AFTER -->
 ## Before / after (Lighthouse, mobile median of 3 local; P / A11y / BP / SEO)
-| Route | Mobile local (before) | Desktop local (before) | Mobile live (before) | After |
+| Route | Mobile local (before) | Desktop local (before) | Mobile live (before) | After (mobile local) |
 |---|---|---|---|---|
-| `/` | 89 / 100 / 100 / 69 | 98 / 100 / 100 / 69 | 96 / 100 / 100 / 69 | Phase 2–3 |
-| `/book/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/soho/` | 96 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | Phase 2–3 |
-| `/soho/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/covent-garden/` | 94 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | Phase 2–3 |
-| `/covent-garden/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/dubai/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 98 / 100 / 100 / 69 | Phase 2–3 |
-| `/private-dining/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 77 / 69 | Phase 2–3 |
-| `/our-story/` | 92 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | Phase 2–3 |
-| `/our-story/fatt/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | Phase 2–3 |
-| `/allergens/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/accessibility/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/privacy/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/booking-terms/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | Phase 2–3 |
-| `/this-page-does-not-exist/` | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | Phase 2–3 |
+| `/` | 89 / 100 / 100 / 69 | 98 / 100 / 100 / 69 | 96 / 100 / 100 / 69 | 89 / 100 / 100 / 69 (Phase 2) |
+| `/book/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/soho/` | 96 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 96 / 100 / 100 / 69 (Phase 2) |
+| `/soho/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/covent-garden/` | 94 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 95 / 100 / 100 / 69 (Phase 2) |
+| `/covent-garden/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
+| `/dubai/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/private-dining/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 77 / 69 | 98 / 100 / 100 / 69 (Phase 2) |
+| `/our-story/` | 92 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 93 / 100 / 100 / 69 (Phase 2) |
+| `/our-story/fatt/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | — |
+| `/allergens/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
+| `/accessibility/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
+| `/privacy/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
+| `/booking-terms/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
+| `/this-page-does-not-exist/` | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | — |
 
 Budgets (brief §4, mobile): P ≥ 90, A11y 100, BP ≥ 95, SEO ≥ 95, LCP < 2.5 s, CLS < 0.05. SEO 69 everywhere is the intended preview `noindex`; the launch-build pass is under SEO.
 

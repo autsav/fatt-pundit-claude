@@ -1,8 +1,6 @@
 {
  "pages": 16,
- "broken": [
-  "https://www.fattpundit.co.uk/404/ (from /404)"
- ],
+ "broken": [],
  "missingHash": [],
  "badAt": [],
  "runtime": [

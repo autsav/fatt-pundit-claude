@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Walk-In Storyboard</title>
+<style>
+  @font-face { font-family: AT; src: url(../../src/assets/fonts/american-typewriter/american-typewriter-regular.woff2); }
+  @font-face { font-family: AT; src: url(../../src/assets/fonts/american-typewriter/american-typewriter-bold.woff2); font-weight: 700; }
+  :root { --ink: #2c2925; --ink-deep: #1a1714; --tiger: #f15d3d; --gold: #cba052; --sand: #dac7b5; --paper: #f6efe4; --mark: #1d6cff; }
+  * { box-sizing: border-box; } body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  header.top { background: var(--ink-deep); color: var(--paper); padding: 40px 24px; }
+  header.top h1 { font-family: AT, serif; font-weight: 700; font-size: clamp(28px, 4vw, 44px); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .02em; }
+  header.top p { max-width: 70ch; margin: 0 0 6px; color: var(--sand); }
+  .wrap { width: min(1240px, 100% - 32px); margin-inline: auto; }
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; font-size: 13px; }
+  .flow span { padding: 4px 10px; border: 1px solid rgb(203 160 82 / .5); color: var(--gold); }
+  .scene { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; padding: 40px 0; border-bottom: 1px solid #d6c8b6; }
+  .scene h2 { font-family: AT, serif; font-weight: 700; margin: 0 0 4px; font-size: 26px; text-transform: uppercase; letter-spacing: .02em; }
+  .kind { margin: 0 0 14px; font-size: 14px; color: #6b5f52; }
+  .shot { margin: 0; } .pos { position: relative; } .shot img { width: 100%; display: block; border: 2px solid var(--ink); }
+  .shot figcaption { font-size: 13px; color: #6b5f52; margin-top: 6px; }
+  .dot { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: var(--mark); color: #fff; font: 700 14px/28px system-ui; text-align: center; box-shadow: 0 0 0 3px #fff; }
+  .bar { position: relative; margin: 4px 0 22px; background: #e9dfd2; border: 1px solid #cdbfae; }
+  .bar i { position: absolute; height: 18px; background: rgb(29 108 255 / .2); border-left: 2px solid var(--mark); border-right: 2px solid var(--mark); }
+  .bar b { position: absolute; margin-top: 0; font: 700 12px/18px system-ui; color: #fff; background: var(--mark); border-radius: 9px; min-width: 18px; text-align: center; transform: translateX(-50%); }
+  .bar .ax { position: absolute; bottom: -18px; font-size: 11px; color: #6b5f52; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid #e0d4c4; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #6b5f52; }
+  td:first-child { width: 28px; } td .n { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: var(--mark); color: #fff; font: 700 12px/20px system-ui; text-align: center; }
+  .meta { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; }
+  .meta p { margin: 0; } .meta b { color: var(--ink); }
+  .new { color: var(--tiger); font-weight: 700; font-size: 12px; }
+  .rules { background: #fff; border: 2px solid var(--ink); padding: 20px 24px; margin: 40px 0; }
+  .rules h2 { margin: 0 0 8px; font-family: AT, serif; text-transform: uppercase; }
+  .rules ul { margin: 0; padding-left: 1.2em; } .rules li { margin: 4px 0; }
+  .phones { display: flex; gap: 12px; } .phones img { width: 31%; border: 2px solid var(--ink); }
+  @media (max-width: 860px) { .scene { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <h1>The Walk-In · motion storyboard</h1>
+  <p>Direction C (client choice, 24 Nov 2026): every scene on the home page stays. The work makes them one continuous walk through the restaurant, with each scene handing something to the next. This page is for sign-off before any scene is built.</p>
+  <p>How to read a scene: the frame is today's site at 1280 px. The blue dots mark what will move. The bar shows when each beat happens (scroll position through a pinned scene, or time for an intro). The table gives the exact change, timing and the motion token from <code>src/styles/tokens.css</code>.</p>
+  <div class="flow" id="flow"></div>
+</div></header>
+
+<main class="wrap" id="scenes"></main>
+
+<section class="wrap rules">
+  <h2>Rules for every scene</h2>
+  <ul>
+    <li>Only the animation tools already in the project: CSS scroll and view timelines, anime.js, Motion, Lenis. No new library.</li>
+    <li><b>transform</b> and <b>opacity</b> only, plus <code>stroke-dashoffset</code> for drawn lines. Responses to a tap or click take 200–600 ms, ease-out (<code>--curve-out</code>); things with weight land on <code>--curve-stamp</code>; scrubbed scenes follow the scroll.</li>
+    <li><b>Reduced motion</b>: each scene shows its finished state (the "Calm" line). <b>Pause motion</b> stills every loop; <code>tests/e2e/motion.spec.ts</code> fails if one is missed.</li>
+    <li><b>Book is one tap away</b> throughout: on phones, the dock stays up while scrolling down through the long scenes.</li>
+    <li><b>Budgets per scene</b>: dropped frames under 2 % (<code>npm run perf:budget</code>), taps under 200 ms (<code>npm run perf:taps</code>), Lighthouse mobile ≥ 90, home JS on track for under 100 KB (new motion goes in CSS and small scripts, not new React islands).</li>
+    <li><b>Proof per scene</b>: before/after at 375 and 1280, a short screen recording, and one line in <code>audit/CHANGELOG.md</code>.</li>
+  </ul>
+</section>
+
+<script>
+// Scene data. dots: [x%, y%] on the frame. beats: [n, start%, end%, what, change, timing]. Positions on the bar are scroll % (or ms for the intro).
+const S = [
+  { id: 'arrival', name: '1 · Arrival', kind: 'Time-based, first visit only, 1.2 s (was 2.2 s)', img: 'arrival.jpg', unit: 'ms', max: 1200,
+    dots: [[50, 37, 1], [50, 52, 2], [50, 82, 3]],
+    beats: [[1, 0, 70, 'Split-flap board', 'flips to FATT PUNDIT (digits first, never spells words)', 'existing, 3 flips'], [2, 65, 80, 'Tiger stamp', 'scale 1.14 → 1, a thud', '--curve-stamp'], [3, 75, 100, 'Board halves become the doors', 'the two halves take the door texture and swing open in 3D (rotateY 0 → ±75°, perspective 1200 px) instead of sliding up and down', '460 ms, --curve-panel <span class="new">NEW</span>']],
+    handoff: 'The board opens as the restaurant doors onto the rainy window: arrival and hero read as one move.', calm: 'No intro (as today).', perf: 'Already within the 1.5 s budget (B-04); the doors are two transformed layers.' },
+  { id: 'hero', name: '2 · The window', kind: 'Pointer + scroll through the hero', img: 'home-00.jpg',
+    dots: [[50, 45, 1], [20, 30, 2], [50, 80, 3], [85, 20, 4]],
+    beats: [[1, 0, 10, 'Name', 'letters rise as the doors open', 'existing'], [2, 0, 100, 'Room behind the glass', 'drifts at 0.3× scroll (translateY 0 → −8 %), and a few px with the mouse on desktop', 'scrubbed <span class="new">NEW</span>'], [3, 0, 100, 'Lamps in the photo', 'breathe 0.85 ↔ 1', 'breathe 4.8 s loop, pausable'], [4, 60, 100, 'Glass', 'rain eases off and the glass mists over as you scroll down', 'scrubbed <span class="new">NEW</span>']],
+    handoff: 'The misted glass clears onto the street: you are now outside the front door.', calm: 'Still photo, no rain, name in place.', perf: 'Parallax on one transformed layer; the WebGL rain already exists.' },
+  { id: 'doors', name: '3 · The street and the door', kind: 'Pinned, scrubbed by scroll', img: 'home-02.jpg',
+    dots: [[36, 14, 1], [50, 30, 2], [50, 60, 3], [50, 94, 4], [80, 55, 5]],
+    beats: [[1, 0, 20, 'Brass lamps', 'light one by one, each glow fading in over 6 % of the scroll with a soft spill down the brick', 'scrubbed <span class="new">NEW</span>'], [2, 15, 35, 'Shop sign', 'lights up (exists)', 'existing'], [3, 35, 60, 'Camera', 'pushes towards the door (scale 1 → 1.25)', 'scrubbed'], [4, 55, 80, 'Door and cobbles', 'the door swings in 3D (rotateY 0 → −75°) and warm light spills across the cobbles', 'scrubbed <span class="new">NEW</span>'], [5, 0, 100, 'Glass reflections', 'slide against the scroll (±20 px)', 'scrubbed <span class="new">NEW</span>']],
+    handoff: 'Through the open door, the red of the velvet fills the frame.', calm: 'Lamps lit, sign lit, door open, still.', perf: 'Glows are opacity on pre-drawn images, never filters (lesson: no filter in scroll scenes).' },
+  { id: 'curtain', name: '4 · The curtain', kind: 'Pinned, scrubbed by scroll, with a settle at the end', img: 'home-03.jpg',
+    dots: [[25, 50, 1], [75, 50, 1], [50, 40, 2], [50, 85, 3]],
+    beats: [[1, 0, 70, 'Velvet panels', 'part (translateX 0 → ±52 %)', 'scrubbed'], [2, 30, 60, 'Light through the gap', 'one gold sweep across the folds', 'scrubbed, once <span class="new">NEW</span>'], [3, 70, 100, 'Settle', 'when the panels reach the edge they sway twice and still (two small overshoots)', '600 ms, --curve-spring <span class="new">NEW</span>']],
+    handoff: 'The curtain\'s red fringe becomes the route line that runs down into the voyage map.', calm: 'Curtain open.', perf: 'Two transformed panels; the settle is a one-shot.' },
+  { id: 'room', name: '5 · First look at the room', kind: 'Scroll', img: 'home-04.jpg',
+    dots: [[50, 50, 1], [50, 90, 2]],
+    beats: [[1, 0, 60, 'Room photo', 'settles from scale 1.08 → 1 as the curtain clears', 'scrubbed'], [2, 50, 100, 'Route line', 'starts at the curtain gap and draws down the page into the map', 'stroke-dashoffset <span class="new">NEW</span>']],
+    handoff: 'The red line carries you onto the voyage map.', calm: 'Room photo, line drawn.', perf: 'One SVG path.' },
+  { id: 'voyage', name: '6 · The voyage', kind: 'Pinned, scrubbed (camera exists)', img: 'home-10.jpg',
+    dots: [[45, 88, 1], [70, 64, 2], [18, 42, 3], [60, 54, 4]],
+    beats: [[1, 0, 100, 'Ship\'s wake', 'a drawn line follows the ship along the route', 'scrubbed <span class="new">NEW</span>'], [2, 20, 95, 'Ports', 'each port stamps in as the ship arrives (scale 1.3 → 1) with a small ink spread', '460 ms, --curve-stamp <span class="new">NEW</span>'], [3, 20, 95, 'Postcards', 'arrive with a slight tilt and settle (rotate −3° → −1°, rise 24 px)', '400 ms, --curve-out'], [4, 90, 100, 'Dubai label', 'no longer hidden by the ship badge (Phase 10 nit)', 'fix']],
+    handoff: 'The ship docks at the menu book; its last stamp becomes the stamp on the book\'s cover.', calm: 'Whole route drawn, all ports stamped, last postcard showing.', perf: 'Measured scene: keep its dropped frames under 2 %; the overlay bake from tasks/todo.md lands first.' },
+  { id: 'menu', name: '7 · The menu book', kind: 'View timeline as it enters, then taps', img: 'home-12.jpg',
+    dots: [[50, 20, 1], [36, 55, 2], [30, 45, 3]],
+    beats: [[1, 0, 30, 'Controls', 'room, menu, diet filter and list view fold into one "Filter" button (U-03)', 'layout'], [2, 0, 60, 'Cover', 'the book opens its cover in 3D as it comes on screen (rotateY 0 → −160°)', 'scrubbed <span class="new">NEW</span>'], [3, 50, 100, 'Steam', 'three wisps rise over the momo page', '3 s loops, off-screen paused <span class="new">NEW</span>']],
+    handoff: 'The book\'s last page is the bar list; turning to it leads you to the bar.', calm: 'Book open on the signature page.', perf: 'Hydrate the book only when it nears the screen; steam is CSS.' },
+  { id: 'bar', name: '8 · The bar after dark', kind: 'View timeline + one-shot', img: 'home-13.jpg',
+    dots: [[50, 45, 1], [30, 92, 2], [78, 92, 3]],
+    beats: [[1, 0, 40, 'Lamps', 'warm up (exists: LightsOn)', 'existing'], [2, 10, 70, 'Bottles', 'a sheen runs along the shelf as you scroll', 'scrubbed gradient <span class="new">NEW</span>'], [3, 40, 100, 'Drink list', 'prints like a receipt; photos ease in (scale 1.04 → 1)', '1.2 s, existing receipt pattern']],
+    handoff: 'Look up from the bar into the room: the film strip of the room slides in.', calm: 'Lit bar, list printed.', perf: 'The sheen is one transformed gradient layer.' },
+  { id: 'roomsheet', name: '9 · The room', kind: 'View timeline + tap', img: 'home-15.jpg',
+    dots: [[70, 50, 1], [62, 30, 2], [18, 70, 3]],
+    beats: [[1, 0, 100, 'Film strip', 'runs sideways as you scroll down (translateX 0 → −30 %)', 'scrubbed, desktop <span class="new">NEW</span>'], [2, 0, 80, 'Frames', 'develop from sepia to colour as each enters (a cross-fade of two layers, no filters)', 'scrubbed <span class="new">NEW</span>'], [3, 0, 100, 'Rating', 'stays still (content)', '—']],
+    handoff: 'Tap a frame: it zooms into the lightbox from where it sits (shared-element view transition).', calm: 'Colour photos, strip still.', perf: 'Thumbs only; the lightbox already loads the large image on demand.' },
+  { id: 'passes', name: '10 · Your boarding pass', kind: 'View timeline + taps', img: 'home-16.jpg',
+    dots: [[22, 60, 1], [50, 60, 1], [78, 60, 1], [29, 47, 2]],
+    beats: [[1, 0, 50, 'Passes', 'slide up out of a ticket wallet one after another (rise 40 %, tilt −2°/1°/−1°)', '500 ms each, 80 ms apart, --curve-spring <span class="new">NEW</span>'], [2, 30, 70, 'Departure board', 'flips to BOARDING for open rooms, OPENING SOON for Dubai (digits first)', 'existing split-flap'], [3, 60, 100, 'Stub', 'tear-to-book keeps its perforation snap', 'existing']],
+    handoff: 'After the passes, the lights go down for the goodbye.', calm: 'Passes in place, board settled.', perf: 'Transforms only.' },
+  { id: 'goodbye', name: '11 · Goodbye and footer', kind: 'Scroll out', img: 'home-18.jpg',
+    dots: [[50, 30, 1], [50, 70, 2]],
+    beats: [[1, 0, 60, 'Lamps', 'dim one by one as you leave (halo opacity 1 → 0.2)', 'scrubbed <span class="new">NEW</span>'], [2, 40, 100, 'Footer', 'one screen: rooms (today + Book), small index, legal (U-05)', 'layout']],
+    handoff: 'Night falls on the room; the page ends on Book.', calm: 'Lamps low, footer still.', perf: '—' },
+  { id: 'pages', name: '12 · Between pages', kind: 'Navigation (Chrome, Edge, Safari 18.2+)', img: 'home-16.jpg',
+    dots: [[22, 48, 1], [50, 6, 2]],
+    beats: [[1, 0, 100, 'Room name', 'flies from the home boarding pass into the branch page hero', '300 ms, --curve-out <span class="new">NEW</span>'], [2, 0, 100, 'Header', 'stays put while the page underneath changes', 'view-transition-name']],
+    handoff: 'Moving between home, a room and its menu feels like walking between rooms, not loading pages.', calm: 'Instant page change (no transition).', perf: 'CSS only: @view-transition { navigation: auto }. Other browsers load normally.' },
+];
+
+const flow = document.getElementById('flow');
+S.forEach((s) => { const e = document.createElement('span'); e.textContent = s.name.replace(/^\d+ · /, ''); flow.append(e); });
+const root = document.getElementById('scenes');
+for (const s of S) {
+  const unit = s.unit === 'ms' ? (p) => `${Math.round((p / 100) * s.max)} ms` : (p) => `${p}%`;
+  // One lane per beat, so overlapping beats stay readable.
+  const bars = s.beats.map(([n, a, z], k) => `<i style="left:${a}%;width:${z - a}%;top:${4 + k * 22}px"></i><b style="left:${(a + z) / 2}%;top:${4 + k * 22}px">${n}</b>`).join('');
+  const rows = s.beats.map(([n, a, z, what, change, timing]) => `<tr><td><span class="n">${n}</span></td><td><b>${what}</b><br>${change}</td><td>${unit(a)}–${unit(z)}<br><small>${timing}</small></td></tr>`).join('');
+  const dots = s.dots.map(([x, y, n]) => `<span class="dot" style="left:${x}%;top:${y}%">${n}</span>`).join('');
+  const el = document.createElement('section');
+  el.className = 'scene'; el.id = s.id;
+  el.innerHTML = `
+    <figure class="shot"><div class="pos">${dots}<img src="img/${s.img}" alt="Today's ${s.name.replace(/^\d+ · /, '')} scene"></div><figcaption>${s.id === 'arrival' ? 'Today at 0.95 s, 1280 px' : 'Today, 1280 px'}. Dots = what moves.</figcaption></figure>
+    <div>
+      <h2>${s.name}</h2><p class="kind">${s.kind}</p>
+      <div class="bar" style="height:${8 + s.beats.length * 22}px">${bars}<span class="ax" style="left:0">0</span><span class="ax" style="right:0">${s.unit === 'ms' ? s.max + ' ms' : '100% scroll'}</span></div>
+      <table><thead><tr><th></th><th>What changes</th><th>When</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="meta"><p><b>Hand-off →</b> ${s.handoff}</p><p><b>Calm (reduced motion):</b> ${s.calm}</p><p><b>Performance:</b> ${s.perf}</p></div>
+    </div>`;
+  root.append(el);
+}
+</script>
+</body>
+</html>
