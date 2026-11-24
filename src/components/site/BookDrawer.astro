@@ -208,7 +208,9 @@ const data = branches.map((b) => ({
         const d = new Date(`${ymd}T12:00:00Z`);
         const wdName = i === 0 ? 'Today' : i === 1 ? 'Tmrw' : d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
         const full = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
-        radio(daysEl, 'book-day', ymd === day, full, `${wdName}<small>${d.getUTCDate()} ${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</small>`, () => { day = ymd; time = ''; draw(); });
+        // The name starts with the words on the chip ("Today 24 Nov"), then the full date (WCAG 2.5.3, AUDIT B-09).
+        const short = `${d.getUTCDate()} ${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}`;
+        radio(daysEl, 'book-day', ymd === day, `${wdName} ${short}, ${full}`, `${wdName}<small>${d.getUTCDate()} ${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</small>`, () => { day = ymd; time = ''; draw(); });
       }
     };
     const drawTimes = () => {
