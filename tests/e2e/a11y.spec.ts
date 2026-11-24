@@ -27,7 +27,7 @@ test('booking day strip: label in name and a scroll cue', async ({ page }) => {
     const visible = (await chips.nth(i).innerText()).replace(/\s+/g, ' ').trim();
     expect(await chips.nth(i).getAttribute('aria-label')).toMatch(new RegExp(`^${visible}`));
   }
-  const mask = await page.locator('[data-book-days]').evaluate((el) => getComputedStyle(el).maskImage || getComputedStyle(el).webkitMaskImage);
+  const mask = await page.locator('[data-book-days]').evaluate((el) => getComputedStyle(el).getPropertyValue('mask-image') || getComputedStyle(el).getPropertyValue('-webkit-mask-image'));
   expect(mask).toContain('linear-gradient');
 });
 
@@ -40,6 +40,7 @@ test('home, reduced motion: no serious or critical axe violations', async ({ pag
   // target-size check reports that position, not the page.
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(800);
-  const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
+  // @axe-core/playwright types a newer Playwright Page than the pinned @playwright/test 1.60; same object at runtime.
+  const r = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]['page'] }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
   expect(r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 });
