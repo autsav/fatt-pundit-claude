@@ -164,11 +164,12 @@ function sync() {
       autoRaf: true, lerp: 0.12, smoothWheel: true, syncTouch: true, syncTouchLerp: 0.1, allowNestedScroll: true,
       anchors: paused() ? false : { offset: headerOffset() }, stopInertiaOnNavigate: true, virtualScroll: gate,
     });
-    if (locks) l.stop();
+    if (locks) { l.stop(); freeze(false); } // a held lock moves from the native freeze to Lenis
     window.__lenis = l;
   } else if (!allowed() && window.__lenis) {
     window.__lenis.destroy();
     window.__lenis = undefined;
+    if (locks) freeze(true); // and back again, so a dialog left open keeps the page still (AUDIT B-03)
   }
 }
 
