@@ -704,6 +704,23 @@ html:has(.hero) { background: var(--color-ink); }
   }
 }
 
+/* The room (Direction C scene 9): each frame develops from sepia to colour as it comes into view (a tinted layer in
+   `color` blend fading out; no filter), and on wide screens the strip drifts a little sideways with the scroll,
+   like film through a gate. Named timelines on the frames: the photo box clips, which would capture view(). */
+.room-frame { view-timeline-name: --room-frame; view-timeline-axis: block; }
+.room-shot { position: relative; }
+.room-shot::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: rgb(124 86 44 / 0.75); mix-blend-mode: color; opacity: 0; }
+@keyframes room-develop { from { opacity: 1; } to { opacity: 0; } }
+@keyframes room-drift { from { transform: translateX(3%); } to { transform: translateX(-3%); } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .room-shot::after { animation-name: room-develop; animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: --room-frame; animation-range: entry 15% cover 45%; }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 761px) {
+    .room-strip { animation-name: room-drift; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+  }
+}
+
 /* "Pause motion" (footer button): one rule holds every loop that never ends on its own where it is (AUDIT B-25).
    Scoped to the registered loops, not `*`: pausing everything would also freeze the booking drawer's entrance
    (off-screen) and the story's scroll scenes. Register each new infinite loop here and in
