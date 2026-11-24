@@ -222,7 +222,8 @@ const data = branches.map((b) => ({
       const closed = $<HTMLElement>('[data-book-closed]');
       closed.hidden = list.length > 0;
       // Name the room and the reason: closed all day, or no tables left today.
-      closed.textContent = (b.hours[KEYS[wd(day)]] ?? []).length
+      // Copy only while shown: hidden notes were read by scrapers and reader modes (AUDIT B-18).
+      closed.textContent = closed.hidden ? '' : (b.hours[KEYS[wd(day)]] ?? []).length
         ? `No more tables at ${b.name} ${day === local(b.tz).ymd ? 'today' : 'that day'}. Pick another day.`
         : `${b.name} is closed on ${new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' })}s. Pick another day.`;
       if (!list.some((m) => hhmm(m) === time)) time = list.find((m) => m >= 19 * 60) !== undefined ? hhmm(list.find((m) => m >= 19 * 60)!) : list[0] !== undefined ? hhmm(list[0]) : '';
@@ -232,18 +233,18 @@ const data = branches.map((b) => ({
       const tooMany = size > b.maxOnline;
       $<HTMLElement>('[data-book-group]').hidden = !tooMany;
       $<HTMLElement>('[data-book-go-wrap]').hidden = tooMany;
-      $<HTMLElement>('[data-book-group-text]').textContent = size >= b.setMenuFrom
+      $<HTMLElement>('[data-book-group-text]').textContent = !tooMany ? '' : size >= b.setMenuFrom
         ? `For ${b.setMenuFrom} or more, ${b.name} plans a set menu with you.`
         : `${b.name} books online for up to ${b.maxOnline}. For ${size}, please call or send an enquiry.`;
       const q = new URLSearchParams({ branch: b.id, guests: String(size), ...(day ? { date: day } : {}), ...(time ? { time } : {}) });
       $<HTMLAnchorElement>('[data-book-enquire]').href = `/private-dining/?${q}`;
       const dep = $<HTMLElement>('[data-book-deposit]');
       dep.hidden = size < b.depositFrom || !b.deposit;
-      dep.textContent = b.deposit;
+      dep.textContent = dep.hidden ? '' : b.deposit;
       const pre = $<HTMLElement>('[data-book-pre]');
       const tm = time ? toMin(time) : -1;
       pre.hidden = !(b.pre && b.preText && tm >= toMin(b.pre[0]) && tm <= toMin(b.pre[1]));
-      pre.textContent = `Pre-theatre menu: seated ${b.preText}.`;
+      pre.textContent = pre.hidden ? '' : `Pre-theatre menu: seated ${b.preText}.`;
       $<HTMLElement>('[data-book-size-said]').textContent = `${size} guest${size === 1 ? '' : 's'}`;
       for (const a of dlg.querySelectorAll<HTMLAnchorElement>('[data-book-tel],[data-book-tel2]')) { a.href = `tel:${b.phone}`; a.textContent = b.phonePretty; }
       $<HTMLElement>('[data-book-name]').textContent = `at ${b.name}`;
