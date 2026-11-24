@@ -22,6 +22,11 @@ say('B-14', !/rel="canonical"/.test(h404) && !/og:url/.test(h404), 'dist/404.htm
 const hHome = readFileSync(join(ROOT, 'dist', 'index.html'), 'utf8');
 say('B-18 (static)', !/No more tables|please call or send an enquiry/.test(hHome), 'dist/index.html: no "No more tables…" / "For 2, please call"');
 
+// Sitemap: every URL carries lastmod = the build date.
+const sm = readFileSync(join(ROOT, 'dist', 'sitemap.xml'), 'utf8');
+const locs = (sm.match(/<loc>/g) ?? []).length, mods = [...new Set(sm.match(/<lastmod>[^<]+/g) ?? [])];
+say('Sitemap lastmod', locs > 0 && (sm.match(/<lastmod>/g) ?? []).length === locs && mods.length === 1, `${locs} URLs, lastmod ${mods.join(', ').replace(/<lastmod>/g, '')}`);
+
 const browser = await chromium.launch();
 // B-18 (hydrated): drawer closed, after its idle pre-draw.
 {
