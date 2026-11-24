@@ -170,6 +170,10 @@ const no = () => String(++n).padStart(2, '0');
         // Each room's own closest time to the one chosen: the rooms open on different minutes (AUDIT B-02).
         const at = time ? nearestSlot(slots(r.hours, r.tz, day), toMin(time)) : undefined;
         const ok = at !== undefined;
+        // The button says where it goes: the group page above the online limit (AUDIT B-12).
+        go.dataset.label ??= go.innerHTML;
+        if (n > r.max) go.textContent = `Plan a group at ${r.name}`;
+        else go.innerHTML = go.dataset.label;
         if (n > r.max) {
           fit.textContent = `${r.name} books online for up to ${r.max}. For ${n}, call or plan a group.`;
           go.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`;

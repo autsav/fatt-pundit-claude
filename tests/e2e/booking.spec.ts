@@ -57,3 +57,15 @@ for (const room of Object.keys(RULES) as (keyof typeof RULES)[]) {
     }
   }
 }
+
+// AUDIT B-12: above a room's online limit, the desk's button says what it now does.
+test('/book/ desk: the button names the group route above the online limit', async ({ page }) => {
+  await page.goto('/book/');
+  await page.selectOption('[data-desk-size]', '8');
+  const go = page.locator('#book-soho [data-desk-go]');
+  await expect(go).toHaveText('Plan a group at Soho');
+  await expect(go).not.toHaveAttribute('target', '_blank');
+  await page.selectOption('[data-desk-size]', '2');
+  await expect(go).toHaveText(/Book at Soho/);
+  await expect(go).toHaveAttribute('target', '_blank');
+});
