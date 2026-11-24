@@ -26,3 +26,11 @@ it('the /og/ header rule keeps share images out of search', async () => {
   expect(og.headers).toContainEqual({ key: 'X-Robots-Tag', value: 'noindex' });
   expect(readFileSync('public/_headers', 'utf8')).toMatch(/\/og\/\*\n(.+\n)*\s+X-Robots-Tag: noindex/);
 });
+
+// Host decision (24 Nov): www is primary; the apex redirects with a 308, matched on the host only.
+it('apex → www redirect is host-matched and permanent', async () => {
+  const { readFileSync } = await import('node:fs');
+  const v = JSON.parse(readFileSync('vercel.json', 'utf8'));
+  const r = v.redirects.find((x: { has?: { type: string; value: string }[] }) => x.has?.some((h) => h.type === 'host'));
+  expect(r).toEqual({ source: '/:path*', has: [{ type: 'host', value: 'fattpundit.co.uk' }], destination: 'https://www.fattpundit.co.uk/:path*', permanent: true });
+});
