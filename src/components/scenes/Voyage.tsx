@@ -459,8 +459,11 @@ export default function Voyage({ art }: { art: VoyageArt }) {
 
         {/* Ticket strip: one hole punched per port; each hole jumps there. */}
         <div className="absolute inset-x-0 top-3 z-10 flex justify-center px-3">
-          {/* Calm mode disables the jump buttons, so the strip itself takes focus to stay scrollable by keyboard (AUDIT B-19). */}
-          <nav ref={ticketRef} aria-label="Ports on the voyage" tabIndex={calm ? 0 : undefined} className="voyage-ticket flex max-w-full snap-x snap-mandatory items-center gap-1 overflow-x-auto bg-sand px-3 py-1.5 text-ink [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,transparent,#000_14px,#000_calc(100%-14px),transparent)] sm:gap-3 sm:snap-none sm:overflow-visible sm:px-5">
+          {/* Calm mode disables the jump buttons, so the strip grows to show every port instead of scrolling
+              (a scroll box with nothing focusable can't be scrolled by keyboard: AUDIT B-19). */}
+          <nav ref={ticketRef} aria-label="Ports on the voyage" className={calm
+            ? 'voyage-ticket flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-sand px-3 py-1.5 text-ink sm:px-5'
+            : 'voyage-ticket flex max-w-full snap-x snap-mandatory items-center gap-1 overflow-x-auto bg-sand px-3 py-1.5 text-ink [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,transparent,#000_14px,#000_calc(100%-14px),transparent)] sm:gap-3 sm:snap-none sm:overflow-visible sm:px-5'}>
             <span className="hidden font-label text-[12px] font-bold uppercase tracking-[0.24em] text-tiger-deep sm:inline">Admit one</span>
             {PORTS.map((pt, i) => (
               <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex shrink-0 snap-center min-h-11 items-center gap-1.5 px-1 font-label text-[12px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i === 0 ? 'is-punched is-here' : ''}`}>
