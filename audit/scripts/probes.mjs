@@ -133,7 +133,7 @@ const probes = {
     const ctx = await browser.newContext({ ...phone, javaScriptEnabled: false }); const res = [];
     for (const r of ROUTES) {
       const page = await ctx.newPage(); await page.goto(BASE + r, { waitUntil: 'load' });
-      const d = await page.evaluate(() => { const ov = document.querySelector('.arrival'); const h1 = document.querySelector('h1'); return { overlayCovers: ov ? getComputedStyle(ov).display !== 'none' && ov.getBoundingClientRect().height > 300 : false, h1Opacity: h1 ? getComputedStyle(h1).opacity : null, h1: h1?.textContent.trim().slice(0, 40), links: document.querySelectorAll('a[href]').length, invisibleText: [...document.querySelectorAll('main h2, main p')].filter((e) => getComputedStyle(e).opacity === '0').length }; });
+      const d = await page.evaluate(() => { const ov = document.querySelector('[data-arrival-overlay]'); const h1 = document.querySelector('h1'); return { overlayCovers: ov ? getComputedStyle(ov).display !== 'none' && ov.getBoundingClientRect().height > 300 : false, h1Opacity: h1 ? getComputedStyle(h1).opacity : null, h1: h1?.textContent.trim().slice(0, 40), links: document.querySelectorAll('a[href]').length, invisibleText: [...document.querySelectorAll('main h2, main p')].filter((e) => e.getClientRects().length > 0 && getComputedStyle(e).opacity === '0').length }; });
       if (r === '/' || r === '/soho/') await page.screenshot({ path: join(SHOTS, `nojs-${r === '/' ? 'home' : 'soho'}--375.jpg`), type: 'jpeg', quality: 70 });
       res.push({ route: r, ...d }); await page.close();
     }
@@ -149,9 +149,11 @@ const probes = {
       const t0 = Date.now(); await page.goto(BASE + '/', { waitUntil: 'commit' });
       let skipVisibleAt = null; let goneAt = null;
       for (let i = 0; i < 120; i++) {
-        const s = await page.evaluate(() => { const ov = document.querySelector('.arrival'); const sk = document.querySelector('[data-skip]'); return { ov: ov ? getComputedStyle(ov).display !== 'none' && getComputedStyle(ov).opacity !== '0' && ov.getBoundingClientRect().height > 0 : false, sk: sk ? sk.getBoundingClientRect().height > 0 && getComputedStyle(sk).visibility !== 'hidden' : false, state: document.documentElement.dataset.arrival }; }).catch(() => ({}));
-        if (s.sk && skipVisibleAt === null) skipVisibleAt = Date.now() - t0;
-        if (!s.ov && i > 2) { goneAt = Date.now() - t0; break; }
+        // Times from navigation start (performance.now()), not from before the request was sent; the board is
+        // gone once it is hidden or its shutter has left the screen.
+        const s = await page.evaluate(() => { const ov = document.querySelector('[data-arrival-overlay]'); const sk = document.querySelector('[data-skip]'); const top = document.querySelector('.arrival .half.top'); const cs = ov && getComputedStyle(ov); return { now: Math.round(performance.now()), ov: !!ov && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0' && !(top && top.getBoundingClientRect().bottom <= 0), sk: sk ? sk.getBoundingClientRect().height > 0 && getComputedStyle(sk).visibility !== 'hidden' : false }; }).catch(() => ({}));
+        if (s.sk && skipVisibleAt === null) skipVisibleAt = s.now;
+        if (s.now && !s.ov && i > 2) { goneAt = s.now; break; }
         await wait(page, 50);
       }
       const firstTab = []; await page.keyboard.press('Tab'); firstTab.push(await page.evaluate(`(${desc})(document.activeElement)`)); await page.keyboard.press('Tab'); firstTab.push(await page.evaluate(`(${desc})(document.activeElement)`));
