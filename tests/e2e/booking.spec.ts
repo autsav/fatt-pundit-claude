@@ -71,6 +71,10 @@ test('/book/ desk: the button names the group route above the online limit', asy
   await page.selectOption('[data-desk-size]', '2');
   await expect(go).toHaveText(/Book at Soho/);
   await expect(go).toHaveAttribute('target', '_blank');
+  // Covent Garden books online for up to 4: at 5 its button turns to the group route too.
+  await page.selectOption('[data-desk-size]', '5');
+  await expect(page.locator('#book-covent-garden [data-desk-go]')).toHaveText('Plan a group at Covent Garden');
+  await expect(go).toHaveText(/Book at Soho/);
 });
 
 // AUDIT B-02: every Tuesday to Sunday of the coming week, 7pm gives Covent Garden a real time.

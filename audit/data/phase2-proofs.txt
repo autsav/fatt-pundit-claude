@@ -1,0 +1,7 @@
+PASS B-13: 45 .astro files, no hard-coded review numbers
+PASS B-14: dist/404.html: no canonical, no og:url
+PASS B-18 (static): dist/index.html: no "No more tables…" / "For 2, please call"
+PASS B-18 (hydrated): hydrated home DOM with the drawer closed: no stale notes
+PASS B-21: home: 0 console warnings or errors after a full scroll
+PASS B-17: static HTML: neutral (no board); hydrated on D+1: "Today, Wednesday" (expected "Today, Wednesday")
+PASS B-20: phone hero at 3.2 s: no wipe hint (audit/screens/after/b20-hero-phone-3s.jpg)
