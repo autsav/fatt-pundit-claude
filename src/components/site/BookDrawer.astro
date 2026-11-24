@@ -153,7 +153,10 @@ const data = branches.map((b) => ({
   .book-link { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-tiger-deep); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
   .book-done[hidden], .book-sheet[hidden] { display: none; }
   .book-go-wrap { display: grid; gap: 18px; }
-  .book-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+  /* More days scroll sideways: the strip fades at its far edge so the cut chip reads as "more", and the end
+     padding lets the last day clear the fade (AUDIT B-10). */
+  .book-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; padding-inline-end: 32px; scroll-snap-type: x mandatory; scroll-padding-inline: 0 32px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
   .book :global(.book-day) { flex: none; flex-direction: column; min-width: 64px; padding: 6px 10px; line-height: 1.15; scroll-snap-align: start; }
   .book :global(.book-day small) { display: block; font-size: 12px; font-weight: 400; }
   .book :global(.book-time) { min-width: 84px; padding: 0 10px; }
