@@ -108,7 +108,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
   }, []);
 
   return (
-    <section id="bar" className="bar-dark relative overflow-hidden text-sand" aria-labelledby="bar-title">
+    <section id="bar" className="bar-dark relative overflow-clip text-sand" aria-labelledby="bar-title">
       <div className="wrap relative py-[var(--section-pad)]">
         <header className="fp-section-head chapter-head fp-reveal">
           <p className="fp-section-label"><span className="fp-section-no">03</span> The bar</p>
@@ -148,6 +148,8 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
               <img src={prints[0].src} srcSet={prints[0].srcset} sizes={prints[0].srcset ? prints[0].sizes : undefined} alt={prints[0].alt} className="fp-photo bar-print left-[5%] top-[52%] w-[50%] -rotate-3 sm:left-[4%] sm:top-[44%] sm:w-[38%]" loading="lazy" decoding="async" />
               <img src={prints[1].src} srcSet={prints[1].srcset} sizes={prints[1].srcset ? prints[1].sizes : undefined} alt={prints[1].alt} className="fp-photo bar-print right-[6%] top-[8%] w-[44%] rotate-2 sm:right-[5%] sm:top-[10%] sm:w-[30%]" loading="lazy" decoding="async" />
               <div className="bar-dark-veil" style={touch ? { opacity: 0.45 } : undefined} aria-hidden="true" />
+              {/* Direction C scene 8: light catches the bottles along the shelf as the bar comes into view. */}
+              <span className="bar-sheen" aria-hidden="true" />
             </div>
             <figcaption className="flex items-center justify-between gap-3 font-note text-[16px] italic text-sand/80">
               <span>{calm ? 'The bar at Covent Garden, lit for the evening.' : 'The bar after dark.'}</span>

@@ -683,6 +683,27 @@ html:has(.hero) { background: var(--color-ink); }
   .menu-steam i:nth-child(2) { animation-delay: 1.05s; } .menu-steam i:nth-child(3) { animation-delay: 2.1s; }
 }
 
+/* The bar (Direction C scene 8): a sheen runs along the shelf as the bar comes into view, the drink list prints
+   line by line, the two prints ease in. Named view timelines on the stage and the apron (the section clips with
+   overflow: clip, so they track the page). Reduced motion: all at rest. */
+.bar-sheen { position: absolute; inset: 0 auto 40% 0; width: 38%; pointer-events: none; opacity: 0; background: linear-gradient(100deg, transparent, rgb(255 222 168 / 0.2) 45%, rgb(255 236 200 / 0.32) 50%, rgb(255 222 168 / 0.2) 55%, transparent); }
+@keyframes bar-sheen { 0% { opacity: 0; transform: translateX(-110%) skewX(-12deg); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(290%) skewX(-12deg); } }
+@keyframes bar-ease-in { from { scale: 1.06; opacity: 0.4; } to { scale: 1; opacity: 1; } }
+@keyframes bar-print { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bar-stage { view-timeline-name: --bar-stage; view-timeline-axis: block; }
+    .bar-apron { view-timeline-name: --bar-apron; view-timeline-axis: block; }
+    .bar-sheen { animation-name: bar-sheen; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --bar-stage; animation-range: entry 30% cover 60%; }
+    .bar-print { animation-name: bar-ease-in; animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: --bar-stage; animation-range: entry 0% cover 35%; }
+    .bar-apron li { animation-name: bar-print; animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: --bar-apron; }
+    .bar-apron li:nth-child(1) { animation-range: entry 20% entry 50%; }
+    .bar-apron li:nth-child(2) { animation-range: entry 35% entry 65%; }
+    .bar-apron li:nth-child(3) { animation-range: entry 50% entry 80%; }
+    .bar-apron li:nth-child(n + 4) { animation-range: entry 65% entry 95%; }
+  }
+}
+
 /* "Pause motion" (footer button): one rule holds every loop that never ends on its own where it is (AUDIT B-25).
    Scoped to the registered loops, not `*`: pausing everything would also freeze the booking drawer's entrance
    (off-screen) and the story's scroll scenes. Register each new infinite loop here and in

@@ -132,7 +132,7 @@ Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scene
 - [x] S5 Room reveal: red route line draws down into the voyage — done (the walk-in dolly existed and is kept instead of a 1.08 → 1 settle)
 - [x] S6 Voyage: ship's wake drawn, ports stamp in, postcards tilt and settle, Dubai label clear — done: port stamp, postcard tilt/settle, Dubai dock offset (wake existed); e2e 120/120, perf:budget 78 / 0.2%
 - [x] S7 Menu book: one Filter button (U-03), cover opens in 3D, steam over the momos; hydrate on approach (B-23 part) — done: menubook.spec.ts (Filter + axe), e2e 122/122, phase8 ok, perf 77 / 0.2%, taps ok
-- [ ] S8 Bar: shelf sheen, drink list prints, photos ease in
+- [x] S8 Bar: shelf sheen, drink list prints, photos ease in — done: measured opacity/scale per scroll point; e2e green; perf:budget unchanged
 - [ ] S9 Room: film strip runs sideways, frames develop, lightbox zooms from the frame
 - [ ] S10 Passes: slide out of a wallet, board flips BOARDING
 - [ ] S11 Goodbye + footer: lamps dim; footer one screen (U-05)
