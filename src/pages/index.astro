@@ -74,6 +74,10 @@ const ROOM: [ImageMetadata, string][] = [
 // Thumbs: 360/480w for the phone's two-up strip at 2x, 640w for the four-up (the sheet's own `sizes`).
 const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640].map(async (w) => `${await webp(src, w)} ${w}w`))).join(', ');
 const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), thumbSet: await thumbSet(src), full: await webp(src, 1600), alt })));
+// Ratings come from branches.json (one source of truth with the branch pages; AUDIT B-13). Covent Garden first,
+// as the larger review count.
+const rated = ['covent-garden', 'soho'].flatMap((id) => { const b = branches.find((x) => x.id === id); return b?.page.rating ? [{ name: b.shortName, ...b.page.rating }] : []; });
+const sameScore = rated.every((r) => r.score === rated[0].score && r.source === rated[0].source);
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 // The hero still: 640w for phones, 1280w for larger screens (it is the LCP image).
@@ -185,8 +189,10 @@ const orgLd = {
             <p class="chapter-intro">Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
           </header>
           <p class="rating fp-reveal">
-            <span class="rating-n fp-num">4.8<span class="rating-of"> / 5</span></span>
-            <span class="rating-src">on Google at both restaurants: 20,030 reviews for Covent Garden and 16,000+ for Soho (November 2026)</span>
+            <span class="rating-n fp-num">{rated[0].score}<span class="rating-of"> / 5</span></span>
+            <span class="rating-src">{sameScore
+              ? `on ${rated[0].source} at both restaurants: ${rated.map((r, i) => `${r.count}${i === 0 ? ' reviews' : ''} for ${r.name}`).join(' and ')} (${rated[0].asOf})`
+              : rated.map((r) => `${r.score} on ${r.source} for ${r.name} (${r.count} reviews, ${r.asOf})`).join('; ')}</span>
           </p>
         </div>
         <RoomContactSheet client:visible frames={sheet} picks={[0, 2]} />
