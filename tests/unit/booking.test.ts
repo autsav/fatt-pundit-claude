@@ -4,7 +4,7 @@ import { slots, nearestSlot, hhmm, toMin } from '../../src/lib/booking';
 
 const room = (id: string) => branches.find((b) => b.id === id)!;
 const TUE = '2030-01-01'; // a Tuesday well in the future, so "today's" 30-minute cut-off never applies
-const times = (id: string, ymd = TUE) => slots(room(id).hours as never, room(id).timezone, ymd).map(hhmm);
+const times = (id: string, ymd = TUE, grid?: 'opening' | 'clock') => slots(room(id).hours as never, room(id).timezone, ymd, grid).map(hhmm);
 
 describe('slots()', () => {
   it('Soho: half-hourly from opening, last seating 45 min before close', () => {
@@ -39,5 +39,30 @@ describe('nearestSlot()', () => {
   });
   it('an empty day has no nearest time', () => {
     expect(nearestSlot([], toMin('19:00'))).toBeUndefined();
+  });
+});
+
+// AUDIT B-02 table: both rooms × opening edge × 19:00 × last slot, on a future Tuesday.
+describe.each([
+  { id: 'soho', first: '12:00', at19: '19:00', last: '21:30' },
+  { id: 'covent-garden', first: '16:45', at19: '19:15', last: '21:45' },
+])('$id grid', ({ id, first, at19, last }) => {
+  const list = slots(room(id).hours as never, room(id).timezone, TUE);
+  it(`first bookable time is ${first} (the opening edge)`, () => expect(hhmm(list[0])).toBe(first));
+  it(`nearest to 19:00 is ${at19}`, () => expect(hhmm(nearestSlot(list, toMin('19:00'))!)).toBe(at19));
+  it(`last seating is ${last} (45 min before 22:30)`, () => expect(hhmm(list.at(-1)!)).toBe(last));
+});
+
+// The open client question (CG grid :15/:45 or :00/:30) is one data line: booking.slotGrid = 'clock'.
+describe("slotGrid 'clock'", () => {
+  it('aligns a 16:45 opening to the half hours', () => {
+    const t = times('covent-garden', TUE, 'clock');
+    expect(t[0]).toBe('17:00');
+    expect(t).toContain('19:00');
+    expect(t).not.toContain('19:15');
+    expect(t.at(-1)).toBe('21:30');
+  });
+  it('leaves a room that opens on the hour unchanged', () => {
+    expect(times('soho', TUE, 'clock')).toEqual(times('soho'));
   });
 });

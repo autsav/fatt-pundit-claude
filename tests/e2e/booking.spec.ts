@@ -72,3 +72,16 @@ test('/book/ desk: the button names the group route above the online limit', asy
   await expect(go).toHaveText(/Book at Soho/);
   await expect(go).toHaveAttribute('target', '_blank');
 });
+
+// AUDIT B-02: every Tuesday to Sunday of the coming week, 7pm gives Covent Garden a real time.
+test('/book/ desk: Covent Garden has a time at 7pm on every open day', async ({ page }) => {
+  await page.goto('/book/');
+  const days = await page.locator('[data-desk-day] option').evaluateAll((os) =>
+    (os as HTMLOptionElement[]).map((o) => o.value).filter((v, i) => i > 0 && i <= 7 && new Date(`${v}T12:00:00Z`).getUTCDay() !== 1));
+  expect(days.length).toBe(6);
+  for (const d of days) {
+    await page.selectOption('[data-desk-day]', d);
+    await page.selectOption('[data-desk-time]', '19:00');
+    await expect(page.locator('#book-covent-garden [data-desk-fit]'), d).toHaveText(/opens with 2 guests, .*, (7pm|7\.15pm|6\.45pm)\./);
+  }
+});

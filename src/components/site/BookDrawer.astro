@@ -22,6 +22,7 @@ const data = branches.map((b) => ({
   provider: b.booking!.provider,
   url: b.booking!.url,
   widgetId: b.booking!.widgetId,
+  grid: b.booking!.slotGrid ?? 'opening',
   phone: b.phone,
   phonePretty: b.phone ? prettyPhone(b.phone) : '',
   maxOnline: b.groups?.onlineMax ?? 8,
@@ -169,8 +170,8 @@ const data = branches.map((b) => ({
 
 <script>
   import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
-  import { KEYS, PROVIDER, local, addDays, wd, toMin, hhmm, prettyMin, slots as slotsFor, providerLink, type Span } from '@/lib/booking';
-  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
+  import { KEYS, PROVIDER, local, addDays, wd, toMin, hhmm, prettyMin, slots as slotsFor, providerLink, type Span, type SlotGrid } from '@/lib/booking';
+  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; grid: SlotGrid; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
   const dlg = document.querySelector<HTMLDialogElement>('[data-book-drawer]');
   const raw = document.querySelector('[data-book-data]')?.textContent;
   if (dlg && raw) {
@@ -191,7 +192,7 @@ const data = branches.map((b) => ({
 
     const pretty = prettyMin;
     // Last booking 45 minutes before closing, every half hour (src/lib/booking.ts).
-    const slots = (ymd: string) => slotsFor(b.hours, b.tz, ymd);
+    const slots = (ymd: string) => slotsFor(b.hours, b.tz, ymd, b.grid);
 
     const radio = (el: HTMLElement, cls: string, on: boolean, label: string, html: string, onPick: () => void) => {
       const btn = document.createElement('button');

@@ -59,7 +59,7 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
       <legend class="fp-legend">Which restaurant?</legend>
       <div class="fp-choices">
         {open.map((b, i) => (
-          <label class="fp-choice"><input type="radio" name="restaurant" value={b.shortName} data-id={b.id} data-email={b.email} data-phone={b.phone} data-phone-pretty={b.phone ? prettyPhone(b.phone) : undefined} data-tz={b.timezone} data-hours={JSON.stringify(b.hours)} checked={i === 0} /><span>{b.shortName}</span></label>
+          <label class="fp-choice"><input type="radio" name="restaurant" value={b.shortName} data-id={b.id} data-email={b.email} data-phone={b.phone} data-phone-pretty={b.phone ? prettyPhone(b.phone) : undefined} data-tz={b.timezone} data-grid={b.booking?.slotGrid ?? 'opening'} data-hours={JSON.stringify(b.hours)} checked={i === 0} /><span>{b.shortName}</span></label>
         ))}
       </div>
     </fieldset>
@@ -144,7 +144,7 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
 </style>
 
 <script>
-  import { addDays, hhmm, local, prettyMin, slots, type Span } from '../lib/booking';
+  import { addDays, hhmm, local, prettyMin, slots, type Span, type SlotGrid } from '../lib/booking';
   const form = document.querySelector<HTMLFormElement>('[data-enquiry]')!;
   const top = document.querySelector<HTMLElement>('[data-enquiry-top]')!;
   const send = form.querySelector<HTMLButtonElement>('[data-enquiry-send]')!;
@@ -169,7 +169,7 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
   const fillTimes = () => {
     const keep = timeSel.value, r = picked();
     const hours = JSON.parse(r.dataset.hours || 'null') as Record<string, Span[]> | null;
-    const all = hours && daySel.value ? slots(hours, r.dataset.tz!, daySel.value) : [];
+    const all = hours && daySel.value ? slots(hours, r.dataset.tz!, daySel.value, r.dataset.grid as SlotGrid) : [];
     timeSel.replaceChildren(new Option(daySel.value && !all.length ? 'Closed that day' : 'Any time', ''), ...all.map((m) => new Option(prettyMin(m), hhmm(m))));
     if (all.some((m) => hhmm(m) === keep)) timeSel.value = keep;
   };

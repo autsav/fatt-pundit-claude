@@ -35,7 +35,7 @@ const no = () => String(++n).padStart(2, '0');
   </ul>
   <ol class="fp-ledger desk" role="list">
     {open.map((b) => (
-      <li class="desk-row" id={`book-${b.id}`} data-desk-room={JSON.stringify({ id: b.id, name: b.shortName, tz: b.timezone, hours: b.hours, provider: b.booking!.provider, url: b.booking!.url, widgetId: b.booking!.widgetId, max: b.groups?.onlineMax ?? 8 })}>
+      <li class="desk-row" id={`book-${b.id}`} data-desk-room={JSON.stringify({ id: b.id, name: b.shortName, tz: b.timezone, hours: b.hours, provider: b.booking!.provider, url: b.booking!.url, widgetId: b.booking!.widgetId, grid: b.booking!.slotGrid ?? 'opening', max: b.groups?.onlineMax ?? 8 })}>
         <span class="fp-ledger-no desk-no" aria-hidden="true">{no()}</span>
         <div class="desk-main">
           <h2 class="desk-name">{b.shortName}</h2>
@@ -107,7 +107,7 @@ const no = () => String(++n).padStart(2, '0');
 
 <script>
   import { openStatus, statusLine, type Hours } from '../lib/hours';
-  import { addDays, hhmm, local, nearestSlot, prettyMin, providerLink, slots, toMin, PROVIDER, type Span } from '../lib/booking';
+  import { addDays, hhmm, local, nearestSlot, prettyMin, providerLink, slots, toMin, PROVIDER, type Span, type SlotGrid } from '../lib/booking';
   // Each room's status on the guest's clock, in the room's own time zone (dot or ring, plus words).
   for (const el of document.querySelectorAll<HTMLElement>('[data-desk-hours]')) {
     const hours = JSON.parse(el.dataset.deskHours!) as Hours | null;
@@ -135,7 +135,7 @@ const no = () => String(++n).padStart(2, '0');
   });
 
   // The desk picker: one day, time and party size for every room.
-  type Room = { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId: string | null; max: number };
+  type Room = { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId: string | null; grid: SlotGrid; max: number };
   const when = document.querySelector<HTMLFormElement>('[data-desk-when]');
   const rows = [...document.querySelectorAll<HTMLElement>('[data-desk-room]')].map((el) => ({ el, r: JSON.parse(el.dataset.deskRoom!) as Room }));
   if (when && rows.length) {
@@ -152,7 +152,7 @@ const no = () => String(++n).padStart(2, '0');
     const size = () => Math.min(9, Math.max(1, Math.round(Number(sizeIn.value)) || 2));
     const fillTimes = () => {
       const keep = timeSel.value;
-      const per = rows.map(({ r }) => slots(r.hours, r.tz, daySel.value));
+      const per = rows.map(({ r }) => slots(r.hours, r.tz, daySel.value, r.grid));
       const all = [...new Set(per.flat())].sort((a, b) => a - b);
       timeSel.replaceChildren(...all.map((m) => new Option(prettyMin(m), hhmm(m))));
       if (!all.length) timeSel.add(new Option('Closed that day', ''));
@@ -168,7 +168,7 @@ const no = () => String(++n).padStart(2, '0');
         const fit = el.querySelector<HTMLElement>('[data-desk-fit]')!;
         const go = el.querySelector<HTMLAnchorElement>('[data-desk-go]')!;
         // Each room's own closest time to the one chosen: the rooms open on different minutes (AUDIT B-02).
-        const at = time ? nearestSlot(slots(r.hours, r.tz, day), toMin(time)) : undefined;
+        const at = time ? nearestSlot(slots(r.hours, r.tz, day, r.grid), toMin(time)) : undefined;
         const ok = at !== undefined;
         // The button says where it goes: the group page above the online limit (AUDIT B-12).
         go.dataset.label ??= go.innerHTML;
@@ -180,7 +180,7 @@ const no = () => String(++n).padStart(2, '0');
           go.removeAttribute('target');
         } else if (!ok) {
           const s = openStatus(r.hours as Hours, r.tz);
-          const none = !slots(r.hours, r.tz, day).length;
+          const none = !slots(r.hours, r.tz, day, r.grid).length;
           fit.textContent = none ? (day === today && !s.open && s.opens ? `Closed today · ${statusLine('', s).replace(/^Opens/, 'opens')}` : `Closed ${when$}`) : 'Outside opening hours';
           go.href = r.url; go.target = '_blank';
         } else {

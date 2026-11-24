@@ -42,7 +42,11 @@ const branches = defineCollection({
       phone: z.string().regex(/^\+\d{8,15}$/).nullable(),
       email: z.email().nullable(),
       booking: z
-        .object({ provider: z.enum(['opentable', 'sevenrooms', 'resdiary', 'other']), url: z.url(), widgetId: z.string().nullable() })
+        .object({
+          provider: z.enum(['opentable', 'sevenrooms', 'resdiary', 'other']), url: z.url(), widgetId: z.string().nullable(),
+          // Half-hour times from the opening minute (default) or on the clock (:00/:30). CLIENT: Covent Garden's answer.
+          slotGrid: z.enum(['opening', 'clock']).optional(),
+        })
         .nullable(),
       hours: hours.nullable(),
       delivery: z.array(z.object({ provider: z.enum(['deliveroo', 'uber-eats']), url: z.url() })),
