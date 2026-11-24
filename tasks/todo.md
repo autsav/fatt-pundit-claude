@@ -134,7 +134,7 @@ Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scene
 - [x] S7 Menu book: one Filter button (U-03), cover opens in 3D, steam over the momos; hydrate on approach (B-23 part) — done: menubook.spec.ts (Filter + axe), e2e 122/122, phase8 ok, perf 77 / 0.2%, taps ok
 - [x] S8 Bar: shelf sheen, drink list prints, photos ease in — done: measured opacity/scale per scroll point; e2e green; perf:budget unchanged
 - [x] S9 Room: film strip runs sideways, frames develop, lightbox zooms from the frame — done: develop + drift (lightbox zoom existed); measured, no x-overflow; e2e green
-- [ ] S10 Passes: slide out of a wallet, board flips BOARDING
+- [x] S10 Passes: slide out of a wallet, board flips BOARDING — done: filmstrip, e2e 122/122, phase8 check ok (focus during drop), smoke 8/8
 - [ ] S11 Goodbye + footer: lamps dim; footer one screen (U-05)
 - [ ] S12 Page transitions: cross-document view transitions (room name, header)
 - [ ] U-04 Book one tap away on phones through the long scenes

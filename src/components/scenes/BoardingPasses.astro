@@ -129,7 +129,8 @@ function byDay(b: Branch) {
     dd.textContent = map[day] ?? 'Closed';
   }
 
-  // Stamp in: each pass thuds down, then its "Boarding" stamp lands.
+  // Direction C scene 10: the passes slide up out of the ticket wallet one after another, then the "Boarding" card
+  // flips down like a departure board.
   if (!calm && passes.length) {
     passes.forEach((p) => p.classList.add('is-waiting'));
     // One observer for the grid; each pass thuds in on its own when it arrives.
@@ -137,8 +138,10 @@ function byDay(b: Branch) {
     const io = new IntersectionObserver(
       async (entries) => {
         const { animate, spring } = await lib;
+        let k = 0; // passes arriving together (a row on wide screens) go one after another
         for (const e of entries) {
           if (!e.isIntersecting) continue;
+          const delay = 80 * k++;
           io.unobserve(e.target);
           const p = e.target as HTMLElement;
           const i = passes.indexOf(p);
@@ -147,17 +150,17 @@ function byDay(b: Branch) {
           const thud = spring(animeSpring(SPRING.stamp));
           animate(p, {
             opacity: { from: 0, to: 1, duration: MS.fast, ease: EASE.animeOut },
-            translateY: [-36, 0],
-            rotate: { from: [-5, 3, -2][i % 3], to: 0 },
-            scale: [1.12, 1],
+            translateY: ['40%', '0%'],
+            rotate: { from: [-2, 1, -1][i % 3], to: 0 },
             ease: thud,
+            delay,
             // anime leaves an inline transform behind, which would beat .pass:hover.
             onComplete: () => (p.style.transform = ''),
           });
           animate(p.querySelector('.pass-boarding')!, {
             opacity: { from: 0, to: 0.9, duration: MS.fast, ease: EASE.animeOut },
-            scale: [2.2, 1],
-            delay: MS.spring * 0.6,
+            rotateX: [-90, 0],
+            delay: delay + MS.spring * 0.6,
             ease: thud,
           });
         }
@@ -253,7 +256,9 @@ function byDay(b: Branch) {
   .pass-inside { display: flex; align-items: center; justify-content: center; min-height: 44px; border: 2px solid var(--color-ink); color: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
   .pass-inside:hover { background: var(--color-ink); color: var(--color-paper); }
   .pass-inside:focus-visible { outline: 3px solid var(--fp-ring); outline-offset: 3px; }
-  .pass-boarding { justify-self: end; padding: 2px 10px; border: 3px double var(--band-text); color: var(--band-text); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -8deg; pointer-events: none; }
+  /* The card flips down from its top edge, like a departure board (perspective on the title row). */
+  .pass-title { perspective: 320px; }
+  .pass-boarding { transform-origin: 50% 0; justify-self: end; padding: 2px 10px; border: 3px double var(--band-text); color: var(--band-text); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; rotate: -8deg; pointer-events: none; }
   @media (max-width: 640px) { .f-extra { display: none; } }
   /* The spring curve at the panel beat: the page leaves at 260 ms, by which the stamp has landed. */
   .pass.is-stamped .pass-boarding { animation: pass-thud var(--dur-panel) var(--curve-spring); }
