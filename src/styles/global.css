@@ -390,8 +390,6 @@
   background: radial-gradient(ellipse at 50% 80%, rgb(255 236 170 / 0.95), var(--color-gold) 30%, var(--color-tiger) 58%, transparent 72%); }
 @media (max-width: 640px) {
   :where(.story-scenes) { --floor: calc(var(--dock-h, 60px) + env(safe-area-inset-bottom)); }
-  /* The dock slides away on scroll down (SiteHeader sets data-away), so the cast settles to the screen foot. */
-  html:has(.dock[data-away]) :where(.story-scenes) { --floor: env(safe-area-inset-bottom, 0px); }
 }
 @media (max-width: 599px) {
   :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }

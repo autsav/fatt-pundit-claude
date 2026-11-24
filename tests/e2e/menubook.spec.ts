@@ -7,6 +7,8 @@ test('menu book: Filter holds the dietary menus and list views', async ({ page }
   await page.goto('/?at=soho#menu');
   const menu = page.locator('#menu');
   await menu.scrollIntoViewIfNeeded();
+  // The book is a client:visible island: wait until it has hydrated (Astro drops the ssr attribute).
+  await page.waitForFunction(() => { const i = document.getElementById('menu')?.closest('astro-island'); return !!i && !i.hasAttribute('ssr'); });
   await expect(menu.getByRole('tab')).toHaveText(['À la carte', 'Set menu', 'Pre-theatre', 'Veg pre-theatre', 'Drinks']);
   const filter = menu.locator('[data-filter-toggle]');
   await expect(filter).toHaveAttribute('aria-expanded', 'false');

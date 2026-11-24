@@ -60,3 +60,18 @@ test('branch Book link announces where it opens', async ({ page, browser }) => {
   await expect(p2.locator('main a[data-book="covent-garden"]').first()).toHaveAccessibleName('Book a table (opens in a new tab)');
   await ctx.close();
 });
+
+// U-04: on phones Book stays one tap away the whole way down the home page.
+test('phone: the dock Book stays on screen while scrolling down', async ({ page }, info) => {
+  test.skip(info.project.name !== 'phone', 'phones only');
+  await page.addInitScript(() => { try { localStorage.setItem('fp-arrived', '1'); } catch {} });
+  await page.goto('/');
+  await page.waitForTimeout(500);
+  const book = page.locator('[data-dock] .dock-book');
+  for (const f of [0.15, 0.35, 0.55, 0.75, 0.9]) {
+    await page.evaluate((f) => { const y = document.documentElement.scrollHeight * f; window.__lenis ? window.__lenis.scrollTo(y, { immediate: true, force: true }) : scrollTo(0, y); }, f);
+    await page.mouse.wheel(0, 300);
+    await page.waitForTimeout(400);
+    await expect(book, `at ${f * 100}%`).toBeInViewport();
+  }
+});

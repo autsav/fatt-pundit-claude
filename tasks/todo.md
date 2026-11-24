@@ -137,5 +137,5 @@ Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scene
 - [x] S10 Passes: slide out of a wallet, board flips BOARDING — done: filmstrip, e2e 122/122, phase8 check ok (focus during drop), smoke 8/8
 - [x] S11 Goodbye + footer: lamps dim; footer one screen (U-05) — done: phone footer ~2,110 → ~1,380 px (≈1.7 screens; every link kept), desktop ~1,660 → ~1,370; axe clean; e2e green
 - [x] S12 Page transitions: cross-document view transitions (room name, header) — done: header group added (room morph existed); transitions.spec.ts 4/4
-- [ ] U-04 Book one tap away on phones through the long scenes
+- [x] U-04 Book one tap away on phones through the long scenes (proof: tests/e2e/a11y.spec.ts dock test)
 - [ ] B-26 home JS budget on track (< 100 KB): new motion in CSS/small scripts, no new islands
