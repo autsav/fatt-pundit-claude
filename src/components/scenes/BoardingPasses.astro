@@ -136,7 +136,7 @@ function byDay(b: Branch) {
     const lib = import('animejs');
     const io = new IntersectionObserver(
       async (entries) => {
-        const { animate, createSpring } = await lib;
+        const { animate, spring } = await lib;
         for (const e of entries) {
           if (!e.isIntersecting) continue;
           io.unobserve(e.target);
@@ -144,7 +144,7 @@ function byDay(b: Branch) {
           const i = passes.indexOf(p);
           p.classList.remove('is-waiting');
           // The stamp spring moves the paper (anime takes the duration from it); opacity is an effect and fades out-curve.
-          const thud = createSpring(animeSpring(SPRING.stamp));
+          const thud = spring(animeSpring(SPRING.stamp));
           animate(p, {
             opacity: { from: 0, to: 1, duration: MS.fast, ease: EASE.animeOut },
             translateY: [-36, 0],

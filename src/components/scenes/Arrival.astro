@@ -51,7 +51,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </style>
 
 <script>
-  import { createTimeline, createSpring } from 'animejs';
+  import { createTimeline, spring } from 'animejs';
   import { SPRING, animeSpring } from '@/lib/motion-tokens';
   import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
@@ -113,7 +113,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       if (!fast) {
         // The stamp thuds onto the board (a spring: it has weight), the board jolts and the shutter
         // starts to split while the thud still rings, with no pause between beats.
-        tl.add('[data-stamp]', { scale: [1.14, 1], ease: createSpring(animeSpring(SPRING.stamp)) }, 0)
+        tl.add('[data-stamp]', { scale: [1.14, 1], ease: spring(animeSpring(SPRING.stamp)) }, 0)
           .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, 60)
           .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, 160);
       }
