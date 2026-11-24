@@ -485,6 +485,8 @@
 @view-transition { navigation: auto; }
 ::view-transition-group(*) { animation-duration: var(--dur-panel); animation-timing-function: var(--curve-out); }
 ::view-transition-group(root) { animation-duration: var(--dur-fast); }
+/* The header stays put while the page underneath changes (Direction C scene 12). */
+header.bar { view-transition-name: site-header; }
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
 }
