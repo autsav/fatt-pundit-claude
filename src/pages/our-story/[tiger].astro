@@ -15,6 +15,7 @@ const t = TIGERS[Astro.params.tiger as keyof typeof TIGERS];
 const branches = await getBranches();
 ---
 <Base title={`You're a ${t.name} · Fatt Pundit`} description={`${t.name}: ${t.trait.toLowerCase()}. “${t.line}” Which tiger are you?`} og={t.id} noindex>
+  <a slot="skip" class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} />
   <main id="content">
     <section class="sec gold-bg">

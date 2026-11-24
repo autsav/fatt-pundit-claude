@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { localStorage.setItem('fp-arrived', '1'); } catch {} }); });
 
 // AUDIT B-11: the first Tab stop is the page's own skip link, never "Skip to footer".
-for (const path of ['/', '/soho/', '/dubai/', '/our-story/', '/book/', '/soho/menu/', '/allergens/']) {
+for (const path of ['/', '/soho/', '/dubai/', '/our-story/', '/our-story/fatt/', '/book/', '/soho/menu/', '/allergens/', '/no-such-page/']) {
   test(`first Tab is the page's skip link: ${path}`, async ({ page }) => {
     await page.goto(path);
     await page.waitForTimeout(450); // Base re-asserts scroll for ~300 ms after load
