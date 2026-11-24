@@ -197,7 +197,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         {b.geo && b.timezone !== 'Europe/London' && <p class="branch-clock" data-branch-clock data-tz={b.timezone} data-lat={b.geo.lat} data-lng={b.geo.lng} data-name={b.shortName}></p>}
         {open && (
           <div class="arrival-actions">
-            {b.booking && <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>}
+            {b.booking && <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table<span class="sr-only" data-tab-note> (opens in a new tab)</span></a>}
             <a class="fp-link fp-link--strong arrival-menus" href={`/${b.id}/menu/`}>See the menus</a>
           </div>
         )}
@@ -365,7 +365,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             {b.booking && (
               <div class="visit-book">
                 <p class="visit-book-h fp-section-label">Reserve</p>
-                <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
+                <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table<span class="sr-only" data-tab-note> (opens in a new tab)</span></a>
                 <p class="visit-via">Online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>
                 {rating && (
                   <p class="visit-proof"><span class="proof-n fp-num">{rating.score}</span><span class="proof-src">on {rating.source} from {rating.count} reviews ({rating.asOf})</span></p>

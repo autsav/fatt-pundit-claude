@@ -317,6 +317,12 @@ const data = branches.map((b) => ({
     dlg.addEventListener('close', () => { opener?.focus(); unlockScroll(); });
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 
+    // With JavaScript these links open this drawer, not the provider's tab: say so (AUDIT B-15).
+    for (const n of document.querySelectorAll<HTMLElement>('[data-book] [data-tab-note]')) {
+      const id = n.closest<HTMLElement>('[data-book]')!.dataset.book ?? '';
+      if (!id || all.some((x) => x.id === id)) n.textContent = ' (opens the booking panel)';
+    }
+
     // Any [data-book] link opens the drawer; its value picks the restaurant
     // (empty = let the guest choose). Delegated, so links added later work too.
     document.addEventListener('click', (e) => {

@@ -49,3 +49,14 @@ test('home, reduced motion: no serious or critical axe violations', async ({ pag
   const r = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]['page'] }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
   expect(r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 });
+
+// AUDIT B-15: branch hero Book links say where they go: a new tab without JS, the booking panel with it.
+test('branch Book link announces where it opens', async ({ page, browser }) => {
+  await page.goto('/soho/');
+  await expect(page.locator('main a[data-book="soho"]').first()).toHaveAccessibleName('Book a table (opens the booking panel)');
+  const ctx = await browser.newContext({ javaScriptEnabled: false });
+  const p2 = await ctx.newPage();
+  await p2.goto('/covent-garden/');
+  await expect(p2.locator('main a[data-book="covent-garden"]').first()).toHaveAccessibleName('Book a table (opens in a new tab)');
+  await ctx.close();
+});
