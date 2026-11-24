@@ -638,11 +638,32 @@ html:has(.hero) { background: var(--color-ink); }
 /* Branch hero name board: the intended size, but never wider than its column (container = .board-slot). */
 .arrival-flap { font-size: min(clamp(22px, 4.6vw, 56px), calc(100cqw / (var(--n, 13) * 0.8))); }
 
+/* Home hero (Direction C scene 2). The room behind the glass lags the scroll (depth), the shelf lamps breathe,
+   and the glass mists over as you leave for the street. Scroll-linked rules live here as longhands (Astro's
+   scoped pipeline drops them: tasks/lessons.md). Reduced motion: still photo, no mist, no breathing. */
+.hero-lamps { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 38% at 50% 14%, rgb(255 190 110 / 0.2), transparent 72%); opacity: 0.7; }
+.hero-mist { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; background: linear-gradient(rgb(218 199 181 / 0.28), rgb(218 199 181 / 0.42) 60%, rgb(218 199 181 / 0.12)); }
+/* The drifting glass carries its own bottom fade down out of the section, so the hand-off to the street is a
+   fixed fade that doesn't move. */
+#top.hero::after { content: ''; position: absolute; inset: auto 0 0; height: 22svh; z-index: 0; pointer-events: none; background: linear-gradient(transparent, var(--color-ink)); }
+@keyframes hero-breathe { from { opacity: 0.55; } to { opacity: 1; } }
+@keyframes hero-drift { to { transform: translateY(14svh) scale(1.03); } }
+@keyframes hero-mist { to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-lamps { animation: hero-breathe 4.8s ease-in-out infinite alternate; }
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-glass { animation-name: hero-drift; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 0 100svh; }
+    .hero-mist { animation-name: hero-mist; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 40svh 100svh; }
+  }
+}
+
 /* "Pause motion" (footer button): one rule holds every loop that never ends on its own where it is (AUDIT B-25).
    Scoped to the registered loops, not `*`: pausing everything would also freeze the booking drawer's entrance
    (off-screen) and the story's scroll scenes. Register each new infinite loop here and in
    docs/qa/phase8-motion/check.mjs KNOWN_LOOPS; tests/e2e/motion.spec.ts fails if one is missed. */
-html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, .o-cue, [data-idle='true']) { animation-play-state: paused; }
+html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, .o-cue, .hero-lamps, [data-idle='true']) { animation-play-state: paused; }
 
 /* Stand-in for the typewriter font while it loads: Courier New, resized per weight so lines break in
    the same places and nothing jumps when the brand font arrives. Measured on this site's own text:

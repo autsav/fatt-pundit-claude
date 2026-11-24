@@ -25,7 +25,11 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
 <section id="top" class="hero rain" aria-labelledby="hero-title">
   <div class="hero-glass" role="img" aria-label="The dining room at Covent Garden through a rainy window: pink booths and bentwood chairs under shelves of brass lamps">
     <RainHero client:idle src={rainSrc} poster={rainPoster} posterSrcset={posterSrcset} posterSizes={posterSizes} />
+    <!-- Direction C scene 2: the shelf lamps breathe (a warm pool over the top of the room). -->
+    <span class="hero-lamps" aria-hidden="true"></span>
   </div>
+  <!-- ...and the glass mists over as you leave the window for the street. -->
+  <span class="hero-mist" aria-hidden="true"></span>
   <div class="hero-words">
     <p class="hero-kicker">Hakka cooking from Calcutta's Chinatown</p>
     <h1 id="hero-title" class="hero-title" data-hero-title>Fatt Pundit</h1>
@@ -52,6 +56,20 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
     );
     io.observe(actions);
   } else document.documentElement.dataset.heroBook = 'out';
+
+  // The room behind the glass drifts a few pixels with the mouse (desktop, motion on, not paused): depth.
+  // It uses the `translate` property, so it adds to the scroll drift on `transform` (global.css "Home hero").
+  const glass = document.querySelector<HTMLElement>('.hero-glass');
+  const hero = document.querySelector<HTMLElement>('#top');
+  if (glass && hero && window.matchMedia('(pointer: fine) and (prefers-reduced-motion: no-preference)').matches) {
+    let raf = 0, x = 0, y = 0;
+    hero.addEventListener('pointermove', (e) => {
+      if (document.documentElement.dataset.motion === 'paused') return;
+      x = e.clientX / innerWidth - 0.5; y = e.clientY / innerHeight - 0.5;
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; glass.style.translate = `${(-x * 14).toFixed(1)}px ${(-y * 8).toFixed(1)}px`; });
+    }, { passive: true });
+    hero.addEventListener('pointerleave', () => { glass.style.translate = ''; });
+  }
 
   // The wipe hint appears once, after ~3s with no pointer input (a guest who is already wiping needs none).
   // Mouse and trackpad only: on touch, vertical swipes scroll the page, so the hint promised what a phone can't do (AUDIT B-20).
@@ -96,7 +114,7 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
 <style>
   .hero { position: relative; display: grid; place-items: center; min-height: calc(100svh - var(--header-h, 72px)); overflow: hidden; background: var(--color-ink); color: var(--color-sand); }
   /* The glass dissolves into the street below over its last 20svh (no flat edge). */
-  .hero-glass { position: absolute; inset: 0; -webkit-mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); }
+  .hero-glass { position: absolute; inset: 0; transition: translate 900ms var(--curve-out); -webkit-mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); }
 
   /* The words float on the glass: they let drags through to it, only their links take pointers. */
   .hero-words { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: var(--space-5); width: 100%; max-width: 64rem; padding: var(--space-8) var(--space-5); text-align: center; pointer-events: none; }
