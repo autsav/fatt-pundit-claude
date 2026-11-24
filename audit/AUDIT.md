@@ -42,7 +42,7 @@ Below budget (before): home mobile local P89 (runs 78/89/90; live 96) with lab L
 - **One P0: with JavaScript off, or if the bundle fails, the home page stays a black intro screen for good** (B-01). The intro also holds the content for 2.2–2.4 s with motion on, against a 1.5 s budget (B-04).
 - **Accessibility is in good shape where axe looks.** axe finds 0 stable serious or critical violations: 1 reduced-motion finding, plus transient hits taken mid-animation. The gaps are in things axe can't see: scroll lock fails under reduced motion (B-03), skip-link order (B-11), label-in-name on the day chips (B-09), and story text that stays invisible without JS (B-05).
 - **Performance is close to budget, except the home page.** Home is mobile P89 locally (96 live), with lab LCP 3.6 s, 1.4 MB and **157 KB of JS against a 100 KB budget**, and its HTML carries all 10 menus. Every other page scores 92–100, and SEO is 100 on a launch build (see Performance and SEO).
-- **Design: the craft is high, but the home page says too much.** It uses nine visual metaphors and about 21 phone screens, with 12 of them before the first dish. "Premium" here means one thread, fewer and larger moments, Book always within reach, and the full menu moved off the home page. Two directions are below, with mocks.
+- **Design: the craft is high, but the home page says too much.** It uses nine visual metaphors and about 21 phone screens, with 12 of them before the first dish. "Premium" here means one thread, fewer and larger moments, Book always within reach, and the full menu moved off the home page. The client chose to keep the current immersive journey and enrich it with motion (Direction C, scene-by-scene plan below); the two simplified directions are kept for reference.
 
 ## Scores
 Design scores run from 1 (poor) to 5 (excellent). The design review used the 375 and 1280 viewport frames, with live interaction checks.
@@ -75,7 +75,7 @@ Severity: **P0** blocks a primary task for some guests. **P1** is a real defect 
 | B-01 | P0 | `/` | Disable JS (or block `_astro/*.js`), open `/` on a first visit | Home page readable, intro skipped | Full-screen "Now arriving" overlay never leaves; Skip does nothing (`audit/screens/probes/nojs-home--375.jpg`) | Inline script sets `data-arrival="play"` and only the JS module ever ends it; CSS hides the overlay only for `data-arrival='skip'` (`src/components/scenes/Arrival.astro:16,36`) | CSS fail-safe: overlay auto-hides via a CSS animation by ~1.5 s whatever JS does, and is shown only when JS sets a class *after* the module loads; `<noscript>` style hides it |
 | B-02 | P1 | `/book/` | Open `/book/` on a Tue–Sun, default 7pm, 2 guests | Covent Garden offers a time | "Outside opening hours" and a plain SevenRooms link (probe `desk`, screenshot frame book--375) | `slots()` (`src/lib/booking.ts:25-34`) steps 30 min from the opening minute: Soho → :00/:30, Covent Garden (opens 16:45) → :15/:45. The desk's one shared time list (`src/pages/book.astro:152-161`) never finds a time both rooms offer | Per-room nearest bookable time in the desk; client to confirm whether CG books on :15/:45 or :00/:30 (no hours changed). Vitest on `slots()` first |
 | B-03 | P1 | all (site menu, "Which restaurant's menus?") | Reduced motion on, open the site menu on a phone, scroll | Page behind stays put | Page scrolls behind the modal (probe `dialogs`, 6 of 6 reduced-motion cases for the two header dialogs) | `lockScroll()` only stops Lenis (`src/lib/smooth-scroll.ts:190`); Lenis isn't created with reduced motion | Lock `html` overflow (with `scrollbar-gutter: stable`) when there's no Lenis |
-| B-04 | P1 | `/` | First visit, motion on | Content within 1.5 s (brief §3) | Overlay gone at 2.18 s (375) / 2.35 s (1280); first Tab lands on "Skip to footer", not the intro's Skip | Board animation length + 4.5 s safety cap (`Arrival.astro:126`); Skip isn't focused or first in order | Cap the intro at 1.2 s (or play it only after the hero is visible, not over it), move focus to Skip on start; or drop the intro (both directions do) |
+| B-04 | P1 | `/` | First visit, motion on | Content within 1.5 s (brief §3) | Overlay gone at 2.18 s (375) / 2.35 s (1280); first Tab lands on "Skip to footer", not the intro's Skip | Board animation length + 4.5 s safety cap (`Arrival.astro:126`); Skip isn't focused or first in order | Keep the intro (Direction C) but cap it at 1.2 s and hand it into the hero (the doors); move focus to Skip on start |
 | B-05 | P1 | `/our-story/` | Disable JS, open the page | Story text readable | 40 headings/paragraphs stay at `opacity: 0` (probe `nojs`) | Reveal start state applied in CSS without a JS gate | Gate the hidden start state on a `js` class set by an inline script, like the scenes' `@supports` gates |
 | B-06 | P1 | `/dubai/`, home Dubai pass | Click "Get the opening date" | A way to join the list | Goes to Instagram; the form renders only with `PUBLIC_DUBAI_LIST_ENDPOINT` or a branch email, both unset | `src/pages/[branch]/index.astro:207`; comment at `:138` promises a reservations-address fallback the code doesn't do | Client: form service (#5/#10/#41). Until then, label the button for what it does ("Follow @fattpundit for the date") and make the comment true or delete it |
 | B-07 | P1 | launch | Build with `PUBLIC_LAUNCH=true`, read `/robots.txt` | Share images reachable by link-preview crawlers | `Disallow: /og/` blocks the `og:image` files for crawlers that honour robots (X) | `src/pages/robots.txt.ts:5-9` | Allow `/og/`; keep them out of search with an `X-Robots-Tag: noindex` header in `vercel.json` |
@@ -206,9 +206,9 @@ Launch-build pass (`PUBLIC_LAUNCH=true`, SEO only, mobile):
 ## UX & design improvements
 | ID | Page/section | Problem | Proposal | Impact | Effort |
 |---|---|---|---|---|---|
-| U-01 | Home | Nine metaphors (rain glass, door, curtain, voyage map, postcards, menu book, film strip, boarding passes, goodbye) compete; nothing is the memorable one | One thread for the whole page (Direction A: the lit room; B: the route line), one device per chapter | H | M |
-| U-02 | Home | 16.7k px at 375 (~21 screens); doors + voyage take ~12 screens before the first dish | ~8 screens: hero → story teaser (1 scene) → 4 dishes → bar → rooms → Book | H | M |
-| U-03 | Home menu book | Four control rows (room, menu, diet filters, list view) on a teaser | Four dishes with real photos and prices; "See the Soho / Covent Garden menus" | H | S |
+| U-01 | Home | Nine devices (rain glass, door, curtain, voyage map, postcards, menu book, film strip, boarding passes, goodbye) feel like separate set pieces; the cuts between them are hard (colour bands, jumps) | **Keep every scene** (client, 24 Nov) and join them into one continuous walk: each scene hands an object or light to the next (Direction C) | H | M |
+| U-02 | Home | 16.7k px at 375 (~21 screens); doors + voyage take ~12 screens before the first dish | Keep the length but give every screen something happening (scrubbed motion, depth); add a phone chapter chip and a visible "Skip to the menus / Book" so the long walk is optional, not a toll | H | M |
+| U-03 | Home menu book | Four control rows (room, menu, diet filters, list view) above the book | Keep the book; fold diet filters and list view into one "Filter" button so the book itself is the hero of the chapter | H | S |
 | U-04 | Phones, all pages | "Book" leaves the screen on scroll-down (dock hides); phone header has only "Menu" | Keep a slim Book bar fixed on phones (hide only while typing), or put Book in the phone header after the hero | H | S |
 | U-05 | Footer, all pages | 3–4 phone screens: goodbye, three room blocks, newsletter, socials, sitemap, giant wordmark, legal | One screen: rooms (name, today, Book), small sitemap, legal; move "Goodbye" into the home closing only | M | S |
 | U-06 | Home "Choose your gate" | A 14 px paragraph of group/deposit rules under three detailed passes | Passes show room, address, today, Book; rules live on `/book/` and the groups page | M | S |
@@ -227,12 +227,53 @@ Launch-build pass (`PUBLIC_LAUNCH=true`, SEO only, mobile):
 - navbar.gallery: a quiet nav with one obvious action.
 
 What to change:
-- **Remove:** the intro board, the door-and-curtain sequence and the menu book from home. Remove repeated travel puns. Make the footer a single screen.
+- **Keep the journey** (client, 24 Nov): arrival, rain glass, doors, curtain, voyage, menu book, bar, room, boarding passes all stay. Premium comes from polish and continuity, not removal. Cut only clutter inside scenes: repeated travel puns, control rows, the 4-screen footer.
 - **Enlarge:** photography (room, food, bar) up to full-bleed or near it, the display name, and dish photos with prices.
-- **Slow down:** fewer things move. One scroll-linked thread per page, at 400–600 ms ease-out, transform and opacity only. Everything else stays still.
+- **Slow down and connect:** motion should feel like one camera walking through the restaurant. It is scroll-scrubbed where possible, uses transform and opacity, and runs 200–600 ms for responses and longer only for scrubbed scenes. Every scene keeps a static end state for reduced motion.
 - **Keep:** American Typewriter + Lora, the ink/sand/gold palette, tiger orange for Book only, and the stamps and boarding pass, used once each.
 
 ## Redesign direction
+
+### Direction C (chosen by the client, 24 Nov): "The Walk-In", the current journey made richer
+**Concept.** Keep the immersive home page exactly as a journey: you arrive, look through the rainy window, the doors open, the curtain parts, you sail the voyage, open the menu, sit at the bar, look around the room, and take your boarding pass. What changes is that it becomes **one continuous camera move instead of nine set pieces**. Each scene hands something to the next:
+- the lamp light from the hero warms the door;
+- the curtain's red becomes the route line;
+- the ship docks at the menu book;
+- the book's last page turns into the bar's receipt;
+- the film strip of the room runs into the boarding passes.
+
+Motion carries the story, and the content stays readable at every point.
+
+**Motion plan, scene by scene.** These add to what exists (`docs/MOTION.md`). They use only the libraries already installed (anime.js, motion, Lenis, CSS scroll and view timelines), so no new dependency.
+
+| # | Scene | Today | Add |
+|---|---|---|---|
+| 1 | Arrival | Split-flap board, 2.2–2.4 s, no fail-safe | Cap at 1.2 s; the board's two halves become the **two doors** opening on the hero (shared element, so arrival and hero read as one move); CSS fail-safe (B-01, B-04) |
+| 2 | Hero, rain glass | WebGL rain, letters rise, wipe hint | Slow **parallax depth**: the room behind the glass drifts at 0.3× scroll and a few px with the pointer (desktop); lamps in the photo **breathe** (opacity 0.85↔1, 4.8 s, existing `breathe`); a wipe trail where the finger or mouse has been, phones included (B-20) |
+| 3 | Doors and street | Pinned: facade → sign lights → door → room | **Scroll-scrubbed lamp-lighting** (the three brass lamps light one by one, glow spilling down the brick); the door swings with real **perspective (rotateY)** and warm light spills across the cobbles; reflections on the glass slide opposite to the scroll |
+| 4 | Curtain | Velvet panels part | Panels part with a **spring and a settle-sway** (2 small overshoots, `--curve-spring`); a dust-in-the-light shimmer as they open (CSS gradient sweep, one pass) |
+| 5 | Voyage | Camera along the map, postcards | The ship leaves a **drawn wake** (SVG stroke along the route, scrubbed); each port **stamps** in (`--curve-stamp`) with a small ink spread; postcards arrive with a slight rotation and settle; fix the Dubai label overlap |
+| 6 | Menu book | Page-flip island, controls above | The book **opens its cover in 3D** as it enters (scrubbed); the signature pages show **steam wisps** over the momos (opacity loop, paused off-screen); controls fold into one Filter button (U-03) |
+| 7 | Bar after dark | Lights up | **Bottles catch light in sequence** as you scroll (a sheen across the shelf); the drink list **prints like a receipt** (existing receipt pattern); photos ease in with a slow Ken Burns (scale 1.04→1, 1.2 s) |
+| 8 | The room | Contact sheet + lightbox | The film strip **runs sideways as you scroll down** (CSS scroll-timeline, translateX); frames **develop** from sepia to colour as they enter (`filter` on the small thumb only, or a cross-fade of two layers); the lightbox opens from the frame you tapped (shared-element zoom) |
+| 9 | Boarding passes | Three passes, tear-to-book stub | Passes **slide out of a ticket wallet** one after another; the departure board split-flaps "BOARDING" for open rooms; the stub tear keeps its perforation snap |
+| 10 | Goodbye → footer | Receipt prints, "Thank you" | The **lights dim** (the room's lamps fade one by one) into a shorter footer (U-05) |
+| — | Between pages | Hard page loads | **Cross-document View Transitions** (`@view-transition { navigation: auto; }`, CSS only): the room name flies from the home pass into the branch hero, and menus slide in. Chrome and Safari 18.2+; other browsers just load normally |
+
+**Guardrails.**
+- Every loop pauses off-screen and obeys Pause motion (B-25).
+- Reduced motion shows each scene's end state.
+- Book stays one tap away throughout (U-04).
+- The home JS budget is met by hydrating the menu book only on approach and keeping new motion in CSS and small scripts, not new islands (B-26).
+- Lighthouse budgets and the scroll jank target (< 2% dropped frames, `npm run perf:budget`) are checked per scene.
+- Before/after at 375 and 1280, plus a short screen recording per scene, go into `audit/screens/after/`.
+
+**Type and palette.** Unchanged: American Typewriter + Lora and the brand tokens, with tiger orange only on Book.
+
+**Next step for C.** A motion storyboard (key frames per scene) for sign-off before building, then one scene at a time in the order above.
+
+### Alternatives considered (not chosen)
+The two directions below simplified the home page. The client prefers to keep the immersive journey, so they are kept for reference only.
 Both directions keep the same stack, the tokens in `src/styles/tokens.css` and `global.css`, the brand fonts and the motion tokens. Neither adds a library. Both drop the intro board, so there is nothing to wait for (this fixes B-04 by design). Both move the full menu to `/[branch]/menu/`. Both keep tiger orange for Book only, with a sticky Book on phones.
 
 ### Direction A: "Lamplight" (the room after dark)
@@ -251,7 +292,7 @@ Both directions keep the same stack, the tokens in `src/styles/tokens.css` and `
 - **Home order.** Hero (name, three room tickets, postcard) → story stop → menu card (four dishes) → bar chit → boarding passes (two rooms + Dubai) → footer.
 - **Mock.** `audit/mocks/direction-b--1280.jpg` and `direction-b--375.jpg` (source `direction-b.html`).
 
-**My recommendation is A.** It answers the brief's "walk in and see the food, the drinks and the room" most directly, and it uses the photography the client is commissioning. B is the better fallback if the photos are late.
+Superseded by Direction C (client, 24 Nov).
 
 ## Proposed task order
 1. **P0:** B-01 (no-JS/failed-JS intro trap).
@@ -259,7 +300,7 @@ Both directions keep the same stack, the tokens in `src/styles/tokens.css` and `
 3. **Accessibility P2:** B-09, B-10, B-11, B-15, B-19. Then re-run axe with a settle wait; target 0 serious/critical on every route.
 4. **Correctness P2:** B-12, B-13, B-14, B-17, B-18, B-20, B-21, B-24.
 5. **Performance:** B-22, B-23 and B-26 (they land with the home redesign); image sizes.
-6. **Design (Phase 3, the chosen direction), one section at a time:** hero → story teaser → dishes → bar → rooms/Book → footer → Dubai → book desk. Before/after screens at 375 and 1280 for each.
+6. **Design (Phase 3, Direction C), one scene at a time** after the storyboard sign-off: arrival → hero → doors → curtain → voyage → menu book → bar → room → boarding passes → goodbye/footer → page transitions. Before/after screens at 375 and 1280 plus a short recording for each.
 
 The test baseline added in Phase 2: Vitest for `src/lib/booking.ts` and `hours.ts` rules, and a Playwright booking e2e covering both rooms × 2/4/7/8 guests × today and future. A typed `src/data/branches.ts` view only if it removes duplication; `branches.json` plus the Zod schema already types it.
 
