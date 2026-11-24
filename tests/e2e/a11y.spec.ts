@@ -4,14 +4,17 @@ import AxeBuilder from '@axe-core/playwright';
 test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { localStorage.setItem('fp-arrived', '1'); } catch {} }); });
 
 // AUDIT B-11: the first Tab stop is the page's own skip link, never "Skip to footer".
-for (const path of ['/', '/soho/', '/dubai/', '/our-story/', '/our-story/fatt/', '/book/', '/soho/menu/', '/allergens/', '/no-such-page/']) {
-  test(`first Tab is the page's skip link: ${path}`, async ({ page }) => {
+// AUDIT B-11: on all 16 routes the first Tab stop is "Skip to content", landing on main#content.
+const ROUTES = ['/', '/book/', '/soho/', '/soho/menu/', '/covent-garden/', '/covent-garden/menu/', '/dubai/', '/private-dining/', '/our-story/', '/our-story/fatt/', '/our-story/pundit/', '/allergens/', '/accessibility/', '/privacy/', '/booking-terms/', '/no-such-page/'];
+for (const path of ROUTES) {
+  test(`first Tab is Skip to content: ${path}`, async ({ page }) => {
     await page.goto(path);
     await page.waitForTimeout(450); // Base re-asserts scroll for ~300 ms after load
     await page.keyboard.press('Tab');
     const a = page.locator(':focus');
-    await expect(a).toHaveClass(/skip/);
-    await expect(a).not.toHaveText('Skip to footer');
+    await expect(a).toHaveText('Skip to content');
+    await expect(page.locator('main#content')).toHaveCount(1);
+    await expect(page.getByText('Skip to footer')).toHaveCount(0);
     const target = (await a.getAttribute('href'))!.slice(1);
     expect(await page.locator(`[id="${target}"]`).count()).toBe(1);
   });
@@ -23,10 +26,12 @@ test('booking day strip: label in name and a scroll cue', async ({ page }) => {
   const t = page.locator('[data-book]:visible').first();
   await t.scrollIntoViewIfNeeded(); await t.click();
   const chips = page.locator('dialog[open] .book-day');
-  for (const i of [0, 1, 5]) {
-    const visible = (await chips.nth(i).innerText()).replace(/\s+/g, ' ').trim();
-    expect(await chips.nth(i).getAttribute('aria-label')).toMatch(new RegExp(`^${visible}`));
-  }
+  // AUDIT B-09: "Today, Tuesday 24 November" / "Tomorrow, …"; the chip's own word leads the name.
+  await expect(chips.nth(0)).toHaveAccessibleName(/^Today, \w+day \d{1,2} \w+$/);
+  await expect(chips.nth(1)).toHaveAccessibleName(/^Tomorrow, \w+day \d{1,2} \w+$/);
+  await expect(chips.nth(1)).toContainText('Tomorrow');
+  await expect(chips.nth(5)).toHaveAccessibleName(/^\w+day \d{1,2} \w+$/);
+  await page.screenshot({ path: `audit/screens/after/b09-b10-day-strip--${test.info().project.name}.jpg`, type: 'jpeg', quality: 70 });
   const mask = await page.locator('[data-book-days]').evaluate((el) => getComputedStyle(el).getPropertyValue('mask-image') || getComputedStyle(el).getPropertyValue('-webkit-mask-image'));
   expect(mask).toContain('linear-gradient');
 });
