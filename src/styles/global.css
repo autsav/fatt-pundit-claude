@@ -217,12 +217,12 @@
 .fx-fade { --o0: 0; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    :root:not([data-story='comic']) .story-scenes { display: block; }
-    :root:not([data-story='comic']) .story-chapter[data-scenes] .comic { display: none; }
+    :root.js:not([data-story='comic']) .story-scenes { display: block; }
+    :root.js:not([data-story='comic']) .story-chapter[data-scenes] .comic { display: none; }
     /* One screen: stages of chapters that play follow each other with no gap, and the last hands
        straight over to the end section. */
-    :root:not([data-story='comic']) .story-chapter[data-scenes] + .story-chapter[data-scenes] { margin-top: 0; }
-    :root:not([data-story='comic']) .story-body:has(> .story-chapter[data-scenes]:last-child) { padding-bottom: 0; }
+    :root.js:not([data-story='comic']) .story-chapter[data-scenes] + .story-chapter[data-scenes] { margin-top: 0; }
+    :root.js:not([data-story='comic']) .story-body:has(> .story-chapter[data-scenes]:last-child) { padding-bottom: 0; }
     .story-scene { view-timeline-name: --scene; view-timeline-axis: block; }
     .story-scene .fx { animation-name: fx-move; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --scene; animation-range: contain var(--from, 0%) contain var(--to, 100%); }
     .story-scene .fx.fx-then-out { animation-name: fx-move, fx-out; animation-fill-mode: both, both;
@@ -268,13 +268,13 @@
     /* Between stages: each stage overlaps the last by its torn top edge, so a scene change reads as a fresh sheet of
        paper laid over the last one: no ruler-straight seam, no screen of blank paper. The edge hides under the
        header while the stage is pinned. The wrappers lose their sand fill so the overlap shows the scene beneath. */
-    :root:not([data-story='comic']) .story-scenes { background: none; }
+    :root.js:not([data-story='comic']) .story-scenes { background: none; }
     /* The stage itself is unmasked (a mask on a full-screen sticky layer is costly); only this top strip is shaped:
        sand paper above the torn line (the torn shape XOR-ed out of a full box), laid over the stage's top edge. */
     .story-scene .scene-stage::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: var(--edge-h); z-index: 30; pointer-events: none; background: var(--color-sand);
       -webkit-mask: var(--torn-top) 0 0 / 100% 100% no-repeat, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
       mask: var(--torn-top) 0 0 / 100% 100% no-repeat, linear-gradient(#000 0 0); mask-composite: exclude; }
-    :root:not([data-story='comic']) :is(.story-scene + .story-scene, .story-chapter[data-scenes] + .story-chapter[data-scenes] .story-scene:first-child, .story-body > .story-chapter[data-scenes]:first-child .story-scene:first-child) { margin-top: calc(-1 * var(--edge-h)); }
+    :root.js:not([data-story='comic']) :is(.story-scene + .story-scene, .story-chapter[data-scenes] + .story-chapter[data-scenes] .story-scene:first-child, .story-body > .story-chapter[data-scenes]:first-child .story-scene:first-child) { margin-top: calc(-1 * var(--edge-h)); }
   }
 }
 @keyframes fx-rock {

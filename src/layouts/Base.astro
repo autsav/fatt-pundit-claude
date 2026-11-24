@@ -54,6 +54,9 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <meta property="og:image:alt" content="A Fatt Pundit boarding pass with the tiger stamp" />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>
+      // Scripts run here: pages gate their JS-and-motion versions on this class (the story's scroll scenes;
+      // without it the static comic shows, AUDIT B-05).
+      document.documentElement.classList.add('js');
       // The guest's own "Pause motion" choice (footer button), applied before first paint.
       try { if (localStorage.getItem('fp-motion') === 'paused') document.documentElement.dataset.motion = 'paused'; } catch (e) {}
     </script>
