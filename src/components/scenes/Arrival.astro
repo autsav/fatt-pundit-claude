@@ -33,12 +33,13 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </div>
 
 <style>
-  /* AUDIT B-01. Laid out only when the inline script chose to play it, and invisible until the board's
-     module has loaded and added .arrival-ready: if the module never arrives, the guest never sees it.
-     Whatever the scripts do, a pure-CSS fail-safe hides it 1.2 s after the page starts (the brief's budget). */
+  /* AUDIT B-01. Laid out only when the inline script chose to play it (never without JavaScript; the
+     <noscript> style agrees), and whatever the scripts do, a pure-CSS fail-safe hides it 1.2 s after the
+     page starts (the brief's budget), so a failed module can hold the page for 1.2 s at most.
+     Not hidden until the module loads: that variant cost ~500 ms of lab LCP on home (P86 vs P90-93,
+     interleaved runs, 24 Nov); real-user LCP was the same either way. */
   .arrival { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; pointer-events: auto; }
-  :global(html[data-arrival='play']) .arrival { display: grid; visibility: hidden; animation: arrival-failsafe 1ms linear 1.2s forwards; }
-  :global(html[data-arrival='play'].arrival-ready) .arrival { visibility: visible; }
+  :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 1.2s forwards; }
   /* Both ends hidden: a one-ended keyframe left visibility 'visible' and opacity at 1e-13 in Chromium. */
   @keyframes arrival-failsafe { from, to { opacity: 0; visibility: hidden; pointer-events: none; } }
   .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
@@ -73,8 +74,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   }
 
   if (root && html.dataset.arrival === 'play') {
-    // Show the board only now that its script is here (B-01), and give Skip the focus (B-04).
-    html.classList.add('arrival-ready');
+    // Skip takes the focus while the board is up (B-04).
     root.querySelector<HTMLElement>('[data-skip]')?.focus({ preventScroll: true });
     document.body.style.overflow = 'hidden';
     lockScroll();

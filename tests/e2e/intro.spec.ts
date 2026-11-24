@@ -11,15 +11,13 @@ for (const width of [375, 1280]) {
     await page.screenshot({ path: `audit/screens/after/b01-nojs--${width}.jpg`, type: 'jpeg', quality: 70 });
     await ctx.close();
   });
-  test(`scripts blocked: the overlay never shows (${width})`, async ({ browser }) => {
+  test(`scripts blocked: the overlay leaves by 1.2 s on its own (${width})`, async ({ browser }) => {
     const ctx = await browser.newContext({ viewport: { width, height: 812 } });
     const page = await ctx.newPage();
     await page.route('**/_astro/*.js', (r) => r.abort());
-    await page.goto('/');
-    for (const at of [300, 1300]) {
-      await page.waitForTimeout(at === 300 ? 300 : 1000);
-      await expect(page.locator('[data-arrival-overlay]')).toBeHidden();
-    }
+    await page.goto('/', { waitUntil: 'commit' });
+    await page.waitForTimeout(1300);
+    await expect(page.locator('[data-arrival-overlay]')).toBeHidden();
     await expect(page.locator('h1').first()).toBeVisible();
     await page.screenshot({ path: `audit/screens/after/b01-blocked--${width}.jpg`, type: 'jpeg', quality: 70 });
     await ctx.close();
@@ -30,8 +28,8 @@ for (const width of [375, 1280]) {
 test('intro gone within 1.3 s, first Tab is Skip', async ({ page }) => {
   await page.goto('/', { waitUntil: 'commit' });
   const t0 = Date.now();
-  await page.waitForSelector('html.arrival-ready', { timeout: 1500 }).catch(() => {});
-  const playing = await page.evaluate(() => document.documentElement.dataset.arrival === 'play' && document.documentElement.classList.contains('arrival-ready'));
+  await page.waitForFunction(() => document.activeElement?.matches('[data-skip]') || document.documentElement.dataset.arrival !== 'play', null, { timeout: 1500 }).catch(() => {});
+  const playing = await page.evaluate(() => document.documentElement.dataset.arrival === 'play');
   if (playing) {
     // Focus starts on Skip, the only control not made inert, so a keyboard guest's first stop is Skip.
     await expect(page.locator('[data-skip]')).toBeFocused({ timeout: 300 });
