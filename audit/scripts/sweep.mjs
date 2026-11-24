@@ -55,7 +55,8 @@ for (const w of WIDTHS) {
       const skip = page.locator('[data-skip]');
       if (await skip.isVisible().catch(() => false)) { await skip.click().catch(() => {}); await settle(page, 700); }
       await scrollThrough(page, HEIGHT[w] ?? 900);
-      await page.evaluate(() => window.scrollTo(0, 0)); await settle(page, 500);
+      // Instant jump (Lenis would glide), then let every animation settle before measuring (gate: ≥ 800 ms).
+      await page.evaluate(() => { window.__lenis?.scrollTo(0, { immediate: true, force: true }); window.scrollTo(0, 0); }); await settle(page, 900);
       rec.height = await page.evaluate(() => document.documentElement.scrollHeight);
       rec.dom = await page.evaluate(() => document.getElementsByTagName('*').length);
       if (SHOTS) {
@@ -71,6 +72,7 @@ for (const w of WIDTHS) {
         }
       }
       if (AXE_WIDTHS.includes(w)) {
+        await page.evaluate(() => { window.__lenis?.scrollTo(0, { immediate: true, force: true }); window.scrollTo(0, 0); }); await settle(page, 900);
         const r = await new AxeBuilder({ page }).withTags(TAGS).analyze();
         rec.axe = r.violations.map((v) => ({ id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.length, targets: v.nodes.slice(0, 5).map((n) => n.target.join(' ')) }));
         // The three dialogs, opened the way a guest would.
@@ -80,7 +82,7 @@ for (const w of WIDTHS) {
           if (!(await t.count())) continue;
           try {
             await t.evaluate((el) => el.scrollIntoView({ block: 'center' })); await settle(page, 300);
-            await t.click({ timeout: 4000 }); await settle(page, 600);
+            await t.click({ timeout: 4000 }); await settle(page, 900);
             if (!(await page.locator('dialog[open]').count())) { rec.axeDialogs[name] = 'did not open'; continue; }
             const d = await new AxeBuilder({ page }).include('dialog[open]').withTags(TAGS).analyze();
             rec.axeDialogs[name] = d.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, targets: v.nodes.slice(0, 3).map((n) => n.target.join(' ')) }));
