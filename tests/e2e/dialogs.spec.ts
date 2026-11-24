@@ -14,8 +14,11 @@ for (const path of ['/', '/soho/']) for (const [name, sel] of [['site menu', '[d
     test.skip(!(await trigger.count()), 'no trigger at this size');
     await trigger.scrollIntoViewIfNeeded();
     await trigger.focus();
+    const w0 = await page.evaluate(() => document.querySelector('main')!.getBoundingClientRect().width);
     await page.keyboard.press('Enter');
     await expect(page.locator('dialog[open]')).toBeVisible();
+    // Locking the page must not shift it sideways (the scrollbar gutter is kept).
+    expect(await page.evaluate(() => document.querySelector('main')!.getBoundingClientRect().width)).toBe(w0);
     const y0 = await page.evaluate(() => scrollY);
     // Tab through the sheet first (the audit probe's path), then wheel near the top-left edge.
     for (let i = 0; i < 30; i++) await page.keyboard.press('Tab');
