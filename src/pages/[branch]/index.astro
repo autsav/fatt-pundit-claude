@@ -170,7 +170,9 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 ---
 <Base title={title} description={description} og={b.id}>
   {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="100vw" fetchpriority="high" />}
-  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  {/* A room that isn't open yet gets no Restaurant entity (no hours, no reservations); the home page's
+      Organization still names it (AUDIT B-24). */}
+  {open && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
   <a slot="skip" class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
   <SiteHeader branches={branches} current={b} />
 
