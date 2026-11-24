@@ -130,7 +130,7 @@ Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scene
 - [x] S3 Doors: lamps light one by one, door swings in 3D with light spill, reflections counter-scroll — done: lamp cones, cobble spill, reflection counter-slide added (the rest existed); e2e 120/120, phase8 check ok
 - [x] S4 Curtain: light sweep through the gap, settle sway at the end — done: settle sway added (light leak existed)
 - [x] S5 Room reveal: red route line draws down into the voyage — done (the walk-in dolly existed and is kept instead of a 1.08 → 1 settle)
-- [ ] S6 Voyage: ship's wake drawn, ports stamp in, postcards tilt and settle, Dubai label clear
+- [x] S6 Voyage: ship's wake drawn, ports stamp in, postcards tilt and settle, Dubai label clear — done: port stamp, postcard tilt/settle, Dubai dock offset (wake existed); e2e 120/120, perf:budget 78 / 0.2%
 - [ ] S7 Menu book: one Filter button (U-03), cover opens in 3D, steam over the momos; hydrate on approach (B-23 part)
 - [ ] S8 Bar: shelf sheen, drink list prints, photos ease in
 - [ ] S9 Room: film strip runs sideways, frames develop, lightbox zooms from the frame

@@ -422,6 +422,11 @@
 .voyage-port.is-reached .voyage-ring { stroke: var(--color-tiger); stroke-opacity: 1; }
 .voyage-port.is-reached .voyage-dot { fill: var(--color-tiger); opacity: 1; }
 .voyage-port.is-here .voyage-ring { transform-box: fill-box; transform-origin: center; animation: voyage-ping 1.8s ease-out 3; }
+/* A reached port is stamped onto the chart: a press with weight (Direction C S6). */
+@media (prefers-reduced-motion: no-preference) {
+  .voyage-port.is-reached .voyage-dot { transform-box: fill-box; transform-origin: center; animation: voyage-stamp var(--dur-spring) var(--curve-stamp) both; }
+}
+@keyframes voyage-stamp { from { transform: scale(2.2); opacity: 0.3; } to { transform: none; opacity: 1; } }
 @keyframes voyage-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
 .voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 600; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
 .voyage-port.is-reached .voyage-name { fill: var(--color-paper-light); }
@@ -443,12 +448,13 @@
 .voyage-sea-note { opacity: 0; transition: opacity var(--dur-panel) var(--curve-out); width: fit-content; max-width: calc(100% - 24px); margin-inline: auto; padding: 4px 14px; background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.5); }
 .voyage-sea-note.is-on { opacity: 1; }
 
-.voyage-card { position: absolute; z-index: 10; left: 12px; right: 12px; bottom: 12px; max-height: 46%; opacity: 0; transform: translateY(var(--rise)) rotate(-1deg); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-story) var(--curve-out); pointer-events: none; }
+/* Postcards arrive tilted and settle with a little weight (Direction C S6): the spring on transform only. */
+.voyage-card { position: absolute; z-index: 10; left: 12px; right: 12px; bottom: 12px; max-height: 46%; opacity: 0; transform: translateY(var(--rise)) rotate(-3.5deg); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-spring) var(--curve-spring); pointer-events: none; }
 .voyage-card.is-on { opacity: 1; transform: rotate(-1deg); pointer-events: auto; }
 /* The outgoing card leaves fast so two postcards never overlap on a phone. */
 .voyage-card:not(.is-on) { transition-duration: var(--dur-fast); }
 @media (min-width: 1024px) {
-  .voyage-card { left: 40px; right: auto; bottom: auto; top: 54%; width: min(430px, 34vw); max-height: 78%; transform: translateY(calc(-50% + var(--rise))) rotate(-1.5deg); }
+  .voyage-card { left: 40px; right: auto; bottom: auto; top: 54%; width: min(430px, 34vw); max-height: 78%; transform: translateY(calc(-50% + var(--rise))) rotate(-4deg); }
   .voyage-card.is-on { transform: translateY(-50%) rotate(-1.5deg); }
 }
 .voyage-card.is-static { position: relative; inset: auto; width: auto; max-height: none; transform: none; }
