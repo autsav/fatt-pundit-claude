@@ -35,7 +35,7 @@ export interface MenuPlace {
   menus: string[];
   book?: { href: string; label: string };
   /** label: the list button's wording (src/lib/waitlist.ts listCta), honest when the list isn't open yet. */
-  soon?: { dishes: string[]; href: string; label: string };
+  soon?: { dishes: string[]; href: string; label: string; sr?: string; external?: boolean };
 }
 const PLACE_KEY = 'fp-menu-at';
 /** One choice/tab look for the branch toggle and the book's bookmarks. */
@@ -508,7 +508,7 @@ export default function MenuBook({
                 </li>
               ))}
             </ul>
-            <a href={place.soon.href} className="fp-btn fp-btn--primary mt-6">{place.soon.label}</a>
+            <a href={place.soon.href} {...(place.soon.external ? { target: '_blank', rel: 'noopener' } : {})} className="fp-btn fp-btn--primary mt-6">{place.soon.label}{place.soon.sr && <span className="sr-only">{place.soon.sr}</span>}</a>
           </div>
         ) : (
         <>

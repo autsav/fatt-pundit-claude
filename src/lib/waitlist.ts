@@ -4,13 +4,14 @@
  * shows it is busy, then says "You're on the list" or keeps the email and explains the failure.
  */
 export const LIST_ENDPOINT = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
-/** One source for every "Dubai list" button. No endpoint = no list yet, so say what the button really does:
- *  it goes to the room page, whose #waitlist block points to Instagram for the opening date. */
-export const listCta = (b: { id: string; shortName: string }) => ({
-  href: `/${b.id}/#waitlist`,
-  label: LIST_ENDPOINT ? `Join the ${b.shortName} list` : `${b.shortName}: get the opening date`,
-  short: LIST_ENDPOINT ? 'Join the list' : 'Get the opening date',
-});
+const INSTAGRAM = 'https://www.instagram.com/fattpundit/';
+/** One source for every "Dubai list" button. With a list endpoint it goes to the room's form. Without one there
+ *  is no list yet, so the button says what it really does: open Instagram, where the date is announced
+ *  (AUDIT B-06). Render `sr` after the label and spread `attrs` on the link. */
+export const listCta = (b: { id: string; shortName: string }) =>
+  LIST_ENDPOINT
+    ? { href: `/${b.id}/#waitlist`, label: `Join the ${b.shortName} list`, short: 'Join the list', sr: '', external: false, attrs: {} }
+    : { href: INSTAGRAM, label: 'Follow @fattpundit for the date', short: 'Follow for the date', sr: ' (opens Instagram)', external: true, attrs: { target: '_blank', rel: 'noopener' } };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function bindWaitlists() {

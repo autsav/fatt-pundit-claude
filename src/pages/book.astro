@@ -58,7 +58,7 @@ const no = () => String(++n).padStart(2, '0');
           <p class="desk-status"><span class="fp-badge fp-badge--soon">Opening soon</span></p>
           <p class="desk-addr">{b.address.street}</p>
         </div>
-        <div class="desk-acts"><a class="fp-btn" href={listCta(b).href}>{listCta(b).short}<span class="sr-only"> for {b.shortName}</span></a></div>
+        <div class="desk-acts"><a class="fp-btn" href={listCta(b).href} {...listCta(b).attrs}>{listCta(b).short}<span class="sr-only"> for {b.shortName}{listCta(b).sr}</span></a></div>
       </li>
     ))}
     {rules && (

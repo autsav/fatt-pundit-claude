@@ -99,11 +99,11 @@ function byDay(b: Branch) {
           class="pass-stub"
           data-tear
           href={open ? b.booking!.url : listEndpoint ? `#wl-${b.id}` : listCta(b).href}
-          {...(open ? { 'data-book': b.id } : {})}
+          {...(open ? { 'data-book': b.id } : listEndpoint ? {} : listCta(b).attrs)}
         >
           {stamps[b.id] ? <Image src={stamps[b.id]} alt="" width={120} class="stub-stamp" /> : <span class="stub-stamp stub-gate" aria-hidden="true">{CODES[b.id]}</span>}
           <span class="stub-text">
-            <span class="stub-cta">{open ? `Book at ${b.shortName}` : listCta(b).short}</span>
+            <span class="stub-cta">{open ? `Book at ${b.shortName}` : listCta(b).short}{!open && !listEndpoint && <span class="sr-only">{listCta(b).sr}</span>}</span>
             <span class="stub-via">{open ? `Tear the stub: ${via}` : 'Bookings open soon'}</span>
           </span>
           <svg class="stub-bars" viewBox="0 0 196 28" preserveAspectRatio="none" aria-hidden="true">

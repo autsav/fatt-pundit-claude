@@ -91,7 +91,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
             <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book {b.shortName}</a>
           ))}
           {soon.map((b) => (
-            <a class="fp-btn" href={listCta(b).href}>{listCta(b).label}</a>
+            <a class="fp-btn" href={listCta(b).href} {...listCta(b).attrs}>{listCta(b).label}<span class="sr-only">{listCta(b).sr}</span></a>
           ))}
         </div>
         <p class="end-menus"><span>Or read the menus first:</span> {open.map((b) => <a class="menu-chip" href={`/${b.id}/menu/`}>{b.shortName} menu</a>)}</p>
