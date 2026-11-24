@@ -104,9 +104,10 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     </script>
   </head>
   <body>
-    <!-- The page's own skip link (to its main content) comes first, the footer second (AUDIT B-11). -->
+    <!-- Skip to content first on every page (every page's <main> is #content), then the page's own shortcut
+         (AUDIT B-11). -->
+    <a class="skip" href="#content">Skip to content</a>
     <slot name="skip" />
-    <a class="skip" href="#footer">Skip to footer</a>
     <slot />
   </body>
 </html>

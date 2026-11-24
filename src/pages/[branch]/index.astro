@@ -174,7 +174,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   <a slot="skip" class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
   <SiteHeader branches={branches} current={b} />
 
-  <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
+  <main id="content" class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
     <!-- 1 · Arrival (Phase 8): the name on the departure board is the page's one bold thing; one Book,
          one link to the menus. Today's status lives once, in the facts strip directly below. -->
     <section class="arrival" data-room-hero style={`view-transition-name: branch-${b.id}`} aria-labelledby="branch-title">

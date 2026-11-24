@@ -6,7 +6,6 @@ import { getBranches } from '../lib/site-data';
 const branches = await getBranches();
 ---
 <Base title="Lost luggage · Fatt Pundit" description="This page has gone missing in transit." noindex>
-  <a slot="skip" class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} />
   <main id="content" class="lost">
     <div class="tag">
