@@ -40,7 +40,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   description="How Indo-Chinese food began: a Hakka cook from Guangdong, a scholar in Calcutta's Chinatown, and the recipes that travelled on to Soho, Covent Garden and Dubai."
   og="home"
 >
-  <a class="skip" href="#canton">Skip to the story</a>
+  <a slot="skip" class="skip" href="#canton">Skip to the story</a>
   <!-- Before the scenes paint: a reader who chose the comic gets it straight away (global.css "Story scenes"). -->
   <script is:inline>try { if (localStorage.getItem('fp-story') === 'comic') document.documentElement.dataset.story = 'comic'; } catch {}</script>
   <SiteHeader branches={branches} />

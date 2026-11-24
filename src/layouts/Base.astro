@@ -100,6 +100,8 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     </script>
   </head>
   <body>
+    <!-- The page's own skip link (to its main content) comes first, the footer second (AUDIT B-11). -->
+    <slot name="skip" />
     <a class="skip" href="#footer">Skip to footer</a>
     <slot />
   </body>

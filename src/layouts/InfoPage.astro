@@ -72,7 +72,7 @@ if (layout === 'doc') {
 const showContents = contents.length > 4;
 ---
 <Base title={`${title} · Fatt Pundit`} description={description} noindex={noindex} preloadBody>
-  <a class="skip" href="#content">Skip to content</a>
+  <a slot="skip" class="skip" href="#content">Skip to content</a>
   <SiteHeader branches={branches} current={current} />
   <main id="content" class:list={['info', `info--${layout}`, { 'has-next': next }]}>
     <div class="wrap">
