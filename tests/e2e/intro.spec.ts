@@ -42,6 +42,10 @@ test('intro gone within 1.3 s, first Tab is Skip', async ({ page }) => {
       || document.querySelector<HTMLElement>('.arrival .half.top')!.getBoundingClientRect().bottom <= 0;
   }, null, { timeout: 4000, polling: 25 });
   expect(Date.now() - t0).toBeLessThanOrEqual(1300);
+  // Once the board has gone, the next Tab starts from the top of the page.
+  await page.waitForFunction(() => document.documentElement.dataset.arrival === 'done', null, { timeout: 3000 }).catch(() => {});
+  await page.keyboard.press('Tab');
+  await expect(page.locator(':focus')).toHaveText('Skip to content');
 });
 
 // AUDIT B-20: the "wipe the glass" hint only appears where a mouse can wipe.

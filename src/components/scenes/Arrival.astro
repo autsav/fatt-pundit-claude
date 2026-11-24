@@ -110,6 +110,11 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 520);
       // The board is leaving: take it out of the accessibility tree and the tab order now,
       // not when the last frame lands (a fading label is not content).
+      // Skip had the focus: hand it back to the top of the page, so the next Tab is "Skip to content",
+      // not whatever follows the board in the document.
+      if (root.contains(document.activeElement)) {
+        const b = document.body; b.tabIndex = -1; b.focus({ preventScroll: true }); b.removeAttribute('tabindex');
+      }
       root.setAttribute('aria-hidden', 'true');
       root.inert = true;
       // A choreographed intro with its own beats (a documented exception in docs/MOTION.md).
