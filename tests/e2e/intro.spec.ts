@@ -32,3 +32,12 @@ test('intro opens within 1.5 s on a first visit', async ({ page }) => {
   }, null, { timeout: 4000, polling: 50 });
   expect(Date.now() - t0).toBeLessThanOrEqual(1500);
 });
+
+// AUDIT B-20: the "wipe the glass" hint only appears where a mouse can wipe.
+test('wipe hint: shown with a mouse, not on touch phones', async ({ page }, info) => {
+  await page.addInitScript(() => { try { localStorage.setItem('fp-arrived', '1'); } catch {} });
+  await page.goto('/');
+  await page.waitForTimeout(3600);
+  const on = await page.locator('.hero-wipe').evaluate((el) => el.classList.contains('is-on'));
+  expect(on).toBe(info.project.name === 'desktop');
+});

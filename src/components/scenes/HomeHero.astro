@@ -54,8 +54,9 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
   } else document.documentElement.dataset.heroBook = 'out';
 
   // The wipe hint appears once, after ~3s with no pointer input (a guest who is already wiping needs none).
+  // Mouse and trackpad only: on touch, vertical swipes scroll the page, so the hint promised what a phone can't do (AUDIT B-20).
   const wipe = document.querySelector<HTMLElement>('.hero-wipe');
-  if (wipe) {
+  if (wipe && window.matchMedia('(pointer: fine)').matches) {
     const t = window.setTimeout(() => wipe.classList.add('is-on'), 3000);
     window.addEventListener('pointerdown', () => window.clearTimeout(t), { once: true, passive: true });
     window.addEventListener('pointermove', () => window.clearTimeout(t), { once: true, passive: true });
