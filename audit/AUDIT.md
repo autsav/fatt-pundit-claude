@@ -19,23 +19,64 @@ Known capture limit: full-page screenshots draw the pinned scroll scenes (doors,
 |---|---|---|---|---|
 | `/` | 89 / 100 / 100 / 69 | 98 / 100 / 100 / 69 | 96 / 100 / 100 / 69 | 89 / 100 / 100 / 69 (Phase 2) |
 | `/book/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
-| `/soho/` | 96 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 96 / 100 / 100 / 69 (Phase 2) |
+| `/soho/` | 96 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 97 / 100 / 100 / 69 (Phase 2) |
 | `/soho/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
-| `/covent-garden/` | 94 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 95 / 100 / 100 / 69 (Phase 2) |
-| `/covent-garden/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
+| `/covent-garden/` | 94 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 94 / 100 / 100 / 69 (Phase 2) |
+| `/covent-garden/menu/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 98 / 100 / 100 / 69 (Phase 2) |
 | `/dubai/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
 | `/private-dining/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 77 / 69 | 98 / 100 / 100 / 69 (Phase 2) |
 | `/our-story/` | 92 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 93 / 100 / 100 / 69 (Phase 2) |
-| `/our-story/fatt/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | — |
-| `/allergens/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
-| `/accessibility/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
-| `/privacy/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
-| `/booking-terms/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | — |
-| `/this-page-does-not-exist/` | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | — |
+| `/our-story/fatt/` | 98 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 99 / 100 / 100 / 69 | 97 / 100 / 100 / 66 (Phase 2) |
+| `/allergens/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/accessibility/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/privacy/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/booking-terms/` | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 | 100 / 100 / 100 / 69 (Phase 2) |
+| `/this-page-does-not-exist/` | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) | n/a (Lighthouse won't audit a 404 response) (Phase 2) |
 
 Budgets (brief §4, mobile): P ≥ 90, A11y 100, BP ≥ 95, SEO ≥ 95, LCP < 2.5 s, CLS < 0.05. SEO 69 everywhere is the intended preview `noindex`; the launch-build pass is under SEO.
 
 Below budget (before): home mobile local P89 (runs 78/89/90; live 96) with lab LCP 3.6 s; LCP > 2.5 s also on `/soho/` (2.6), `/covent-garden/` (2.9), `/our-story/` (3.2) locally (all < 2.1 s live); live `/private-dining/` Best Practices 77 (B-16); live `/dubai/` CLS 0.1 in one run (re-measure in Phase 2). Everything else meets budget.
+<!-- /LH-BEFORE-AFTER -->
+
+## Phase 2: fix status (24 Nov 2026)
+Branch `redesign/premium-audit`. One commit per ID, plus follow-ups that cite the same ID. Each proof is a named test or file. `npm test` runs Vitest (22) and the hours checks; `npm run test:e2e` runs Playwright (120, phone and desktop).
+
+| ID | Status | Commit(s) | Proof |
+|---|---|---|---|
+| B-01 | ✅ | 035a3b1, 7516873 | Overlay invisible until the module adds `.arrival-ready`; CSS hides it at 1.2 s; `<noscript>` hides it. `intro.spec.ts`: JS off and blocked scripts at 375/1280; `audit/screens/after/b01-*` |
+| B-04 | ✅ | 8728228, facafb7, d6bfd9b | Intro ≤ 1.2 s, Skip focused, no 4.5 s cap. `intro.spec.ts`: gone ≤ 1.3 s, Skip focused, next Tab after the intro = "Skip to content". Probe (page clock): 1.08–1.12 s motion, 0.2–0.3 s reduced |
+| B-02 | ✅ | f0ad81f, e2651e7, 062c21a | Per-room nearest time on the desk; `booking.slotGrid` ('opening' default, 'clock' = :00/:30) makes the Covent Garden answer one data line. `tests/unit/booking.test.ts` table (both rooms × opening edge × 19:00 × last slot + clock grid); `booking.spec.ts`: Covent Garden has a time at 7pm every Tue–Sun |
+| B-03 | ✅ | 32b9acb, 9d259d5, 5977f14 | `dialogs.spec.ts` (reduced motion asserted): page behind still, no width change on open. Probe: 5/5 reduced-motion dialog cases still (the menus chooser has no phone trigger on `/soho/`) |
+| B-05 | ✅ | 1df565f | Story scenes gated on an inline-set `js` class. `story.spec.ts`: with JS off, no rendered heading or paragraph at opacity 0; with JS on, the scenes play |
+| B-06 | ✅ (form waits on client) | b068c44, 92b8a66 | Every Dubai list button: "Follow @fattpundit for the date" ("Follow for the date" where tight) + "(opens Instagram)", straight to Instagram in a new tab. The form stays behind `PUBLIC_DUBAI_LIST_ENDPOINT`. `dubai.spec.ts`; no "Get the opening date" in `dist/`; `audit/screens/after/b06-*` |
+| B-07 | ✅ | 472b9ed, b6eeb28, 06ed5d0 | Launch `robots.txt` has no `Disallow: /og/` (`audit/data/robots-launch.txt`); `X-Robots-Tag: noindex` on `/og/*` (vercel.json + _headers). `robots.test.ts` |
+| B-16 | ✅ (form waits on client) | 6087119 | No form without `PUBLIC_FORM_ENDPOINT`: "Email us" + "Call" per room. With an endpoint, no client-side `to` field (route by `restaurant` server-side). `groups.spec.ts`; Lighthouse Best Practices 100 locally (live 77 was the mailto form) |
+| B-08 | ✅ | f25d9cc | `src/data/story-art.ts` manifest; StoryComic and SceneArt read only from it (an unknown slot fails the build); placeholders kept; the built page's 143 image refs are identical. `docs/ILLUSTRATOR-BRIEF.md`: 44 slots, 22 to commission. `story-art.test.ts` |
+| B-11 | ✅ | 6e3c7a5, d65425d, cae8c30 | "Skip to content" first on all 16 routes, page skip second, no "Skip to footer". `a11y.spec.ts` |
+| B-09 | ✅ | 6dcd794, 1af7125 | "Today, Tuesday 24 November" / "Tomorrow, …" (the chip now shows "Tomorrow", so its word leads the name). `a11y.spec.ts` |
+| B-10 | ✅ | 1a07842 | Edge fade, snap, end padding. `audit/screens/after/b09-b10-day-strip--phone.jpg` |
+| B-15 | ✅ | fc33dd2 | sr note "(opens in a new tab)" without JS, "(opens the booking panel)" once the drawer takes the link: true either way. `a11y.spec.ts` |
+| B-19 | ✅ | fbbc778, 4ed61f7 | Calm-mode strip grows (wraps), no scroll region. axe 375 reduced motion clean; `audit/screens/after/b19-*` |
+| B-25 | ✅ | d996fdf, e10e97b | One paused rule (`animation-play-state: paused`, no `!important`), scoped to the registered loops: `*` would freeze the booking drawer's entrance and the story's scroll scenes. o-cue-bob, lo-sway and lo-fall registered; the check's stale selector fixed. `docs/qa/phase8-motion/check.mjs` with motion on: ok; `motion.spec.ts` |
+| B-12 | ✅ | 16d9628, b52f1d0 | `booking.spec.ts`: Soho 8, Covent Garden 5 → "Plan a group at …" |
+| B-13 | ✅ | 84cf3aa | `audit/data/phase2-proofs.txt`: no review numbers in `.astro` |
+| B-14 | ✅ | e80c0be | `dist/404.html` has no canonical/og:url (proofs file) |
+| B-17 | ✅ | f3da74e | Proofs file: static HTML neutral; with the clock at D+1 the page says "Today, Wednesday" |
+| B-18 | ✅ | 8d9d5d4 | Proofs file: `dist/index.html` and the hydrated DOM are free of "No more tables…" / "For 2, please call"; `hidden-copy.spec.ts` |
+| B-20 | ✅ | c3b9e29 | Proofs file + `audit/screens/after/b20-hero-phone-3s.jpg` |
+| B-21 | ✅ | dfd088c | Proofs file: 0 console warnings after a full scroll |
+| B-24 | ✅ | 10268c5 | `jsonld.spec.ts`; `audit/data/jsonld-dump.txt` (Dubai: none; Soho and Covent Garden: Restaurant) |
+| Host | ✅ | 1783692 | `vercel.json`: host-matched apex → www, permanent (308); `robots.test.ts` |
+| Perf | ✅ | 7292cd1 (B-22), d4065f1, dad380c | Curtain fallback removed once live; map 1000 → 750 px (107 → 73 KB); voyage stamps 300 → 200 px; sitemap `lastmod` |
+| B-23, B-26 | ➡️ Phase 3 | — | The home menu and islands depend on the Direction C storyboard |
+
+Harness: smoke 8/8 (e07b68e); `perf:taps` all < 200 ms at 4× CPU; the booking e2e covers both rooms × 2/4/7/8 × today/+3.
+
+**Gate (24 Nov):**
+- verify green; astro check 0 errors / 0 warnings; Vitest 22/22; Playwright 120/120.
+- axe after an instant scroll and a 900 ms settle: **0 serious/critical** across 16 routes × 375/1280 × motion on/reduced, dialogs included (`audit/data/sweep-gate-*.json`).
+- Console clean; links 0 broken, 0 missing anchors, 0 bad `?at=`.
+- Probes: `audit/data/probes.json`. Lighthouse: the "After" column above.
 
 ## Summary
 - **The booking widget's rules are right. The "contradiction" the scrape found is not what guests see.** I checked all 16 combinations (Soho and Covent Garden × 2/4/7/8 guests × today and +3 days). Thresholds, the £10 deposit from 4, the set menu from 8, the pre-theatre windows and both provider deep links behave correctly. The scraper read text that the drawer writes into hidden nodes (B-18). The real booking bug is on `/book/`: Covent Garden shows "Outside opening hours" at 7pm on days it is open (B-02).
@@ -164,7 +205,7 @@ Not tested here and still open from Phase 10: real VoiceOver and NVDA, Safari, F
 | `/booking-terms/` | 1.2 s | 77 ms | 0 | 0 ms | 249 | 14 | 29 | 58 | 126 | `div.info-desk > section.in-short > ul > li` | 58KB /_astro/momo-mix-vegetable.B0Y3ep22_xj86m.webp<br>35KB /_astro/fonts/72a3e9c5d5030199.woff2<br>34KB /_astro/fonts/435c08ed98fe9a95.woff2<br>33KB /_astro/fonts/7087c481161d8962.woff2<br>23KB /_astro/fonts/5e51b176470dd270.woff2 |
 
 JS KB is transfer size (gzip/brotli as served). Budget: home JS < 100 KB — **home ships 157 KB of JS (over budget)**; branch pages ~104 KB (React client 63 KB). Observed LCP is 65–230 ms everywhere; lab LCP > 2.5 s comes from simulated slow-4G image loads (lesson: check observed first).
-
+<!-- /LH-PERF -->
 Image probe on home (1280, after a full scroll): 22 image requests, 1,279 KB. The largest are `voyage-sea` AVIF (208 KB), the `street` layer (202 KB), the `gallery-01` hero (186 KB) and `map.webp` (107 KB). Over-served images: `map.webp` 1000 px shown at 372 px, and the gold and orange stamps 300 px shown at about 100 px. Only one image has `fetchpriority="high"` (the hero still), which is correct. DOM: 1,713 nodes, 374 of them in the menu, 259 of those in the hidden measuring copy.
 
 Fixes, in order:
@@ -202,7 +243,7 @@ Launch-build pass (`PUBLIC_LAUNCH=true`, SEO only, mobile):
 | `/book/` | 100 | — |
 | `/our-story/` | 100 | — |
 | `/private-dining/` | 100 | — |
-
+<!-- /LH-SEO -->
 ## UX & design improvements
 | ID | Page/section | Problem | Proposal | Impact | Effort |
 |---|---|---|---|---|---|

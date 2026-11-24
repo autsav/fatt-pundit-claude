@@ -18,6 +18,7 @@ perf += '\nJS KB is transfer size (gzip/brotli as served). Budget: home JS < 100
 let seo = '';
 if (Object.keys(launch).length) { seo = '\nLaunch-build pass (`PUBLIC_LAUNCH=true`, SEO only, mobile):\n\n| Route | SEO | Failing audits |\n|---|---|---|\n'; for (const [k, s] of Object.entries(launch)) if (k.endsWith('mobile') && typeof s === 'object') seo += `| \`${k.split(' ')[0]}\` | ${s.seo} | ${s.failing.join(', ') || '—'} |\n`; }
 let md = readFileSync(join(ROOT, 'AUDIT.md'), 'utf8');
-md = md.replace(/<!-- LH-BEFORE-AFTER -->[\s\S]*?(?=\n## Summary)/, `<!-- LH-BEFORE-AFTER -->\n${before}`).replace(/<!-- LH-PERF -->[\s\S]*?(?=\nImage probe)/, `<!-- LH-PERF -->\n${perf}`).replace(/<!-- LH-SEO -->[\s\S]*?(?=\n## UX)/, `<!-- LH-SEO -->\n${seo}`);
+// Bounded by its own end marker: a lookahead to the next heading once swallowed a section placed in between.
+md = md.replace(/<!-- LH-BEFORE-AFTER -->[\s\S]*?<!-- \/LH-BEFORE-AFTER -->/, `<!-- LH-BEFORE-AFTER -->\n${before}<!-- /LH-BEFORE-AFTER -->`).replace(/<!-- LH-PERF -->[\s\S]*?<!-- \/LH-PERF -->/, `<!-- LH-PERF -->\n${perf}<!-- /LH-PERF -->`).replace(/<!-- LH-SEO -->[\s\S]*?<!-- \/LH-SEO -->/, `<!-- LH-SEO -->\n${seo}<!-- /LH-SEO -->`);
 writeFileSync(join(ROOT, 'AUDIT.md'), md);
 console.log('filled', routes.length, 'routes; live', Object.keys(live).length, 'launch', Object.keys(launch).length);

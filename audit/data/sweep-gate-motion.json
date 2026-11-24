@@ -1,0 +1,526 @@
+{
+ "base": "http://localhost:4399",
+ "motion": "motion",
+ "at": "2026-11-24T15:23:05.100Z",
+ "pages": [
+  {
+   "route": "/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 16727,
+   "dom": 1592,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/accessibility/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 4570,
+   "dom": 478,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/allergens/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 5194,
+   "dom": 518,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/book/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 4677,
+   "dom": 572,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/booking-terms/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 5294,
+   "dom": 521,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/covent-garden/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [
+    "net::ERR_ABORTED http://localhost:4399/_astro/cg-lights-on.UNRYFZUg.mp4"
+   ],
+   "http": [],
+   "status": 200,
+   "height": 8948,
+   "dom": 1194,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": []
+   }
+  },
+  {
+   "route": "/covent-garden/menu/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 8184,
+   "dom": 3186,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": []
+   }
+  },
+  {
+   "route": "/dubai/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 4975,
+   "dom": 635,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": []
+   }
+  },
+  {
+   "route": "/our-story/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 33233,
+   "dom": 1836,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/our-story/fatt/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 2913,
+   "dom": 446,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/our-story/pundit/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 2934,
+   "dom": 446,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/privacy/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 4498,
+   "dom": 481,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/private-dining/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 5166,
+   "dom": 504,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/soho/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 7767,
+   "dom": 1079,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": []
+   }
+  },
+  {
+   "route": "/soho/menu/",
+   "width": 375,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 7933,
+   "dom": 3361,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": []
+   }
+  },
+  {
+   "route": "/this-page-does-not-exist/",
+   "width": 375,
+   "console": [
+    "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "pageerror": [],
+   "failed": [],
+   "http": [
+    "404 http://localhost:4399/this-page-does-not-exist/"
+   ],
+   "status": 404,
+   "height": 3194,
+   "dom": 466,
+   "axe": [],
+   "axeDialogs": {
+    "book": [],
+    "site-menu": [],
+    "menus": []
+   }
+  },
+  {
+   "route": "/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 15139,
+   "dom": 1592,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/accessibility/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 3257,
+   "dom": 478,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/allergens/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 3544,
+   "dom": 518,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/book/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 3349,
+   "dom": 572,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/booking-terms/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 3439,
+   "dom": 521,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/covent-garden/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [
+    "net::ERR_ABORTED http://localhost:4399/_astro/cg-lights-on.UNRYFZUg.mp4"
+   ],
+   "http": [],
+   "status": 200,
+   "height": 8476,
+   "dom": 1194,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/covent-garden/menu/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 6614,
+   "dom": 3186,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/dubai/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 4158,
+   "dom": 635,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/our-story/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 18667,
+   "dom": 1836,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/our-story/fatt/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 2458,
+   "dom": 446,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/our-story/pundit/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 2492,
+   "dom": 446,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/privacy/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 3239,
+   "dom": 481,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/private-dining/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 3834,
+   "dom": 504,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/soho/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 6621,
+   "dom": 1079,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/soho/menu/",
+   "width": 1280,
+   "console": [],
+   "pageerror": [],
+   "failed": [],
+   "http": [],
+   "status": 200,
+   "height": 6467,
+   "dom": 3361,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  },
+  {
+   "route": "/this-page-does-not-exist/",
+   "width": 1280,
+   "console": [
+    "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "pageerror": [],
+   "failed": [],
+   "http": [
+    "404 http://localhost:4399/this-page-does-not-exist/"
+   ],
+   "status": 404,
+   "height": 2605,
+   "dom": 466,
+   "axe": [],
+   "axeDialogs": {
+    "book": []
+   }
+  }
+ ]
+}

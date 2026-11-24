@@ -1,0 +1,1 @@
+Booking smoke test passed (8 runs).
