@@ -186,9 +186,14 @@ export function initSmoothScroll(): void {
   new ResizeObserver(measureZones).observe(document.body);
 }
 
-/** Freeze page scroll (dialog, drawer, lightbox). Counted, so overlays can stack. */
-export function lockScroll(): void { if (locks++ === 0) window.__lenis?.stop(); }
-export function unlockScroll(): void { if (locks > 0 && --locks === 0) window.__lenis?.start(); }
+/**
+ * Freeze page scroll (dialog, drawer, lightbox). Counted, so overlays can stack. Without Lenis (reduced
+ * motion) native scrolling is frozen instead: a modal dialog doesn't stop the page behind it scrolling
+ * (AUDIT B-03). The gutter is kept so the page doesn't jump sideways when its scrollbar goes.
+ */
+const freeze = (on: boolean) => { const s = document.documentElement.style; s.overflow = on ? 'hidden' : ''; s.scrollbarGutter = on ? 'stable' : ''; };
+export function lockScroll(): void { if (locks++ === 0) { if (window.__lenis) window.__lenis.stop(); else freeze(true); } }
+export function unlockScroll(): void { if (locks > 0 && --locks === 0) { if (window.__lenis) window.__lenis.start(); freeze(false); } }
 
 export function scrollToEl(target: Target, opts: Opts = {}): void {
   const l = window.__lenis;
