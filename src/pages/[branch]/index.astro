@@ -136,7 +136,8 @@ const daysOpen = b.hours ? (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as
 const openDays = daysOpen === 7 ? 'Open every day.' : daysOpen > 0 ? `Open ${['', 'one', 'two', 'three', 'four', 'five', 'six'][daysOpen]} days a week.` : 'Opening hours.';
 const rules = groupRules(b);
 // The Dubai list posts to a form-to-email service once PUBLIC_DUBAI_LIST_ENDPOINT is set (CLIENT-INPUTS #5, #10).
-// Until then the form opens an email to the Dubai address, or the group's reservations address, and says so.
+// Until then it opens an email to the Dubai address if branches.json has one; with neither, the #waitlist block
+// points to Instagram for the date (AUDIT B-06: no reservations-address fallback, that inbox is the client's call).
 const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
 const listEmail = b.email ?? '';
 
