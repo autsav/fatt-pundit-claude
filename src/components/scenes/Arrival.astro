@@ -81,8 +81,9 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     if (boardEl) {
       Promise.all([import('react'), import('react-dom/client'), import('./ArrivalBoard.tsx')]).then(([{ createElement }, { createRoot }, { default: Board }]) => {
         if (!boardEl.isConnected) return;
-        board = createRoot(boardEl);
-        board.render(createElement(Board));
+        const r = createRoot(boardEl);
+        r.render(createElement(Board));
+        board = r;
       });
     }
     const ac = new AbortController();
