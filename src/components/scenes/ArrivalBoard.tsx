@@ -29,7 +29,7 @@ export default function ArrivalBoard() {
     <SplitFlapText
       className="font-display text-[clamp(30px,7.4vw,92px)] tracking-normal"
       length={11}
-      maxFlips={3}
+      maxFlips={2}
       onSettled={settled}
       text={text}
       tileClassName="bg-[#3a3631] text-sand shadow-[inset_0_0_0_1px_rgb(203_160_82/0.35),0_6px_14px_rgb(0_0_0/0.45)]"
