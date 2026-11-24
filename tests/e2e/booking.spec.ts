@@ -12,12 +12,15 @@ test.beforeEach(async ({ page }) => {
 // AUDIT B-02: Covent Garden (opens 16:45) must get a time at the desk's default 7pm.
 test('/book/ desk: each room resolves its own nearest time', async ({ page }) => {
   await page.goto('/book/');
-  await page.selectOption('[data-desk-day]', { index: 3 });
-  await page.selectOption('[data-desk-time]', '19:00').catch(() => {});
+  // A future Tuesday to Saturday: both rooms open (Soho closes Sundays, Covent Garden Mondays).
+  const day = await page.locator('[data-desk-day] option').evaluateAll((os) =>
+    (os as HTMLOptionElement[]).map((o) => o.value).find((v, i) => i > 0 && [2, 3, 4, 5, 6].includes(new Date(`${v}T12:00:00Z`).getUTCDay())));
+  await page.selectOption('[data-desk-day]', day!);
+  await page.selectOption('[data-desk-time]', '19:00');
   const fit = (id: string) => page.locator(`#book-${id} [data-desk-fit]`);
-  await expect(fit('covent-garden')).not.toHaveText(/Outside opening hours/);
-  await expect(fit('covent-garden')).toHaveText(/7\.15pm|6\.45pm|Closed/);
-  await expect(fit('soho')).toHaveText(/7pm|Closed/);
+  await expect(fit('covent-garden')).toHaveText(/7\.15pm/);
+  await expect(fit('soho')).toHaveText(/7pm/);
+  await expect(page.locator('#book-covent-garden [data-desk-go]')).toHaveAttribute('href', /start_time=19%3A15|start_time=19:15/);
 });
 
 // Brief §6: both rooms × 2/4/7/8 guests × today and a future day, through the Book drawer.
