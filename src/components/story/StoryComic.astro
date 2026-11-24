@@ -27,9 +27,9 @@ interface Props {
 }
 const { mode, only } = Astro.props;
 
-// Illustrations, when the illustrator's files are in (named after the panel id).
-const art = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/*.{jpg,jpeg,png,webp,avif}', { eager: true });
-const artFor = (id: string) => Object.entries(art).find(([path]) => path.split('/').pop()!.replace(/\.\w+$/, '') === id)?.[1].default;
+// Illustrations come from the story-art manifest (src/data/story-art.ts, AUDIT B-08): today's placeholders,
+// the illustrator's files once delivered under the same slot ids.
+const artFor = (id: string) => storyArt(id).image;
 
 const sketchSrc: Record<Sketch, ImageMetadata> = { ship, mountains, tiger, compass, map, stamp };
 const sketchUrl = Object.fromEntries(
@@ -53,6 +53,7 @@ const groups =
   mode === 'full'
     ? await Promise.all(chapters.map((c, n) => ({ c, n })).filter(({ c }) => !only || c.id === only).map(async ({ c, n }) => ({ ...c, n, panels: await Promise.all(c.panels.map((p) => show(p, p.size))) })))
     : [{ id: 'story-short', label: '', title: '', n: 0, panels: await Promise.all(chapters.flatMap((c) => c.panels).filter((p) => p.short).map((p, i) => show(p, i === 0 ? 'wide' : 'half'))) }];
+import { storyArt } from '../../data/story-art';
 ---
 
 <div class:list={['comic', `comic-${mode}`]} data-comic>
