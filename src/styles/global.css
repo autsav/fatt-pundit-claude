@@ -638,9 +638,11 @@ html:has(.hero) { background: var(--color-ink); }
 /* Branch hero name board: the intended size, but never wider than its column (container = .board-slot). */
 .arrival-flap { font-size: min(clamp(22px, 4.6vw, 56px), calc(100cqw / (var(--n, 13) * 0.8))); }
 
-/* "Pause motion" (footer button): the loops that never end on their own stand still.
-   Every new infinite loop goes in this list; tests/e2e/motion.spec.ts fails if one is missed (AUDIT B-25). */
-html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, .o-cue, [data-idle='true']) { animation: none !important; }
+/* "Pause motion" (footer button): one rule holds every loop that never ends on its own where it is (AUDIT B-25).
+   Scoped to the registered loops, not `*`: pausing everything would also freeze the booking drawer's entrance
+   (off-screen) and the story's scroll scenes. Register each new infinite loop here and in
+   docs/qa/phase8-motion/check.mjs KNOWN_LOOPS; tests/e2e/motion.spec.ts fails if one is missed. */
+html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, .o-cue, [data-idle='true']) { animation-play-state: paused; }
 
 /* Stand-in for the typewriter font while it loads: Courier New, resized per weight so lines break in
    the same places and nothing jumps when the brand font arrives. Measured on this site's own text:
