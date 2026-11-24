@@ -32,8 +32,11 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </div>
 
 <style>
-  .arrival { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; pointer-events: auto; }
-  :global(html[data-arrival='skip']) .arrival { display: none; }
+  /* Hidden unless the inline script above chose to play it: with JavaScript off the guest never sees it.
+     If the board's script then fails to load, the CSS fail-safe fades it out on its own (AUDIT B-01). */
+  .arrival { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; pointer-events: auto; }
+  :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 5s forwards; }
+  @keyframes arrival-failsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
   .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
   .half.top { top: 0; border-bottom: 1px solid rgb(203 160 82 / 0.25); }
   .half.bottom { bottom: 0; }
