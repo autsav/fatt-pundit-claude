@@ -6,7 +6,7 @@
  * map page on the back, as on the real menu. Bookmark tabs swap the menu.
  * Everything printed comes from menus.json + dishes.json via index.astro; nothing is typed here.
  */
-import { Fragment, type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import PageFlip from '@/components/kokonutui/page-flip';
 
@@ -269,8 +269,10 @@ function Signatures({ dishes, art }: { dishes: SignatureDish[]; art: Art }) {
       <p className="m-0 text-center text-[5.6cqw] font-bold uppercase leading-none tracking-[0.1em]">From the pass</p>
       <p className="m-0 mt-[1.2cqw] text-center font-note text-[3.6cqw] font-medium italic text-tiger-deep">Our signature dishes</p>
       <div className="mt-[3cqw] grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-[3cqw]">
-        {pics.map((d) => (
-          <figure key={d.name} className="m-0 flex min-h-0 flex-col">
+        {pics.map((d, i) => (
+          <figure key={d.name} className="relative m-0 flex min-h-0 flex-col">
+            {/* Steam off the first plate (the momos): three wisps, a registered loop that Pause motion stills. */}
+            {i === 0 && <span className="menu-steam" aria-hidden="true"><i /><i /><i /></span>}
             <img src={d.image} srcSet={d.srcset} sizes={d.sizes} alt={d.alt ?? ''} width={800} height={600} className="fp-photo min-h-0 w-full flex-1 object-cover" loading="lazy" decoding="async" draggable={false} />
             <figcaption className="mt-[1.2cqw] text-[2.8cqw] font-bold uppercase leading-tight tracking-[0.05em]">
               {d.name}
@@ -334,6 +336,18 @@ export default function MenuBook({
     return [...list.filter((m) => !m.diet), ...list.filter((m) => m.diet)];
   }, [menus, place]);
   const [active, setActive] = useState(menus[0]?.id);
+  // U-03: the bookmarks carry the general menus; the dietary menus and the list views sit behind one Filter.
+  const main = useMemo(() => shown.filter((m) => !m.diet), [shown]);
+  const diets = useMemo(() => shown.filter((m) => m.diet), [shown]);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!filterOpen) return;
+    const off = (e: Event) => { if (!filterRef.current?.contains(e.target as Node)) setFilterOpen(false); };
+    const esc = (e: Event) => { if ((e as globalThis.KeyboardEvent).key === 'Escape') { setFilterOpen(false); filterRef.current?.querySelector<HTMLButtonElement>('[data-filter-toggle]')?.focus(); } };
+    document.addEventListener('pointerdown', off); document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', off); document.removeEventListener('keydown', esc); };
+  }, [filterOpen]);
   const [opened, setOpened] = useState(false);
   // Wide screens open on the first spread (cover beside the first page) instead of a lone cover.
   useEffect(() => {
@@ -342,11 +356,6 @@ export default function MenuBook({
   const menu = shown.find((m) => m.id === active) ?? shown[0] ?? menus[0];
   const tagRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const menuTabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const listRef = useRef<HTMLDetailsElement>(null);
-  // Phones: the book's type is small there, so the readable list view starts open.
-  useEffect(() => {
-    if (listRef.current && window.matchMedia('(max-width: 639px)').matches) listRef.current.open = true;
-  }, []);
 
   // Which branch: a shared link (?at=soho) first, then the guest's last pick on this device.
   useEffect(() => {
@@ -379,11 +388,11 @@ export default function MenuBook({
       setOpened(true);
     });
   const onTabKey = (e: KeyboardEvent, i: number) => {
-    const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? shown.length - 1 : -1;
+    const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? main.length - 1 : -1;
     if (n < 0) return;
     e.preventDefault();
-    const to = (n + shown.length) % shown.length;
-    pickTab(shown[to].id);
+    const to = (n + main.length) % main.length;
+    pickTab(main[to].id);
     menuTabRefs.current[to]?.focus();
   };
 
@@ -444,7 +453,7 @@ export default function MenuBook({
   }, [menu?.id, place?.id, opened, pages]);
 
   return (
-    <section ref={sectionRef} id="menu" className="relative overflow-hidden bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
+    <section ref={sectionRef} id="menu" className="relative overflow-clip bg-sand py-[var(--section-pad)] text-ink" aria-label="The menus">
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="wrap relative flex flex-col items-center">
         {/* Chapter head (the home page's numbered chapters), then one toolbar: which room's book, or the list. */}
@@ -484,14 +493,6 @@ export default function MenuBook({
                 </div>
               </div>
             )}
-            {lists && lists.length > 0 && (
-              <details ref={listRef} className="menu-toolbar-group">
-                <summary className="menu-toolbar-label cursor-pointer !text-[13px] text-ink/70">List view &amp; diet filters</summary>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {lists.map((l) => <a key={l.href} className="fp-btn fp-btn--sm !border-ink/40 !bg-transparent !text-[13px]" href={l.href}>{l.label}</a>)}
-                </div>
-              </details>
-            )}
             {!places && <p className="m-0 fp-body">The menu you'll be handed at the table. Pick yours from the bookmarks.</p>}
           </div>
         </header>
@@ -516,14 +517,11 @@ export default function MenuBook({
         <div className="mx-auto mt-7 w-full max-w-[1000px]">
           {/* Bookmarks: paper tabs standing up from the top edge of the book. */}
           {/* Bookmarks: one paper style, the open one in ink (no colour without meaning). */}
-          <div role="tablist" aria-label="Menus" className="relative z-10 flex snap-x snap-mandatory items-end gap-[6px] overflow-x-auto px-4 [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)] sm:flex-wrap sm:justify-center sm:snap-none sm:overflow-visible">
-            {shown.map((m, i) => {
+          <div className="relative z-10 flex items-end gap-[6px] px-4 max-sm:pr-0 sm:justify-center">
+          <div role="tablist" aria-label="Menus" className="flex min-w-0 snap-x snap-mandatory items-end gap-[6px] overflow-x-auto [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)] sm:flex-wrap sm:justify-center sm:snap-none sm:overflow-visible">
+            {main.map((m, i) => {
               const on = m.id === menu.id;
-              const firstDiet = m.diet && !shown[i - 1]?.diet && i > 0;
               return (
-                <Fragment key={m.id}>
-                {firstDiet && <span aria-hidden="true" className="hidden h-0 basis-full sm:block" />}
-                {firstDiet && <span aria-hidden="true" className="self-center shrink-0 whitespace-nowrap px-1 pb-1 font-note text-[15px] italic text-ink/80 max-sm:hidden">For dietary needs:</span>}
                 <button
                   key={m.id}
                   ref={(el) => {
@@ -533,7 +531,7 @@ export default function MenuBook({
                   role="tab"
                   aria-selected={on}
                   aria-controls="menu-panel"
-                  tabIndex={on ? 0 : -1}
+                  tabIndex={on || (i === 0 && menu.diet) ? 0 : -1}
                   type="button"
                   onClick={() => pickTab(m.id)}
                   onKeyDown={(e) => onTabKey(e, i)}
@@ -541,16 +539,65 @@ export default function MenuBook({
                 >
                   {m.tab}
                 </button>
-                </Fragment>
               );
             })}
           </div>
+          {(diets.length > 0 || (lists && lists.length > 0)) && (
+            <div ref={filterRef} className="relative shrink-0">
+              {/* One Filter for dietary menus and the list views (U-03). Shows which diet is open. */}
+              <button
+                type="button"
+                data-filter-toggle
+                aria-expanded={filterOpen}
+                aria-controls="menu-filter"
+                onClick={() => setFilterOpen((v) => !v)}
+                className={`${menu.diet ? CHOICE_ON : CHOICE_OFF} ${CHOICE} whitespace-nowrap !border-b-0 shadow-[0_-2px_6px_rgb(0_0_0/0.10)] pb-4 pt-3 ${menu.diet || filterOpen ? '' : 'translate-y-2 hover:translate-y-1'} [transition:transform_var(--dur-spring)_var(--curve-spring)]`}
+              >
+                {menu.diet ? `Filter: ${menu.tab}` : 'Filter'}
+              </button>
+              <div id="menu-filter" hidden={!filterOpen} className="menu-filter absolute right-0 top-full z-30 mt-2 w-[min(300px,86vw)] border-2 border-ink bg-paper-light p-4 text-left shadow-[0_14px_28px_rgb(0_0_0/0.25)]">
+                {diets.length > 0 && (
+                  <div role="group" aria-labelledby="menu-filter-diet">
+                    <p id="menu-filter-diet" className="m-0 mb-2 font-note text-[15px] italic text-ink/80">For dietary needs</p>
+                    <div className="flex flex-wrap gap-2">
+                      {diets.map((m) => (
+                        <button key={m.id} type="button" aria-pressed={m.id === menu.id} onClick={() => { setFilterOpen(false); pickTab(m.id); }} className={`${m.id === menu.id ? CHOICE_ON : CHOICE_OFF} ${CHOICE} !text-[14px]`}>
+                          {m.tab}
+                        </button>
+                      ))}
+                      {menu.diet && (
+                        <button type="button" onClick={() => { setFilterOpen(false); pickTab(main[0].id); }} className={`${CHOICE_OFF} ${CHOICE} !text-[14px]`}>Show all</button>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {lists && lists.length > 0 && (
+                  <div className={diets.length > 0 ? 'mt-4 border-t border-dashed border-ink/30 pt-3' : ''}>
+                    <p className="m-0 mb-2 font-note text-[15px] italic text-ink/80">Read it as a list</p>
+                    <div className="flex flex-wrap gap-2">
+                      {lists.map((l) => <a key={l.href} className="fp-btn fp-btn--sm !border-ink/40 !bg-transparent !text-[13px]" href={l.href}>{l.label}</a>)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          </div>
           {/* Sized from the viewport height so the open book fits one screen, with a floor: on a phone on its
               side (390px tall) the height rule alone gave a 75px book with 2px type. Past the floor it scrolls. */}
-          <div id="menu-panel" role="tabpanel" aria-labelledby={`menu-tab-${menu.id}`} className="relative mx-auto shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)] [transition:opacity_var(--dur-fast)_var(--curve-out)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))', opacity: measured ? 1 : 0, viewTransitionName: 'menu-book' }}>
+          <div id="menu-panel" role="tabpanel" {...(menu.diet ? { "aria-label": `${menu.tab} menu` } : { "aria-labelledby": `menu-tab-${menu.id}` })} className="relative mx-auto shadow-[0_24px_30px_rgb(0_0_0/0.35)] max-sm:!max-w-[max(260px,40svh)] [transition:opacity_var(--dur-fast)_var(--curve-out)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))', opacity: measured ? 1 : 0, viewTransitionName: 'menu-book' }}>
             <PageFlip key={`${place?.id}-${menu.id}-${opened ? 'open' : 'shut'}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} start={opened ? 1 : 0} />
+            {/* Direction C scene 7: on wide screens a copy of the cover lies over the right page and swings open on
+                the spine as the book comes on screen (global.css "Menu book"), uncovering the spread beneath. */}
+            {opened && <div className="menu-cover-swing" aria-hidden="true"><Cover menu={menu} art={art} place={place} /></div>}
           </div>
         </div>
+        {lists && lists.length > 0 && (
+          <p className="m-0 mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[15px] sm:hidden">
+            <span className="font-note italic text-ink/80">Small print? Read it as a list:</span>
+            {lists.map((l) => <a key={l.href} className="fp-link fp-link--strong" href={l.href}>{l.label}</a>)}
+          </p>
+        )}
         {menu.id === 'a-la-carte' && signatures && signatures.length > 1 && (
           <ul className="m-0 mt-5 grid w-full max-w-[420px] list-none grid-cols-2 gap-3 p-0 sm:hidden" aria-label="Signature dishes">
             {signatures.slice(0, 2).map((d) => (
