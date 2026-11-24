@@ -88,15 +88,17 @@ const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) =>
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
   // One width per asset (shared with the menu book's map, so one file).
-  map: await img(map, 1000),
+  // ~750 px: shown at about 372 px in the voyage card and ~400 px in the menu book, so 2× either way.
+  map: await img(map, 750),
   // A picture, not the SVG: the browser re-rasterised the vector chart (a
   // 16-megapixel draw) whenever the camera zoomed, stalling scroll frames.
   sea: (await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 })).src,
   seaSet: (await Promise.all([1600, 2400, 3200].map(async (w) => `${(await getImage({ src: voyageSea, width: w, format: 'avif', quality: 50 })).src} ${w}w`))).join(', '),
   ship: await img(shipArt, 160),
   compass: await img(compassArt, 240),
-  stampGold: await stampSrc(stampGoldArt, 300),
-  stampOrange: await stampSrc(stampOrangeArt, 300),
+  // Shown at most ~102 px wide in the voyage: 200 px covers 2×.
+  stampGold: await stampSrc(stampGoldArt, 200),
+  stampOrange: await stampSrc(stampOrangeArt, 200),
   mountainA: await img(mountainAArt, 300),
   mountainsB: await img(mountainsBArt, 520),
   mountainsC: await img(mountainsCArt, 260),
@@ -133,7 +135,7 @@ const menuPlaces = await Promise.all(
     soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: listCta(b).href, label: listCta(b).short, sr: listCta(b).sr, external: listCta(b).external },
   })),
 );
-const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 300), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
+const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 300), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 750) }; // the book's stamps stay 300 px: one shows at 46% of a page
 // Search engines: the group, with each restaurant as its own entity.
 // The group rules differ by room, so each room states its own.
 const groupNotes = branches.flatMap((b) => { const g = groupRules(b); return g ? [`${b.shortName}: ${g.depositShort} ${g.setMenu}`] : []; });
