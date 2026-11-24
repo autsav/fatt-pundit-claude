@@ -43,7 +43,9 @@ const sum = (j) => {
   };
 };
 
-const summary = {};
+// Merge into the label's summary, so re-measuring one route keeps the others.
+const summaryFile = join(ROOT, 'data', `lighthouse-${LABEL}.json`);
+const summary = readFileSafe(summaryFile) ?? {};
 for (const route of ROUTES) {
   for (const preset of ['mobile', 'desktop']) {
     const n = preset === 'mobile' ? RUNS : 1;
@@ -60,4 +62,4 @@ for (const route of ROUTES) {
     console.log(route, preset, `P${s.perf} A${s.a11y} BP${s.bp} SEO${s.seo} LCP${s.lcp} CLS${s.cls} TBT${s.tbt} ${s.totalKB}KB runs=${s.perfRuns}`);
   }
 }
-writeFileSync(join(ROOT, 'data', `lighthouse-${LABEL}.json`), JSON.stringify(summary, null, 1));
+writeFileSync(summaryFile, JSON.stringify(summary, null, 1));
