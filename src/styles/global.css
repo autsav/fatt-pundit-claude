@@ -721,6 +721,17 @@ html:has(.hero) { background: var(--color-ink); }
   }
 }
 
+/* Goodbye (Direction C scene 11): the room's warm light dims as you leave the page. */
+.foot .goodbye { position: relative; }
+.foot .goodbye::before { content: ''; position: absolute; inset: -12% -4%; z-index: 0; pointer-events: none; background: radial-gradient(45% 60% at 28% 45%, rgb(255 190 110 / 0.18), transparent 70%); }
+.foot .goodbye > * { position: relative; z-index: 1; }
+@keyframes goodbye-dim { from { opacity: 1; } to { opacity: 0.12; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .foot .goodbye::before { animation-name: goodbye-dim; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: cover 35% exit 90%; }
+  }
+}
+
 /* "Pause motion" (footer button): one rule holds every loop that never ends on its own where it is (AUDIT B-25).
    Scoped to the registered loops, not `*`: pausing everything would also freeze the booking drawer's entrance
    (off-screen) and the story's scroll scenes. Register each new infinite loop here and in
