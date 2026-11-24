@@ -10,12 +10,19 @@ describe('robots.txt', () => {
     expect(await body()).toContain('Disallow: /\n');
   });
   // AUDIT B-07: share images must stay fetchable by link-preview crawlers that honour robots.txt.
-  it('launch builds allow the share images but not their source pages', async () => {
+  it('launch builds leave /og/ crawlable (noindex comes from the header)', async () => {
     vi.stubEnv('PUBLIC_LAUNCH', 'true');
     const t = await body();
-    const lines = t.split('\n');
-    expect(lines.indexOf('Allow: /og/*.png')).toBeGreaterThan(-1);
-    expect(lines.indexOf('Allow: /og/*.png')).toBeLessThan(lines.indexOf('Disallow: /og/'));
+    expect(t).not.toContain('Disallow: /og/');
+    expect(t).toContain('Disallow: /styleguide/');
     expect(t).toContain('Sitemap: https://www.fattpundit.co.uk/sitemap.xml');
   });
+});
+
+it('the /og/ header rule keeps share images out of search', async () => {
+  const { readFileSync } = await import('node:fs');
+  const v = JSON.parse(readFileSync('vercel.json', 'utf8'));
+  const og = v.headers.find((h: { source: string }) => h.source === '/og/(.*)');
+  expect(og.headers).toContainEqual({ key: 'X-Robots-Tag', value: 'noindex' });
+  expect(readFileSync('public/_headers', 'utf8')).toMatch(/\/og\/\*\n(.+\n)*\s+X-Robots-Tag: noindex/);
 });
