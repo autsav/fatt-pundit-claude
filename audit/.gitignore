@@ -6,3 +6,4 @@ frames/
 refs/
 lighthouse/**/*.full.json
 !screens/before/scenes/
+!screens/after/
