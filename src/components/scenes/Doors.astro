@@ -81,6 +81,9 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
       <div class="curtain-still"><Picture {...velvetImg} class="curtain-still-img" /></div>
       <Picture src={facade} alt="" formats={formats} class="facade" widths={[900, 1400, 2000, 2800, 4096]} sizes="(max-aspect-ratio: 3/4) 170vw, max(100vw, 133svh)" loading="lazy" fetchpriority="low" />
       <Picture src={reflectFront} alt="" formats={formats} class="reflect" widths={[1000, 2048]} sizes="(max-aspect-ratio: 3/4) 200vw, 100vw" loading="lazy" fetchpriority="low" data-reflect />
+      <!-- Direction C scene 3: warm light from the room spills across the step and cobbles as the door opens
+           (under the door leaf, from the doorway's foot). -->
+      <span class="spill" aria-hidden="true" data-spill></span>
       <div class="door" data-door>
         <Picture src={door} alt="" formats={formats} class="door-img" widths={[400, 712]} sizes="(max-aspect-ratio: 3/4) 40vw, 25vw" loading="lazy" fetchpriority="low" />
         <Picture src={reflectDoor} alt="" formats={formats} class="reflect" widths={[356, 712]} sizes="(max-aspect-ratio: 3/4) 40vw, 25vw" loading="lazy" fetchpriority="low" data-reflect />
@@ -119,6 +122,8 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
         <h2 class="o-line">From Guangdong to Calcutta</h2>
         <p class="o-sub">Hakka families sailed from southern China with their recipes, and met the spices of India in Tangra, Calcutta's Chinatown.</p>
         <p class="o-cue" aria-hidden="true">Keep scrolling to follow the ship</p>
+        <!-- Direction C scene 5: the curtain's red becomes the route line, drawn down into the voyage. -->
+        <svg class="o-route" viewBox="0 0 4 100" preserveAspectRatio="none" aria-hidden="true"><path d="M2 0 V100" pathLength="1" stroke-dasharray="1" data-route /></svg>
       </div>
     </div>
   </div>
@@ -183,6 +188,11 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
   /* A lamp: a warm pool thrown down the fascia from the brass shade; unlit until it flicks on. */
   .lamp { position: absolute; left: var(--x); top: 17%; width: 14cqw; height: 12cqw; translate: -50% 0; background: radial-gradient(55% 60% at 50% 12%, rgb(255 214 140 / 0.8), rgb(255 170 70 / 0.3) 40%, transparent 75%); opacity: 0; pointer-events: none; }
   .lamp.is-on { opacity: 1; animation: lamp-flick 520ms steps(1, end); }
+  /* Each lamp throws a soft cone of light down the brick (it lights with its lamp). */
+  .lamp::after { content: ''; position: absolute; left: 50%; top: 45%; width: 70%; height: 190%; translate: -50% 0; background: radial-gradient(50% 100% at 50% 0, rgb(255 196 120 / 0.26), transparent 72%); pointer-events: none; }
+  .spill { position: absolute; left: 8%; top: 89.4%; width: 35%; height: 10.6%; background: linear-gradient(rgb(255 206 140 / 0.62), rgb(255 176 90 / 0.22) 55%, transparent); clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%); opacity: 0; pointer-events: none; will-change: opacity; }
+  .o-route { width: 4px; height: clamp(56px, 12vh, 120px); overflow: visible; }
+  .o-route path { fill: none; stroke: var(--color-tiger-deep); stroke-width: 2px; vector-effect: non-scaling-stroke; stroke-dashoffset: 0; }
   @keyframes lamp-flick { 0% { opacity: 0.7; } 18% { opacity: 0.1; } 34% { opacity: 0.9; } 46% { opacity: 0.3; } 60%, 100% { opacity: 1; } }
   /* The sign: gilt slab capitals on the red fascia, as on Maiden Lane; unlit gilt is dark with a faint catch-light. */
   .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #4a3418; text-align: center; line-height: 1; text-shadow: 0 0.03em 0 rgb(255 220 160 / 0.12); }
@@ -283,7 +293,7 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
     /* Tall screens: a wider front (its sides crop) instead of a small card. */
     @media (max-aspect-ratio: 3/4) { .camera { width: 150%; margin-left: -25%; } }
     .lamp { opacity: 1; } .sign-lit [data-ch], .sign-lit [data-sub] { opacity: 1; } .sign-shine, .seam, .surround { display: none; }
-    .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .door { transform: rotateY(-62deg); }
+    .dim { opacity: 0.15; } .reflect { opacity: 0.3; } .door { transform: rotateY(-62deg); } .spill { opacity: 0.8; }
     .inside, .threshold, .exposure, .vig, .dip { display: none; }
     .below { position: relative; bottom: 0; padding-block: 16px; }
     .flood { position: relative; display: grid; opacity: 1; padding-block: 64px; background: var(--color-sand); }
@@ -336,6 +346,7 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
     const all = (sel: string) => [...section.querySelectorAll<HTMLElement>(sel)];
     const lamps = all('[data-lamp]'), chars = all('[data-ch]'), subs = all('[data-sub]'), reflects = all('[data-reflect]');
     const door = $('[data-door]'), doorShade = $('[data-door-shade]'), dim = $('[data-dim]');
+    const spill = $('[data-spill]'), route = section.querySelector<SVGPathElement>('[data-route]');
     const threshold = $('[data-threshold]'), velvet = $('[data-velvet]');
     const panelR = $('[data-panel="r"]'), panelL = $('[data-panel="l"]'), shades = all('[data-shade]');
     const vDim = $('[data-velvet-dim]'), vRim = $('[data-velvet-rim]'), railEl = $('[data-rail]');
@@ -430,6 +441,9 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
       set(dim, 'opacity', (0.78 - 0.56 * lit).toFixed(3));
       const r = (0.9 - 0.82 * lit).toFixed(3);
       reflects.forEach((el) => set(el, 'opacity', r));
+      // Reflections in the glass slide against the scroll (they're on the glass, not in the room): depth.
+      const rx = (-20 * range(t, 0, 0.3)).toFixed(1);
+      reflects.forEach((el) => set(el, 'transform', `translateX(${rx}px)`));
       const below = 1 - range(t, 0.04, 0.1);
       set(comein, 'opacity', below.toFixed(3)); set(comein, 'visibility', below > 0.02 ? 'visible' : 'hidden');
 
@@ -437,6 +451,7 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
       const open = inOut(range(t, 0.24, 0.38));
       set(door, 'transform', `rotateY(${(open * -78).toFixed(2)}deg)`);
       set(doorShade, 'opacity', Math.min(1, open * 1.3).toFixed(3));
+      set(spill, 'opacity', (0.85 * open).toFixed(3));
       set(vDim, 'opacity', ((0.78 - 0.62 * lit) * (1 - range(t, 0.46, 0.54))).toFixed(3));
       set(vRim, 'opacity', (open * (1 - range(t, 0.5, 0.56))).toFixed(3));
 
@@ -485,8 +500,10 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
       vis(leakL, leakOn && split); if (split) { set(leakL, 'opacity', lo); set(leakL, 'transform', `translateX(${(stageW * 0.5 * sx).toFixed(1)}px)`); }
       // The stack arrives first; the panel fades under it (no double image). Then you pass it and the rail.
       const by = inOut(range(t, 0.7, 0.78)), so = range(t, 0.66, 0.69).toFixed(3);
-      show(stackR, t >= 0.66 && t < 0.78); set(stackR, 'opacity', so); set(stackR, 'transform', `translateX(${(by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)})`);
-      show(stackL, split && t >= 0.66 && t < 0.78); if (split) { set(stackL, 'opacity', so); set(stackL, 'transform', `translateX(${(-by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)})`); }
+      // Velvet has weight: as it gathers it sways twice and settles (a damped skew, scrubbed with the scroll).
+      const q = range(t, 0.68, 0.78), swayK = Math.sin(q * Math.PI * 4) * (1 - q) * 2.2;
+      show(stackR, t >= 0.66 && t < 0.78); set(stackR, 'opacity', so); set(stackR, 'transform', `translateX(${(by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)}) skewX(${(-swayK).toFixed(2)}deg)`);
+      show(stackL, split && t >= 0.66 && t < 0.78); if (split) { set(stackL, 'opacity', so); set(stackL, 'transform', `translateX(${(-by * 120).toFixed(1)}%) scale(${(1 + 0.25 * by).toFixed(4)}) skewX(${swayK.toFixed(2)}deg)`); }
       set(railEl, 'opacity', (1 - by).toFixed(3));
       set(railEl, 'transform', `translateY(${(-by * 60).toFixed(1)}%) scale(${(1 + 0.2 * by).toFixed(4)})`);
       show(threshold, t < 0.78);
@@ -505,6 +522,8 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
       const bloom = inQuad(range(t, 0.82, 0.92));
       show(flood, bloom > 0.001, 'grid'); set(flood, 'opacity', bloom.toFixed(3));
       set(opening, 'opacity', range(t, 0.86, 0.92).toFixed(3));
+      // The route line draws down from the opening toward the voyage over the last beat.
+      if (route) set(route as unknown as HTMLElement, 'stroke-dashoffset', (1 - range(t, 0.9, 1)).toFixed(3));
     };
 
     // One rAF per scroll event batches the writes. Smoothing of wheel notches is global (smooth-scroll.ts),

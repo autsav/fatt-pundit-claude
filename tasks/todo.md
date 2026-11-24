@@ -127,9 +127,9 @@ Open with the client (code ready for a one-line data change): CG slot grid, CG p
 Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scenes/, `node audit/scripts/scenes.mjs`), one line in audit/CHANGELOG.md, reduced-motion end state, Pause motion covers loops, tests green, perf budget (perf:budget home) not worse. No new libraries; transform/opacity (+ stroke-dashoffset) only.
 - [x] S1 Arrival: board halves open as doors (rotateY, perspective), hand-off to the hero — done: intro.spec.ts 12/12, probe 1.17–1.19 s, audit/screens/after/scenes/arrival-*
 - [x] S2 Hero: room drifts with scroll (+ pointer on desktop), lamps breathe, glass mists as you leave — done: computed transform/opacity checked at 0/50/85%, reduced motion none, motion.spec + a11y green, perf:budget unchanged
-- [ ] S3 Doors: lamps light one by one, door swings in 3D with light spill, reflections counter-scroll
-- [ ] S4 Curtain: light sweep through the gap, settle sway at the end
-- [ ] S5 Room reveal: settle 1.08 → 1; red route line draws down into the voyage
+- [x] S3 Doors: lamps light one by one, door swings in 3D with light spill, reflections counter-scroll — done: lamp cones, cobble spill, reflection counter-slide added (the rest existed); e2e 120/120, phase8 check ok
+- [x] S4 Curtain: light sweep through the gap, settle sway at the end — done: settle sway added (light leak existed)
+- [x] S5 Room reveal: red route line draws down into the voyage — done (the walk-in dolly existed and is kept instead of a 1.08 → 1 settle)
 - [ ] S6 Voyage: ship's wake drawn, ports stamp in, postcards tilt and settle, Dubai label clear
 - [ ] S7 Menu book: one Filter button (U-03), cover opens in 3D, steam over the momos; hydrate on approach (B-23 part)
 - [ ] S8 Bar: shelf sheen, drink list prints, photos ease in
