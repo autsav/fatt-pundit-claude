@@ -33,6 +33,21 @@ export const slots = (hours: Record<string, Span[]>, tz: string, ymd: string) =>
   return out;
 };
 
+/**
+ * The room's bookable time closest to `want` (minutes), the later one on a tie, or undefined when none is
+ * within `window` minutes. Rooms open at different minutes (Covent Garden 16:45 → :15/:45, Soho :00/:30),
+ * so a time shared across rooms must be resolved per room (AUDIT B-02).
+ */
+export const nearestSlot = (list: number[], want: number, window = 45) => {
+  let best: number | undefined;
+  for (const m of list) {
+    const d = Math.abs(m - want);
+    if (d > window) continue;
+    if (best === undefined || d < Math.abs(best - want) || (d === Math.abs(best - want) && m > best)) best = m;
+  }
+  return best;
+};
+
 /** The provider's booking page with date, time and party size filled in (or its plain page). */
 export const providerLink = (b: { url: string; provider: string; widgetId?: string | null }, day: string, time: string, size: number) => {
   if (b.provider === 'opentable' && b.widgetId) {

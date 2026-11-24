@@ -107,7 +107,7 @@ const no = () => String(++n).padStart(2, '0');
 
 <script>
   import { openStatus, statusLine, type Hours } from '../lib/hours';
-  import { addDays, hhmm, local, prettyMin, providerLink, slots, PROVIDER, type Span } from '../lib/booking';
+  import { addDays, hhmm, local, nearestSlot, prettyMin, providerLink, slots, toMin, PROVIDER, type Span } from '../lib/booking';
   // Each room's status on the guest's clock, in the room's own time zone (dot or ring, plus words).
   for (const el of document.querySelectorAll<HTMLElement>('[data-desk-hours]')) {
     const hours = JSON.parse(el.dataset.deskHours!) as Hours | null;
@@ -167,7 +167,9 @@ const no = () => String(++n).padStart(2, '0');
       for (const { el, r } of rows) {
         const fit = el.querySelector<HTMLElement>('[data-desk-fit]')!;
         const go = el.querySelector<HTMLAnchorElement>('[data-desk-go]')!;
-        const ok = Boolean(time) && slots(r.hours, r.tz, day).some((m) => hhmm(m) === time);
+        // Each room's own closest time to the one chosen: the rooms open on different minutes (AUDIT B-02).
+        const at = time ? nearestSlot(slots(r.hours, r.tz, day), toMin(time)) : undefined;
+        const ok = at !== undefined;
         if (n > r.max) {
           fit.textContent = `${r.name} books online for up to ${r.max}. For ${n}, call or plan a group.`;
           go.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`;
@@ -178,8 +180,8 @@ const no = () => String(++n).padStart(2, '0');
           fit.textContent = none ? (day === today && !s.open && s.opens ? `Closed today · ${statusLine('', s).replace(/^Opens/, 'opens')}` : `Closed ${when$}`) : 'Outside opening hours';
           go.href = r.url; go.target = '_blank';
         } else {
-          fit.textContent = `${PROVIDER[r.provider] ?? 'The booking page'} opens with ${n} guest${n === 1 ? '' : 's'}, ${longDay(day)}, ${timeSel.selectedOptions[0]?.text}.`;
-          go.href = providerLink(r, day, time, n); go.target = '_blank';
+          fit.textContent = `${PROVIDER[r.provider] ?? 'The booking page'} opens with ${n} guest${n === 1 ? '' : 's'}, ${longDay(day)}, ${prettyMin(at!)}.`;
+          go.href = providerLink(r, day, hhmm(at!), n); go.target = '_blank';
         }
         // 9 or more: no room booking button, just the way to plan a group.
         const grp = el.querySelector<HTMLAnchorElement>('[data-desk-group]')!;
