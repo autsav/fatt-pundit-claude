@@ -819,15 +819,15 @@
  ],
  "intro": {
   "375-no-preference": {
-   "skipVisibleAtMs": 146,
-   "overlayGoneAtMs": 1115,
+   "skipVisibleAtMs": 103,
+   "overlayGoneAtMs": 1185,
    "lcp": [
     {
-     "t": 44,
+     "t": 56,
      "el": "ASIDE.preview-flag"
     },
     {
-     "t": 84,
+     "t": 104,
      "el": "IMG.size-full scale-105 object-cover"
     }
    ],
@@ -838,14 +838,14 @@
   },
   "375-reduce": {
    "skipVisibleAtMs": null,
-   "overlayGoneAtMs": 277,
+   "overlayGoneAtMs": 190,
    "lcp": [
     {
-     "t": 40,
+     "t": 44,
      "el": "ASIDE.preview-flag"
     },
     {
-     "t": 108,
+     "t": 88,
      "el": "IMG.size-full scale-105 object-cover"
     }
    ],
@@ -855,11 +855,29 @@
    ]
   },
   "1280-no-preference": {
-   "skipVisibleAtMs": 150,
-   "overlayGoneAtMs": 1075,
+   "skipVisibleAtMs": 72,
+   "overlayGoneAtMs": 1172,
    "lcp": [
     {
-     "t": 52,
+     "t": 44,
+     "el": "ASIDE.preview-flag"
+    },
+    {
+     "t": 104,
+     "el": "IMG.size-full scale-105 object-cover"
+    }
+   ],
+   "firstTab": [
+    "a \"Skip to content\"",
+    "a \"Skip to your table\""
+   ]
+  },
+  "1280-reduce": {
+   "skipVisibleAtMs": null,
+   "overlayGoneAtMs": 214,
+   "lcp": [
+    {
+     "t": 48,
      "el": "ASIDE.preview-flag"
     },
     {
@@ -872,25 +890,7 @@
     "a \"Skip to your table\""
    ]
   },
-  "1280-reduce": {
-   "skipVisibleAtMs": null,
-   "overlayGoneAtMs": 313,
-   "lcp": [
-    {
-     "t": 44,
-     "el": "ASIDE.preview-flag"
-    },
-    {
-     "t": 108,
-     "el": "IMG.size-full scale-105 object-cover"
-    }
-   ],
-   "firstTab": [
-    "a \"Skip to content\"",
-    "a \"Skip to your table\""
-   ]
-  },
-  "skipByEnterMs": 350,
+  "skipByEnterMs": 415,
   "wipeHintOnPhone": [
    {
     "text": "Wipe the glass to look inside",
