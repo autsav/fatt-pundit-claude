@@ -347,6 +347,8 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
     const gapT = $('[data-gap="t"]'), gapB = $('[data-gap="b"]'), gapL = $('[data-gap="l"]'), gapR = $('[data-gap="r"]'), gaps = [gapT, gapB, gapL, gapR];
     const rail = document.querySelector<HTMLElement>('.rail'), navBook = document.querySelector<HTMLElement>('.nav-book'), header = document.querySelector<HTMLElement>('header.bar');
     section.classList.add('is-live');
+    // The live scene draws its own curtain: drop the calm/no-script fallback so it can never be fetched or decoded (AUDIT B-22).
+    section.querySelector('.curtain-still')?.remove();
 
     // Inline style writes only when the value changes (most beats sit still most of the time).
     const memo = new WeakMap<HTMLElement, Record<string, string>>();
