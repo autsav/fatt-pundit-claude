@@ -19,6 +19,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   })();
 </script>
 
+<noscript><style>[data-arrival-overlay] { display: none; }</style></noscript>
 <div class="arrival" data-arrival-overlay>
   <div class="half top"></div>
   <div class="half bottom"></div>
@@ -32,11 +33,12 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </div>
 
 <style>
-  /* Hidden unless the inline script above chose to play it: with JavaScript off the guest never sees it.
-     If the board's script then fails to load, the CSS fail-safe hides it at 2 s on its own (AUDIT B-01). */
+  /* AUDIT B-01. Laid out only when the inline script chose to play it, and invisible until the board's
+     module has loaded and added .arrival-ready: if the module never arrives, the guest never sees it.
+     Whatever the scripts do, a pure-CSS fail-safe hides it 1.2 s after the page starts (the brief's budget). */
   .arrival { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; pointer-events: auto; }
-  :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 2s forwards; }
-  /* Both ends hidden: a one-ended keyframe left visibility 'visible' and opacity at 1e-13 in Chromium. */
+  :global(html[data-arrival='play']) .arrival { display: grid; visibility: hidden; animation: arrival-failsafe 1ms linear 1.2s forwards; }
+  :global(html[data-arrival='play'].arrival-ready) .arrival { visibility: visible; }
   @keyframes arrival-failsafe { from, to { opacity: 0; visibility: hidden; pointer-events: none; } }
   .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
   .half.top { top: 0; border-bottom: 1px solid rgb(203 160 82 / 0.25); }
@@ -70,6 +72,8 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   }
 
   if (root && html.dataset.arrival === 'play') {
+    // Show the board only now that its script is here (B-01).
+    html.classList.add('arrival-ready');
     document.body.style.overflow = 'hidden';
     lockScroll();
     // While the board is up, nothing behind it can take keyboard focus (only Skip can).
