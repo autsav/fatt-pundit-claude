@@ -1,5 +1,5 @@
 ---
-// Scene 0: arrival. First visit on this device only, ~1.5 s. Skip, a tap, a key or a scroll ends it.
+// Scene 0: arrival. First visit on this device only, at most 1.5 s (AUDIT B-04). Skip, a tap, a key or a scroll ends it.
 // A departure board clatters into FATT PUNDIT, the tiger stamp thuds down,
 // and the board splits open onto the rainy street.
 import { stampSrc } from '../../lib/stamp';
@@ -33,10 +33,11 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 
 <style>
   /* Hidden unless the inline script above chose to play it: with JavaScript off the guest never sees it.
-     If the board's script then fails to load, the CSS fail-safe fades it out on its own (AUDIT B-01). */
+     If the board's script then fails to load, the CSS fail-safe hides it at 2 s on its own (AUDIT B-01). */
   .arrival { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; pointer-events: auto; }
-  :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 5s forwards; }
-  @keyframes arrival-failsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+  :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 2s forwards; }
+  /* Both ends hidden: a one-ended keyframe left visibility 'visible' and opacity at 1e-13 in Chromium. */
+  @keyframes arrival-failsafe { from, to { opacity: 0; visibility: hidden; pointer-events: none; } }
   .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
   .half.top { top: 0; border-bottom: 1px solid rgb(203 160 82 / 0.25); }
   .half.bottom { bottom: 0; }
@@ -100,7 +101,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       window.dispatchEvent(new Event('fp:opening'));
       for (const s of behind) s.inert = false;
       // The shutter is about to open: give scrolling back now, not when the last frame lands.
-      window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 760);
+      window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 520);
       // The board is leaving: take it out of the accessibility tree and the tab order now,
       // not when the last frame lands (a fading label is not content).
       root.setAttribute('aria-hidden', 'true');
@@ -116,8 +117,8 @@ const stampImg = { src: await stampSrc(stamp, 320) };
           .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, 60)
           .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, 160);
       }
-      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, fast ? 0 : 280)
-        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, '<<')
+      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 460, ease: 'inOutExpo' }, fast ? 0 : 160)
+        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 460, ease: 'inOutExpo' }, '<<')
         .add('.arrival .skip-arrival', { opacity: 0, duration: 150 }, '<<');
     };
     window.addEventListener('fp:board-done', () => open(false), { once: true });
@@ -125,8 +126,12 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     // Any attempt to get on with it ends the intro: a tap, a scroll, or a key (Tab still reaches Skip).
     for (const ev of ['pointerdown', 'wheel', 'touchmove'] as const) window.addEventListener(ev, () => open(true), { passive: true, signal: ac.signal });
     window.addEventListener('keydown', (e) => { if (e.key !== 'Tab' && e.key !== 'Shift') open(true); }, { signal: ac.signal });
-    // Safety net: never trap a guest behind the board.
-    window.setTimeout(() => open(true), 4500);
+    // Budget (brief: never hold the content more than 1.5 s after navigation, not after this script
+    // loads): the shutter starts by 0.8 s even if the flaps are still settling (0.16 + 0.46 s to clear),
+    // and a fast open (0.38 s) at 1.05 s is the last resort.
+    const since = performance.now();
+    window.setTimeout(() => open(false), Math.max(0, 800 - since));
+    window.setTimeout(() => open(true), Math.max(0, 1050 - since));
   } else {
     finish();
   }
