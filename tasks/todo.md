@@ -60,3 +60,17 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [x] B1 style frame A approved; harbour layers generated (hills far/near, water, junk) and the opening backdrop; voyage-sea.svg no longer used by the story
 - [x] B1 rest (22 Nov 2026): Tangra lane far/near, stall, spice sacks, chillies, wok street at night, wok, steamer lid, Soho at night (replaces the CC photo), Dubai skyline + dunes, suitcases, laid table, crumpled paper; opening re-rendered at 2K. Perf medians: score 96, TBT 179 ms, LCP 2.2 s, dropped frames 1.8%, 522 KB
 - [ ] B2 characters (illustrator, #49); C release check + award entry
+
+## Premium audit — Phase 1 (branch redesign/premium-audit; plan: brief of 24 Nov 2026)
+Audit only. No src/ changes. Commit only audit/ + tasks/. Stop for approval at the end.
+- [x] P1-0 Branch + QA devDeps (@playwright/test 1.60, @axe-core/playwright, lighthouse; package.json uncommitted until Phase 2) — proof: deps installed (package.json uncommitted, per decision)
+- [x] P1-1 `npm run verify` green + `astro preview` on :4321; live build = main? — proof: verify ok; 0 errors/0 warnings/7 hints; live assets == local
+- [x] P1-2 Sweep: full-page screens 375/768/1280/1920 × motion on/off → audit/screens/before/ (slim set committed); console/network per route — proof: audit/data/sweep-*.json, audit/screens/before/
+- [x] P1-3 axe (@axe-core/playwright) every route at 375 + 1280, plus open dialogs — proof: audit/data/sweep-*.json (axe + axeDialogs); AUDIT.md §Accessibility
+- [x] P1-4 Lighthouse mobile (median 3) + desktop, local + live → audit/lighthouse/; PUBLIC_LAUNCH SEO pass — proof: audit/data/lighthouse-{local,live,launch}.json, audit/lighthouse/
+- [x] P1-5 Link checker: internal routes, #tables #menu #bar #footer #waitlist, ?at= — proof: audit/data/links.json: 0 broken, 0 missing #, 0 bad ?at= (+ B-14)
+- [x] P1-6 Existing checks re-run: test:smoke, phase8 motion check, perf:taps — proof: smoke 6/8 (stale test), phase8 → B-25, taps aborted (harness); AUDIT.md §Accessibility
+- [x] P1-7 Probes for the 13 suspects (booking matrix, names, images, home DOM, no-JS, intro, skip links, dialogs, date strip, hours TZ, reviews, SEO, Dubai list) — proof: audit/data/probes.json, audit/screens/probes/
+- [x] P1-8 Design review: scores per page × category; references; what "premium" means here — proof: AUDIT.md §Scores, §UX; refs in audit/refs/ (local)
+- [x] P1-9 Two redesign directions with annotated mocks (audit/mocks/) — proof: audit/mocks/direction-{a,b}--{1280,375}.jpg
+- [x] P1-10 audit/AUDIT.md in the brief's structure; commit audit/ + tasks/; STOP for approval — proof: audit/AUDIT.md; commit on redesign/premium-audit

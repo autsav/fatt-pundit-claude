@@ -1,0 +1,1377 @@
+{
+ "booking": {
+  "matrix": [
+   {
+    "branch": "Soho",
+    "size": 2,
+    "day": "Tuesday 24 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 13,
+    "opened": "https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-24T19%3A00&covers=2&lang=en-GB"
+   },
+   {
+    "branch": "Soho",
+    "size": 2,
+    "day": "Friday 27 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 14,
+    "preTheatreAt": "5pm",
+    "preNote": "Pre-theatre menu: seated 5–5.45pm.",
+    "opened": "https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-27T17%3A00&covers=2&lang=en-GB"
+   },
+   {
+    "branch": "Soho",
+    "size": 4,
+    "day": "Tuesday 24 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before."
+    ],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 13,
+    "opened": "https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-24T19%3A00&covers=4&lang=en-GB"
+   },
+   {
+    "branch": "Soho",
+    "size": 4,
+    "day": "Friday 27 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before."
+    ],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 14,
+    "preTheatreAt": "5pm",
+    "preNote": "Pre-theatre menu: seated 5–5.45pm.",
+    "opened": "https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-27T17%3A00&covers=4&lang=en-GB"
+   },
+   {
+    "branch": "Soho",
+    "size": 7,
+    "day": "Tuesday 24 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before."
+    ],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 13,
+    "opened": "https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-24T19%3A00&covers=7&lang=en-GB"
+   },
+   {
+    "branch": "Soho",
+    "size": 7,
+    "day": "Friday 27 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before."
+    ],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 14,
+    "preTheatreAt": "5pm",
+    "preNote": "Pre-theatre menu: seated 5–5.45pm.",
+    "opened": "https://www.opentable.co.uk/restref/client/?rid=171789&restref=171789&datetime=2026-11-27T17%3A00&covers=7&lang=en-GB"
+   },
+   {
+    "branch": "Soho",
+    "size": 8,
+    "day": "Tuesday 24 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.",
+     "For 8 or more, Soho plans a set menu with you."
+    ],
+    "goVisible": false,
+    "goDisabled": "true",
+    "groupVisible": true,
+    "times": 13
+   },
+   {
+    "branch": "Soho",
+    "size": 8,
+    "day": "Friday 27 November",
+    "name": "at Soho",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.",
+     "For 8 or more, Soho plans a set menu with you."
+    ],
+    "goVisible": false,
+    "goDisabled": "true",
+    "groupVisible": true,
+    "times": 14,
+    "preTheatreAt": "5pm",
+    "preNote": "Pre-theatre menu: seated 5–5.45pm."
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 2,
+    "day": "Tuesday 24 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 11,
+    "opened": "https://www.sevenrooms.com/explore/fattpunditcoventgarden/reservations/create/search/?date=2026-11-24&party_size=2&start_time=19%3A15"
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 2,
+    "day": "Friday 27 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 15,
+    "preTheatreAt": "4.45pm",
+    "preNote": "Pre-theatre menu: seated 4.45–5.30pm.",
+    "opened": "https://www.sevenrooms.com/explore/fattpunditcoventgarden/reservations/create/search/?date=2026-11-27&party_size=2&start_time=16%3A45"
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 4,
+    "day": "Tuesday 24 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before."
+    ],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 11,
+    "opened": "https://www.sevenrooms.com/explore/fattpunditcoventgarden/reservations/create/search/?date=2026-11-24&party_size=4&start_time=19%3A15"
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 4,
+    "day": "Friday 27 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before."
+    ],
+    "goVisible": true,
+    "goDisabled": "false",
+    "groupVisible": false,
+    "times": 15,
+    "preTheatreAt": "4.45pm",
+    "preNote": "Pre-theatre menu: seated 4.45–5.30pm.",
+    "opened": "https://www.sevenrooms.com/explore/fattpunditcoventgarden/reservations/create/search/?date=2026-11-27&party_size=4&start_time=16%3A45"
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 7,
+    "day": "Tuesday 24 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.",
+     "Covent Garden books online for up to 4. For 7, please call or send an enquiry."
+    ],
+    "goVisible": false,
+    "goDisabled": "true",
+    "groupVisible": true,
+    "times": 11
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 7,
+    "day": "Friday 27 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.",
+     "Covent Garden books online for up to 4. For 7, please call or send an enquiry."
+    ],
+    "goVisible": false,
+    "goDisabled": "true",
+    "groupVisible": true,
+    "times": 15,
+    "preTheatreAt": "4.45pm",
+    "preNote": "Pre-theatre menu: seated 4.45–5.30pm."
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 8,
+    "day": "Tuesday 24 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.",
+     "For 8 or more, Covent Garden plans a set menu with you."
+    ],
+    "goVisible": false,
+    "goDisabled": "true",
+    "groupVisible": true,
+    "times": 11
+   },
+   {
+    "branch": "Covent Garden",
+    "size": 8,
+    "day": "Friday 27 November",
+    "name": "at Covent Garden",
+    "hiddenButRendered": [],
+    "visibleNotes": [
+     "Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.",
+     "For 8 or more, Covent Garden plans a set menu with you."
+    ],
+    "goVisible": false,
+    "goDisabled": "true",
+    "groupVisible": true,
+    "times": 15,
+    "preTheatreAt": "4.45pm",
+    "preNote": "Pre-theatre menu: seated 4.45–5.30pm."
+   }
+  ],
+  "aria2": "- dialog \"Book at Soho\":\n  - paragraph: Your table\n  - heading \"Book at Soho\" [level=2]\n  - button \"Close\": ×\n  - group \"Where\":\n    - text: Where\n    - radio \"Soho\" [checked]\n    - text: Soho\n    - radio \"Covent Garden\"\n    - text: Covent Garden\n  - group \"How many\":\n    - text: How many\n    - button \"One fewer guest\": −\n    - spinbutton \"Guests\": \"2\"\n    - button \"One more guest\": +\n    - text: 2 guests\n  - group \"Which day\":\n    - text: Which day\n    - radiogroup \"Day\":\n      - radio \"Tuesday 24 November\" [checked]: Today 24 Nov\n      - radio \"Wednesday 25 November\": Tmrw 25 Nov\n      - radio \"Thursday 26 November\": Thu 26 Nov\n      - radio \"Friday 27 November\": Fri 27 Nov\n      - radio \"Saturday 28 November\": Sat 28 Nov\n      - radio \"Sunday 29 November\": Sun 29 Nov\n      - radio \"Monday 30 November\": Mon 30 Nov\n      - radio \"Tuesday 1 December\": Tue 1 Dec\n      - radio \"Wednesday 2 December\": Wed 2 Dec\n      - radio \"Thursday 3 December\": Thu 3 Dec\n      - radio \"Friday 4 December\": Fri 4 Dec\n      - radio \"Saturday 5 December\": Sat 5 Dec\n      - radio \"Sunday 6 December\": Sun 6 Dec\n      - radio \"Monday 7 December\": Mon 7 Dec\n      - radio \"Tuesday 8 December\": Tue 8 Dec\n      - radio \"Wednesday 9 December\": Wed 9 Dec\n      - radio \"Thursday 10 December\": Thu 10 Dec\n      - radio \"Friday 11 December\": Fri 11 Dec\n      - radio \"Saturday 12 December\": Sat 12 Dec\n      - radio \"Sunday 13 December\": Sun 13 Dec\n      - radio \"Monday 14 December\": Mon 14 Dec\n  - group \"Time\":\n    - text: Time\n    - radiogroup \"Time\":\n      - radio \"12.30pm\"\n      - radio \"1pm\"\n      - radio \"1.30pm\"\n      - radio \"5pm\"\n      - radio \"5.30pm\"\n      - radio \"6pm\"\n      - radio \"6.30pm\"\n      - radio \"7pm\" [checked]\n      - radio \"7.30pm\"\n      - radio \"8pm\"\n      - radio \"8.30pm\"\n      - radio \"9pm\"\n      - radio \"9.30pm\"\n  - paragraph: Soho books online for up to 7. For 2, please call or send an enquiry.\n  - link \"Send a group enquiry\":\n    - /url: /private-dining/?branch=soho&guests=2&date=2026-11-24&time=19%3A00\n  - paragraph:\n    - text: \"Ask about space for your group: call\"\n    - link \"020 7287 7900\":\n      - /url: tel:+442072877900\n    - text: .\n  - button \"Find a table\"\n  - paragraph:\n    - text: Opens OpenTable in a new tab with your choices filled in. Or call\n    - link \"020 7287 7900\":\n      - /url: tel:+442072877900\n    - text: .",
+  "aria8": "- dialog \"Book at Soho\":\n  - paragraph: Your table\n  - heading \"Book at Soho\" [level=2]\n  - button \"Close\": ×\n  - group \"Where\":\n    - text: Where\n    - radio \"Soho\" [checked]\n    - text: Soho\n    - radio \"Covent Garden\"\n    - text: Covent Garden\n  - group \"How many\":\n    - text: How many\n    - button \"One fewer guest\": −\n    - spinbutton \"Guests\": \"8\"\n    - button \"One more guest\": +\n    - paragraph: \"Tables of 4 or more: £10 a person deposit, refundable up to 24 hours before.\"\n    - text: 8 guests\n  - group \"Which day\":\n    - text: Which day\n    - radiogroup \"Day\":\n      - radio \"Tuesday 24 November\" [checked]: Today 24 Nov\n      - radio \"Wednesday 25 November\": Tmrw 25 Nov\n      - radio \"Thursday 26 November\": Thu 26 Nov\n      - radio \"Friday 27 November\": Fri 27 Nov\n      - radio \"Saturday 28 November\": Sat 28 Nov\n      - radio \"Sunday 29 November\": Sun 29 Nov\n      - radio \"Monday 30 November\": Mon 30 Nov\n      - radio \"Tuesday 1 December\": Tue 1 Dec\n      - radio \"Wednesday 2 December\": Wed 2 Dec\n      - radio \"Thursday 3 December\": Thu 3 Dec\n      - radio \"Friday 4 December\": Fri 4 Dec\n      - radio \"Saturday 5 December\": Sat 5 Dec\n      - radio \"Sunday 6 December\": Sun 6 Dec\n      - radio \"Monday 7 December\": Mon 7 Dec\n      - radio \"Tuesday 8 December\": Tue 8 Dec\n      - radio \"Wednesday 9 December\": Wed 9 Dec\n      - radio \"Thursday 10 December\": Thu 10 Dec\n      - radio \"Friday 11 December\": Fri 11 Dec\n      - radio \"Saturday 12 December\": Sat 12 Dec\n      - radio \"Sunday 13 December\": Sun 13 Dec\n      - radio \"Monday 14 December\": Mon 14 Dec\n  - group \"Time\":\n    - text: Time\n    - radiogroup \"Time\":\n      - radio \"12.30pm\"\n      - radio \"1pm\"\n      - radio \"1.30pm\"\n      - radio \"5pm\"\n      - radio \"5.30pm\"\n      - radio \"6pm\"\n      - radio \"6.30pm\"\n      - radio \"7pm\" [checked]\n      - radio \"7.30pm\"\n      - radio \"8pm\"\n      - radio \"8.30pm\"\n      - radio \"9pm\"\n      - radio \"9.30pm\"\n  - paragraph: For 8 or more, Soho plans a set menu with you.\n  - link \"Send a group enquiry\":\n    - /url: /private-dining/?branch=soho&guests=8&date=2026-11-24&time=19%3A00\n  - paragraph:\n    - text: \"Ask about space for your group: call\"\n    - link \"020 7287 7900\":\n      - /url: tel:+442072877900\n    - text: .",
+  "tabAt8": [
+   "button[One more guest] \"+\" h=48",
+   "button[Tuesday 24 November] \"Today 24 Nov\" h=49",
+   "button[7pm] \"7pm\" h=44",
+   "a \"Send a group enquiry\" h=50",
+   "a \"020 7287 7900\" h=39",
+   "body \"Skip to footer Skip to your table WEBSIT\" h=9733",
+   "dialog \"Your table BOOK AT SOHO × WHERE Soho Cov\" h=747",
+   "button[Close] \"×\" h=48",
+   "input \"soho\" h=13",
+   "button[One fewer guest] \"−\" h=48",
+   "input[Guests] \"8\" h=48",
+   "button[One more guest] \"+\" h=48",
+   "button[Tuesday 24 November] \"Today 24 Nov\" h=49",
+   "button[7pm] \"7pm\" h=44"
+  ],
+  "strip": {
+   "scrollW": 1539,
+   "clientW": 339,
+   "mask": "none",
+   "first": [
+    {
+     "visible": "Today 24 Nov",
+     "name": "Tuesday 24 November"
+    },
+    {
+     "visible": "Tmrw 25 Nov",
+     "name": "Wednesday 25 November"
+    }
+   ],
+   "selectedInViewAfterReopen": true
+  }
+ },
+ "desk": [
+  {
+   "size": "2",
+   "day": 0,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "OpenTable opens with 2 guests, Tuesday 24 November, 7pm.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Outside opening hours",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "2",
+   "day": 3,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "OpenTable opens with 2 guests, Friday 27 November, 7pm.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Outside opening hours",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "4",
+   "day": 0,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "OpenTable opens with 4 guests, Tuesday 24 November, 7pm.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Outside opening hours",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "4",
+   "day": 3,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "OpenTable opens with 4 guests, Friday 27 November, 7pm.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Outside opening hours",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "7",
+   "day": 0,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "OpenTable opens with 7 guests, Tuesday 24 November, 7pm.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Covent Garden books online for up to 4. For 7, call or plan a group.",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "7",
+   "day": 3,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "OpenTable opens with 7 guests, Friday 27 November, 7pm.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Covent Garden books online for up to 4. For 7, call or plan a group.",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "8",
+   "day": 0,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "Soho books online for up to 7. For 8, call or plan a group.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Covent Garden books online for up to 4. For 8, call or plan a group.",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "8",
+   "day": 3,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "Soho books online for up to 7. For 8, call or plan a group.",
+     "go": true,
+     "group": false
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Covent Garden books online for up to 4. For 8, call or plan a group.",
+     "go": true,
+     "group": false
+    }
+   ]
+  },
+  {
+   "size": "9",
+   "day": 0,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "Soho books online for up to 7. For 9 or more, plan a group.",
+     "go": false,
+     "group": true
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Covent Garden books online for up to 4. For 9 or more, plan a group.",
+     "go": false,
+     "group": true
+    }
+   ]
+  },
+  {
+   "size": "9",
+   "day": 3,
+   "rows": [
+    {
+     "room": "soho",
+     "fit": "Soho books online for up to 7. For 9 or more, plan a group.",
+     "go": false,
+     "group": true
+    },
+    {
+     "room": "covent-garden",
+     "fit": "Covent Garden books online for up to 4. For 9 or more, plan a group.",
+     "go": false,
+     "group": true
+    }
+   ]
+  }
+ ],
+ "names": {
+  "duringIntro": "- link \"Skip to footer\":\n  - /url: \"#footer\"\n- link \"Skip to your table\":\n  - /url: \"#tables\"\n- complementary \"Preview notice\": Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed\n- banner:\n  - link \"FATT PUNDIT\":\n    - /url: \"#top\"\n  - navigation \"Main\":\n    - link \"Soho\":\n      - /url: /soho/\n    - link \"Covent Garden\":\n      - /url: /covent-garden/\n    - link \"Dubai\":\n      - /url: /dubai/\n    - group: Menus\n    - link \"Our story\":\n      - /url: /our-story/\n    - link \"Groups\":\n      - /url: /private-dining/\n    - link \"Book a table\":\n      - /url: /book/\n- main:\n  - button \"Skip\"\n  - region \"Fatt Pundit\":\n    - 'img \"The dining room at Covent Garden through a rainy window: pink booths and bentwood chairs under shelves of brass lamps\"'\n    - paragraph: Hakka cooking from Calcutta's Chinatown\n    - heading \"Fatt Pundit\" [level=1]\n    - navigation \"Choose your restaurant\":\n      - paragraph: Choose your restaurant\n      - list:\n        - listitem:\n          - link \"Soho Opens 12pm\":\n            - /url: /soho/\n        - listitem:\n          - link \"Covent Garden Opens 4.45pm\":\n            - /url: /covent-garden/\n        - listitem:\n          - link \"Dubai Opening soon\":\n            - /url: /dubai/",
+  "afterIntro": "- link \"Skip to footer\":\n  - /url: \"#footer\"\n- link \"Skip to your table\":\n  - /url: \"#tables\"\n- complementary \"Preview notice\": Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed\n- banner:\n  - link \"FATT PUNDIT\":\n    - /url: \"#top\"\n  - navigation \"Main\":\n    - link \"Soho\":\n      - /url: /soho/\n    - link \"Covent Garden\":\n      - /url: /covent-garden/\n    - link \"Dubai\":\n      - /url: /dubai/\n    - group: Menus\n    - link \"Our story\":\n      - /url: /our-story/\n    - link \"Groups\":\n      - /url: /private-dining/\n    - link \"Book a table\":\n      - /url: /book/\n- main:\n  - region \"Fatt Pundit\":\n    - 'img \"The dining room at Covent Garden through a rainy window: pink booths and bentwood chairs under shelves of brass lamps\"'\n    - paragraph: Hakka cooking from Calcutta's Chinatown\n    - heading \"Fatt Pundit\" [level=1]\n    - navigation \"Choose your restaurant\":\n      - paragraph: Choose your restaurant\n      - list:\n        - listitem:\n          - link \"Soho Opens 12pm\":\n            - /url: /soho/\n        - listitem:\n          - link \"Covent Garden Opens 4.45pm\":\n            - /url: /covent-garden/\n        - listitem:\n          - link \"Dubai Opening soon\":\n            - /url: /dubai/\n    - link \"Book a table\":",
+  "h1": "- heading \"Fatt Pundit\" [level=1]",
+  "doubledInRawText": 0,
+  "doubledInTree": false
+ },
+ "images": {
+  "count": 34,
+  "emptyAltVisibleToAT": [
+   {
+    "src": "/_astro/stamp-gold.-wpOHqAj_mPliW.png",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 300,
+    "rendered": 99,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/stamp-orange.Bk6KjSeJ_1Dy29F.png",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 300,
+    "rendered": 105,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/stamp-orange.Bk6KjSeJ_1Dy29F.png",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 300,
+    "rendered": 159,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-05.ZN5rxqVK_ZKLmeY.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 438,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-03.BjJwLRbB_Zvv5fq.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-02.DqX2e8vS_Zf4zNI.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-08.DsATjoEU_Z1jyNxX.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-04.DcWCLPKI_Z22AaSb.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-07.BeYINrP2_Z1Nl7Io.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-06.Bvu973qT_1nlCRx.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/gallery-01.CO-AmVvm_1lwNRn.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 173,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/logo-stamp-distressed-left.CscvUbFs_Z1rSGTJ.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 58,
+    "display": "block"
+   },
+   {
+    "src": "/_astro/logo-stamp-distressed-right.DAyL0elD_1gOX7Q.webp",
+    "alt": "",
+    "hidden": false,
+    "loading": "lazy",
+    "fetchpriority": null,
+    "natural": 0,
+    "rendered": 58,
+    "display": "block"
+   }
+  ],
+  "missingAlt": [],
+  "highPriority": [
+   {
+    "src": "/_astro/gallery-01.CO-AmVvm_1YEWbi.webp",
+    "alt": "",
+    "hidden": true,
+    "loading": null,
+    "fetchpriority": "high",
+    "natural": 1280,
+    "rendered": 1328,
+    "display": "block"
+   }
+  ],
+  "duplicatesInDom": [
+   [
+    "/_astro/interior-door-view-g.Cr3b3yGa_Z2sSfxx.avif",
+    2
+   ],
+   [
+    "/_astro/velvet-g.DBMl0JGv_20YGC9.avif",
+    3
+   ],
+   [
+    "/_astro/curtain-stack.w_0I1fSV_i8FUz.avif",
+    2
+   ],
+   [
+    "/_astro/stamp-gold.-wpOHqAj_mPliW.png",
+    2
+   ],
+   [
+    "/_astro/stamp-orange.Bk6KjSeJ_1Dy29F.png",
+    3
+   ]
+  ],
+  "oversized": [
+   "/_astro/map.DW3xBVEl_7o5eD.webp 1000→372",
+   "/_astro/stamp-gold.-wpOHqAj_mPliW.png 300→99",
+   "/_astro/stamp-orange.Bk6KjSeJ_1Dy29F.png 300→105"
+  ],
+  "totalImageKB": 1279,
+  "requested": 22,
+  "top": [
+   {
+    "u": "/_astro/voyage-sea._AgFX7Il_h7w6S.avif",
+    "kb": 208
+   },
+   {
+    "u": "/_astro/street-g.B4cM874r_Z1Xafik.avif",
+    "kb": 202
+   },
+   {
+    "u": "/_astro/gallery-01.CO-AmVvm_Z25SH0H.webp",
+    "kb": 186
+   },
+   {
+    "u": "/_astro/map.DW3xBVEl_7o5eD.webp",
+    "kb": 107
+   },
+   {
+    "u": "/_astro/voyage-sea._AgFX7Il_1PjF3q.avif",
+    "kb": 85
+   },
+   {
+    "u": "/_astro/gallery-01.CO-AmVvm_1YEWbi.webp",
+    "kb": 75
+   },
+   {
+    "u": "/_astro/interior-door-view-g.Cr3b3yGa_Z2sSfxx.avif",
+    "kb": 61
+   },
+   {
+    "u": "/_astro/ship.UnwJMfLG_Z27jlNb.webp",
+    "kb": 60
+   },
+   {
+    "u": "/_astro/velvet-g.DBMl0JGv_20YGC9.avif",
+    "kb": 55
+   },
+   {
+    "u": "/_astro/facade-g.C-DdmR4X_ZEfg5W.avif",
+    "kb": 46
+   },
+   {
+    "u": "/_astro/tiger-head-left.B8Cz0Sm1_Zex4Md.png",
+    "kb": 33
+   },
+   {
+    "u": "/_astro/stamp-orange.Bk6KjSeJ_1Dy29F.png",
+    "kb": 30
+   }
+  ],
+  "downloadedTwice": 22
+ },
+ "homedom": {
+  "htmlKB": 229,
+  "dishMentionsInHtml": 223,
+  "continuedInHtml": 7,
+  "nodes": 1713,
+  "continued": 7,
+  "menuNodes": 374,
+  "hiddenMenuNodes": 259
+ },
+ "nojs": [
+  {
+   "route": "/",
+   "overlayCovers": true,
+   "h1Opacity": "1",
+   "h1": "Fatt Pundit",
+   "links": 110,
+   "invisibleText": 3
+  },
+  {
+   "route": "/book/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Book a table",
+   "links": 91,
+   "invisibleText": 0
+  },
+  {
+   "route": "/soho/",
+   "overlayCovers": true,
+   "h1Opacity": "1",
+   "h1": "Fatt Pundit Soho",
+   "links": 109,
+   "invisibleText": 0
+  },
+  {
+   "route": "/soho/menu/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Soho menus",
+   "links": 175,
+   "invisibleText": 0
+  },
+  {
+   "route": "/covent-garden/",
+   "overlayCovers": true,
+   "h1Opacity": "1",
+   "h1": "Fatt Pundit Covent Garden",
+   "links": 106,
+   "invisibleText": 0
+  },
+  {
+   "route": "/covent-garden/menu/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Covent Garden menus",
+   "links": 167,
+   "invisibleText": 0
+  },
+  {
+   "route": "/dubai/",
+   "overlayCovers": true,
+   "h1Opacity": "1",
+   "h1": "Fatt Pundit Dubai",
+   "links": 85,
+   "invisibleText": 0
+  },
+  {
+   "route": "/private-dining/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Groups and private dining",
+   "links": 88,
+   "invisibleText": 0
+  },
+  {
+   "route": "/our-story/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "The tale of Fatt & Pundit",
+   "links": 99,
+   "invisibleText": 40
+  },
+  {
+   "route": "/allergens/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Allergens and dietary needs",
+   "links": 88,
+   "invisibleText": 0
+  },
+  {
+   "route": "/accessibility/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Accessibility",
+   "links": 83,
+   "invisibleText": 0
+  },
+  {
+   "route": "/privacy/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Privacy",
+   "links": 83,
+   "invisibleText": 0
+  },
+  {
+   "route": "/booking-terms/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Booking terms",
+   "links": 98,
+   "invisibleText": 0
+  },
+  {
+   "route": "/this-page-does-not-exist/",
+   "overlayCovers": false,
+   "h1Opacity": "1",
+   "h1": "Lost luggage",
+   "links": 85,
+   "invisibleText": 0
+  }
+ ],
+ "intro": {
+  "375-no-preference": {
+   "skipVisibleAtMs": 102,
+   "overlayGoneAtMs": 2181,
+   "lcp": [
+    {
+     "t": 68,
+     "el": "ASIDE.preview-flag"
+    },
+    {
+     "t": 112,
+     "el": "IMG.size-full scale-105 object-cover"
+    }
+   ],
+   "firstTab": [
+    "a \"Skip to footer\"",
+    "a \"Skip to your table\""
+   ]
+  },
+  "375-reduce": {
+   "skipVisibleAtMs": null,
+   "overlayGoneAtMs": 198,
+   "lcp": [
+    {
+     "t": 44,
+     "el": "ASIDE.preview-flag"
+    },
+    {
+     "t": 92,
+     "el": "IMG.size-full scale-105 object-cover"
+    }
+   ],
+   "firstTab": [
+    "a \"Skip to footer\"",
+    "a \"Skip to your table\""
+   ]
+  },
+  "1280-no-preference": {
+   "skipVisibleAtMs": 87,
+   "overlayGoneAtMs": 2350,
+   "lcp": [
+    {
+     "t": 56,
+     "el": "ASIDE.preview-flag"
+    },
+    {
+     "t": 108,
+     "el": "IMG.size-full scale-105 object-cover"
+    }
+   ],
+   "firstTab": [
+    "a \"Skip to footer\"",
+    "a \"Skip to your table\""
+   ]
+  },
+  "1280-reduce": {
+   "skipVisibleAtMs": null,
+   "overlayGoneAtMs": 230,
+   "lcp": [
+    {
+     "t": 60,
+     "el": "ASIDE.preview-flag"
+    },
+    {
+     "t": 136,
+     "el": "IMG.size-full scale-105 object-cover"
+    }
+   ],
+   "firstTab": [
+    "a \"Skip to footer\"",
+    "a \"Skip to your table\""
+   ]
+  },
+  "skipByEnterMs": 429,
+  "wipeHintOnPhone": [
+   {
+    "text": "Wipe the glass to look inside",
+    "visible": true
+   }
+  ]
+ },
+ "skiplinks": [
+  {
+   "route": "/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to your table",
+     "href": "#tables",
+     "target": true
+    },
+    {
+     "text": "Skip the story: choose your table",
+     "href": "#tables",
+     "target": true
+    }
+   ],
+   "mainId": null,
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to your table\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/book/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/soho/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to opening hours and directions",
+     "href": "#visit",
+     "target": true
+    }
+   ],
+   "mainId": null,
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to opening hours and directions\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/soho/menu/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/covent-garden/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to opening hours and directions",
+     "href": "#visit",
+     "target": true
+    }
+   ],
+   "mainId": null,
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to opening hours and directions\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/covent-garden/menu/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/dubai/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to the waiting list",
+     "href": "#waitlist",
+     "target": true
+    }
+   ],
+   "mainId": null,
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to the waiting list\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/private-dining/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/our-story/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to the story",
+     "href": "#canton",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to the story\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/allergens/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/accessibility/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/privacy/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/booking-terms/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  },
+  {
+   "route": "/this-page-does-not-exist/",
+   "skips": [
+    {
+     "text": "Skip to footer",
+     "href": "#footer",
+     "target": true
+    },
+    {
+     "text": "Skip to content",
+     "href": "#content",
+     "target": true
+    }
+   ],
+   "mainId": "content",
+   "firstTabs": [
+    "a \"Skip to footer\"",
+    "a \"Skip to content\"",
+    "a \"FATT PUNDIT\""
+   ]
+  }
+ ],
+ "dialogs": [
+  {
+   "motion": "no-preference",
+   "dialog": "site-menu",
+   "route": "/",
+   "trigger": "a[Site menu] \"Menu\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 2,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a[Site menu] \"Menu\""
+  },
+  {
+   "motion": "no-preference",
+   "dialog": "site-menu",
+   "route": "/soho/",
+   "trigger": "a[Site menu] \"Menu\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 2,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a[Site menu] \"Menu\""
+  },
+  {
+   "motion": "no-preference",
+   "dialog": "menus",
+   "route": "/",
+   "trigger": "a \"Menus\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 7,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a \"Menus\""
+  },
+  {
+   "motion": "no-preference",
+   "dialog": "book",
+   "route": "/",
+   "trigger": "a \"Book\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 2,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a \"Book\""
+  },
+  {
+   "motion": "no-preference",
+   "dialog": "book",
+   "route": "/soho/",
+   "trigger": "a \"Book a table\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 3,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a \"Book a table\""
+  },
+  {
+   "motion": "reduce",
+   "dialog": "site-menu",
+   "route": "/",
+   "trigger": "a[Site menu] \"Menu\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 2,
+   "pageScrolledBehind": true,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a[Site menu] \"Menu\""
+  },
+  {
+   "motion": "reduce",
+   "dialog": "site-menu",
+   "route": "/soho/",
+   "trigger": "a[Site menu] \"Menu\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 2,
+   "pageScrolledBehind": true,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a[Site menu] \"Menu\""
+  },
+  {
+   "motion": "reduce",
+   "dialog": "menus",
+   "route": "/",
+   "trigger": "a \"Menus\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 7,
+   "pageScrolledBehind": true,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a \"Menus\""
+  },
+  {
+   "motion": "reduce",
+   "dialog": "book",
+   "route": "/",
+   "trigger": "a \"Book\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 2,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a \"Book\""
+  },
+  {
+   "motion": "reduce",
+   "dialog": "book",
+   "route": "/soho/",
+   "trigger": "a \"Book a table\"",
+   "open": {
+    "modal": true,
+    "ariaModal": null
+   },
+   "tabEscapes": 3,
+   "pageScrolledBehind": false,
+   "escCloses": true,
+   "focusReturned": true,
+   "focusAfter": "a \"Book a table\""
+  }
+ ],
+ "hours": {
+  "visitorClock": "New York 19:30 Tue 24 Nov = London 00:30 Wed 25 Nov",
+  "todayLines": [
+   "Today, Wednesday"
+  ],
+  "statusLines": [
+   "Closed now · 77 Berwick Street",
+   "Opens 12pm",
+   "Closed",
+   "Opens 12pm",
+   "Closed",
+   "Closed"
+  ],
+  "drawerFirstDay": "Wednesday 25 November"
+ }
+}

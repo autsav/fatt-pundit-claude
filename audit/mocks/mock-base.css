@@ -1,0 +1,20 @@
+/* Shared mock base: brand tokens copied from src/styles/global.css (values only; prototypes, not production). */
+@font-face { font-family: AT; src: url(../../src/assets/fonts/american-typewriter/american-typewriter-regular.woff2); font-weight: 400; }
+@font-face { font-family: AT; src: url(../../src/assets/fonts/american-typewriter/american-typewriter-bold.woff2); font-weight: 700; }
+@font-face { font-family: AT; src: url(../../src/assets/fonts/american-typewriter/american-typewriter-light.woff2); font-weight: 300; }
+@font-face { font-family: Lora; src: url(../../node_modules/@fontsource/lora/files/lora-latin-500-italic.woff2); font-style: italic; font-weight: 500; }
+:root { --ink: #2c2925; --ink-deep: #1a1714; --tiger: #f15d3d; --tiger-deep: #93321b; --gold: #cba052; --sand: #dac7b5; --paper: #f6efe4; --paper-light: #faf6ef;
+  --display: clamp(3.25rem, 1.2rem + 8.4vw, 8.75rem); --h2: clamp(2.375rem, 1.26rem + 4.57vw, 5.375rem); --body: clamp(1.0625rem, 1.016rem + .19vw, 1.1875rem); --small: .9375rem; }
+* { box-sizing: border-box; } html, body { margin: 0; } body { font-family: AT, Georgia, serif; font-size: var(--body); line-height: 1.55; }
+img { display: block; max-width: 100%; } a { color: inherit; }
+.wrap { width: min(1200px, 100% - 32px); margin-inline: auto; }
+.note { font-family: Lora, Georgia, serif; font-style: italic; }
+.btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; font-weight: 700; text-decoration: none; border: 2px solid currentColor; }
+.btn--book { background: var(--tiger); border-color: var(--tiger); color: var(--ink-deep); }
+/* Annotations */
+.ann { position: absolute; z-index: 50; width: 34px; height: 34px; border-radius: 50%; background: #1d6cff; color: #fff; font: 700 17px/34px system-ui, sans-serif; text-align: center; box-shadow: 0 0 0 3px #fff; }
+.legend { background: #fff; color: #111; font: 15px/1.45 system-ui, sans-serif; padding: 32px 16px; }
+.legend ol { max-width: 900px; margin: 0 auto; padding-left: 1.4em; } .legend h2 { max-width: 900px; margin: 0 auto 12px; font: 700 20px system-ui, sans-serif; }
+.legend li { margin-bottom: 6px; }
+.stickybook { display: none; }
+@media (max-width: 700px) { .stickybook { display: flex; position: fixed; inset: auto 0 0; z-index: 40; } .stickybook a { flex: 1; justify-content: center; } }

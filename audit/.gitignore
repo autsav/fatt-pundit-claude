@@ -1,0 +1,7 @@
+# Slim set only (user, 24 Nov 2026): commit 375 + 1280 motion-on screens; the rest stays local.
+screens/before/*
+!screens/before/*--375--motion.jpg
+!screens/before/*--1280--motion.jpg
+frames/
+refs/
+lighthouse/**/*.full.json

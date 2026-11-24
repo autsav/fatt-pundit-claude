@@ -1,0 +1,82 @@
+{
+ "pages": 16,
+ "broken": [
+  "https://www.fattpundit.co.uk/404/ (from /404)"
+ ],
+ "missingHash": [],
+ "badAt": [],
+ "runtime": [
+  {
+   "check": "/#top",
+   "ok": true
+  },
+  {
+   "check": "/#menu",
+   "ok": true
+  },
+  {
+   "check": "/#bar",
+   "ok": true
+  },
+  {
+   "check": "/#room",
+   "ok": true
+  },
+  {
+   "check": "/#tables",
+   "ok": true
+  },
+  {
+   "check": "/#footer",
+   "ok": true
+  },
+  {
+   "check": "/dubai/#waitlist",
+   "ok": true
+  },
+  {
+   "check": "/dubai/#footer",
+   "ok": true
+  },
+  {
+   "check": "/soho/#footer",
+   "ok": true
+  },
+  {
+   "check": "/covent-garden/#footer",
+   "ok": true
+  },
+  {
+   "check": "/book/#footer",
+   "ok": true
+  },
+  {
+   "check": "/?at=soho#menu shows Soho",
+   "ok": true,
+   "sample": "02 The menus The menus: Turn the pages Open the book for Soho Covent Garden Dubai · soon List view & diet filters À la carte Set menu Pre-theatre Veg pre-theatr"
+  },
+  {
+   "check": "/?at=covent-garden#menu shows Covent Garden",
+   "ok": true,
+   "sample": "02 The menus The menus: Turn the pages Open the book for Soho Covent Garden Dubai · soon List view & diet filters À la carte Set menu Pre-theatre Veg pre-theatr"
+  },
+  {
+   "check": "/?at=nowhere falls back without errors",
+   "ok": true
+  }
+ ],
+ "external": [
+  "https://deliveroo.co.uk/menu/london/soho/fatt-pundit",
+  "https://maps.apple.com/?q=Fatt%20Pundit%2C%206%20Maiden%20Lane%2C%20Covent%20Garden%2C%20London%2C%20WC2E%207NA",
+  "https://maps.apple.com/?q=Fatt%20Pundit%2C%2077%20Berwick%20Street%2C%20Soho%2C%20London%2C%20W1F%208TH",
+  "https://www.facebook.com/fattpundit/",
+  "https://www.google.com/maps/search/?api=1&query=Fatt%20Pundit%2C%206%20Maiden%20Lane%2C%20Covent%20Garden%2C%20London%2C%20WC2E%207NA",
+  "https://www.google.com/maps/search/?api=1&query=Fatt%20Pundit%2C%2077%20Berwick%20Street%2C%20Soho%2C%20London%2C%20W1F%208TH",
+  "https://www.google.com/maps/search/?api=1&query=Fatt%20Pundit%2C%20The%20Hangout%2C%20Mall%20of%20the%20Emirates%2C%20Al%20Barsha%2C%20Dubai",
+  "https://www.instagram.com/fattpundit/",
+  "https://www.opentable.com/r/fatt-pundit-london",
+  "https://www.sevenrooms.com/reservations/fattpunditcoventgarden",
+  "https://www.ubereats.com/london/food-delivery/fatt-pundit/mirV7fF6QeOiVlUK8OSNPA",
+  "https://x.com/FattPundit"
+ ]
+}

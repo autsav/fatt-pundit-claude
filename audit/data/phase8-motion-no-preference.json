@@ -1,0 +1,418 @@
+[
+  {
+    "page": "/",
+    "view": "390",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 700,
+      "long": 2,
+      "worst": 83
+    },
+    "loops": [
+      "o-cue-bob"
+    ],
+    "unknownLoops": [
+      "o-cue-bob"
+    ],
+    "revealsLeft": 0,
+    "loopsAfterPause": [
+      "o-cue-bob"
+    ],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 5,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "turn": {
+        "before": "Soho À la carte menu, page 1 of 10",
+        "after": "Soho À la carte menu, page 1 of 10",
+        "flap": false,
+        "ok": true
+      }
+    },
+    "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('[data-tear][target=\"_blank\"]').first()\n"
+  },
+  {
+    "page": "/soho/",
+    "view": "390",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 731,
+      "long": 1,
+      "worst": 50
+    },
+    "loops": [],
+    "unknownLoops": [],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 5,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      }
+    }
+  },
+  {
+    "page": "/covent-garden/",
+    "view": "390",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 707,
+      "long": 0,
+      "worst": 0
+    },
+    "loops": [],
+    "unknownLoops": [],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 5,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "plate": {
+        "pressed": "false",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "ok": true
+      }
+    }
+  },
+  {
+    "page": "/our-story/",
+    "view": "390",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 622,
+      "long": 6,
+      "worst": 100
+    },
+    "loops": [
+      "lo-sway",
+      "lo-fall"
+    ],
+    "unknownLoops": [
+      "lo-sway",
+      "lo-fall"
+    ],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      }
+    }
+  },
+  {
+    "page": "/",
+    "view": "1440",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 635,
+      "long": 1,
+      "worst": 83
+    },
+    "loops": [
+      "o-cue-bob"
+    ],
+    "unknownLoops": [
+      "o-cue-bob"
+    ],
+    "revealsLeft": 0,
+    "loopsAfterPause": [
+      "o-cue-bob"
+    ],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 5,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "turn": {
+        "before": "Soho À la carte menu, page 2–3 of 10",
+        "after": "Soho À la carte menu, page 2–3 of 10",
+        "flap": false,
+        "ok": true
+      }
+    },
+    "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('[data-tear][target=\"_blank\"]').first()\n"
+  },
+  {
+    "page": "/soho/",
+    "view": "1440",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 666,
+      "long": 1,
+      "worst": 50
+    },
+    "loops": [],
+    "unknownLoops": [],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 5,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      }
+    }
+  },
+  {
+    "page": "/covent-garden/",
+    "view": "1440",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 649,
+      "long": 0,
+      "worst": 0
+    },
+    "loops": [],
+    "unknownLoops": [],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 5,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "room-lightbox",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      },
+      "plate": {
+        "pressed": "false",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "ok": true
+      }
+    }
+  },
+  {
+    "page": "/our-story/",
+    "view": "1440",
+    "motion": "no-preference",
+    "errors": [],
+    "scroll": {
+      "frames": 619,
+      "long": 1,
+      "worst": 50
+    },
+    "loops": [
+      "lo-sway",
+      "lo-fall"
+    ],
+    "unknownLoops": [
+      "lo-sway",
+      "lo-fall"
+    ],
+    "revealsLeft": 0,
+    "loopsAfterPause": [],
+    "videosPlaying": 0,
+    "dialogs": [
+      {
+        "dialog": "book",
+        "exit": 4,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      },
+      {
+        "dialog": "index index-menus",
+        "exit": 3,
+        "shown": true,
+        "gone": true
+      }
+    ],
+    "interrupt": {
+      "drawer": {
+        "gone": true,
+        "reopened": true,
+        "ok": true
+      }
+    }
+  }
+]
