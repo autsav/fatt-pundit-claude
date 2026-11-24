@@ -4,7 +4,9 @@
  * `groups`), then an enquiry that ends in a clear outcome.
  * Sending: PUBLIC_FORM_ENDPOINT (a form-to-email service, e.g. Formspree or Web3Forms) receives a normal
  * POST and emails the restaurant; the page shows "Enquiry sent" or keeps everything if it fails.
- * Until it is set, the form opens the guest's email app addressed to the room (the old behaviour).
+ * Until it is set there is no form (a form posting to mailto: is an insecure-form warning, AUDIT B-16): each
+ * room offers "Email us" and a call. The service routes by the `restaurant` field on its side; the page sends
+ * no inbox address (set the per-restaurant rules in the form service, CLIENT-INPUTS #5).
  * Arriving from the Book drawer, ?branch=&date=&guests=&time= fill the form in.
  */
 import InfoPage from '../layouts/InfoPage.astro';
@@ -51,9 +53,23 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
 
   <section class="pd-sheet surface-paper-light" aria-labelledby="enquiry-title">
   <h2 id="enquiry-title" class="pd-sheet-h">Send an enquiry</h2>
-  <div class="status-slot" data-enquiry-top></div>
-  <form class="fp-form enquiry" data-enquiry aria-labelledby="enquiry-title" novalidate
-    action={endpoint ?? `mailto:${open[0]?.email}`} method="post" data-endpoint={endpoint ? '' : undefined}>
+  {!endpoint && (
+    <div class="pd-contact">
+      <p>Tell the restaurant your date, how many of you there are and anything we should know, and they'll come back to you with what's possible.</p>
+      {open.map((b) => (
+        <div class="pd-contact-room" data-contact-room>
+          <p class="fp-h4">{b.shortName}</p>
+          <div class="pd-contact-acts">
+            <a class="fp-btn fp-btn--primary" href={`mailto:${b.email}?subject=${encodeURIComponent('Group enquiry')}`}>Email us<span class="sr-only"> at {b.shortName}</span></a>
+            {b.phone && <a class="fp-btn" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  {endpoint && <div class="status-slot" data-enquiry-top></div>}
+  {endpoint && <form class="fp-form enquiry" data-enquiry aria-labelledby="enquiry-title" novalidate
+    action={endpoint} method="post" data-endpoint="">
     <input type="hidden" name="_subject" value="Group enquiry" data-subject />
     <fieldset class="fp-fieldset">
       <legend class="fp-legend">Which restaurant?</legend>
@@ -104,8 +120,8 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
     <div>
       <button class="fp-btn fp-btn--primary" type="submit" data-enquiry-send>Send enquiry</button>
     </div>
-    <p class="fp-hint">{endpoint ? "We'll reply by email as soon as we can." : 'This opens your email app with everything filled in, addressed to the restaurant.'}</p>
-  </form>
+    <p class="fp-hint">We'll reply by email as soon as we can.</p>
+  </form>}
   </section>
   </div>
 </InfoPage>
@@ -139,16 +155,23 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
   .pd-sheet-h { margin: 0; font-size: var(--step-h3); font-weight: 300; text-transform: none; line-height: 1.1; letter-spacing: var(--tracking-display); }
   .eq-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .status-slot:empty { display: none; }
+  .pd-contact { display: grid; gap: var(--space-5); }
+  .pd-contact > p { margin: 0; }
+  .pd-contact-room { display: grid; gap: var(--space-3); padding-top: var(--space-4); border-top: var(--border-rule) solid var(--fp-rule); }
+  .pd-contact-room .fp-h4 { margin: 0; }
+  .pd-contact-acts { display: flex; flex-wrap: wrap; gap: var(--space-3); }
   .status-slot :global(ul) { margin: 6px 0 0 !important; padding-left: 1.2em; }
   .status-slot :global(a) { color: inherit !important; }
 </style>
 
 <script>
   import { addDays, hhmm, local, prettyMin, slots, type Span, type SlotGrid } from '../lib/booking';
-  const form = document.querySelector<HTMLFormElement>('[data-enquiry]')!;
+  const formEl = document.querySelector<HTMLFormElement>('[data-enquiry]');
+  // The form exists only with PUBLIC_FORM_ENDPOINT set (AUDIT B-16).
+  if (formEl) {
+  const form: HTMLFormElement = formEl;
   const top = document.querySelector<HTMLElement>('[data-enquiry-top]')!;
   const send = form.querySelector<HTMLButtonElement>('[data-enquiry-send]')!;
-  const usesService = form.hasAttribute('data-endpoint');
   const field = (n: string) => form.elements.namedItem(n) as HTMLInputElement;
 
   // Arriving from the Book drawer: room, date, guests and time are already chosen.
@@ -217,17 +240,11 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
     const date = new Date(`${d.get('date')}T12:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     const summary = `${pick.value} · ${date}${d.get('time') ? ` at ${timeSel.selectedOptions[0].text}` : ''} · ${d.get('guests')} guests`;
     const subject = `Group enquiry: ${d.get('guests')} guests on ${date} at ${pick.value}`;
-    if (!usesService) {
-      const body = [`Restaurant: ${pick.value}`, `Date: ${date}`, `Time: ${d.get('time') || '-'}`, `Guests: ${d.get('guests')}`, `Name: ${d.get('name')}`, `Email: ${d.get('email')}`, `Phone: ${d.get('phone') || '-'}`, '', `${d.get('notes') || ''}`].join('\n');
-      location.href = `mailto:${pick.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      status('info', `<strong>Your email app should open now</strong>Everything is filled in, addressed to ${esc(pick.value)}. If nothing opens, email <a href="mailto:${esc(pick.dataset.email!)}">${esc(pick.dataset.email!)}</a>.`, 'status');
-      return;
-    }
     // Honeypot: a bot fills the hidden field; it sees "sent" and nothing is delivered.
     if (d.get('company')) { form.hidden = true; status('success', '<strong>Enquiry sent</strong>', 'status'); return; }
     form.querySelector<HTMLInputElement>('[data-subject]')!.value = subject;
     d.set('_subject', subject);
-    d.set('to', pick.dataset.email!);
+    // No inbox address from the page: the form service routes by the `restaurant` field (server-side rule).
     send.setAttribute('aria-busy', 'true');
     try {
       const res = await fetch(form.action, { method: 'POST', body: d, headers: { Accept: 'application/json' } });
@@ -242,4 +259,5 @@ const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
       send.removeAttribute('aria-busy');
     }
   });
+  }
 </script>

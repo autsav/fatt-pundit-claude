@@ -1,0 +1,42 @@
+{
+ "/private-dining/ mobile": {
+  "perf": 0,
+  "a11y": 0,
+  "bp": 100,
+  "seo": 0,
+  "lcp": 0,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 0,
+  "totalKB": 0,
+  "jsKB": 0,
+  "cssKB": 0,
+  "imgKB": 0,
+  "fontKB": 0,
+  "heaviest": [],
+  "failing": [],
+  "perfRuns": [
+   0
+  ]
+ },
+ "/private-dining/ desktop": {
+  "perf": 0,
+  "a11y": 0,
+  "bp": 100,
+  "seo": 0,
+  "lcp": 0,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 0,
+  "totalKB": 0,
+  "jsKB": 0,
+  "cssKB": 0,
+  "imgKB": 0,
+  "fontKB": 0,
+  "heaviest": [],
+  "failing": [],
+  "perfRuns": [
+   0
+  ]
+ }
+}
