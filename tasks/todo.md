@@ -122,3 +122,20 @@ Gate
 - [ ] PR opened; then STOP (next: storyboard sign-off)
 
 Open with the client (code ready for a one-line data change): CG slot grid, CG pre-theatre window, form service (#5/#10/#41), review source.
+
+## Phase 3 — Direction C "The Walk-In" (storyboard approved 24 Nov; branch redesign/walk-in)
+Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scenes/, `node audit/scripts/scenes.mjs`), one line in audit/CHANGELOG.md, reduced-motion end state, Pause motion covers loops, tests green, perf budget (perf:budget home) not worse. No new libraries; transform/opacity (+ stroke-dashoffset) only.
+- [ ] S1 Arrival: board halves open as doors (rotateY, perspective), hand-off to the hero
+- [ ] S2 Hero: room drifts 0.3× scroll (+ pointer on desktop), lamps breathe, glass mists as you leave
+- [ ] S3 Doors: lamps light one by one, door swings in 3D with light spill, reflections counter-scroll
+- [ ] S4 Curtain: light sweep through the gap, settle sway at the end
+- [ ] S5 Room reveal: settle 1.08 → 1; red route line draws down into the voyage
+- [ ] S6 Voyage: ship's wake drawn, ports stamp in, postcards tilt and settle, Dubai label clear
+- [ ] S7 Menu book: one Filter button (U-03), cover opens in 3D, steam over the momos; hydrate on approach (B-23 part)
+- [ ] S8 Bar: shelf sheen, drink list prints, photos ease in
+- [ ] S9 Room: film strip runs sideways, frames develop, lightbox zooms from the frame
+- [ ] S10 Passes: slide out of a wallet, board flips BOARDING
+- [ ] S11 Goodbye + footer: lamps dim; footer one screen (U-05)
+- [ ] S12 Page transitions: cross-document view transitions (room name, header)
+- [ ] U-04 Book one tap away on phones through the long scenes
+- [ ] B-26 home JS budget on track (< 100 KB): new motion in CSS/small scripts, no new islands
