@@ -7,7 +7,7 @@
  * Phones leave Book to the dock (one tiger action per view).
  */
 import GateBoard from './GateBoard.astro';
-import RainHero from './RainHero.tsx';
+import RainHero from './RainHero.astro';
 import type { Branch } from '@/lib/site-data';
 
 interface Props {
@@ -24,7 +24,7 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
 <script is:inline>document.documentElement.dataset.heroBook = 'in';</script>
 <section id="top" class="hero rain" aria-labelledby="hero-title">
   <div class="hero-glass" role="img" aria-label="The dining room at Covent Garden through a rainy window: pink booths and bentwood chairs under shelves of brass lamps">
-    <RainHero client:idle src={rainSrc} poster={rainPoster} posterSrcset={posterSrcset} posterSizes={posterSizes} />
+    <RainHero src={rainSrc} poster={rainPoster} posterSrcset={posterSrcset} posterSizes={posterSizes} />
     <!-- Direction C scene 2: the shelf lamps breathe (a warm pool over the top of the room). -->
     <span class="hero-lamps" aria-hidden="true"></span>
   </div>
@@ -75,7 +75,9 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
   // Mouse and trackpad only: on touch, vertical swipes scroll the page, so the hint promised what a phone can't do (AUDIT B-20).
   const wipe = document.querySelector<HTMLElement>('.hero-wipe');
   if (wipe && window.matchMedia('(pointer: fine)').matches) {
-    const t = window.setTimeout(() => wipe.classList.add('is-on'), 3000);
+    // Only when the glass is live (src/lib/rain-glass.ts shows its canvas); without a GPU the still can't be wiped.
+    const live = () => document.querySelector<HTMLElement>('[data-rain-glass] canvas')?.style.opacity === '1';
+    const t = window.setTimeout(() => { if (live()) wipe.classList.add('is-on'); }, 3000);
     window.addEventListener('pointerdown', () => window.clearTimeout(t), { once: true, passive: true });
     window.addEventListener('pointermove', () => window.clearTimeout(t), { once: true, passive: true });
   }

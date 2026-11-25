@@ -66,6 +66,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   import { createTimeline, spring } from 'animejs';
   import { SPRING, animeSpring } from '@/lib/motion-tokens';
   import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
+  import { flapBoard } from '@/lib/split-flap';
 
   const root = document.querySelector<HTMLElement>('[data-arrival-overlay]');
   const html = document.documentElement;
@@ -91,18 +92,26 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     for (let el: HTMLElement = root; el.parentElement && el !== document.body; el = el.parentElement) {
       for (const s of el.parentElement.children) if (s !== el && s instanceof HTMLElement && !s.inert && !/^(SCRIPT|STYLE|LINK)$/.test(s.tagName)) { s.inert = true; behind.push(s); }
     }
-    // The board is mounted only here, so returning guests never download or hydrate it; the stamp
-    // fetches at high priority only now.
+    // The board is drawn only here, so returning guests never build it; the stamp fetches at high priority only now.
     const stamp = root.querySelector<HTMLImageElement>('[data-stamp]');
     if (stamp) { stamp.loading = 'eager'; stamp.fetchPriority = 'high'; }
     const boardEl = root.querySelector<HTMLElement>('.board');
     if (boardEl) {
-      Promise.all([import('react'), import('react-dom/client'), import('./ArrivalBoard.tsx')]).then(([{ createElement }, { createRoot }, { default: Board }]) => {
-        if (!boardEl.isConnected) return;
-        const r = createRoot(boardEl);
-        r.render(createElement(Board));
-        board = r;
+      // The board starts on numbers and signs and clatters through a couple more before each letter
+      // lands, so it never spells anything but the name. Plain DOM (AUDIT B-26: no React for the intro).
+      const TARGET = 'FATT PUNDIT';
+      const START = [...TARGET].map((c, i) => (c === ' ' ? ' ' : '7&2:9-4/38'[i % 10])).join('');
+      const b = flapBoard(boardEl, START, {
+        length: 11,
+        maxFlips: 2,
+        className: 'inline-flex gap-[0.08em] font-bold tabular-nums sm:text-5xl font-display text-[clamp(30px,7.4vw,92px)] tracking-normal',
+        tileClassName: 'relative inline-block h-[1.15em] w-[0.72em] rounded-[0.08em] [perspective:5em] bg-[#3a3631] text-sand shadow-[inset_0_0_0_1px_rgb(203_160_82/0.35),0_6px_14px_rgb(0_0_0/0.45)]',
+        // Stamp the moment the last flap lands, plus a short beat so the eye reads the name.
+        onSettled: (t) => { if (t === TARGET) window.setTimeout(() => window.dispatchEvent(new Event('fp:board-done')), 80); },
       });
+      board = b;
+      // Flip on the next frame: the whole intro must hand over within 1.5 s (AUDIT B-04).
+      requestAnimationFrame(() => b.set(TARGET));
     }
     const ac = new AbortController();
     let started = false;

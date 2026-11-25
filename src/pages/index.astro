@@ -81,9 +81,11 @@ const sameScore = rated.every((r) => r.score === rated[0].score && r.source === 
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 // The hero still: 640w for phones, 1280w for larger screens (it is the LCP image).
-const rainPoster640 = (await getImage({ src: inside, width: 640, format: 'webp', quality: 65 })).src;
-const rainPoster = (await getImage({ src: inside, width: 1280, format: 'webp', quality: 70 })).src;
-const rainPosterSet = `${rainPoster640} 640w, ${rainPoster} 1280w`;
+// The still sits behind fog and a 60% ink layer, so it is meant to be soft: request it at about half the
+// screen's pixels (sizes="50vw" below). It is the LCP image, so its bytes sit on the critical path (AUDIT B-26).
+const rainPoster = (await getImage({ src: inside, width: 640, format: 'webp', quality: 60 })).src;
+const rainPoster960 = (await getImage({ src: inside, width: 960, format: 'webp', quality: 55 })).src;
+const rainPosterSet = `${rainPoster} 640w, ${rainPoster960} 960w`;
 const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
@@ -164,7 +166,7 @@ const orgLd = {
     <!-- 0 · Arrival -->
     <Arrival />
     <!-- 1 · The window: name, restaurant board, Book; the room behind rainy glass -->
-    <HomeHero branches={branches} rainSrc={rainSrc} rainPoster={rainPoster} posterSrcset={rainPosterSet} posterSizes="100vw" />
+    <HomeHero branches={branches} rainSrc={rainSrc} rainPoster={rainPoster} posterSrcset={rainPosterSet} posterSizes="50vw" />
     <!-- 2 · The doors -->
     <Doors />
 

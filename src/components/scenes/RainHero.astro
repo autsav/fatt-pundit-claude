@@ -1,0 +1,50 @@
+---
+/**
+ * Scene 1: rain on the window, full screen. Plain HTML and one script (no React on the home page's first
+ * screen, AUDIT B-26): the fogged still paints at once, and the glass (src/lib/rain-glass.ts) starts over it
+ * once the arrival board has opened, so the two never fight for the CPU. Guests can wipe the glass to look
+ * inside; a hand wipes one streak first, so they see that they can. If WebGL can't run, the still remains.
+ */
+interface Props {
+  /** The dining room behind the rainy window (same-origin URL). */
+  src: string;
+  /** Small soft still of the same room, painted at once and kept if WebGL can't run. */
+  poster: string;
+  posterSrcset?: string;
+  posterSizes?: string;
+}
+const { src, poster, posterSrcset, posterSizes } = Astro.props;
+---
+<div class="absolute inset-0 overflow-hidden bg-ink">
+  <!-- As a full-screen hero this still is the largest thing painted, so it loads first. -->
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+    <img src={poster} srcset={posterSrcset} sizes={posterSizes} alt="" class="size-full scale-105 object-cover" decoding="sync" fetchpriority="high" />
+    <div class="absolute inset-0 bg-ink" style="opacity: 0.6"></div>
+  </div>
+  <div class="absolute inset-0 h-full w-full touch-pan-y select-none overflow-hidden text-sand" data-rain-glass data-src={src}>
+    <!-- Theme colour for the shader: the fog on the glass. -->
+    <span class="hidden text-[#2c2925]" data-rain-fog></span>
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+      <canvas class="h-full w-full opacity-0 transition-opacity duration-700 ease-out"></canvas>
+    </div>
+    <!-- A soft dark pool behind the words, for 4.5:1 contrast over the glass. -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0" style="background: radial-gradient(ellipse 60% 55% at 50% 50%, rgb(28 25 22 / 0.78) 0%, rgb(28 25 22 / 0.55) 45%, transparent 80%)"></div>
+  </div>
+</div>
+
+<script>
+  import { mountRainGlass } from '@/lib/rain-glass';
+  const root = document.querySelector<HTMLElement>('[data-rain-glass]');
+  const canvas = root?.querySelector('canvas');
+  const fog = root?.querySelector('[data-rain-fog]');
+  if (root && canvas && fog) {
+    const start = () => mountRainGlass(root, canvas, fog, { src: root.dataset.src!, rain: 0.55, streak: true });
+    // As before (it was a client:idle island): wait for an idle moment, then for the arrival board if it plays.
+    const go = () => {
+      if (document.documentElement.dataset.arrival === 'play') addEventListener('fp:arrived', start, { once: true });
+      else start();
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1500 });
+    else setTimeout(go, 200);
+  }
+</script>

@@ -26,13 +26,19 @@ for (const width of [375, 1280]) {
 
 // AUDIT B-04: the intro hands over within 1.2 s (≤ 1.3 s measured), and Skip has the focus.
 test('intro gone within 1.3 s, first Tab is Skip', async ({ page }) => {
+  // Record the first element to take focus (polling can miss it: the board can open within a few frames).
+  await page.addInitScript(() => {
+    const w = window as unknown as { __firstFocus?: string; __played?: boolean };
+    document.addEventListener('focusin', (e) => { w.__firstFocus ??= (e.target as Element).matches('[data-skip]') ? 'skip' : (e.target as Element).tagName; }, true);
+    document.addEventListener('DOMContentLoaded', () => { w.__played = document.documentElement.dataset.arrival === 'play'; });
+  });
   await page.goto('/', { waitUntil: 'commit' });
   const t0 = Date.now();
-  await page.waitForFunction(() => document.activeElement?.matches('[data-skip]') || document.documentElement.dataset.arrival !== 'play', null, { timeout: 1500 }).catch(() => {});
-  const playing = await page.evaluate(() => document.documentElement.dataset.arrival === 'play');
-  if (playing) {
+  await page.waitForFunction(() => (window as unknown as { __played?: boolean }).__played !== undefined, null, { timeout: 1500 });
+  if (await page.evaluate(() => (window as unknown as { __played?: boolean }).__played)) {
     // Focus starts on Skip, the only control not made inert, so a keyboard guest's first stop is Skip.
-    await expect(page.locator('[data-skip]')).toBeFocused({ timeout: 300 });
+    await page.waitForFunction(() => (window as unknown as { __firstFocus?: string }).__firstFocus !== undefined, null, { timeout: 1500 });
+    expect(await page.evaluate(() => (window as unknown as { __firstFocus?: string }).__firstFocus)).toBe('skip');
   }
   await page.waitForFunction(() => {
     const o = document.querySelector('[data-arrival-overlay]');
@@ -47,11 +53,24 @@ test('intro gone within 1.3 s, first Tab is Skip', async ({ page }) => {
   await expect(page.locator(':focus')).toHaveText('Skip to content');
 });
 
-// AUDIT B-20: the "wipe the glass" hint only appears where a mouse can wipe.
-test('wipe hint: shown with a mouse, not on touch phones', async ({ page }, info) => {
+// AUDIT B-20: the "wipe the glass" hint only appears where a mouse can wipe, and only when the glass is live.
+// B-26: on a software WebGL renderer (no GPU, e.g. SwiftShader in headless Chromium) the rain never starts
+// and the fogged still stays.
+test('wipe hint: shown with a mouse on live glass; no rain on a software renderer', async ({ page }, info) => {
   await page.addInitScript(() => { try { localStorage.setItem('fp-arrived', '1'); } catch {} });
   await page.goto('/');
   await page.waitForTimeout(3600);
-  const on = await page.locator('.hero-wipe').evaluate((el) => el.classList.contains('is-on'));
-  expect(on).toBe(info.project.name === 'desktop');
+  const { on, live, software } = await page.evaluate(() => {
+    const gl = document.createElement('canvas').getContext('webgl2');
+    const i = gl?.getExtension('WEBGL_debug_renderer_info');
+    const r = gl ? String(gl.getParameter(i ? i.UNMASKED_RENDERER_WEBGL : gl.RENDERER)) : '';
+    return {
+      on: document.querySelector('.hero-wipe')!.classList.contains('is-on'),
+      live: document.querySelector<HTMLElement>('[data-rain-glass] canvas')!.style.opacity === '1',
+      software: !gl || /swiftshader|llvmpipe|softpipe|software/i.test(r),
+    };
+  });
+  if (software) expect(live).toBe(false);
+  expect(on).toBe(info.project.name === 'desktop' && live);
+  await expect(page.locator('.hero-glass img')).toBeVisible();
 });
