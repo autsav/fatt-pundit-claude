@@ -55,6 +55,9 @@ for (const [view, viewport] of VIEWS) {
       if (view === 'phone' && (await pg.locator('[data-dock][data-after-hero]').count())) {
         await pg.mouse.wheel(0, 1200);
         await pg.waitForTimeout(800);
+        // The dock goes away on scroll down and comes back on scroll up (SiteHeader.astro), as a guest would.
+        await pg.mouse.wheel(0, -200);
+        await pg.waitForTimeout(600);
       }
       await pg.locator(view === 'phone' ? '[data-dock] [data-book]' : '[data-book]:visible').first().click();
       const dlg = pg.locator('[data-book-drawer]');

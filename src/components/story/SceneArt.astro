@@ -1,13 +1,14 @@
 ---
 /**
  * An art slot in a story scene. Shows, in order of preference:
- *  1. the illustrator's layer, src/assets/images/story/layers/<name>.(png|webp), when it exists;
+ *  1. the slot's art from the story-art manifest (src/data/story-art.ts; file src/assets/images/story/layers/<name>.webp);
  *  2. the fallback art we already own (a brand cut-out or a photo);
  *  3. a storyboard card with the pencilled note of what will be drawn there.
  * So a scene can be built and approved before its illustration arrives; dropping the file in is enough.
  * Always decorative (alt=""): what the stage shows is said once by StoryScene's sr-only sentence.
  */
 import { getImage } from 'astro:assets';
+import { storyArt } from '../../data/story-art';
 
 interface Props {
   name: string;
@@ -27,8 +28,8 @@ interface Props {
 // rest carries the parent's scope attribute, so the chapter component's styles reach this element.
 const { name, fallback, note, widths = [480, 960, 1600, 2400], sizes, class: cls, warm = false, quality = 72, priority = false, ...rest } = Astro.props;
 
-const layers = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/story/layers/*.{png,webp}', { eager: true });
-const drawn = Object.entries(layers).find(([path]) => path.split('/').pop()!.replace(/\.\w+$/, '') === name)?.[1].default;
+// Every slot is listed in the manifest (a name that isn't fails the build: AUDIT B-08).
+const drawn = storyArt(name).image;
 const src = drawn ?? fallback;
 
 let img: { src: string; srcset: string; w: number; h: number } | undefined;

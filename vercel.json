@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": true,
   "redirects": [
+    { "source": "/:path*", "has": [{ "type": "host", "value": "fattpundit.co.uk" }], "destination": "https://www.fattpundit.co.uk/:path*", "permanent": true },
     { "source": "/soho/reserve-a-table", "destination": "/book/?branch=soho", "statusCode": 301 },
     { "source": "/soho/reserve-a-table/", "destination": "/book/?branch=soho", "statusCode": 301 },
     { "source": "/covent-garden/reserve-a-table", "destination": "/book/?branch=covent-garden", "statusCode": 301 },
@@ -27,6 +28,10 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
         }
       ]
     },

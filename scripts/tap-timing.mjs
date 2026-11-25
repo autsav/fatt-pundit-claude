@@ -7,6 +7,9 @@
 // transitions are not counted (they are the paint after the paint). Fails when a tap's median is over budget.
 import { chromium } from 'playwright-core';
 
+// Past the hero, then a little back up: the phone dock hides on scroll down and returns on scroll up (SiteHeader.astro).
+const dockUp = async (p) => { await p.evaluate(() => window.scrollTo(0, 900)); await p.waitForTimeout(200); await p.evaluate(() => window.scrollTo(0, 860)); await p.waitForTimeout(500); };
+
 const BASE = process.env.BASE ?? 'http://localhost:4321';
 const CHROME = process.env.CHROME_PATH ?? (process.platform === 'win32' ? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe' : '/usr/bin/google-chrome');
 const BUDGET = Number(process.env.BUDGET_MS ?? 200);
@@ -14,12 +17,12 @@ const RUNS = Number(process.env.RUNS ?? 3);
 
 /** The taps: page, viewport, how to get the control on screen, the control, and what must follow. */
 const TAPS = [
-  { name: 'Book from the dock', page: '/soho/', view: 'phone', ready: async (p) => p.evaluate(() => window.scrollTo(0, 900)), target: '.dock-book', after: 'dialog.book[open]' },
+  { name: 'Book from the dock', page: '/soho/', view: 'phone', ready: async (p) => dockUp(p), target: '.dock-book', after: 'dialog.book[open]' },
   { name: 'A plate', page: '/covent-garden/', view: 'desk', ready: async (p) => { await p.locator('[data-plate]').first().scrollIntoViewIfNeeded(); await p.waitForTimeout(2800); }, target: '[data-plate]', after: '[data-plate][aria-pressed="true"]' },
   { name: 'A page turn', page: '/', view: 'desk', ready: async (p) => { await p.locator('#menu').scrollIntoViewIfNeeded(); await p.waitForTimeout(1200); }, target: 'button[aria-label="Next page"]', after: null },
   // A day chip: there are always 21 of them, while a closed day has no time chips.
   // The drawer draws its chips when its own button opens it (not on showModal), so open it from the dock.
-  { name: 'A menu chip', page: '/soho/', view: 'phone', ready: async (p) => { await p.evaluate(() => window.scrollTo(0, 900)); await p.locator('.dock-book').click(); await p.waitForTimeout(600); }, target: '.book-day:not([aria-checked="true"])', after: '.book-day[aria-checked="true"]' },
+  { name: 'A menu chip', page: '/soho/', view: 'phone', ready: async (p) => { await dockUp(p); await p.locator('.dock-book').click(); await p.waitForTimeout(600); }, target: '.book-day:not([aria-checked="true"])', after: '.book-day[aria-checked="true"]' },
   { name: 'A passport stamp', page: '/soho/menu/', view: 'phone', ready: async (p) => { await p.locator('.pp-stamp').first().scrollIntoViewIfNeeded(); await p.waitForTimeout(300); }, target: '.pp-stamp', after: '.pp-stamp[aria-pressed="true"]' },
 ];
 const VIEWS = { phone: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, desk: { viewport: { width: 1440, height: 900 } } };

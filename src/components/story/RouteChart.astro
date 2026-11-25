@@ -139,7 +139,7 @@ const dirs = legs.map((l, li) => {
 const mixed = new Set(dirs).size > 1;
 const shipFace = (finished ? dirs[dirs.length - 1] : dirs[0]) === 'left' ? '1 1' : '-1 1';
 const parked = finished ? `translate:${pct(park[0], W)}% ${pct(park[1], H)}%` : undefined;
-const gate = (rules: string) => `@supports (animation-timeline: view()){@media (prefers-reduced-motion: no-preference){:root:not([data-story='comic']){${rules}}}}`;
+const gate = (rules: string) => `@supports (animation-timeline: view()){@media (prefers-reduced-motion: no-preference){:root.js:not([data-story='comic']){${rules}}}}`;
 const swap = hasOne && hasTwo ? scroll(legs[pairFrom].from) : null;
 const css =
   `@keyframes rcid-${id}-ship{${moves.join('')}}` +

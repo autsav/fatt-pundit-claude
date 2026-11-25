@@ -74,6 +74,10 @@ const ROOM: [ImageMetadata, string][] = [
 // Thumbs: 360/480w for the phone's two-up strip at 2x, 640w for the four-up (the sheet's own `sizes`).
 const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640].map(async (w) => `${await webp(src, w)} ${w}w`))).join(', ');
 const sheet = await Promise.all(ROOM.map(async ([src, alt]) => ({ thumb: await webp(src, 640), thumbSet: await thumbSet(src), full: await webp(src, 1600), alt })));
+// Ratings come from branches.json (one source of truth with the branch pages; AUDIT B-13). Covent Garden first,
+// as the larger review count.
+const rated = ['covent-garden', 'soho'].flatMap((id) => { const b = branches.find((x) => x.id === id); return b?.page.rating ? [{ name: b.shortName, ...b.page.rating }] : []; });
+const sameScore = rated.every((r) => r.score === rated[0].score && r.source === rated[0].source);
 const stamps: Record<string, typeof stampLeft> = { soho: stampLeft, 'covent-garden': stampRight };
 const rainSrc = (await getImage({ src: inside, width: 1800, format: 'webp', quality: 82 })).src;
 // The hero still: 640w for phones, 1280w for larger screens (it is the LCP image).
@@ -84,15 +88,17 @@ const img = async (src: Parameters<typeof getImage>[0]['src'], width: number) =>
 // Every drawing in the voyage comes from the brand guidelines (p.24 menu map and stamps).
 const voyageArt = {
   // One width per asset (shared with the menu book's map, so one file).
-  map: await img(map, 1000),
+  // ~750 px: shown at about 372 px in the voyage card and ~400 px in the menu book, so 2× either way.
+  map: await img(map, 750),
   // A picture, not the SVG: the browser re-rasterised the vector chart (a
   // 16-megapixel draw) whenever the camera zoomed, stalling scroll frames.
   sea: (await getImage({ src: voyageSea, width: 3200, format: 'avif', quality: 50 })).src,
   seaSet: (await Promise.all([1600, 2400, 3200].map(async (w) => `${(await getImage({ src: voyageSea, width: w, format: 'avif', quality: 50 })).src} ${w}w`))).join(', '),
   ship: await img(shipArt, 160),
   compass: await img(compassArt, 240),
-  stampGold: await stampSrc(stampGoldArt, 300),
-  stampOrange: await stampSrc(stampOrangeArt, 300),
+  // Shown at most ~102 px wide in the voyage: 200 px covers 2×.
+  stampGold: await stampSrc(stampGoldArt, 200),
+  stampOrange: await stampSrc(stampOrangeArt, 200),
   mountainA: await img(mountainAArt, 300),
   mountainsB: await img(mountainsBArt, 520),
   mountainsC: await img(mountainsCArt, 260),
@@ -126,10 +132,10 @@ const menuPlaces = await Promise.all(
     street: b.address.street,
     menus: b.menus,
     book: b.status === 'open' && b.booking ? { href: b.booking.url, label: `Book at ${b.shortName}` } : undefined,
-    soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: listCta(b).href, label: listCta(b).short },
+    soon: b.status === 'open' ? undefined : { dishes: (await Promise.all((b.page.teaser ?? []).map(dish))).map((d) => d.name), href: listCta(b).href, label: listCta(b).short, sr: listCta(b).sr, external: listCta(b).external },
   })),
 );
-const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 300), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 1000) };
+const menuArt = { frame: await img(frameArt, 1000), stampGold: await stampSrc(stampGoldArt, 300), stampOrange: await stampSrc(stampOrangeArt, 300), map: await img(map, 750) }; // the book's stamps stay 300 px: one shows at 46% of a page
 // Search engines: the group, with each restaurant as its own entity.
 // The group rules differ by room, so each room states its own.
 const groupNotes = branches.flatMap((b) => { const g = groupRules(b); return g ? [`${b.shortName}: ${g.depositShort} ${g.setMenu}`] : []; });
@@ -151,10 +157,10 @@ const orgLd = {
   og="home"
 >
   <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
-  <a class="skip" href="#tables">Skip to your table</a>
+  <a slot="skip" class="skip" href="#tables">Skip to your table</a>
   <SiteHeader branches={branches} />
 
-  <main>
+  <main id="content">
     <!-- 0 · Arrival -->
     <Arrival />
     <!-- 1 · The window: name, restaurant board, Book; the room behind rainy glass -->
@@ -185,8 +191,10 @@ const orgLd = {
             <p class="chapter-intro">Painted walls from old Tangra, a tiger on the brickwork, blue-and-white plates and warm brass light.</p>
           </header>
           <p class="rating fp-reveal">
-            <span class="rating-n fp-num">4.8<span class="rating-of"> / 5</span></span>
-            <span class="rating-src">on Google at both restaurants: 20,030 reviews for Covent Garden and 16,000+ for Soho (November 2026)</span>
+            <span class="rating-n fp-num">{rated[0].score}<span class="rating-of"> / 5</span></span>
+            <span class="rating-src">{sameScore
+              ? `on ${rated[0].source} at both restaurants: ${rated.map((r, i) => `${r.count}${i === 0 ? ' reviews' : ''} for ${r.name}`).join(' and ')} (${rated[0].asOf})`
+              : rated.map((r) => `${r.score} on ${r.source} for ${r.name} (${r.count} reviews, ${r.asOf})`).join('; ')}</span>
           </p>
         </div>
         <RoomContactSheet client:visible frames={sheet} picks={[0, 2]} />

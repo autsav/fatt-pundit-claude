@@ -35,7 +35,8 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <title>{title}</title>
     <meta name="description" content={description} />
     {hide && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="canonical" href={canonical} />
+    {/* A noindex page (404, share-image sources) names no URL of its own (AUDIT B-14). */}
+    {!noindex && <link rel="canonical" href={canonical} />}
     <meta name="theme-color" content="#2c2925" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/png" href={icon.src} />
@@ -46,13 +47,16 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <meta property="og:locale" content="en_GB" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="A Fatt Pundit boarding pass with the tiger stamp" />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>
+      // Scripts run here: pages gate their JS-and-motion versions on this class (the story's scroll scenes;
+      // without it the static comic shows, AUDIT B-05).
+      document.documentElement.classList.add('js');
       // The guest's own "Pause motion" choice (footer button), applied before first paint.
       try { if (localStorage.getItem('fp-motion') === 'paused') document.documentElement.dataset.motion = 'paused'; } catch (e) {}
     </script>
@@ -100,7 +104,10 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     </script>
   </head>
   <body>
-    <a class="skip" href="#footer">Skip to footer</a>
+    <!-- Skip to content first on every page (every page's <main> is #content), then the page's own shortcut
+         (AUDIT B-11). -->
+    <a class="skip" href="#content">Skip to content</a>
+    <slot name="skip" />
     <slot />
   </body>
 </html>

@@ -19,7 +19,9 @@ interface Props {
 const clean = (s: string) => s.toUpperCase().replace(/[^ A-Z0-9:.\-/&!?]/g, ' ').slice(0, 24);
 
 export default function TonightBoard({ branch, name, tz, rows, csvUrl }: Props) {
-  const [lines, setLines] = useState(() => pick(rows, branch, todayIn(tz)));
+  // Start empty: this initialiser also runs at build time, where "today" is the build day, so the static HTML
+  // held stale lines until hydration (AUDIT B-17). The effect picks today's lines in the guest's browser.
+  const [lines, setLines] = useState<Special[]>([]);
 
   useEffect(() => {
     setLines(pick(rows, branch, todayIn(tz)));

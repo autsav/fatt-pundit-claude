@@ -136,7 +136,8 @@ const daysOpen = b.hours ? (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as
 const openDays = daysOpen === 7 ? 'Open every day.' : daysOpen > 0 ? `Open ${['', 'one', 'two', 'three', 'four', 'five', 'six'][daysOpen]} days a week.` : 'Opening hours.';
 const rules = groupRules(b);
 // The Dubai list posts to a form-to-email service once PUBLIC_DUBAI_LIST_ENDPOINT is set (CLIENT-INPUTS #5, #10).
-// Until then the form opens an email to the Dubai address, or the group's reservations address, and says so.
+// Until then it opens an email to the Dubai address if branches.json has one; with neither, the #waitlist block
+// points to Instagram for the date (AUDIT B-06: no reservations-address fallback, that inbox is the client's call).
 const listEndpoint = import.meta.env.PUBLIC_DUBAI_LIST_ENDPOINT as string | undefined;
 const listEmail = b.email ?? '';
 
@@ -169,11 +170,13 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 ---
 <Base title={title} description={description} og={b.id}>
   {heroImg && <link slot="head" rel="preload" as="image" imagesrcset={heroSet} imagesizes="100vw" fetchpriority="high" />}
-  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <a class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
+  {/* A room that isn't open yet gets no Restaurant entity (no hours, no reservations); the home page's
+      Organization still names it (AUDIT B-24). */}
+  {open && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
+  <a slot="skip" class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
   <SiteHeader branches={branches} current={b} />
 
-  <main class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
+  <main id="content" class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
     <!-- 1 · Arrival (Phase 8): the name on the departure board is the page's one bold thing; one Book,
          one link to the menus. Today's status lives once, in the facts strip directly below. -->
     <section class="arrival" data-room-hero style={`view-transition-name: branch-${b.id}`} aria-labelledby="branch-title">
@@ -196,7 +199,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
         {b.geo && b.timezone !== 'Europe/London' && <p class="branch-clock" data-branch-clock data-tz={b.timezone} data-lat={b.geo.lat} data-lng={b.geo.lng} data-name={b.shortName}></p>}
         {open && (
           <div class="arrival-actions">
-            {b.booking && <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>}
+            {b.booking && <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table<span class="sr-only" data-tab-note> (opens in a new tab)</span></a>}
             <a class="fp-link fp-link--strong arrival-menus" href={`/${b.id}/menu/`}>See the menus</a>
           </div>
         )}
@@ -364,7 +367,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
             {b.booking && (
               <div class="visit-book">
                 <p class="visit-book-h fp-section-label">Reserve</p>
-                <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table</a>
+                <a class="fp-btn fp-btn--primary" href={b.booking.url} data-book={b.id} target="_blank" rel="noopener">Book a table<span class="sr-only" data-tab-note> (opens in a new tab)</span></a>
                 <p class="visit-via">Online with {BOOKING_NAMES[b.booking.provider]}, or call us.</p>
                 {rating && (
                   <p class="visit-proof"><span class="proof-n fp-num">{rating.score}</span><span class="proof-src">on {rating.source} from {rating.count} reviews ({rating.asOf})</span></p>

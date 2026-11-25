@@ -1,5 +1,5 @@
 ---
-// Scene 0: arrival. First visit on this device only, ~1.5 s. Skip, a tap, a key or a scroll ends it.
+// Scene 0: arrival. First visit on this device only, at most 1.2 s (AUDIT B-04). Skip, a tap, a key or a scroll ends it.
 // A departure board clatters into FATT PUNDIT, the tiger stamp thuds down,
 // and the board splits open onto the rainy street.
 import { stampSrc } from '../../lib/stamp';
@@ -19,6 +19,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   })();
 </script>
 
+<noscript><style>[data-arrival-overlay] { display: none; }</style></noscript>
 <div class="arrival" data-arrival-overlay>
   <div class="half top"></div>
   <div class="half bottom"></div>
@@ -32,8 +33,15 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </div>
 
 <style>
-  .arrival { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; pointer-events: auto; }
-  :global(html[data-arrival='skip']) .arrival { display: none; }
+  /* AUDIT B-01. Laid out only when the inline script chose to play it (never without JavaScript; the
+     <noscript> style agrees), and whatever the scripts do, a pure-CSS fail-safe hides it 1.2 s after the
+     page starts (the brief's budget), so a failed module can hold the page for 1.2 s at most.
+     Not hidden until the module loads: that variant cost ~500 ms of lab LCP on home (P86 vs P90-93,
+     interleaved runs, 24 Nov); real-user LCP was the same either way. */
+  .arrival { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; pointer-events: auto; }
+  :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 1.2s forwards; }
+  /* Both ends hidden: a one-ended keyframe left visibility 'visible' and opacity at 1e-13 in Chromium. */
+  @keyframes arrival-failsafe { from, to { opacity: 0; visibility: hidden; pointer-events: none; } }
   .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
   .half.top { top: 0; border-bottom: 1px solid rgb(203 160 82 / 0.25); }
   .half.bottom { bottom: 0; }
@@ -47,7 +55,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 </style>
 
 <script>
-  import { createTimeline, createSpring } from 'animejs';
+  import { createTimeline, spring } from 'animejs';
   import { SPRING, animeSpring } from '@/lib/motion-tokens';
   import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
 
@@ -66,6 +74,8 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   }
 
   if (root && html.dataset.arrival === 'play') {
+    // Skip takes the focus while the board is up (B-04).
+    root.querySelector<HTMLElement>('[data-skip]')?.focus({ preventScroll: true });
     document.body.style.overflow = 'hidden';
     lockScroll();
     // While the board is up, nothing behind it can take keyboard focus (only Skip can).
@@ -97,9 +107,14 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       window.dispatchEvent(new Event('fp:opening'));
       for (const s of behind) s.inert = false;
       // The shutter is about to open: give scrolling back now, not when the last frame lands.
-      window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 760);
+      window.setTimeout(() => { document.body.style.overflow = ''; if (!unlocked) { unlocked = true; unlockScroll(); } }, fast ? 0 : 520);
       // The board is leaving: take it out of the accessibility tree and the tab order now,
       // not when the last frame lands (a fading label is not content).
+      // Skip had the focus: hand it back to the top of the page, so the next Tab is "Skip to content",
+      // not whatever follows the board in the document.
+      if (root.contains(document.activeElement)) {
+        const b = document.body; b.tabIndex = -1; b.focus({ preventScroll: true }); b.removeAttribute('tabindex');
+      }
       root.setAttribute('aria-hidden', 'true');
       root.inert = true;
       // A choreographed intro with its own beats (a documented exception in docs/MOTION.md).
@@ -109,12 +124,12 @@ const stampImg = { src: await stampSrc(stamp, 320) };
       if (!fast) {
         // The stamp thuds onto the board (a spring: it has weight), the board jolts and the shutter
         // starts to split while the thud still rings, with no pause between beats.
-        tl.add('[data-stamp]', { scale: [1.14, 1], ease: createSpring(animeSpring(SPRING.stamp)) }, 0)
+        tl.add('[data-stamp]', { scale: [1.14, 1], ease: spring(animeSpring(SPRING.stamp)) }, 0)
           .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, 60)
           .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, 160);
       }
-      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, fast ? 0 : 280)
-        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 380 : 560, ease: 'inOutExpo' }, '<<')
+      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 300 : 400, ease: 'inOutExpo' }, fast ? 0 : 100)
+        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 300 : 400, ease: 'inOutExpo' }, '<<')
         .add('.arrival .skip-arrival', { opacity: 0, duration: 150 }, '<<');
     };
     window.addEventListener('fp:board-done', () => open(false), { once: true });
@@ -122,8 +137,12 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     // Any attempt to get on with it ends the intro: a tap, a scroll, or a key (Tab still reaches Skip).
     for (const ev of ['pointerdown', 'wheel', 'touchmove'] as const) window.addEventListener(ev, () => open(true), { passive: true, signal: ac.signal });
     window.addEventListener('keydown', (e) => { if (e.key !== 'Tab' && e.key !== 'Shift') open(true); }, { signal: ac.signal });
-    // Safety net: never trap a guest behind the board.
-    window.setTimeout(() => open(true), 4500);
+    // Budget (AUDIT B-04: the page is in by 1.2 s after navigation, not after this script loads): the
+    // shutter starts by 0.65 s even if the flaps are still settling (0.1 + 0.4 s to clear), and a fast
+    // open (0.3 s) at 0.85 s is the last resort. The CSS fail-safe above hides the board at 1.2 s regardless.
+    const since = performance.now();
+    window.setTimeout(() => open(false), Math.max(0, 650 - since));
+    window.setTimeout(() => open(true), Math.max(0, 850 - since));
   } else {
     finish();
   }

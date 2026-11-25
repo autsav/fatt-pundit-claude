@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction A · Lamplight (mock)</title>
+<link rel="stylesheet" href="mock-base.css">
+<style>
+  /* Direction A — "Lamplight": the room after dark. Ink-deep base, warm photography, gold hairlines, tiger orange only on Book. */
+  body { background: var(--ink-deep); color: var(--paper); }
+  header.top { position: sticky; top: 0; z-index: 30; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; background: rgb(26 23 20 / .92); border-bottom: 1px solid rgb(203 160 82 / .35); }
+  header.top b { letter-spacing: .14em; font-size: 15px; } header.top nav { display: flex; gap: 24px; align-items: center; font-size: 15px; }
+  header.top .btn { min-height: 40px; }
+  section { position: relative; }
+  .hero { min-height: 92svh; display: grid; align-items: end; }
+  .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(.55) saturate(.9); }
+  .hero .wrap { position: relative; padding-block: 72px; }
+  .hero h1 { margin: 0; font-size: var(--display); line-height: .9; letter-spacing: -.01em; text-transform: uppercase; font-weight: 700; }
+  .hero .note { font-size: clamp(20px, 2vw, 28px); color: var(--gold); margin: 0 0 16px; }
+  .rooms { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .rooms a { display: grid; gap: 2px; min-width: 220px; padding: 14px 18px; border: 1px solid rgb(203 160 82 / .6); background: rgb(26 23 20 / .55); text-decoration: none; }
+  .rooms a span { font-size: 14px; color: var(--sand); } .rooms a strong { letter-spacing: .08em; text-transform: uppercase; }
+  .chapter { padding-block: clamp(96px, 14vw, 180px); border-top: 1px solid rgb(203 160 82 / .25); }
+  .chapter h2 { font-weight: 300; font-size: var(--h2); line-height: 1.02; margin: 0 0 20px; max-width: 14ch; }
+  .chapter p.lede { max-width: 56ch; color: var(--sand); margin: 0 0 28px; }
+  .story { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .route { aspect-ratio: 4/3; border: 1px solid rgb(203 160 82 / .4); display: grid; place-items: center; background: radial-gradient(circle at 30% 40%, rgb(203 160 82 / .12), transparent 60%); }
+  .route svg { width: 86%; }
+  .dishes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .dish img { aspect-ratio: 4/5; object-fit: cover; width: 100%; }
+  .dish h3 { font-size: 18px; margin: 14px 0 2px; text-transform: uppercase; letter-spacing: .04em; } .dish p { margin: 0; color: var(--sand); font-size: 15px; }
+  .bar { display: grid; grid-template-columns: 7fr 5fr; gap: 48px; align-items: end; }
+  .bar img { aspect-ratio: 3/2; object-fit: cover; width: 100%; }
+  .drink { border-top: 1px solid var(--gold); padding-top: 16px; }
+  .places { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgb(203 160 82 / .35); }
+  .place { background: var(--ink-deep); padding: 32px; display: grid; gap: 10px; }
+  .place h3 { margin: 0; font-size: clamp(28px, 3vw, 40px); text-transform: uppercase; }
+  .place p { margin: 0; color: var(--sand); }
+  .dubai { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .book { text-align: center; } .book h2 { margin-inline: auto; }
+  @media (max-width: 700px) {
+    header.top nav a:not(.btn) { display: none; }
+    .story, .bar, .places { grid-template-columns: 1fr; }
+    .dishes { grid-template-columns: repeat(4, 72%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+    .dish { scroll-snap-align: start; }
+    .rooms a { min-width: 0; flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<header class="top"><b>FATT PUNDIT</b><nav><a href="#">Soho</a><a href="#">Covent Garden</a><a href="#">Dubai</a><a href="#">Menus</a><a href="#">Our story</a><a class="btn btn--book" href="#">Book a table</a></nav></header>
+
+<section class="hero">
+  <span class="ann" style="top:120px;left:24px">1</span>
+  <img src="../../src/assets/images/covent-garden/gallery-01.jpg" alt="">
+  <div class="wrap">
+    <p class="note">Hakka cooking from Calcutta’s Chinatown</p>
+    <h1>Fatt<br>Pundit</h1>
+    <div class="rooms">
+      <a href="#"><strong>Soho</strong><span>77 Berwick Street</span></a>
+      <a href="#"><strong>Covent Garden</strong><span>6 Maiden Lane</span></a>
+      <a href="#"><strong>Dubai</strong><span>Opening soon</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="chapter"><div class="wrap story">
+  <span class="ann" style="top:-17px;left:0">2</span>
+  <div>
+    <h2>A long way from home.</h2>
+    <p class="lede">Hakka families sailed from Guangdong to Calcutta. Their cooking met Indian spice in Tangra, and in 2019 it reached Berwick Street.</p>
+    <a class="btn" href="#">Read the whole story</a>
+  </div>
+  <div class="route" aria-hidden="true"><svg viewBox="0 0 400 220"><path d="M360 60 C 300 120, 250 130, 220 120 S 120 60, 40 70" fill="none" stroke="#cba052" stroke-width="2" stroke-dasharray="6 6"/><circle cx="360" cy="60" r="7" fill="#f15d3d"/><circle cx="220" cy="120" r="7" fill="#cba052"/><circle cx="40" cy="70" r="7" fill="#cba052"/><text x="330" y="40" fill="#dac7b5" font-size="14">Guangdong</text><text x="196" y="150" fill="#dac7b5" font-size="14">Calcutta</text><text x="22" y="50" fill="#dac7b5" font-size="14">London</text></svg></div>
+</div></section>
+
+<section class="chapter"><div class="wrap">
+  <span class="ann" style="top:-17px;left:0">3</span>
+  <h2>Four to start with.</h2>
+  <p class="lede">The plates guests order again. The full menus live on each restaurant’s page.</p>
+  <div class="dishes">
+    <figure class="dish" style="margin:0"><img src="../../src/assets/images/dishes/momo-mix-vegetable.jpg" alt=""><h3>Mix vegetable momo</h3><p>£7</p></figure>
+    <figure class="dish" style="margin:0"><img src="../../src/assets/images/dishes/crackling-spinach.jpg" alt=""><h3>Crackling spinach</h3><p>£11</p></figure>
+    <figure class="dish" style="margin:0"><img src="../../src/assets/images/dishes/crispy-okra-salt-n-pepper.jpg" alt=""><h3>Crispy okra salt ‘n’ pepper</h3><p>£11</p></figure>
+    <figure class="dish" style="margin:0"><img src="../../src/assets/images/dishes/sizzling-brownie.jpg" alt=""><h3>Sizzling brownie</h3><p>£12.50</p></figure>
+  </div>
+  <p style="margin-top:28px"><a href="#">Soho menus</a> · <a href="#">Covent Garden menus</a></p>
+</div></section>
+
+<section class="chapter"><div class="wrap bar">
+  <span class="ann" style="top:-17px;left:0">4</span>
+  <img src="../../src/assets/images/covent-garden/gallery-03.jpg" alt="">
+  <div>
+    <h2>The bar after dark.</h2>
+    <div class="drink"><strong>GUAVA CHILLI SOUR</strong><p class="lede" style="margin:4px 0 0">Himalayan salt, red chilli, guava; spike it with tequila. Mocktail £8.50, spike it £13.50.</p></div>
+  </div>
+</div></section>
+
+<section class="chapter"><div class="wrap">
+  <span class="ann" style="top:-17px;left:0">5</span>
+  <h2>Two rooms in London.</h2>
+  <div class="places">
+    <div class="place"><h3>Soho</h3><p>77 Berwick Street, W1F 8TH</p><p class="note" style="color:var(--gold)">Open today · 12–2.30pm, 5–10.30pm</p><div><a class="btn btn--book" href="#">Book Soho</a></div></div>
+    <div class="place"><h3>Covent Garden</h3><p>6 Maiden Lane, WC2E 7NA</p><p class="note" style="color:var(--gold)">Open today · 4.45–10.30pm</p><div><a class="btn btn--book" href="#">Book Covent Garden</a></div></div>
+    <div class="place dubai"><p><strong>DUBAI</strong> · The Hangout, Mall of the Emirates · opening soon</p><a class="btn" href="#">Join the opening list</a></div>
+  </div>
+</div></section>
+
+<section class="chapter book"><div class="wrap">
+  <span class="ann" style="top:-17px;left:0">6</span>
+  <h2>Your table is waiting.</h2>
+  <p class="lede" style="margin-inline:auto">Pick a room, a day and how many. The booking opens with OpenTable or SevenRooms in a new tab.</p>
+  <a class="btn btn--book" href="#">Book a table</a>
+</div></section>
+
+<div class="stickybook"><a class="btn btn--book" href="#">Book a table</a></div>
+
+<div class="legend"><h2>Direction A · Lamplight — notes</h2><ol>
+  <li><b>Hero = the room through the window.</b> One photo, the name, three rooms. No intro board, no door/curtain sequence before content (intro max 0 s; the glass effect stays as a quiet wipe on desktop only).</li>
+  <li><b>Story teaser = one idea.</b> A single scroll-drawn route (CSS scroll-timeline, transform/opacity only); the full voyage moves to /our-story/.</li>
+  <li><b>Four dishes, real photos, real prices.</b> Phones: snap carousel. Full menu leaves the home page (menu book → /[branch]/menu/).</li>
+  <li><b>Bar = one photo + one drink.</b> Big image, small words.</li>
+  <li><b>Locations as a quiet ledger</b>: address, today’s hours (client-side, London time), one Book per room. Dubai is a slim row.</li>
+  <li><b>Book is the last word</b>, and a sticky “Book a table” bar on phones the whole way down. Tiger orange is reserved for Book only.</li>
+</ol></div>
+</body>
+</html>

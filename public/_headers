@@ -5,6 +5,8 @@
 
 /og/*
   Cache-Control: public, max-age=86400
+  # Fetchable for link previews (robots.txt allows /og/*.png) but kept out of search results (AUDIT B-07).
+  X-Robots-Tag: noindex
 
 /*
   # The site is HTTPS only on every host: browsers that have seen this never try plain HTTP again

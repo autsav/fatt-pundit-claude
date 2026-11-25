@@ -1,0 +1,960 @@
+{
+ "/ mobile": {
+  "perf": 96,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 2569,
+  "cls": 0.009,
+  "tbt": 20,
+  "fcp": 1219,
+  "observedLcp": 340,
+  "totalKB": 1405,
+  "jsKB": 159,
+  "cssKB": 39,
+  "imgKB": 1033,
+  "fontKB": 125,
+  "heaviest": [
+   "201KB /_astro/street-g.B4cM874r_Z1Xafik.avif",
+   "200KB /_astro/interior-door-view-g.Cr3b3yGa_Z1xiq0g.avif",
+   "186KB /_astro/gallery-01.CO-AmVvm_Z25SH0H.webp",
+   "109KB /_astro/velvet-g.DBMl0JGv_2l2pqy.avif",
+   "75KB /_astro/gallery-01.CO-AmVvm_1YEWbi.webp"
+  ],
+  "failing": [
+   "largest-contentful-paint",
+   "speed-index",
+   "unused-javascript",
+   "is-crawlable",
+   "forced-reflow-insight",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   96
+  ]
+ },
+ "/ desktop": {
+  "perf": 99,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 494,
+  "cls": 0.007,
+  "tbt": 0,
+  "fcp": 294,
+  "observedLcp": 280,
+  "totalKB": 1263,
+  "jsKB": 158,
+  "cssKB": 40,
+  "imgKB": 892,
+  "fontKB": 126,
+  "heaviest": [
+   "201KB /_astro/street-g.B4cM874r_Z1Xafik.avif",
+   "186KB /_astro/gallery-01.CO-AmVvm_Z25SH0H.webp",
+   "113KB /_astro/interior-door-view-g.Cr3b3yGa_Z1crK3i.avif",
+   "75KB /_astro/gallery-01.CO-AmVvm_1YEWbi.webp",
+   "65KB /_astro/client.C5yqT35c.js"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "forced-reflow-insight",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   99
+  ]
+ },
+ "/book/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 927,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 927,
+  "observedLcp": 235,
+  "totalKB": 284,
+  "jsKB": 16,
+  "cssKB": 31,
+  "imgKB": 88,
+  "fontKB": 125,
+  "heaviest": [
+   "88KB /_astro/crackling-spinach.C4H3Bw-u_1hbVUQ.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "25KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/book/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 257,
+  "cls": 0.001,
+  "tbt": 0,
+  "fcp": 257,
+  "observedLcp": 196,
+  "totalKB": 243,
+  "jsKB": 16,
+  "cssKB": 31,
+  "imgKB": 47,
+  "fontKB": 125,
+  "heaviest": [
+   "47KB /_astro/crackling-spinach.C4H3Bw-u_Z1oJdSB.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/soho/ mobile": {
+  "perf": 99,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1962,
+  "cls": 0.004,
+  "tbt": 0,
+  "fcp": 1062,
+  "observedLcp": 247,
+  "totalKB": 430,
+  "jsKB": 104,
+  "cssKB": 36,
+  "imgKB": 135,
+  "fontKB": 125,
+  "heaviest": [
+   "65KB /_astro/client.C5yqT35c.js",
+   "56KB /_astro/crackling-spinach.C4H3Bw-u_ng9qx.webp",
+   "36KB /_astro/momo-mix-vegetable.B0Y3ep22_Z2u7j4R.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   99
+  ]
+ },
+ "/soho/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 448,
+  "cls": 0.001,
+  "tbt": 0,
+  "fcp": 288,
+  "observedLcp": 258,
+  "totalKB": 427,
+  "jsKB": 104,
+  "cssKB": 36,
+  "imgKB": 131,
+  "fontKB": 125,
+  "heaviest": [
+   "76KB /_astro/04-momos-chutney.BgmjUMiE_2hKuoh.webp",
+   "65KB /_astro/client.C5yqT35c.js",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/soho/menu/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1117,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 1117,
+  "observedLcp": 329,
+  "totalKB": 218,
+  "jsKB": 18,
+  "cssKB": 36,
+  "imgKB": 7,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "25KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css",
+   "23KB /_astro/fonts/5e51b176470dd270.woff2"
+  ],
+  "failing": [
+   "is-crawlable",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/soho/menu/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 296,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 296,
+  "observedLcp": 459,
+  "totalKB": 218,
+  "jsKB": 18,
+  "cssKB": 36,
+  "imgKB": 7,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css",
+   "23KB /_astro/fonts/5e51b176470dd270.woff2"
+  ],
+  "failing": [
+   "is-crawlable",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/covent-garden/ mobile": {
+  "perf": 99,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1991,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 1059,
+  "observedLcp": 236,
+  "totalKB": 878,
+  "jsKB": 105,
+  "cssKB": 36,
+  "imgKB": 431,
+  "fontKB": 125,
+  "heaviest": [
+   "172KB /_astro/gallery-01.CO-AmVvm_Z1vIFCW.webp",
+   "149KB /_astro/cg-booths-glow.B4nEEiPZ.mp4",
+   "65KB /_astro/client.C5yqT35c.js",
+   "56KB /_astro/crackling-spinach.C4H3Bw-u_ng9qx.webp",
+   "49KB /_astro/gallery-01.CO-AmVvm_2gnL12.webp"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   99
+  ]
+ },
+ "/covent-garden/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 569,
+  "cls": 0.001,
+  "tbt": 0,
+  "fcp": 289,
+  "observedLcp": 253,
+  "totalKB": 749,
+  "jsKB": 105,
+  "cssKB": 36,
+  "imgKB": 301,
+  "fontKB": 125,
+  "heaviest": [
+   "149KB /_astro/cg-booths-glow.B4nEEiPZ.mp4",
+   "141KB /_astro/gallery-01.CO-AmVvm_1WVppp.webp",
+   "65KB /_astro/client.C5yqT35c.js",
+   "56KB /_astro/cg-lights-on-lit.h0AR0-wx_ZYtAra.webp",
+   "49KB /_astro/gallery-01.CO-AmVvm_2gnL12.webp"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/covent-garden/menu/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1677,
+  "cls": 0.028,
+  "tbt": 0,
+  "fcp": 1077,
+  "observedLcp": 207,
+  "totalKB": 219,
+  "jsKB": 18,
+  "cssKB": 36,
+  "imgKB": 7,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css",
+   "23KB /_astro/fonts/5e51b176470dd270.woff2"
+  ],
+  "failing": [
+   "is-crawlable",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/covent-garden/menu/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 292,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 292,
+  "observedLcp": 230,
+  "totalKB": 219,
+  "jsKB": 18,
+  "cssKB": 36,
+  "imgKB": 7,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css",
+   "23KB /_astro/fonts/5e51b176470dd270.woff2"
+  ],
+  "failing": [
+   "is-crawlable",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/dubai/ mobile": {
+  "perf": 98,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1061,
+  "cls": 0.1,
+  "tbt": 0,
+  "fcp": 1061,
+  "observedLcp": 279,
+  "totalKB": 364,
+  "jsKB": 104,
+  "cssKB": 36,
+  "imgKB": 73,
+  "fontKB": 125,
+  "heaviest": [
+   "73KB /_astro/crispy-okra-salt-n-pepper.Bph3S8Xk_Z1enDKF.webp",
+   "65KB /_astro/client.C5yqT35c.js",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   98
+  ]
+ },
+ "/dubai/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 287,
+  "cls": 0.001,
+  "tbt": 0,
+  "fcp": 287,
+  "observedLcp": 243,
+  "totalKB": 330,
+  "jsKB": 104,
+  "cssKB": 36,
+  "imgKB": 39,
+  "fontKB": 125,
+  "heaviest": [
+   "65KB /_astro/client.C5yqT35c.js",
+   "39KB /_astro/crispy-okra-salt-n-pepper.Bph3S8Xk_ZqwrQf.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2"
+  ],
+  "failing": [
+   "unused-javascript",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/private-dining/ mobile": {
+  "perf": 99,
+  "a11y": 100,
+  "bp": 77,
+  "seo": 69,
+  "lcp": 1824,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 1074,
+  "observedLcp": 371,
+  "totalKB": 313,
+  "jsKB": 16,
+  "cssKB": 31,
+  "imgKB": 116,
+  "fontKB": 125,
+  "heaviest": [
+   "89KB /_astro/gallery-04.DcWCLPKI_2gogcI.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "28KB /_astro/gallery-06.Bvu973qT_1u7QB8.webp"
+  ],
+  "failing": [
+   "is-on-https",
+   "unused-css-rules",
+   "inspector-issues",
+   "is-crawlable",
+   "image-delivery-insight",
+   "lcp-discovery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   99
+  ]
+ },
+ "/private-dining/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 77,
+  "seo": 69,
+  "lcp": 428,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 308,
+  "observedLcp": 263,
+  "totalKB": 294,
+  "jsKB": 16,
+  "cssKB": 31,
+  "imgKB": 97,
+  "fontKB": 125,
+  "heaviest": [
+   "52KB /_astro/gallery-06.Bvu973qT_Z1SfPkG.webp",
+   "45KB /_astro/gallery-04.DcWCLPKI_1abXAN.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2"
+  ],
+  "failing": [
+   "is-on-https",
+   "unused-css-rules",
+   "inspector-issues",
+   "is-crawlable",
+   "image-delivery-insight",
+   "lcp-discovery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/our-story/ mobile": {
+  "perf": 99,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 2111,
+  "cls": 0.012,
+  "tbt": 0,
+  "fcp": 1211,
+  "observedLcp": 295,
+  "totalKB": 753,
+  "jsKB": 14,
+  "cssKB": 46,
+  "imgKB": 554,
+  "fontKB": 90,
+  "heaviest": [
+   "127KB /_astro/harbour-ship.DxAquXI5_Z18MywW.webp",
+   "69KB /_astro/harbour-hills-near.X0zZm8ED_ReQIh.webp",
+   "60KB /_astro/opening-harbour.CCZv7oa3_6bRFs.webp",
+   "52KB /_astro/sticky-pan.D0vbHyi8_1bOG8H.webp",
+   "42KB /_astro/harbour-hills-far.DZSGDfpx_228Wdq.webp"
+  ],
+  "failing": [
+   "mainthread-work-breakdown",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   99
+  ]
+ },
+ "/our-story/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 530,
+  "cls": 0.022,
+  "tbt": 0,
+  "fcp": 292,
+  "observedLcp": 309,
+  "totalKB": 1135,
+  "jsKB": 14,
+  "cssKB": 47,
+  "imgKB": 936,
+  "fontKB": 90,
+  "heaviest": [
+   "207KB /_astro/voyage-sea._AgFX7Il_h7w6S.avif",
+   "164KB /_astro/opening-harbour.CCZv7oa3_ZIdJWJ.webp",
+   "126KB /_astro/harbour-hills-near.X0zZm8ED_SX4P0.webp",
+   "75KB /_astro/harbour-hills-far.DZSGDfpx_Z1gSjcB.webp",
+   "65KB /_astro/harbour-water.CHFFpOd1_RGwX0.webp"
+  ],
+  "failing": [
+   "is-crawlable",
+   "forced-reflow-insight",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/our-story/fatt/ mobile": {
+  "perf": 99,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1958,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 908,
+  "observedLcp": 411,
+  "totalKB": 248,
+  "jsKB": 14,
+  "cssKB": 32,
+  "imgKB": 91,
+  "fontKB": 90,
+  "heaviest": [
+   "91KB /_astro/tiger-head-right.B0gAFUjb_A9Xjq.webp",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "25KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css",
+   "23KB /_astro/fonts/5e51b176470dd270.woff2"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "lcp-discovery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   99
+  ]
+ },
+ "/our-story/fatt/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 256,
+  "cls": 0.001,
+  "tbt": 0,
+  "fcp": 256,
+  "observedLcp": 192,
+  "totalKB": 189,
+  "jsKB": 14,
+  "cssKB": 31,
+  "imgKB": 32,
+  "fontKB": 90,
+  "heaviest": [
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "32KB /_astro/tiger-head-right.B0gAFUjb_Z1Q8eIt.webp",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css",
+   "23KB /_astro/fonts/5e51b176470dd270.woff2"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/allergens/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 1084,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 1084,
+  "observedLcp": 262,
+  "totalKB": 252,
+  "jsKB": 14,
+  "cssKB": 31,
+  "imgKB": 58,
+  "fontKB": 125,
+  "heaviest": [
+   "58KB /_astro/momo-mix-vegetable.B0Y3ep22_xj86m.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "unused-css-rules",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/allergens/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 249,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 249,
+  "observedLcp": 215,
+  "totalKB": 224,
+  "jsKB": 14,
+  "cssKB": 32,
+  "imgKB": 30,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "30KB /_astro/momo-mix-vegetable.B0Y3ep22_26LVrF.webp",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/accessibility/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 926,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 926,
+  "observedLcp": 208,
+  "totalKB": 251,
+  "jsKB": 14,
+  "cssKB": 32,
+  "imgKB": 58,
+  "fontKB": 125,
+  "heaviest": [
+   "58KB /_astro/momo-mix-vegetable.B0Y3ep22_xj86m.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "25KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "unused-css-rules",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/accessibility/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 266,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 266,
+  "observedLcp": 258,
+  "totalKB": 224,
+  "jsKB": 14,
+  "cssKB": 31,
+  "imgKB": 30,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "30KB /_astro/momo-mix-vegetable.B0Y3ep22_26LVrF.webp",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/privacy/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 930,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 930,
+  "observedLcp": 232,
+  "totalKB": 251,
+  "jsKB": 14,
+  "cssKB": 32,
+  "imgKB": 58,
+  "fontKB": 125,
+  "heaviest": [
+   "58KB /_astro/momo-mix-vegetable.B0Y3ep22_xj86m.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "unused-css-rules",
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/privacy/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 298,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 298,
+  "observedLcp": 242,
+  "totalKB": 224,
+  "jsKB": 14,
+  "cssKB": 31,
+  "imgKB": 30,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "30KB /_astro/momo-mix-vegetable.B0Y3ep22_26LVrF.webp",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/booking-terms/ mobile": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 911,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 911,
+  "observedLcp": 252,
+  "totalKB": 251,
+  "jsKB": 14,
+  "cssKB": 31,
+  "imgKB": 58,
+  "fontKB": 125,
+  "heaviest": [
+   "58KB /_astro/momo-mix-vegetable.B0Y3ep22_xj86m.webp",
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "24KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/booking-terms/ desktop": {
+  "perf": 100,
+  "a11y": 100,
+  "bp": 100,
+  "seo": 69,
+  "lcp": 248,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 248,
+  "observedLcp": 218,
+  "totalKB": 224,
+  "jsKB": 14,
+  "cssKB": 31,
+  "imgKB": 30,
+  "fontKB": 125,
+  "heaviest": [
+   "35KB /_astro/fonts/72a3e9c5d5030199.woff2",
+   "34KB /_astro/fonts/435c08ed98fe9a95.woff2",
+   "33KB /_astro/fonts/7087c481161d8962.woff2",
+   "30KB /_astro/momo-mix-vegetable.B0Y3ep22_26LVrF.webp",
+   "25KB /_astro/logo-stamp-distressed-left.DNY1Exw2.css"
+  ],
+  "failing": [
+   "is-crawlable",
+   "image-delivery-insight",
+   "network-dependency-tree-insight",
+   "render-blocking-insight"
+  ],
+  "perfRuns": [
+   100
+  ]
+ },
+ "/this-page-does-not-exist/ mobile": {
+  "perf": 0,
+  "a11y": 0,
+  "bp": 0,
+  "seo": 0,
+  "lcp": 0,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 0,
+  "totalKB": 0,
+  "jsKB": 0,
+  "cssKB": 0,
+  "imgKB": 0,
+  "fontKB": 0,
+  "heaviest": [],
+  "failing": [],
+  "perfRuns": [
+   0
+  ]
+ },
+ "/this-page-does-not-exist/ desktop": {
+  "perf": 0,
+  "a11y": 0,
+  "bp": 0,
+  "seo": 0,
+  "lcp": 0,
+  "cls": 0,
+  "tbt": 0,
+  "fcp": 0,
+  "totalKB": 0,
+  "jsKB": 0,
+  "cssKB": 0,
+  "imgKB": 0,
+  "fontKB": 0,
+  "heaviest": [],
+  "failing": [],
+  "perfRuns": [
+   0
+  ]
+ }
+}

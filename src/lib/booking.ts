@@ -21,16 +21,39 @@ export const toMin = (s: string) => { const [h, m] = s.split(':').map(Number); r
 export const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 export const prettyMin = (m: number) => { const h = Math.floor(m / 60) % 24; return `${h % 12 || 12}${m % 60 ? '.' + String(m % 60).padStart(2, '0') : ''}${h < 12 ? 'am' : 'pm'}`; };
 
-/** Bookable times (minutes past midnight): every half hour, the last 45 minutes before closing; today only from 30 minutes on. */
-export const slots = (hours: Record<string, Span[]>, tz: string, ymd: string) => {
+/** How a room's half-hour times line up: from its opening minute (16:45 → :15/:45), or on the clock (:00/:30). */
+export type SlotGrid = 'opening' | 'clock';
+
+/**
+ * Bookable times (minutes past midnight): every half hour, the last 45 minutes before closing; today only
+ * from 30 minutes on. `grid` comes from branches.json `booking.slotGrid` (default 'opening'), so the client's
+ * answer on Covent Garden's times is one data line (AUDIT B-02).
+ */
+export const slots = (hours: Record<string, Span[]>, tz: string, ymd: string, grid: SlotGrid = 'opening') => {
   const spans = hours[KEYS[wd(ymd)]] ?? [];
   const now = local(tz);
   const out: number[] = [];
   for (const [a, z] of spans) {
     let end = toMin(z); if (end <= toMin(a)) end += 24 * 60;
-    for (let m = toMin(a); m <= end - 45; m += 30) if (ymd !== now.ymd || m > now.mins + 30) out.push(m);
+    const start = grid === 'clock' ? Math.ceil(toMin(a) / 30) * 30 : toMin(a);
+    for (let m = start; m <= end - 45; m += 30) if (ymd !== now.ymd || m > now.mins + 30) out.push(m);
   }
   return out;
+};
+
+/**
+ * The room's bookable time closest to `want` (minutes), the later one on a tie, or undefined when none is
+ * within `window` minutes. Rooms open at different minutes (Covent Garden 16:45 → :15/:45, Soho :00/:30),
+ * so a time shared across rooms must be resolved per room (AUDIT B-02).
+ */
+export const nearestSlot = (list: number[], want: number, window = 45) => {
+  let best: number | undefined;
+  for (const m of list) {
+    const d = Math.abs(m - want);
+    if (d > window) continue;
+    if (best === undefined || d < Math.abs(best - want) || (d === Math.abs(best - want) && m > best)) best = m;
+  }
+  return best;
 };
 
 /** The provider's booking page with date, time and party size filled in (or its plain page). */

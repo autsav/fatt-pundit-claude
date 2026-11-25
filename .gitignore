@@ -7,3 +7,7 @@ demo/
 # QA script output (large PNG montages; the report and scripts beside them are tracked)
 docs/qa/*/screens/
 docs/qa/*/out/
+
+# Playwright
+test-results/
+playwright-report/

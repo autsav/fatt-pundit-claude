@@ -19,7 +19,7 @@ const VIEWS = [
   ['1440', { width: 1440, height: 900 }],
 ];
 // Loops that are allowed to run for ever (all stopped by Pause motion).
-const KNOWN_LOOPS = new Set(['fp-pulse', 'voyage-ping', 'breathe', 'fp-typing', 'kokonutui-typewriter-caret', 'ping']);
+const KNOWN_LOOPS = new Set(['fp-pulse', 'voyage-ping', 'breathe', 'fp-typing', 'kokonutui-typewriter-caret', 'ping', 'o-cue-bob', 'lo-sway', 'lo-fall']);
 
 // WebGL off, as in scripts/perf-budget.mjs: headless Chrome draws it in software, which would drown everything else.
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox', '--disable-gpu', '--disable-webgl', '--disable-webgl2'] });
@@ -157,13 +157,15 @@ for (const [vname, v] of VIEWS) {
           });
           for (const [k, v] of Object.entries(row.interrupt)) if (!v.ok) fail.push(`${path}@${vname}: interrupted ${k} ended mid-state ${JSON.stringify(v)}`);
           if (path === '/') {
-            // A stub tear must not delay the booking hand-off.
-            await page.evaluate(() => { window.__opened = null; window.open = (u) => { window.__opened = performance.now(); return { opener: null }; }; });
-            const stub = page.locator('[data-tear][target="_blank"]').first();
+            // A stub tear must not delay the booking hand-off: an open room's stub opens the Book drawer
+            // (it used to open the provider's tab directly, which this check timed through window.open).
+            const stub = page.locator('[data-tear][data-book]').first();
             await stub.scrollIntoViewIfNeeded();
             await page.waitForTimeout(1200);
+            await page.evaluate(() => { window.__opened = null; document.querySelector('dialog[data-book-drawer]')?.addEventListener('toggle', () => { window.__opened ??= performance.now(); }, { once: true }); });
             const t0 = await page.evaluate(() => performance.now());
             await stub.click();
+            await page.waitForTimeout(300);
             row.tearToOpenMs = await page.evaluate((t0) => (window.__opened === null ? null : Math.round(window.__opened - t0)), t0);
             if (row.tearToOpenMs === null || row.tearToOpenMs > 100) fail.push(`${path}@${vname}: booking opened after ${row.tearToOpenMs} ms`);
             // Controls stay usable while the passes drop in: focus lands on a stub during the animation.

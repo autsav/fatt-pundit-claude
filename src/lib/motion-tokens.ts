@@ -19,7 +19,7 @@ export const SPRING = {
   ui: { type: 'spring', stiffness: 500, damping: 34 },
 } as const;
 
-/** The same spring for anime.js (`createSpring(animeSpring(SPRING.stamp))`): anime takes its duration from the spring. */
+/** The same spring for anime.js (`spring(animeSpring(SPRING.stamp))`): anime takes its duration from the spring. */
 export const animeSpring = (s: { stiffness: number; damping: number; mass?: number }, velocity = 0) =>
   ({ mass: s.mass ?? 1, stiffness: s.stiffness, damping: s.damping, velocity }) as const;
 

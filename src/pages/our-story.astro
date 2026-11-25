@@ -40,7 +40,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   description="How Indo-Chinese food began: a Hakka cook from Guangdong, a scholar in Calcutta's Chinatown, and the recipes that travelled on to Soho, Covent Garden and Dubai."
   og="home"
 >
-  <a class="skip" href="#canton">Skip to the story</a>
+  <a slot="skip" class="skip" href="#canton">Skip to the story</a>
   <!-- Before the scenes paint: a reader who chose the comic gets it straight away (global.css "Story scenes"). -->
   <script is:inline>try { if (localStorage.getItem('fp-story') === 'comic') document.documentElement.dataset.story = 'comic'; } catch {}</script>
   <SiteHeader branches={branches} />
@@ -91,7 +91,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
             <a class="fp-btn fp-btn--primary" href={b.booking?.url ?? `/${b.id}/`} data-book={b.id}>Book {b.shortName}</a>
           ))}
           {soon.map((b) => (
-            <a class="fp-btn" href={listCta(b).href}>{listCta(b).label}</a>
+            <a class="fp-btn" href={listCta(b).href} {...listCta(b).attrs}>{listCta(b).label}<span class="sr-only">{listCta(b).sr}</span></a>
           ))}
         </div>
         <p class="end-menus"><span>Or read the menus first:</span> {open.map((b) => <a class="menu-chip" href={`/${b.id}/menu/`}>{b.shortName} menu</a>)}</p>
@@ -120,13 +120,13 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
      plain display and position rules survive @supports here (animation-timeline would not). */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      :global(:root:not([data-story='comic'])) .story-chapter[data-scenes] .story-transcript { display: block; position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-      :global(:root:not([data-story='comic'])) .story-hero { position: relative; z-index: 5; height: 0; padding: 0; background: none; }
-      :global(:root:not([data-story='comic'])) .story-hero .wrap { position: static; }
-      :global(:root:not([data-story='comic'])) .story-hero :is(.story-stamp, .kicker, .story-h1, .story-lede, .story-note, .story-cue) {
+      :global(:root.js:not([data-story='comic'])) .story-chapter[data-scenes] .story-transcript { display: block; position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      :global(:root.js:not([data-story='comic'])) .story-hero { position: relative; z-index: 5; height: 0; padding: 0; background: none; }
+      :global(:root.js:not([data-story='comic'])) .story-hero .wrap { position: static; }
+      :global(:root.js:not([data-story='comic'])) .story-hero :is(.story-stamp, .kicker, .story-h1, .story-lede, .story-note, .story-cue) {
         position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-      :global(:root:not([data-story='comic'])) .story-hero .story-mode { position: absolute; top: 12px; right: clamp(12px, 3vw, 40px); margin: 0; }
-      :global(:root:not([data-story='comic'])) .story-hero .story-mode button { min-height: 44px; padding: 6px 12px; background: rgb(250 246 239 / 0.85); }
+      :global(:root.js:not([data-story='comic'])) .story-hero .story-mode { position: absolute; top: 12px; right: clamp(12px, 3vw, 40px); margin: 0; }
+      :global(:root.js:not([data-story='comic'])) .story-hero .story-mode button { min-height: 44px; padding: 6px 12px; background: rgb(250 246 239 / 0.85); }
     }
   }
   .story-body { background: var(--color-sand); padding-top: 0; }
@@ -149,7 +149,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   /* The last scene hands over to #end by tearing in over it, as every stage does (global.css "Between stages"). */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      :global(:root:not([data-story='comic'])) .story-end { position: relative; margin-top: calc(-1 * var(--edge-h));
+      :global(:root.js:not([data-story='comic'])) .story-end { position: relative; margin-top: calc(-1 * var(--edge-h));
         -webkit-mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat;
         mask: var(--torn-top) top / 100% var(--edge-h) no-repeat, linear-gradient(#000 0 0) 0 calc(var(--edge-h) - 1px) / 100% 100% no-repeat; }
     }

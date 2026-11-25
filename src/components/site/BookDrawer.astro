@@ -22,6 +22,7 @@ const data = branches.map((b) => ({
   provider: b.booking!.provider,
   url: b.booking!.url,
   widgetId: b.booking!.widgetId,
+  grid: b.booking!.slotGrid ?? 'opening',
   phone: b.phone,
   phonePretty: b.phone ? prettyPhone(b.phone) : '',
   maxOnline: b.groups?.onlineMax ?? 8,
@@ -153,7 +154,10 @@ const data = branches.map((b) => ({
   .book-link { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-tiger-deep); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
   .book-done[hidden], .book-sheet[hidden] { display: none; }
   .book-go-wrap { display: grid; gap: 18px; }
-  .book-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+  /* More days scroll sideways: the strip fades at its far edge so the cut chip reads as "more", and the end
+     padding lets the last day clear the fade (AUDIT B-10). */
+  .book-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; padding-inline-end: 32px; scroll-snap-type: x mandatory; scroll-padding-inline: 0 32px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
   .book :global(.book-day) { flex: none; flex-direction: column; min-width: 64px; padding: 6px 10px; line-height: 1.15; scroll-snap-align: start; }
   .book :global(.book-day small) { display: block; font-size: 12px; font-weight: 400; }
   .book :global(.book-time) { min-width: 84px; padding: 0 10px; }
@@ -166,8 +170,8 @@ const data = branches.map((b) => ({
 
 <script>
   import { lockScroll, unlockScroll } from '@/lib/smooth-scroll';
-  import { KEYS, PROVIDER, local, addDays, wd, toMin, hhmm, prettyMin, slots as slotsFor, providerLink, type Span } from '@/lib/booking';
-  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
+  import { KEYS, PROVIDER, local, addDays, wd, toMin, hhmm, prettyMin, slots as slotsFor, providerLink, type Span, type SlotGrid } from '@/lib/booking';
+  interface B { id: string; name: string; tz: string; hours: Record<string, Span[]>; provider: string; url: string; widgetId?: string; phone?: string; phonePretty: string; grid: SlotGrid; maxOnline: number; setMenuFrom: number; depositFrom: number; deposit: string; pre: Span | null; preText: string | null }
   const dlg = document.querySelector<HTMLDialogElement>('[data-book-drawer]');
   const raw = document.querySelector('[data-book-data]')?.textContent;
   if (dlg && raw) {
@@ -188,7 +192,7 @@ const data = branches.map((b) => ({
 
     const pretty = prettyMin;
     // Last booking 45 minutes before closing, every half hour (src/lib/booking.ts).
-    const slots = (ymd: string) => slotsFor(b.hours, b.tz, ymd);
+    const slots = (ymd: string) => slotsFor(b.hours, b.tz, ymd, b.grid);
 
     const radio = (el: HTMLElement, cls: string, on: boolean, label: string, html: string, onPick: () => void) => {
       const btn = document.createElement('button');
@@ -206,9 +210,11 @@ const data = branches.map((b) => ({
       for (let i = 0; i < 21; i++) {
         const ymd = addDays(today, i);
         const d = new Date(`${ymd}T12:00:00Z`);
-        const wdName = i === 0 ? 'Today' : i === 1 ? 'Tmrw' : d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
+        const wdName = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
         const full = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
-        radio(daysEl, 'book-day', ymd === day, full, `${wdName}<small>${d.getUTCDate()} ${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</small>`, () => { day = ymd; time = ''; draw(); });
+        // Today and Tomorrow are named "Today, Tuesday 24 November": the word on the chip first (WCAG 2.5.3),
+        // then the full date; other days by their full date (AUDIT B-09).
+        radio(daysEl, 'book-day', ymd === day, i < 2 ? `${wdName}, ${full}` : full, `${wdName}<small>${d.getUTCDate()} ${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</small>`, () => { day = ymd; time = ''; draw(); });
       }
     };
     const drawTimes = () => {
@@ -217,7 +223,8 @@ const data = branches.map((b) => ({
       const closed = $<HTMLElement>('[data-book-closed]');
       closed.hidden = list.length > 0;
       // Name the room and the reason: closed all day, or no tables left today.
-      closed.textContent = (b.hours[KEYS[wd(day)]] ?? []).length
+      // Copy only while shown: hidden notes were read by scrapers and reader modes (AUDIT B-18).
+      closed.textContent = closed.hidden ? '' : (b.hours[KEYS[wd(day)]] ?? []).length
         ? `No more tables at ${b.name} ${day === local(b.tz).ymd ? 'today' : 'that day'}. Pick another day.`
         : `${b.name} is closed on ${new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' })}s. Pick another day.`;
       if (!list.some((m) => hhmm(m) === time)) time = list.find((m) => m >= 19 * 60) !== undefined ? hhmm(list.find((m) => m >= 19 * 60)!) : list[0] !== undefined ? hhmm(list[0]) : '';
@@ -227,18 +234,18 @@ const data = branches.map((b) => ({
       const tooMany = size > b.maxOnline;
       $<HTMLElement>('[data-book-group]').hidden = !tooMany;
       $<HTMLElement>('[data-book-go-wrap]').hidden = tooMany;
-      $<HTMLElement>('[data-book-group-text]').textContent = size >= b.setMenuFrom
+      $<HTMLElement>('[data-book-group-text]').textContent = !tooMany ? '' : size >= b.setMenuFrom
         ? `For ${b.setMenuFrom} or more, ${b.name} plans a set menu with you.`
         : `${b.name} books online for up to ${b.maxOnline}. For ${size}, please call or send an enquiry.`;
       const q = new URLSearchParams({ branch: b.id, guests: String(size), ...(day ? { date: day } : {}), ...(time ? { time } : {}) });
       $<HTMLAnchorElement>('[data-book-enquire]').href = `/private-dining/?${q}`;
       const dep = $<HTMLElement>('[data-book-deposit]');
       dep.hidden = size < b.depositFrom || !b.deposit;
-      dep.textContent = b.deposit;
+      dep.textContent = dep.hidden ? '' : b.deposit;
       const pre = $<HTMLElement>('[data-book-pre]');
       const tm = time ? toMin(time) : -1;
       pre.hidden = !(b.pre && b.preText && tm >= toMin(b.pre[0]) && tm <= toMin(b.pre[1]));
-      pre.textContent = `Pre-theatre menu: seated ${b.preText}.`;
+      pre.textContent = pre.hidden ? '' : `Pre-theatre menu: seated ${b.preText}.`;
       $<HTMLElement>('[data-book-size-said]').textContent = `${size} guest${size === 1 ? '' : 's'}`;
       for (const a of dlg.querySelectorAll<HTMLAnchorElement>('[data-book-tel],[data-book-tel2]')) { a.href = `tel:${b.phone}`; a.textContent = b.phonePretty; }
       $<HTMLElement>('[data-book-name]').textContent = `at ${b.name}`;
@@ -309,6 +316,12 @@ const data = branches.map((b) => ({
     });
     dlg.addEventListener('close', () => { opener?.focus(); unlockScroll(); });
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+
+    // With JavaScript these links open this drawer, not the provider's tab: say so (AUDIT B-15).
+    for (const n of document.querySelectorAll<HTMLElement>('[data-book] [data-tab-note]')) {
+      const id = n.closest<HTMLElement>('[data-book]')!.dataset.book ?? '';
+      if (!id || all.some((x) => x.id === id)) n.textContent = ' (opens the booking panel)';
+    }
 
     // Any [data-book] link opens the drawer; its value picks the restaurant
     // (empty = let the guest choose). Delegated, so links added later work too.

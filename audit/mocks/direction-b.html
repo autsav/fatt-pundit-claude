@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction B · The Paper Trail (mock)</title>
+<link rel="stylesheet" href="mock-base.css">
+<style>
+  /* Direction B — "The Paper Trail": printed ephemera on paper. One red route line threads the whole page (the journey),
+     each chapter is one printed object: a ticket, a menu card, a bar chit, a postcard, a boarding pass. */
+  body { background: var(--paper-light); color: var(--ink); }
+  header.top { position: sticky; top: 0; z-index: 30; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; background: var(--paper-light); border-bottom: 2px solid var(--ink); }
+  header.top b { letter-spacing: .14em; font-size: 15px; } header.top nav { display: flex; gap: 24px; align-items: center; font-size: 15px; }
+  header.top .btn { min-height: 40px; }
+  main { position: relative; }
+  /* The thread: a single route line down the left gutter, drawn by scroll in production. */
+  .thread { position: absolute; top: 0; bottom: 0; left: max(24px, calc(50% - 640px)); width: 2px; background: repeating-linear-gradient(var(--tiger-deep) 0 10px, transparent 10px 18px); }
+  section { position: relative; padding: clamp(80px, 11vw, 150px) 0 0 max(56px, calc(50% - 600px)); padding-right: 16px; }
+  .stop { position: absolute; left: calc(max(24px, calc(50% - 640px)) - 7px); top: clamp(88px, 11vw, 158px); width: 16px; height: 16px; border-radius: 50%; background: var(--tiger); box-shadow: 0 0 0 4px var(--paper-light); }
+  .kicker { font-family: Lora, serif; font-style: italic; color: var(--tiger-deep); font-size: 19px; margin: 0 0 8px; }
+  h1 { font-size: var(--display); line-height: .9; margin: 0; text-transform: uppercase; }
+  h2 { font-weight: 300; font-size: var(--h2); line-height: 1.02; margin: 0 0 24px; max-width: 16ch; }
+  .lede { max-width: 58ch; margin: 0 0 28px; }
+  .hero { display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; padding-top: 56px; max-width: 1240px; }
+  .postcard { background: #fff; padding: 14px 14px 44px; box-shadow: 0 10px 28px rgb(44 41 37 / .28); transform: rotate(-1.5deg); }
+  .postcard img { aspect-ratio: 4/3; object-fit: cover; width: 100%; }
+  .ticketrow { display: grid; gap: 10px; margin-top: 28px; max-width: 460px; }
+  .ticketrow a { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 2px solid var(--ink); background: var(--paper); text-decoration: none; }
+  .ticketrow a b { letter-spacing: .06em; text-transform: uppercase; } .ticketrow a span { font-size: 14px; }
+  .card { max-width: 1040px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; border: 2px solid var(--ink); background: var(--paper); padding: 28px; }
+  .card figure { margin: 0; } .card img { aspect-ratio: 1; object-fit: cover; width: 100%; }
+  .card figcaption { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; font-weight: 700; font-size: 16px; border-bottom: 1px dotted var(--ink); padding-bottom: 6px; }
+  .bar { display: grid; grid-template-columns: 6fr 5fr; gap: 40px; max-width: 1100px; align-items: center; }
+  .bar img { aspect-ratio: 4/5; object-fit: cover; width: 100%; }
+  .chit { background: var(--ink); color: var(--paper); padding: 28px; }
+  .passes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1040px; }
+  .pass { border: 2px solid var(--ink); background: #fff; display: grid; grid-template-columns: 1fr auto; }
+  .pass .body { padding: 24px; display: grid; gap: 8px; } .pass h3 { margin: 0; font-size: clamp(26px, 3vw, 36px); text-transform: uppercase; }
+  .pass .stub { border-left: 2px dashed var(--ink); padding: 24px 18px; display: grid; place-items: center; writing-mode: vertical-rl; font-weight: 700; letter-spacing: .1em; background: var(--tiger); }
+  .dubai { grid-column: 1 / -1; padding: 16px 24px; border: 2px dashed var(--ink); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .end { padding-bottom: 140px; }
+  @media (max-width: 700px) {
+    header.top nav a:not(.btn) { display: none; }
+    .hero, .bar, .passes { grid-template-columns: 1fr; }
+    .card { grid-template-columns: 1fr 1fr; padding: 16px; gap: 14px; }
+    .card figcaption { flex-direction: column; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<header class="top"><b>FATT PUNDIT</b><nav><a href="#">Soho</a><a href="#">Covent Garden</a><a href="#">Dubai</a><a href="#">Menus</a><a href="#">Our story</a><a class="btn btn--book" href="#">Book a table</a></nav></header>
+<main>
+<div class="thread" aria-hidden="true"></div>
+
+<section class="hero">
+  <span class="ann" style="top:40px;left:8px">1</span>
+  <div>
+    <p class="kicker">Hakka cooking from Calcutta’s Chinatown</p>
+    <h1>Fatt<br>Pundit</h1>
+    <div class="ticketrow">
+      <a href="#"><b>Soho</b><span>77 Berwick Street</span></a>
+      <a href="#"><b>Covent Garden</b><span>6 Maiden Lane</span></a>
+      <a href="#"><b>Dubai</b><span>Opening soon</span></a>
+    </div>
+  </div>
+  <div class="postcard"><img src="../../src/assets/images/covent-garden/gallery-05.jpg" alt=""></div>
+</section>
+
+<section><span class="stop"></span>
+  <span class="ann" style="top:60px;left:8px">2</span>
+  <p class="kicker">Guangdong → Calcutta → London</p>
+  <h2>The recipes travelled. So did we.</h2>
+  <p class="lede">Hakka families carried their cooking to Tangra, Calcutta’s Chinatown, where it met Indian spice. The line on the left is their route; it reaches London in 2019.</p>
+  <a class="btn" href="#">Read the whole story</a>
+</section>
+
+<section><span class="stop"></span>
+  <span class="ann" style="top:60px;left:8px">3</span>
+  <p class="kicker">From the pass</p>
+  <h2>Start with these four.</h2>
+  <div class="card">
+    <figure><img src="../../src/assets/images/dishes/momo-mix-vegetable.jpg" alt=""><figcaption><span>Mix vegetable momo</span><span>£7</span></figcaption></figure>
+    <figure><img src="../../src/assets/images/dishes/crackling-spinach.jpg" alt=""><figcaption><span>Crackling spinach</span><span>£11</span></figcaption></figure>
+    <figure><img src="../../src/assets/images/dishes/crispy-okra-salt-n-pepper.jpg" alt=""><figcaption><span>Crispy okra salt ‘n’ pepper</span><span>£11</span></figcaption></figure>
+    <figure><img src="../../src/assets/images/dishes/sizzling-brownie.jpg" alt=""><figcaption><span>Sizzling brownie</span><span>£12.50</span></figcaption></figure>
+  </div>
+  <p style="margin-top:20px"><a href="#">Soho menus</a> · <a href="#">Covent Garden menus</a></p>
+</section>
+
+<section><span class="stop"></span>
+  <span class="ann" style="top:60px;left:8px">4</span>
+  <div class="bar">
+    <img src="../../src/assets/images/journey/05-bar-guava-chilli-sour.jpg" alt="">
+    <div><p class="kicker">The bar</p><h2>Fruit vendors, spiced and salted.</h2>
+      <div class="chit"><strong>GUAVA CHILLI SOUR</strong><p style="margin:6px 0 0">Himalayan salt, red chilli, guava; spike it with tequila. Mocktail £8.50, spike it £13.50.</p></div></div>
+  </div>
+</section>
+
+<section class="end"><span class="stop"></span>
+  <span class="ann" style="top:60px;left:8px">5</span>
+  <p class="kicker">Your table</p>
+  <h2>Choose your room.</h2>
+  <div class="passes">
+    <div class="pass"><div class="body"><h3>Soho</h3><p style="margin:0">77 Berwick Street, W1F 8TH</p><p class="kicker" style="margin:0">Open today · 12–2.30pm, 5–10.30pm</p></div><a class="stub" href="#" style="text-decoration:none">BOOK SOHO</a></div>
+    <div class="pass"><div class="body"><h3>Covent Garden</h3><p style="margin:0">6 Maiden Lane, WC2E 7NA</p><p class="kicker" style="margin:0">Open today · 4.45–10.30pm</p></div><a class="stub" href="#" style="text-decoration:none">BOOK CG</a></div>
+    <div class="dubai"><span><b>DUBAI</b> · The Hangout, Mall of the Emirates · opening soon</span><a class="btn" href="#">Join the opening list</a></div>
+  </div>
+</section>
+</main>
+<div class="stickybook"><a class="btn btn--book" href="#">Book a table</a></div>
+
+<div class="legend"><h2>Direction B · The Paper Trail — notes</h2><ol>
+  <li><b>Hero = printed matter, not a scene.</b> Name, three room tickets, one postcard photo. Loads instantly (no intro); LCP is text.</li>
+  <li><b>One thread holds the whole page.</b> A dashed route line in the gutter draws itself with scroll (CSS scroll-timeline; reduced motion: drawn). Each chapter is a stop on it — the endspeciesism idea, in brand ephemera.</li>
+  <li><b>Menu card, four dishes.</b> Dotted price leaders like the printed menu; full menus on /[branch]/menu/.</li>
+  <li><b>Bar chit.</b> One drink in ink-reversed type beside one portrait photo.</li>
+  <li><b>Boarding passes kept, simplified</b>: one per room, the stub is the Book button (tiger orange only here and in the header). Sticky Book bar on phones.</li>
+</ol></div>
+</body>
+</html>
