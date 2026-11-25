@@ -34,7 +34,7 @@
   .fp-prose a { color: var(--fp-link); font-weight: 700; text-underline-offset: 0.18em; }
   @media (hover: hover) {.fp-prose a:hover { color: var(--fp-link-hover); text-decoration-thickness: 2px; }}
 
-  /* Sheet: a paper form/card with a hard offset shadow (the look of private dining's enquiry sheet). */
+  /* Sheet: a paper form/card with a hard offset shadow (the look of the groups page's enquiry sheet). */
   .fp-sheet { padding: var(--space-6); border: 1px solid rgb(26 23 20 / 0.2); background: var(--color-paper); box-shadow: 8px 8px 0 rgb(26 23 20 / 0.12); }
 
   /* ---------------------------------------------------------------- Layout */

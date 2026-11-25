@@ -7,6 +7,8 @@
     { "source": "/soho/reserve-a-table/", "destination": "/book/?branch=soho", "statusCode": 301 },
     { "source": "/covent-garden/reserve-a-table", "destination": "/book/?branch=covent-garden", "statusCode": 301 },
     { "source": "/covent-garden/reserve-a-table/", "destination": "/book/?branch=covent-garden", "statusCode": 301 },
+    { "source": "/private-dining", "destination": "/groups/", "statusCode": 308 },
+    { "source": "/private-dining/", "destination": "/groups/", "statusCode": 308 },
     { "source": "/soho/monetary-voucher", "destination": "/soho/", "statusCode": 301 },
     { "source": "/soho/monetary-voucher/", "destination": "/soho/", "statusCode": 301 },
     { "source": "/soho/food-pickup", "destination": "/soho/#at-home", "statusCode": 301 },

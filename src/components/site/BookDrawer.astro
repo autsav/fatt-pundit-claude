@@ -74,7 +74,7 @@ const data = branches.map((b) => ({
     <div class="book-group" data-book-group hidden>
       <div class="book-group-in">
         <p data-book-group-text></p>
-        <a class="fp-btn fp-btn--primary book-go" data-book-enquire href="/private-dining/">Send a group enquiry</a>
+        <a class="fp-btn fp-btn--primary book-go" data-book-enquire href="/groups/">Send a group enquiry</a>
         <p class="book-small">Ask about space for your group: call <a data-book-tel href="#"></a>.</p>
       </div>
     </div>
@@ -238,7 +238,7 @@ const data = branches.map((b) => ({
         ? `For ${b.setMenuFrom} or more, ${b.name} plans a set menu with you.`
         : `${b.name} books online for up to ${b.maxOnline}. For ${size}, please call or send an enquiry.`;
       const q = new URLSearchParams({ branch: b.id, guests: String(size), ...(day ? { date: day } : {}), ...(time ? { time } : {}) });
-      $<HTMLAnchorElement>('[data-book-enquire]').href = `/private-dining/?${q}`;
+      $<HTMLAnchorElement>('[data-book-enquire]').href = `/groups/?${q}`;
       const dep = $<HTMLElement>('[data-book-deposit]');
       dep.hidden = size < b.depositFrom || !b.deposit;
       dep.textContent = dep.hidden ? '' : b.deposit;
