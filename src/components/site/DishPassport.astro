@@ -32,7 +32,7 @@ const { branch, name } = Astro.props;
   .pp { position: fixed; z-index: 30; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); }
   /* Below 1024px the phone dock sits along the bottom edge: clear it. */
   @media (max-width: 1023.98px) { .pp { bottom: calc(var(--dock-h, 64px) + env(safe-area-inset-bottom, 0px) + 14px); } }
-  .pp-open { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-gold); color: var(--color-ink-deep); font: inherit; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 14px; cursor: pointer; box-shadow: 4px 4px 0 var(--color-ink); }
+  .pp-open { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 2px solid var(--color-ink); background: var(--color-gold); color: var(--color-ink-deep); font: inherit; font-weight: 700; letter-spacing: var(--tracking-title); text-transform: uppercase; font-size: 14px; cursor: pointer; box-shadow: 4px 4px 0 var(--color-ink); }
   .pp-n { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 50%; background: var(--color-ink); color: var(--color-sand); font-size: 13px; }
   .pp-open.is-bump { animation: pp-bump var(--dur-spring) var(--curve-spring); }
   @keyframes pp-bump { 40% { transform: scale(1.12) rotate(-3deg); } }
@@ -46,7 +46,7 @@ const { branch, name } = Astro.props;
   @supports (overlay: auto) { .pp-dlg, .pp-dlg::backdrop { transition-property: transform, opacity, overlay, display; transition-behavior: allow-discrete; } }
   .pp-sheet { background: var(--color-paper-light); color: var(--color-ink); border: 2px solid var(--color-ink); padding: 24px; box-shadow: 8px 8px 0 var(--color-ink); background-image: radial-gradient(rgb(44 41 37 / 0.06) 1px, transparent 1.2px); background-size: 7px 7px; }
   .pp-kicker { margin: 0; font-family: var(--font-note); font-style: italic; color: var(--color-tiger-deep); }
-  .pp-title { margin: 2px 0 14px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 26px; }
+  .pp-title { margin: 2px 0 14px; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: 26px; }
   .pp-list { margin: 0 0 12px; padding-left: 1.4em; display: grid; gap: 6px; font-weight: 700; }
   .pp-list :global(button) { min-height: 24px; margin-left: 8px; font: inherit; font-size: 13px; font-weight: 400; background: none; border: 0; color: var(--color-tiger-deep); text-decoration: underline; cursor: pointer; }
   .pp-empty, .pp-hint, .pp-done { margin: 0 0 10px; font-family: var(--font-note); font-style: italic; }

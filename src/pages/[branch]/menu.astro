@@ -234,7 +234,7 @@ const ld = {
   .mb-links { display: flex; flex-wrap: wrap; gap: var(--space-1, 4px) var(--space-4); margin-inline-start: auto !important; }
   .menu-ask, .menu-key { margin: 6px 0 0 !important; font-size: var(--step-small); }
   .menu-ask a { color: var(--color-tiger-deep); font-weight: 700; }
-  .menu-key { font-size: var(--step-tag); letter-spacing: 0.04em; color: var(--fp-fg-muted); }
+  .menu-key { font-size: var(--step-tag); letter-spacing: var(--tracking-copy); color: var(--fp-fg-muted); }
   .menu-block h2:focus-visible { outline-offset: 4px; }
   /* Section jump chips: one sticky strip under the picker; a sideways scroll-snap row on phones. */
   .menu-chips { position: sticky; top: calc(var(--menu-bar, 56px) + 44px); z-index: 4; display: flex; gap: 6px; margin: var(--space-3) 0 0; padding: 6px 0; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; background: var(--color-paper-light); border-bottom: 1px solid var(--fp-rule); }
@@ -284,9 +284,9 @@ const ld = {
   }
   .menu-block { padding-top: 0; scroll-margin-top: 200px; content-visibility: auto; contain-intrinsic-size: auto 1200px; }
   .menu-block + .menu-block { margin-top: var(--space-8); }
-  .menu-block h2 { margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 3px double var(--color-ink); padding-bottom: 8px; }
+  .menu-block h2 { margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); text-transform: uppercase; letter-spacing: var(--tracking-title); border-bottom: 3px double var(--color-ink); padding-bottom: 8px; }
   .menu-intro, .menu-note { font-family: var(--font-note); font-style: italic; }
-  .menu-sec h3 { margin: 22px 0 6px; font-size: var(--step-small); letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-tiger-deep); }
+  .menu-sec h3 { margin: 22px 0 6px; font-size: var(--step-small); letter-spacing: var(--tracking-title); text-transform: uppercase; color: var(--color-tiger-deep); }
   .menu-sec ul { list-style: none; padding: 0; margin: 0; }
   .menu-item { padding: 10px 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); }
   /* Name | price | passport stamp on the first line (a grid, so a long name wraps inside its own column
@@ -295,7 +295,7 @@ const ld = {
   .mi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'name price stamp'; align-items: baseline; gap: 2px 12px; }
   .mi-name { grid-area: name; font-weight: 700; font-size: var(--step-h4); }
   .mi-sig { font-size: var(--step-tag); font-weight: 700; color: var(--color-tiger-deep); white-space: nowrap; }
-  .mi-tags { margin: 2px 0 0 !important; font-size: var(--step-tag); letter-spacing: 0.06em; color: var(--fp-fg-muted); }
+  .mi-tags { margin: 2px 0 0 !important; font-size: var(--step-tag); letter-spacing: var(--tracking-copy); color: var(--fp-fg-muted); }
   .mi-price { grid-area: price; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* The stamp says what it does: a heart-stamp over "Save" ("Saved" once collected), set apart from the price. */
   .mi-head :global(.pp-stamp) { grid-area: stamp; align-self: center; width: auto; min-width: 44px; height: auto; min-height: 44px; margin: -8px 0 -8px 8px; padding: 2px 0 2px 12px; border-left: 1px dotted rgb(44 41 37 / 0.4); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }

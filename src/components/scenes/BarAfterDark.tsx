@@ -154,7 +154,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
             <figcaption className="flex items-center justify-between gap-3 font-note text-[16px] italic text-sand/80">
               <span>{calm ? 'The bar at Covent Garden, lit for the evening.' : 'The bar after dark.'}</span>
               {!calm && (
-                <button type="button" className="fp-btn fp-btn--text shrink-0 font-label text-[12px] font-bold uppercase not-italic tracking-[0.2em] text-gold" aria-pressed={lit} onClick={() => setLit((v) => !v)}>
+                <button type="button" className="fp-btn fp-btn--text shrink-0 font-label text-[12px] font-bold uppercase not-italic tracking-copy text-gold" aria-pressed={lit} onClick={() => setLit((v) => !v)}>
                   Lights up
                 </button>
               )}
@@ -164,12 +164,12 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
           {/* The menu on a leather apron. */}
           <div className="bar-apron relative">
             <span className="bar-deboss" aria-hidden="true" style={{ WebkitMaskImage: `url(${tiger})`, maskImage: `url(${tiger})` }} />
-            <h3 className="relative m-0 mb-2 font-note text-[20px] font-medium normal-case italic tracking-normal text-gold">From the bar</h3>
+            <h3 className="relative m-0 mb-2 font-note text-[20px] font-medium normal-case italic tracking-copy text-gold">From the bar</h3>
             <ul className="relative m-0 list-none p-0">
               {drinks.map((d) => (
                 <li key={d.id} className="flex items-baseline justify-between gap-4 border-b border-dashed border-sand/35 py-3.5 last:border-b-0">
                   <div className="min-w-0">
-                    <p className="m-0 text-[17px] font-bold uppercase tracking-[0.06em] [text-wrap:balance]">{d.name}</p>
+                    <p className="m-0 text-[17px] font-bold uppercase tracking-title [text-wrap:balance]">{d.name}</p>
                     {d.description && <p className="m-0 mt-1 font-note text-[15px] italic leading-snug text-sand/80">{d.description}</p>}
                   </div>
                   {d.price && <span className="min-w-[7ch] max-w-[42%] shrink-0 text-right font-bold text-tiger-bright">{d.price}</span>}

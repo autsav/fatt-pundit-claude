@@ -29,7 +29,7 @@ const SPOTS: [number, number, number][] = [
   [34, 30, 15], [50, 22, 13], [66, 30, 15], [26, 58, 12], [42, 56, 17], [59, 58, 14], [75, 54, 12], [50, 84, 12], [67, 84, 13],
 ];
 
-const COBALT = '#23428f';
+const COBALT = '#465460';
 
 function PlateArt({ v }: { v: number }) {
   const dots = Array.from({ length: 24 }, (_, i) => (i / 24) * Math.PI * 2);
@@ -162,7 +162,7 @@ export default function PlateWall({ dishes }: { dishes: PlateDish[] }) {
                 <span className="absolute inset-0 rounded-full shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden]">
                   <PlateArt v={i % 3} />
                 </span>
-                <span className="@container absolute inset-0 flex flex-col items-center justify-center rounded-full border-[0.35em] border-[#23428f] bg-[#fbfaf6] p-[14%] text-center shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                <span className="@container absolute inset-0 flex flex-col items-center justify-center rounded-full border-[0.35em] border-[#465460] bg-[#fbfaf6] p-[14%] text-center shadow-[0_6px_10px_rgb(44_41_37/0.28)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
                   {/* Sized so the longest word fits the plate and the name stays within three lines.
                       Plates whose writing area is under 90px (phones, tablets and the small plates on any wall)
                       show only the price, at 30cqi (12–27px); the name is captioned below. At 13cqi the price was

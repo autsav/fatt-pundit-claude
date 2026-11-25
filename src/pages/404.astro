@@ -78,13 +78,13 @@ const branches = await getBranches();
   .tag { position: relative; width: min(520px, 100% - 32px); box-sizing: border-box; background: var(--color-sand); color: var(--color-ink); padding: 48px 32px 32px; border: 2px solid var(--color-ink); box-shadow: var(--lift-3); transform: rotate(-1.5deg); text-align: center; }
   @media (prefers-reduced-motion: reduce) { .tag { transform: none; } }
   .tag::before { content: ''; position: absolute; top: 16px; left: 50%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--color-ink); box-shadow: 0 0 0 5px var(--color-gold); }
-  .tag-head { font-size: inherit; line-height: inherit; margin: 18px 0 0; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-tiger-deep); }
+  .tag-head { font-size: inherit; line-height: inherit; margin: 18px 0 0; font-weight: 700; letter-spacing: var(--tracking-title); text-transform: uppercase; color: var(--color-tiger-deep); }
   .tag-code { margin: 4px 0; font-size: clamp(72px, 16vw, 128px); font-weight: 700; line-height: 1; }
   .tag-line { margin: 0 0 24px; font-family: var(--font-note); font-style: italic; font-size: 21px; }
   .tag-go { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--color-ink); text-align: left; }
   .tag-go a { display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 4px; border-bottom: 1px solid var(--color-ink); color: var(--color-ink); font-weight: 700; text-decoration: none; }
   .tag-go a:hover { background: var(--color-paper-light); text-decoration: underline; text-underline-offset: 4px; }
-  .tag-group { margin: 20px 0 6px; font-size: 14px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; text-align: left; color: var(--color-tiger-deep); }
+  .tag-group { margin: 20px 0 6px; font-size: 14px; font-weight: 700; letter-spacing: var(--tracking-title); text-transform: uppercase; text-align: left; color: var(--color-tiger-deep); }
   .tag-line + .tag-group, .did-you-mean + .tag-group { margin-top: 0; }
   .did-you-mean { margin: -8px 0 16px; font-weight: 700; }
   .did-you-mean a { color: var(--color-ink); }

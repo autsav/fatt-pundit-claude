@@ -6,6 +6,7 @@ import { stampSrc } from '@/lib/stamp';
  * Calm mode: already open, receipt in place. No JS: same, nothing hidden.
  */
 import type { Branch } from '@/lib/site-data';
+import Namemark from './Namemark.astro';
 import stampArt from '@/assets/images/brand/logo-stamp-distressed-left.png';
 
 interface Props {
@@ -19,7 +20,7 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
     <div class="receipt-slot" aria-hidden="true"></div>
     <div class="receipt-clip">
       <div class="receipt" aria-hidden="true">
-        <p class="r-c r-big">Fatt Pundit</p>
+        <p class="r-c r-big"><Namemark /></p>
         <p class="r-c">Hakka cooking from Tangra</p>
         <p class="r-c r-date" data-receipt-date>&nbsp;</p>
         <p class="r-rule" aria-hidden="true"></p>
@@ -79,7 +80,7 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   /* The slot the receipt prints out of. */
   .receipt-slot { position: absolute; left: 8px; right: 8px; top: 16px; height: 6px; border-radius: 3px; background: #000; box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.9), 0 1px 0 rgb(203 160 82 / 0.3); }
   .receipt-clip { position: relative; clip-path: inset(0 -20px -100vh -20px); }
-  .receipt { --ink: #2c2925; text-align: left; background: #fbf8f2; color: var(--ink); padding: 12px 10px 18px; font-family: var(--font-label); font-size: 12.5px; line-height: 1.35; letter-spacing: 0.04em;
+  .receipt { --ink: #2c2925; text-align: left; background: #fbf8f2; color: var(--ink); padding: 12px 10px 18px; font-family: var(--font-label); font-size: 12.5px; line-height: 1.35; letter-spacing: var(--tracking-copy);
     box-shadow: 0 6px 14px rgb(0 0 0 / 0.35);
     -webkit-mask: linear-gradient(#000, #000) top / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at 50% 0, #000 90deg, transparent 0) bottom / 10px 6px repeat-x;
     mask: linear-gradient(#000, #000) top / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at 50% 0, #000 90deg, transparent 0) bottom / 10px 6px repeat-x; }
@@ -88,7 +89,7 @@ const BARS = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 1, 3, 1, 2, 1, 3, 2, 1, 1, 
   .bill.is-open .receipt { translate: 0 0; transition: translate var(--dur-story-long) steps(12, end) var(--dur-panel); }
   .receipt p, .receipt dl { margin: 0; }
   .r-c { text-align: center; }
-  .r-big { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+  .r-big { font-size: 18px; line-height: 0; } /* the approved namemark (guidelines p.8), not typed */
   .r-date { margin-top: 4px !important; }
   .r-rule { height: 0; margin: 8px 0 !important; border-top: 1.5px dashed var(--ink); }
   .r-row { display: flex; justify-content: space-between; gap: 8px; text-transform: uppercase; }

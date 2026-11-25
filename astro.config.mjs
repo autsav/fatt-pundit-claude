@@ -46,7 +46,6 @@ export default defineConfig({
               { src: [`${kam}-700-normal.woff2`], weight: 700, style: 'normal' },
             ]
           : [
-              { src: [`${at}/american-typewriter-light.woff2`], weight: 300, style: 'normal' },
               { src: [`${at}/american-typewriter-regular.woff2`], weight: 400, style: 'normal' },
               { src: [`${at}/american-typewriter-bold.woff2`], weight: 700, style: 'normal' },
             ],

@@ -159,7 +159,7 @@ export default function RoomContactSheet({ frames, picks }: { frames: SheetFrame
             <img key={cur.full} src={cur.full} srcSet={cur.thumbSet ? `${cur.thumbSet}, ${cur.full} 1600w` : undefined} sizes={cur.thumbSet ? '100vw' : undefined} alt={cur.alt} className="fp-photo room-lightbox-img" style={{ viewTransitionName: 'room-photo' }} />
             <figcaption className="flex w-full max-w-[1100px] items-center justify-between gap-4 px-2 text-sand">
               <span className="font-note text-[16px] italic">{cur.alt}</span>
-              <span aria-live="polite" className="shrink-0 font-label text-[12px] font-bold uppercase tracking-[0.24em] text-gold">
+              <span aria-live="polite" className="shrink-0 font-label text-[12px] font-bold uppercase tracking-title text-gold">
                 Frame {FIRST + open}, {open + 1} of {frames.length}
               </span>
             </figcaption>

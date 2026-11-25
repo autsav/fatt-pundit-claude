@@ -136,7 +136,7 @@ const { src, off, lit, litSet, label, lamps, ratio, place } = Astro.props;
   [data-still] .lit { opacity: 1; }
   /* Evening: a deep blue-ink multiply that grows with scroll, darker at the edges. */
   .dusk { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: calc(var(--dusk) * 0.55);
-    background: radial-gradient(120% 90% at 40% 30%, #8a7f96, #3a3348 70%, #241f2c); }
+    background: radial-gradient(120% 90% at 40% 30%, var(--color-slate), color-mix(in srgb, var(--color-slate-deep) 55%, var(--color-ink)) 70%, var(--color-ink)); }
   /* The same dusk on a CSS view timeline is in global.css ("Lights on"): the scoped-style pipeline drops
      animation-timeline declarations written here. */
 

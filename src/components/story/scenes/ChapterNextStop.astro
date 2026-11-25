@@ -90,7 +90,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .ns-tag { left: 50%; top: 40%; translate: -50% -50%; rotate: -5deg; display: grid; gap: 0.3em; justify-items: center; padding: calc(var(--u) * 5) calc(var(--u) * 4) calc(var(--u) * 2.4); background: var(--color-paper-light); color: var(--color-ink);
     border: 3px solid var(--color-ink); box-shadow: 5px 5px 0 var(--glow); clip-path: polygon(14% 0, 86% 0, 100% 18%, 100% 100%, 0 100%, 0 18%); z-index: 2; --from: 6%; --to: 10%; --out-from: 18%; --out-to: 20%; }
   .ns-tag::before { content: ''; position: absolute; top: calc(var(--u) * 1.6); left: 50%; width: calc(var(--u) * 2.4); aspect-ratio: 1; translate: -50% 0; border-radius: 50%; background: var(--color-ink); }
-  .ns-tag-to { font: 700 clamp(26px, calc(var(--u) * 5), 72px) / 1 var(--font-display, Georgia, serif); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+  .ns-tag-to { font: 700 clamp(26px, calc(var(--u) * 5), 72px) / 1 var(--font-display, Georgia, serif); text-transform: uppercase; letter-spacing: var(--tracking-title); white-space: nowrap; }
   .ns-tag-to b { color: var(--color-tiger, #e8811f); }
   .ns-tag-sub { font: italic 500 clamp(15px, calc(var(--u) * 1.8), 24px) / 1.2 var(--font-note, Georgia, serif); }
   /* Paper-cut panoramas, bottom-aligned, full width; the dunes are nearer so they rise a little faster (bigger --y0, same score). */
@@ -127,7 +127,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .ns-hang { position: absolute; width: clamp(28px, 3.4vw, 52px); height: auto; translate: -50% 0; transform-origin: 50% 0; }
   /* The tent card on the empty chair: the reader's seat. Lands as the caption says so. */
   .ns-reserved { left: calc(50% + var(--tw) * 0.33); bottom: calc(var(--tb) + var(--tw) * 0.24); translate: -50% 0; z-index: var(--z-prop-front); margin: 0; padding: 0.3em 0.8em;
-    font: 700 clamp(12px, 1.3vw, 17px) / 1.2 var(--font-display, Georgia, serif); letter-spacing: 0.08em; text-transform: uppercase; rotate: -4deg;
+    font: 700 clamp(12px, 1.3vw, 17px) / 1.2 var(--font-display, Georgia, serif); letter-spacing: var(--tracking-title); text-transform: uppercase; rotate: -4deg;
     color: var(--color-ink); background: var(--color-paper); border: 2px solid var(--color-ink); box-shadow: 3px 3px 0 var(--color-tiger, #e8811f); --from: 52%; --to: 56%; }
   .ns-steam { inset: 0; pointer-events: none; --from: 50%; --to: 54%; }
   .ns-puff { position: absolute; top: calc(100% - var(--tb) - var(--tw) * 0.5); --y1: -18vh; --o1: 0; }

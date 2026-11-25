@@ -3,10 +3,9 @@
 // A departure board clatters into FATT PUNDIT, the tiger stamp thuds down,
 // and the board splits open onto the rainy street.
 import { stampSrc } from '../../lib/stamp';
-// Tiger-orange stamp as a plain picture (a CSS mask made the browser wait on
+// Gold stamp as a plain picture (a CSS mask made the browser wait on
 // scripts before it counted as painted).
-import stamp from '../../assets/images/brand/logo-stamp-tiger.png';
-// Negative logo = tiger orange on dark (guidelines p.15): drawn as a mask so the colour is exact.
+import stamp from '../../assets/images/brand/stamp-gold.png';
 const stampImg = { src: await stampSrc(stamp, 320) };
 ---
 <script is:inline>
@@ -28,7 +27,7 @@ const stampImg = { src: await stampSrc(stamp, 320) };
     <p class="kicker">Now arriving</p>
     <div class="board"></div>
     <p class="route">Guangdong, Calcutta, London, Dubai</p>
-    <img class="stamp" data-stamp src={stampImg.src} alt="" width="329" height="430" loading="lazy" decoding="async" />
+    <img class="stamp" data-stamp src={stampImg.src} alt="" width="431" height="564" loading="lazy" decoding="async" />
   </div>
   <button class="skip-arrival" type="button" data-skip>Skip</button>
 </div>
@@ -54,11 +53,11 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   .half.left::after { right: clamp(10px, 1.6vw, 18px); }
   .half.right::after { left: clamp(10px, 1.6vw, 18px); }
   .center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 24px; text-align: center; }
-  .kicker { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; color: var(--color-gold); font-size: 13px; }
-  .route { margin: 0; font-family: var(--font-note); font-style: italic; color: rgb(218 199 181 / 0.88); font-size: 17px; letter-spacing: 0.04em; }
+  .kicker { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: var(--tracking-title); text-transform: uppercase; color: var(--color-gold); font-size: 13px; }
+  .route { margin: 0; font-family: var(--font-note); font-style: italic; color: rgb(218 199 181 / 0.88); font-size: 17px; letter-spacing: var(--tracking-copy); }
   /* Below the board, never over its letters. */
   .stamp { width: clamp(84px, 10vw, 130px); height: auto; margin-top: -4px; opacity: 0.92; pointer-events: none; }
-  .skip-arrival { position: absolute; right: 20px; bottom: 20px; min-height: 44px; padding: 0 18px; background: transparent; border: 1px solid rgb(218 199 181 / 0.4); color: var(--color-sand); font: inherit; font-size: 14px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; }
+  .skip-arrival { position: absolute; right: 20px; bottom: 20px; min-height: 44px; padding: 0 18px; background: transparent; border: 1px solid rgb(218 199 181 / 0.4); color: var(--color-sand); font: inherit; font-size: 14px; text-transform: uppercase; letter-spacing: var(--tracking-title); cursor: pointer; }
   .skip-arrival:hover { border-color: var(--color-gold); color: var(--color-gold); }
 </style>
 

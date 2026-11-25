@@ -1,0 +1,21 @@
+---
+/**
+ * The approved namemark (guidelines p.8), traced from the B3 PDF: never typed text.
+ * Colour comes from `color` (currentColor), size from the parent's font-size: the letters keep
+ * the cap height of the type they replace (line: 0.7em tall, stack: 1.71em).
+ * Decorative by default (wrap it in a labelled link or heading); pass `label` to make it an image.
+ */
+import line from '../../assets/images/brand/namemark-line.svg?raw';
+import stack from '../../assets/images/brand/namemark-stack.svg?raw';
+
+interface Props { variant?: 'line' | 'stack'; label?: string; class?: string }
+const { variant = 'line', label, class: cls } = Astro.props;
+---
+<span class:list={['namemark', `namemark--${variant}`, cls]} role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'} set:html={variant === 'line' ? line : stack} />
+
+<style is:global>
+  .namemark { display: inline-block; vertical-align: middle; line-height: 0; }
+  .namemark svg { display: block; height: 100%; width: auto; }
+  .namemark--line { height: 0.7em; }
+  .namemark--stack { height: 1.71em; }
+</style>
