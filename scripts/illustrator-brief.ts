@@ -5,7 +5,7 @@ import { ART_SLOTS } from '../src/data/story-art-slots.ts';
 const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
 const aspect = (w: number, h: number) => { const r = w / h; const g = gcd(w, h); const exact = `${w / g}:${h / g}`; return exact.length <= 6 ? exact : `${r.toFixed(2)}:1`; };
 const esc = (s: string) => s.replace(/\|/g, '\\|');
-const rows = ART_SLOTS.map((s) => `| \`${s.id}\` | ${s.kind} | ${s.chapter} | ${esc(s.what)} | ${s.deliver.width} × ${s.deliver.height} | ${aspect(s.deliver.width, s.deliver.height)} | ${esc(s.deliver.layers)} | ${s.deliver.transparent ? 'Yes (alpha)' : 'No'} | ${s.placeholder ? '**Commission** (placeholder in place)' : 'Approved stand-in; optional'} | \`${s.file}\` |`);
+const rows = ART_SLOTS.map((s) => `| \`${s.id}\` | ${s.kind} | ${s.chapter} | ${esc(s.what)} | ${s.deliver.width} × ${s.deliver.height} | ${aspect(s.deliver.width, s.deliver.height)} | ${esc(s.deliver.layers)} | ${s.deliver.transparent ? 'Yes (alpha)' : 'No'} | ${s.placeholder ? '**Commission** (placeholder in place)' : 'Approved; redraw optional'} | \`${s.file}\` |`);
 const commission = ART_SLOTS.filter((s) => s.placeholder);
 
 const md = `# Illustrator brief: "The tale of Fatt & Pundit"
@@ -13,9 +13,9 @@ const md = `# Illustrator brief: "The tale of Fatt & Pundit"
 Generated from \`src/data/story-art-slots.ts\` by \`node scripts/illustrator-brief.ts\`. Do not edit by hand; edit the slots and re-run.
 
 ## What this is
-The story page (/our-story/) is built and live with **placeholder art** in every slot below. Each delivered file replaces its placeholder with **no code change**: save it under the delivery file name and rebuild. The owner keeps the current tiger panels until these arrive (decision of 24 Nov 2026).
+The story page (/our-story/) is built and live with art in every slot below. **The owner keeps the tiger art in place as the final art (decision of 25 Nov 2026), so nothing is commissioned today.** This brief stays as the spec for any future redraw: a delivered file replaces the current one with **no code change** (save it under the delivery file name and rebuild).
 
-**To commission: ${commission.length} slots** (${commission.filter((s) => s.kind === 'panel').length} comic panels, ${commission.filter((s) => s.kind === 'character').length} character cut-outs). The other ${ART_SLOTS.length - commission.length} slots (backdrops, props) already have owner-approved art; redrawing them in the same hand is optional.
+**To commission: ${commission.length} slots.** All ${ART_SLOTS.length - commission.length} slots have owner-approved art; redrawing any of them in one hand is optional.
 
 ## Rules for every file
 - Style: paper-cut / printed ephemera, matching the brand guidelines; brand palette (ink #2c2925, tiger #f15d3d, gold #cba052, sand #dac7b5, slate #758591, paper #f6efe4).

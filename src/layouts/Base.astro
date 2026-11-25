@@ -98,7 +98,9 @@ const touchIcon = await getImage({ src: stamp, width: 180, format: 'png' });
     <Analytics />
     <!-- Instant page changes (Chrome/Edge): a branch page is rendered in the
          background once the guest hovers its link (desktop) or it sits on
-         screen (phones). Other browsers ignore this and load normally. -->
+         screen (phones). Other browsers ignore this and load normally.
+         A prerendered page opens without the cross-page view transition (the pass morph); owner's call,
+         25 Nov 2026: keep prerender, faster beats the morph. -->
     <script type="speculationrules" is:inline>
       {"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/our-story/"}},{"not":{"selector_matches":"[target=_blank], [download], [href*='#'], [rel~=nofollow]"}}]},"eagerness":"moderate"},{"where":{"href_matches":"/our-story/"},"eagerness":"conservative"}]}
     </script>

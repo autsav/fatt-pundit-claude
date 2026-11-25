@@ -348,7 +348,7 @@ The test baseline added in Phase 2: Vitest for `src/lib/booking.ts` and `hours.t
 
 ## Flagged, not changed (content, URLs, prices)
 - **Review figures** "4.8 / 5, 20,030 (Covent Garden), 16,000+ (Soho), November 2026": hard-coded on home, with no link to the source. The client should confirm them and provide a source URL.
-- **Pre-theatre windows.** Soho 17:00–17:45 matches the brief. Covent Garden is 16:45–17:30, which the brief doesn't state; please confirm.
+- **Pre-theatre windows.** Soho 17:00–17:45 matches the brief. Covent Garden is 16:45–17:30, which the brief doesn't state; please confirm. **Confirmed by the owner, 25 Nov 2026.**
 - **Covent Garden booking times** on :15/:45 (from opening at 16:45): does SevenRooms take those slots?
 - **Canonical host** is `www.fattpundit.co.uk`, while the brief says `fattpundit.co.uk`. Which is primary?
 - **Story panel art provenance** (B-08).
