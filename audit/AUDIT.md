@@ -68,7 +68,8 @@ Branch `redesign/premium-audit`. One commit per ID, plus follow-ups that cite th
 | B-24 | ✅ | 10268c5 | `jsonld.spec.ts`; `audit/data/jsonld-dump.txt` (Dubai: none; Soho and Covent Garden: Restaurant) |
 | Host | ✅ | 1783692 | `vercel.json`: host-matched apex → www, permanent (308); `robots.test.ts` |
 | Perf | ✅ | 7292cd1 (B-22), d4065f1, dad380c | Curtain fallback removed once live; map 1000 → 750 px (107 → 73 KB); voyage stamps 300 → 200 px; sitemap `lastmod` |
-| B-23, B-26 | ➡️ Phase 3 | — | The home menu and islands depend on the Direction C storyboard |
+| B-23 | ➡️ open | — | The home menu still ships all 10 menus inside the MenuBook island (loads on approach, after first paint) |
+| B-26 | ✅ fixed | perf/home-js | First-visit home JS 148.5 → 69 KB: no React before the voyage (rain glass and intro board are plain DOM); rain skipped on software WebGL; smaller soft hero still. Lighthouse home 88–91 (was 77), TBT 0, 1091 KB |
 
 Harness: smoke 8/8 (e07b68e); `perf:taps` all < 200 ms at 4× CPU; the booking e2e covers both rooms × 2/4/7/8 × today/+3.
 
