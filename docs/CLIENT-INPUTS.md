@@ -90,6 +90,11 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 ## Answered
 | Date | Answer | Used in |
 | --- | --- | --- |
+| 25 Nov 2026 | Gold or foil versions of the logo are allowed on the web where they look good (as on the menus, cards, bill holder and aprons, guidelines p.23–41) | Gold stamp kept (voyage, menu book, branch pages, story); footer namemark in gold foil; the orange straight-title stamp (not in the pack) replaced by the gold stamp in the favicon, arrival board, our-story and the London chapter |
+| 25 Nov 2026 | The wordmark is always the approved namemark artwork, exactly as in the guidelines (p.8), never typed text | `Namemark.astro` + `namemark-line/stack.svg` (traced from the B3 PDF): header, home hero, footer, menu book, receipt, boarding passes, Covent Garden door sign |
+| 25 Nov 2026 | Type strictly per the guidelines (p.20–21): American Typewriter Bold / Semi Bold / Regular and Lora Medium Italic only; tracking 100 for titles and subtitles, 50 for copy and notes | AT Light dropped; section headlines are Semi Bold (600, shows Bold until the licensed Semi Bold file arrives, see #31); `--tracking-copy` 0.05em; system sans on the door sign removed. Leading kept at web values for readability (WCAG) |
+| 25 Nov 2026 | Sign-off by the guidelines: decided by us. Brand hues only; their darker/lighter shades (gold foil, lamp glow, contrast-safe text tints) and paper stock (as the printed menus) are allowed; other hues are not | Blue plates, purple dusk, jade, crimson and navy night skies mapped to slate, ink, tiger and paper |
+| 25 Nov 2026 | Both tigers are Fatt Pundit, not one per restaurant | Asset README note removed; no tiger is tied to a branch |
 | 25 Nov 2026 | Covent Garden pre-theatre seating 4.45–5.30pm (confirms the data; Soho stays 5–5.45pm) | `branches.json` `preTheatre` (unchanged); closes the audit question |
 | 25 Nov 2026 | There is no private dining. Groups are big tables and the set menu; enquiries by email or phone, so groups need no form service (closes #47; #5 now covers only the Dubai list) | `/private-dining/` → `/groups/` (308), page renamed "Groups", no whole-room wording |
 | 25 Nov 2026 | Review figures come from Google reviews | `branches.json` `rating.source` "Google" (home and room pages already say so) |

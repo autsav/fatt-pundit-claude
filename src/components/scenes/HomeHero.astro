@@ -8,6 +8,7 @@
  */
 import GateBoard from './GateBoard.astro';
 import RainHero from './RainHero.astro';
+import Namemark from '../site/Namemark.astro';
 import type { Branch } from '@/lib/site-data';
 
 interface Props {
@@ -32,7 +33,7 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
   <span class="hero-mist" aria-hidden="true"></span>
   <div class="hero-words">
     <p class="hero-kicker">Hakka cooking from Calcutta's Chinatown</p>
-    <h1 id="hero-title" class="hero-title" data-hero-title>Fatt Pundit</h1>
+    <h1 id="hero-title" class="hero-title" data-hero-title><span class="sr-only">Fatt Pundit</span><Namemark class="hero-mark hero-mark--line" /><Namemark variant="stack" class="hero-mark hero-mark--stack" /></h1>
     <div class="hero-board"><GateBoard branches={branches} /></div>
     <div class="hero-actions">
       <a class="fp-btn fp-btn--primary hero-book" href="/book/" data-book="">Book a table</a>
@@ -42,8 +43,8 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
 </section>
 
 <script>
-  import { animate, stagger, splitText } from 'animejs';
-  import { EASE, MS, STAGGER_MS } from '@/lib/motion-tokens';
+  import { animate } from 'animejs';
+  import { EASE, MS } from '@/lib/motion-tokens';
 
   // One Book in view: the header's Book steps aside while the hero's Book is on screen, and comes
   // back (stamped in) once the guest scrolls past it.
@@ -82,7 +83,8 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
     window.addEventListener('pointermove', () => window.clearTimeout(t), { once: true, passive: true });
   }
 
-  // First visit only: the name rises letter by letter as the arrival shutter opens. Returning guests
+  // First visit only: the namemark rises out of a clip as the arrival shutter opens (it is approved
+  // artwork, guidelines p.8, so it moves as one piece: never split into letters). Returning guests
   // (and calm mode, where the board never plays) get the name painted finished.
   const el = document.querySelector<HTMLElement>('[data-hero-title]');
   if (el && document.documentElement.dataset.arrival === 'play') {
@@ -90,21 +92,17 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
       'fp:opening',
       () => {
         // Starts with the shutter, not after it, so the name is readable as the board opens. The soft
-        // shadow is held off while the letters rise (it would be cut to their clip boxes).
-        el.style.textShadow = 'none';
-        const split = splitText(el, { chars: { wrap: 'clip' } });
-        for (const c of split.chars) (c as HTMLElement).style.transform = 'translateY(110%)';
-        el.classList.add('is-rising');
-        // Ten letters are one word, so they take a tighter stagger than the six-sibling rule allows.
-        animate(split.chars, {
+        // shadow is held off while it rises (the clip would cut it).
+        const marks = el.querySelectorAll<HTMLElement>('.hero-mark');
+        el.classList.add('is-rising', 'is-clipped');
+        for (const m of marks) m.style.transform = 'translateY(110%)';
+        animate(marks, {
           y: ['110%', '0%'],
-          rotate: { from: 8, to: 0 },
           duration: MS.story,
           ease: EASE.animeOut,
-          delay: stagger(STAGGER_MS * 0.75),
           onComplete: () => {
-            split.revert();
-            el.style.textShadow = '';
+            el.classList.remove('is-clipped');
+            for (const m of marks) m.style.transform = '';
           },
         });
       },
@@ -122,7 +120,18 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
   .hero-words { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: var(--space-5); width: 100%; max-width: 64rem; padding: var(--space-8) var(--space-5); text-align: center; pointer-events: none; }
   .hero-words :is(a, .hero-board) { pointer-events: auto; }
   .hero-kicker { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: var(--step-h4); color: var(--color-gold); }
-  .hero-title { margin: 0; font-size: min(clamp(52px, 10vw, 140px), 17svh); line-height: 0.9; color: var(--color-sand); text-shadow: 0 6px 40px rgb(0 0 0 / 0.55); transition: text-shadow var(--dur-panel); }
+  /* The approved namemark (guidelines p.8), sized by font-size: the line mark is 10em wide, so 8.6vw keeps
+     it inside the screen; phones get the stacked mark (5.6em wide). Sand on the dark pool, like the
+     cream embroidery on the black apron (p.40). */
+  .hero-title { margin: 0; font-size: min(clamp(52px, 8.6vw, 124px), 17svh); line-height: 0; color: var(--color-sand); }
+  .hero-title :global(.hero-mark svg) { filter: drop-shadow(0 6px 30px rgb(0 0 0 / 0.55)); }
+  .hero-title.is-clipped { overflow: clip; }
+  .hero-title.is-clipped :global(.hero-mark svg) { filter: none; }
+  .hero-title :global(.hero-mark--stack) { display: none; }
+  @media (max-width: 639px) {
+    .hero-title :global(.hero-mark--line) { display: none; }
+    .hero-title :global(.hero-mark--stack) { display: inline-block; }
+  }
   /* Held back while the arrival board is up; the script lets it rise as the board opens. */
   :global(html[data-arrival='play']) .hero-title:not(.is-rising) { opacity: 0; }
   .hero-board { width: 100%; margin-top: var(--space-2); }

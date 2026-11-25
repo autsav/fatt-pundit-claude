@@ -9,6 +9,7 @@ import type { Branch } from '@/lib/site-data';
 import { onlineSummary } from '@/lib/site-data';
 import { listCta } from '@/lib/waitlist';
 import BookDrawer from './BookDrawer.astro';
+import Namemark from './Namemark.astro';
 
 interface Props {
   branches: Branch[];
@@ -39,7 +40,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
 {import.meta.env.PUBLIC_LAUNCH !== 'true' && <aside class="preview-flag" aria-label="Preview notice"><span class="pf-long">Website preview for Fatt Pundit, not the live site. Prices and photos to be confirmed</span><span class="pf-short">Website preview, not the live site</span></aside>}
 <header class="bar">
   <div class="wrap bar-in">
-    <a class="brand" href={path === '/' ? '#top' : '/'}>FATT PUNDIT</a>
+    <a class="brand" href={path === '/' ? '#top' : '/'} aria-label="Fatt Pundit, home"><Namemark /></a>
     <nav aria-label="Main" class="nav">
       {branches.map((b) => (
         <a href={`/${b.id}/`} aria-current={b.id === current?.id ? (onBranchHome ? 'page' : 'true') : undefined}>{b.shortName}</a>

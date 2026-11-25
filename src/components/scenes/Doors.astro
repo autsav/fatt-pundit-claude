@@ -11,6 +11,7 @@
 import { Picture, getImage } from 'astro:assets';
 import type { ImageOutputFormat } from 'astro';
 import { getBranches } from '../../lib/site-data';
+import Namemark from '../site/Namemark.astro';
 import facade from '../../assets/images/covent-garden/front/facade-g.webp';
 import door from '../../assets/images/covent-garden/front/door-g.webp';
 import room from '../../assets/images/covent-garden/interior-door-view-g.jpg';
@@ -90,17 +91,19 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
         <span class="door-shade" data-door-shade></span>
       </div>
       <!-- The lamps and the sign: drawn in code so they can light up. The lit sign is a second
-           copy on top, shown letter by letter, so lighting it never repaints the scaled front. -->
+           copy on top, so lighting it never repaints the scaled front. The name is the approved
+           namemark (guidelines p.8, "for signage"): one piece, never lit letter by letter. -->
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs><linearGradient id="sign-gilt" gradientUnits="userSpaceOnUse" x1="0" y1="136" x2="0" y2="0"><stop offset="0" stop-color="#fbe4a4" /><stop offset="0.42" stop-color="#e6b85e" /><stop offset="0.56" stop-color="#a97629" /><stop offset="1" stop-color="#ecc571" /></linearGradient></defs></svg>
       {[0, 1, 2].map((i) => <span class="lamp" data-lamp style={`--x:${[33.9, 50.9, 68.2][i]}%`}></span>)}
       {[false, true].map((lit) => (
         <p class:list={['sign', { 'sign-lit': lit }]} aria-hidden={lit ? 'true' : undefined}>
-          <span class="sign-name">{[...name].map((ch) => <span class="ch" data-ch={lit ? '' : undefined}>{ch === ' ' ? ' ' : ch}</span>)}</span>
+          <span class="sign-name">{!lit && <span class="sr-only">{name}</span>}<span class="ch" data-ch={lit ? '' : undefined}><Namemark /></span></span>
           <span class="sign-sub" data-sub={lit ? '' : undefined}>From Guangdong to Calcutta</span>
           <span class="sign-addr" data-sub={lit ? '' : undefined}>{address}</span>
         </p>
       ))}
       <!-- One pass of light across the gilt once the sign is fully lit. -->
-      <p class="sign sign-shine" aria-hidden="true" data-shine><span class="sign-name">{name}</span></p>
+      <p class="sign sign-shine" aria-hidden="true" data-shine><span class="sign-name"><Namemark /></span></p>
       {houseNo && <span class="house-no">{houseNo}</span>}
     </div>
     <!-- Crossing the threshold: the dark of the door depth, eyes adjusting to the warm room, the edges of your view. -->
@@ -196,16 +199,16 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
   @keyframes lamp-flick { 0% { opacity: 0.7; } 18% { opacity: 0.1; } 34% { opacity: 0.9; } 46% { opacity: 0.3; } 60%, 100% { opacity: 1; } }
   /* The sign: gilt slab capitals on the red fascia, as on Maiden Lane; unlit gilt is dark with a faint catch-light. */
   .sign { position: absolute; left: 13.7%; right: 11.6%; top: 20.4%; margin: 0; display: grid; justify-items: center; gap: 0.35cqw; font-family: var(--font-display); text-transform: uppercase; color: #4a3418; text-align: center; line-height: 1; text-shadow: 0 0.03em 0 rgb(255 220 160 / 0.12); }
-  .sign-name { font-weight: 700; font-size: 4.3cqw; letter-spacing: 0.1em; }
-  .ch { display: inline-block; white-space: pre; }
-  /* As on Maiden Lane: the lines under the name are white sans, not gold slab. */
-  .sign-sub, .sign-addr { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-stretch: 87.5%; font-weight: 700; color: rgb(236 230 220 / 0.42); text-shadow: none; }
-  .sign-sub { font-size: max(1.2cqw, 9px); letter-spacing: 0.08em; }
-  .sign-addr { font-size: max(0.88cqw, 8px); letter-spacing: 0.08em; }
+  .sign-name { font-weight: 700; font-size: 4.3cqw; letter-spacing: var(--tracking-title); }
+  .ch { display: inline-block; line-height: 0; }
+  /* The lines under the name: white, in the brand face (guidelines p.20: no other fonts). */
+  .sign-sub, .sign-addr { font-weight: 700; color: rgb(236 230 220 / 0.42); text-shadow: none; }
+  .sign-sub { font-size: max(1.2cqw, 9px); letter-spacing: var(--tracking-title); }
+  .sign-addr { font-size: max(0.88cqw, 8px); letter-spacing: var(--tracking-title); }
   @media (max-aspect-ratio: 3/4) { .sign-sub { font-size: max(1.6cqw, 10px); } .sign-addr { font-size: max(1.2cqw, 9px); } }
   /* Lit: gilt leaf (a vertical bevel of golds) with a thin dark keyline; the lamps' glow on the fascia. */
   .sign-lit { text-shadow: none; filter: drop-shadow(0 0 0.35cqw rgb(255 190 90 / 0.45)); will-change: transform; }
-  .sign-lit .ch { background: linear-gradient(180deg, #fbe4a4 0%, #e6b85e 42%, #a97629 56%, #ecc571 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 0.012em rgb(60 22 10 / 0.6); }
+  .sign-lit .ch :global(svg) { fill: url(#sign-gilt); stroke: rgb(60 22 10 / 0.6); stroke-width: 2px; }
   .sign-lit .sign-sub, .sign-lit .sign-addr { color: #f6f1e8; }
   /* The shine: a pale band wiped across the name once (mask moves; plays one time, in its own layer). */
   .sign-shine { color: #fff6dc; text-shadow: none; opacity: 0; will-change: transform; -webkit-mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; mask: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%) 150% 0 / 300% 100% no-repeat; }
@@ -218,7 +221,7 @@ const stackImg = { src: stack, alt: '', formats, widths: [300, 600, 891], sizes:
   /* "Come in.": small tracked capitals over a soft pool of shadow (no box edges). */
   .below { position: absolute; left: 0; right: 0; bottom: 4vh; display: grid; justify-items: center; gap: 2px; padding: 28px 16px 0; isolation: isolate; }
   .below::before { content: ""; position: absolute; inset: -40px -10% -24px; z-index: -1; background: radial-gradient(closest-side, rgb(13 11 9 / 0.6), transparent); }
-  .come-in { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.32em; color: var(--color-gold); font-size: 16px; text-shadow: 0 1px 8px rgb(0 0 0 / 0.8); }
+  .come-in { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); color: var(--color-gold); font-size: 16px; text-shadow: 0 1px 8px rgb(0 0 0 / 0.8); }
   .skip-story { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 8px; color: rgb(218 199 181 / 0.9); font-size: 14px; text-decoration: none; text-shadow: 0 1px 6px rgb(0 0 0 / 0.8); }
   .skip-story:hover, .skip-story:focus-visible { color: var(--color-gold); text-decoration: underline; text-underline-offset: 4px; }
   @media (orientation: landscape) and (max-height: 500px) { .below { bottom: 4px; padding-top: 8px; } .come-in { font-size: 12px; } }

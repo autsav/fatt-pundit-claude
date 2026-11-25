@@ -204,7 +204,7 @@ const pundit = wok.bubbles?.find((b) => b.who === 'Pundit');
     filter: saturate(0.85) contrast(0.95) drop-shadow(calc(var(--q) * 0.16) 0 0 #fbf6ea) drop-shadow(calc(var(--q) * -0.16) 0 0 #fbf6ea) drop-shadow(0 calc(var(--q) * 0.16) 0 #fbf6ea) drop-shadow(0 calc(var(--q) * -0.16) 0 #fbf6ea); }
   /* The name of the dish at the centre: on the cloth, under the lip, always inside the stage. */
   .sn-tag { --from: var(--dfrom); --to: var(--dto); --out-from: var(--dout-from); --out-to: var(--dout-to); position: absolute; left: 50%; bottom: calc(var(--floor) + var(--lip) * 0.3); translate: -50% 0; margin: 0; padding: 0.35em 0.9em; white-space: nowrap; rotate: -2deg;
-    font: 700 clamp(13px, calc(var(--u) * 1.5), 22px) / 1.2 var(--font-display, Georgia, serif); letter-spacing: 0.04em; text-transform: uppercase;
+    font: 700 clamp(13px, calc(var(--u) * 1.5), 22px) / 1.2 var(--font-display, Georgia, serif); letter-spacing: var(--tracking-title); text-transform: uppercase;
     color: var(--color-paper); background: var(--color-ink); box-shadow: 3px 3px 0 var(--color-tiger, #e8811f); }
   .sn-cap3 { --from: 63%; --to: 66%; --out-from: 97%; --out-to: 100%; }
 

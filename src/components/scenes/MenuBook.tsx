@@ -9,6 +9,13 @@
 import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import PageFlip from '@/components/kokonutui/page-flip';
+import namemarkLine from '@/assets/images/brand/namemark-line.svg?raw';
+import namemarkStack from '@/assets/images/brand/namemark-stack.svg?raw';
+
+/** The approved namemark (guidelines p.8), never typed: sized by font-size, coloured by currentColor. */
+const Namemark = ({ svg, className }: { svg: string; className: string }) => (
+  <span aria-hidden="true" className={`inline-block align-middle leading-none [&>svg]:block [&>svg]:h-full [&>svg]:w-auto ${className}`} dangerouslySetInnerHTML={{ __html: svg }} />
+);
 
 export interface MenuItemLite {
   name: string;
@@ -39,7 +46,7 @@ export interface MenuPlace {
 }
 const PLACE_KEY = 'fp-menu-at';
 /** One choice/tab look for the branch toggle and the book's bookmarks. */
-const CHOICE = 'min-h-11 border-2 px-4 font-label text-[15px] font-bold tracking-[0.02em]';
+const CHOICE = 'min-h-11 border-2 px-4 font-label text-[15px] font-bold tracking-title';
 const CHOICE_ON = 'bg-ink text-sand border-ink';
 const CHOICE_OFF = 'bg-paper-light text-ink border-ink/50';
 /** A dish for the signature page that opens the à la carte menu (home page). */
@@ -134,10 +141,10 @@ function Frame({ art, children }: { art: Art; children: ReactNode }) {
 function Item({ i }: { i: MenuItemLite }) {
   return (
     <li className="pb-[3cqw]">
-      <p className="m-0 text-[3.9cqw] font-bold uppercase leading-[1.3] tracking-[0.04em]">
+      <p className="m-0 text-[3.9cqw] font-bold uppercase leading-[1.3] tracking-title">
         {i.name}
         {i.price && !i.options && <span className="font-bold normal-case text-ink"> | {i.price}</span>}
-        {i.tags.length > 0 && <span className="ml-[1.4cqw] align-[0.2cqw] font-label text-[2.6cqw] tracking-[0.18em] text-gold-deep">{i.tags.join(' ')}</span>}
+        {i.tags.length > 0 && <span className="ml-[1.4cqw] align-[0.2cqw] font-label text-[2.6cqw] tracking-title text-gold-deep">{i.tags.join(' ')}</span>}
       </p>
       {i.options && i.price && <p className="m-0 text-[3.2cqw] font-bold leading-[1.45]">{i.price}</p>}
       {i.desc && <p className="m-0 text-[3.3cqw] leading-[1.36] text-ink/85">{i.desc}</p>}
@@ -149,7 +156,7 @@ function SectionHead({ title, note, cont }: { title: string; note?: string; cont
   return (
     <div className="pb-[1.6cqw]">
       {/* h3: the book sits under the chapter's h2 and has no heading of its own between. */}
-      <h3 className="m-0 text-[4.4cqw] font-bold uppercase tracking-[0.12em]">
+      <h3 className="m-0 text-[4.4cqw] font-bold uppercase tracking-title">
         {title}
         {cont && <span className="font-note text-[3.2cqw] normal-case tracking-normal text-ink/60"> continued</span>}
       </h3>
@@ -163,11 +170,11 @@ const Allergy = ({ text }: { text: string }) => <p className="m-0 pt-[1cqw] text
 function MenuHeader({ menu, art }: { menu: MenuLite; art: Art }) {
   return (
     <header className="flex items-center justify-between gap-[2cqw] pb-[4cqw] text-center">
-      <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
+      <img src={art.stampGold} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
       <div>
-        <p className="m-0 text-[6.6cqw] font-bold uppercase leading-none tracking-[0.1em]">Fatt Pundit</p>
+        <p className="m-0 text-[6cqw] leading-none"><span className="sr-only">Fatt Pundit</span><Namemark svg={namemarkLine} className="h-[0.7em]" /></p>
         <p className="m-0 mt-[1.6cqw] font-note text-[4cqw] text-tiger-deep">{menu.title}</p>
-        <p className="m-0 mt-[1cqw] font-label text-[2.6cqw] font-bold uppercase tracking-[0.22em]">Soho and Covent Garden</p>
+        <p className="m-0 mt-[1cqw] font-label text-[2.6cqw] font-bold uppercase tracking-title">Soho and Covent Garden</p>
       </div>
       <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[15cqw]" draggable={false} />
     </header>
@@ -237,7 +244,7 @@ function MenuPage({ menu, data, n, art }: { menu: MenuLite; data: PageData; n: n
         );
       })}
       {data.last && <Allergy text={menu.allergyNote} />}
-      <p className="m-0 mt-auto pt-[2cqw] text-center font-label text-[2.6cqw] font-bold tracking-[0.2em] text-ink/60">{n}</p>
+      <p className="m-0 mt-auto pt-[2cqw] text-center font-label text-[2.6cqw] font-bold tracking-title text-ink/60">{n}</p>
     </Frame>
   );
 }
@@ -248,9 +255,9 @@ function Cover({ menu, art, place }: { menu: MenuLite; art: Art; place?: MenuPla
       <div className="pointer-events-none absolute inset-[3cqw] border-[0.5cqw] border-gold/60" />
       <img src={art.stampOrange} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[46cqw]" draggable={false} />
       <div>
-        <p className="m-0 text-[8cqw] font-bold uppercase leading-none tracking-[0.12em]">Fatt Pundit</p>
+        <p className="m-0 text-[9cqw] leading-none"><span className="sr-only">Fatt Pundit</span><Namemark svg={namemarkStack} className="h-[1.71em]" /></p>
         <p className="m-0 mt-[3cqw] font-note text-[5.4cqw] text-gold">{menu.title}</p>
-        {place && <p className="m-0 mt-[4cqw] font-label text-[3.2cqw] font-bold uppercase tracking-[0.22em] text-sand/85">{place.name}, {place.street}</p>}
+        {place && <p className="m-0 mt-[4cqw] font-label text-[3.2cqw] font-bold uppercase tracking-title text-sand/85">{place.name}, {place.street}</p>}
       </div>
       <p className="absolute bottom-[9cqw] m-0 font-note font-medium normal-case italic tracking-normal text-[max(14px,3.4cqw)] text-sand/80">Turn the corner</p>
     </div>
@@ -266,7 +273,7 @@ function Signatures({ dishes, art }: { dishes: SignatureDish[]; art: Art }) {
   const rest = dishes.filter((d) => !pics.includes(d));
   return (
     <Frame art={art}>
-      <p className="m-0 text-center text-[5.6cqw] font-bold uppercase leading-none tracking-[0.1em]">From the pass</p>
+      <p className="m-0 text-center text-[5.6cqw] font-bold uppercase leading-none tracking-title">From the pass</p>
       <p className="m-0 mt-[1.2cqw] text-center font-note text-[3.6cqw] font-medium italic text-tiger-deep">Our signature dishes</p>
       <div className="mt-[3cqw] grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-[3cqw]">
         {pics.map((d, i) => (
@@ -274,7 +281,7 @@ function Signatures({ dishes, art }: { dishes: SignatureDish[]; art: Art }) {
             {/* Steam off the first plate (the momos): three wisps, a registered loop that Pause motion stills. */}
             {i === 0 && <span className="menu-steam" aria-hidden="true"><i /><i /><i /></span>}
             <img src={d.image} srcSet={d.srcset} sizes={d.sizes} alt={d.alt ?? ''} width={800} height={600} className="fp-photo min-h-0 w-full flex-1 object-cover" loading="lazy" decoding="async" draggable={false} />
-            <figcaption className="mt-[1.2cqw] text-[2.8cqw] font-bold uppercase leading-tight tracking-[0.05em]">
+            <figcaption className="mt-[1.2cqw] text-[2.8cqw] font-bold uppercase leading-tight tracking-title">
               {d.name}
               {d.price && <span className="font-normal"> | {d.price}</span>}
             </figcaption>
@@ -293,7 +300,7 @@ function Back({ art }: { art: Art }) {
   return (
     <Frame art={art}>
       <div className="flex items-start justify-between gap-[3cqw]">
-        <img src={art.stampGold} alt="" width={508} height={564} loading="lazy" decoding="async" className="h-auto w-[18cqw]" draggable={false} />
+        <img src={art.stampGold} alt="" width={431} height={564} loading="lazy" decoding="async" className="h-auto w-[18cqw]" draggable={false} />
         <p className="m-0 flex-1 text-center font-note text-[3.3cqw] leading-[1.4]">
           Originating from Calcutta, this unique cuisine was invented when the Hakka people migrated to India from the Chinese province of Guangdong, bringing their traditional cooking with them and meeting the spices of India.
         </p>
@@ -499,12 +506,12 @@ export default function MenuBook({
 
         {place?.soon ? (
           <div className="menu-soon mt-8 w-full max-w-[560px]">
-            <p className="m-0 font-label text-[13px] font-bold uppercase tracking-[0.24em] text-tiger-deep">Opening soon</p>
+            <p className="m-0 font-label text-[13px] font-bold uppercase tracking-title text-tiger-deep">Opening soon</p>
             <h3 className="m-0 mt-2 font-note text-[clamp(26px,3vw,34px)] font-medium normal-case italic leading-tight tracking-normal">{place.name}, {place.street}</h3>
             <p className="m-0 mt-3 text-[16px] leading-snug">The menu is being written. These are coming with us:</p>
             <ul className="m-0 mt-3 list-none p-0">
               {place.soon.dishes.map((d) => (
-                <li key={d} className="border-b border-dashed border-ink/30 py-2.5 text-[17px] font-bold uppercase tracking-[0.06em]">
+                <li key={d} className="border-b border-dashed border-ink/30 py-2.5 text-[17px] font-bold uppercase tracking-title">
                   {d}
                 </li>
               ))}
@@ -603,7 +610,7 @@ export default function MenuBook({
             {signatures.slice(0, 2).map((d) => (
               <li key={d.name} className="flex flex-col gap-1.5">
                 {d.image && <img src={d.image} srcSet={d.srcset} sizes={d.sizes} alt={d.alt ?? ''} width={800} height={600} className="fp-photo aspect-[4/3] w-full object-cover" loading="lazy" decoding="async" />}
-                <p className="m-0 text-[14px] font-bold uppercase leading-tight tracking-[0.05em]">{d.name}{d.price && <span className="font-normal"> | {d.price}</span>}</p>
+                <p className="m-0 text-[14px] font-bold uppercase leading-tight tracking-title">{d.name}{d.price && <span className="font-normal"> | {d.price}</span>}</p>
               </li>
             ))}
           </ul>

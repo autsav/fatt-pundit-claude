@@ -468,9 +468,9 @@ export default function Voyage({ art }: { art: VoyageArt }) {
           <nav ref={ticketRef} aria-label="Ports on the voyage" className={calm
             ? 'voyage-ticket flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-sand px-3 py-1.5 text-ink sm:px-5'
             : 'voyage-ticket flex max-w-full snap-x snap-mandatory items-center gap-1 overflow-x-auto bg-sand px-3 py-1.5 text-ink [scrollbar-width:none] max-sm:[mask-image:linear-gradient(90deg,transparent,#000_14px,#000_calc(100%-14px),transparent)] sm:gap-3 sm:snap-none sm:overflow-visible sm:px-5'}>
-            <span className="hidden font-label text-[12px] font-bold uppercase tracking-[0.24em] text-tiger-deep sm:inline">Admit one</span>
+            <span className="hidden font-label text-[12px] font-bold uppercase tracking-title text-tiger-deep sm:inline">Admit one</span>
             {PORTS.map((pt, i) => (
-              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex shrink-0 snap-center min-h-11 items-center gap-1.5 px-1 font-label text-[12px] font-bold uppercase tracking-[0.18em] sm:text-[12px] ${i === 0 ? 'is-punched is-here' : ''}`}>
+              <button key={pt.id} type="button" onClick={() => jump(i)} disabled={calm} aria-label={`Jump to ${pt.name}`} className={`voyage-hole group flex shrink-0 snap-center min-h-11 items-center gap-1.5 px-1 font-label text-[12px] font-bold uppercase tracking-title sm:text-[12px] ${i === 0 ? 'is-punched is-here' : ''}`}>
                 <span className="voyage-punch" aria-hidden="true" />
                 <span>{pt.name}</span>
               </button>
@@ -519,7 +519,7 @@ function Postcard({ i, art, store, still = false }: { i: number; art: VoyageArt;
               <span className="fp-section-no">01</span> Our story
             </p>
           )}
-          <p className="m-0 font-note font-medium normal-case italic tracking-normal text-[17px] text-tiger-deep">Stop {i + 1} of 4</p>
+          <p className="m-0 font-note font-medium normal-case italic tracking-copy text-[17px] text-tiger-deep">Stop {i + 1} of 4</p>
           <h3 className="voyage-title m-0">{['Guangdong', 'Calcutta', 'London', 'Dubai'][i]}</h3>
         </div>
         <span className="voyage-postmark" aria-hidden="true">
@@ -542,12 +542,12 @@ function Postcard({ i, art, store, still = false }: { i: number; art: VoyageArt;
         <>
           <div className="flex items-end justify-center gap-6">
             <figure className="m-0 flex flex-col items-center gap-1">
-              <img src={art.stampGold} alt="" className="h-auto w-[clamp(64px,8vw,96px)]" width={508} height={564} loading="lazy" decoding="async" />
-              <figcaption className="font-note font-medium normal-case italic tracking-normal text-[15px]">Soho, 2019</figcaption>
+              <img src={art.stampGold} alt="" className="h-auto w-[clamp(64px,8vw,96px)]" width={431} height={564} loading="lazy" decoding="async" />
+              <figcaption className="font-note font-medium normal-case italic tracking-copy text-[15px]">Soho, 2019</figcaption>
             </figure>
             <figure className="m-0 flex flex-col items-center gap-1">
               <img src={art.stampOrange} alt="" className="h-auto w-[clamp(68px,8.5vw,102px)]" width={431} height={564} loading="lazy" decoding="async" />
-              <figcaption className="font-note font-medium normal-case italic tracking-normal text-[15px]">Covent Garden, 2021</figcaption>
+              <figcaption className="font-note font-medium normal-case italic tracking-copy text-[15px]">Covent Garden, 2021</figcaption>
             </figure>
           </div>
           <p className={text}>The recipes reach London: Soho in 2019, Covent Garden in 2021.</p>

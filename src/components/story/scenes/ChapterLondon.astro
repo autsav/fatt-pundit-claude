@@ -10,7 +10,7 @@ import { chapterOf, panelOf, firstSentence, NUMBER_WORDS } from '../../../lib/st
 import RouteChart from '../RouteChart.astro';
 import { Picture, getImage } from 'astro:assets';
 import { stampSrc } from '../../../lib/stamp';
-import stampTiger from '../../../assets/images/brand/logo-stamp-tiger.png';
+import stampTiger from '../../../assets/images/brand/stamp-gold.png';
 // The shopfront, drawn as paper-cut layers (layers/storefront/README rows in ../../assets/images/story/layers/README.md).
 import sSky from '../../../assets/images/story/layers/storefront/s0-sky.webp';
 import sNb from '../../../assets/images/story/layers/storefront/s1-neighbours.webp';
@@ -108,7 +108,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
           <svg class="lo-m lo-blade" viewBox="-10 0 20 24" aria-hidden="true">
             <g class="lo-blade-in">
               <path d="M-3.2 0V6.9M3.2 0V6.9" stroke="#241f1c" stroke-width=".5" fill="none" />
-              <circle cx="0" cy="15" r="8.9" fill="#1d1614" /><circle cx="0" cy="15" r="8" fill="#7a1220" /><circle cx="0" cy="15" r="6.9" fill="#efe3cc" />
+              <circle cx="0" cy="15" r="8.9" fill="#1d1614" /><circle cx="0" cy="15" r="8" fill="#93321b" /><circle cx="0" cy="15" r="6.9" fill="#efe3cc" />
               <circle cx="0" cy="15" r="7.35" fill="none" stroke="#d9a63c" stroke-width=".4" />
               <image href={stamp} x="-5.4" y="9.6" width="10.8" height="10.8" />
               <circle cx="0" cy=".2" r=".9" fill="#241f1c" />
@@ -160,7 +160,7 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
 
 <style>
   /* Colour: a wet slate night; the stage is dark so nothing sand-coloured shows between layers. */
-  .story-scenes { --sky: #1b2330; --ground: #101722; }
+  .story-scenes { --sky: color-mix(in srgb, var(--color-slate-deep) 35%, var(--color-ink)); --ground: color-mix(in srgb, var(--color-slate-deep) 15%, var(--color-ink-deep)); }
 
   /* 1-5: the title lifts away. 4-22, another sea: the night chart (RouteChart, leg 2), out 21-22; the sky is opaque from 20 (a cut). */
   .lo-title { --o1: 0; --y1: -8%; --from: 1%; --to: 5%; }
@@ -227,13 +227,13 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   /* The room through the glass (the facade's holes are x 190-2220, y 744-1395 of 2400x1792), the frame of the art cropped by scale. */
   .lo-view { left: 7.9%; top: 41.5%; width: 84.6%; height: 36.4%; overflow: clip; }
   .lo-view img { position: absolute; left: -7%; top: -38%; width: 114%; height: auto; }
-  .lo-shade { left: 7.9%; top: 41.5%; width: 84.6%; height: 36.4%; background: linear-gradient(180deg, #0d1320, #1a2030); --o0: 0.9; --o1: 0; --from: 33%; --to: 40%; }
+  .lo-shade { left: 7.9%; top: 41.5%; width: 84.6%; height: 36.4%; background: linear-gradient(180deg, var(--color-ink-deep), color-mix(in srgb, var(--color-slate-deep) 30%, var(--color-ink))); --o0: 0.9; --o1: 0; --from: 33%; --to: 40%; }
   /* The glazed door in its opening (x 1286-1504, y 960-1390), a hair larger so the jambs cover its edge. Hinged left, opens inward 44-48. */
   .lo-door { left: 53.42%; top: 53.35%; width: 9.42%; height: 24.44%; transform-origin: 0 50%; --pv: calc(var(--F) * 0.45); --from: 44%; --to: 48%; --e: ease-in-out; }
   .lo-aw { left: -2%; top: 37.6%; width: 104%; height: auto; transform-origin: 50% 0; --sy0: 0; --sy1: 0.42; --e: var(--ease-stamp); --from: 28%; --to: 32%; }
 
   /* The sign band is y 476-688 of 1792. Live letters in the site's display face; the lit copy sits on the unlit one. */
-  .lo-sign { left: 0; width: 100%; top: 26.6%; height: 11.8%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: calc(var(--c) * 6.6); line-height: 1; letter-spacing: 0.12em; text-transform: uppercase; }
+  .lo-sign { left: 0; width: 100%; top: 26.6%; height: 11.8%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: calc(var(--c) * 6.6); line-height: 1; letter-spacing: var(--tracking-title); text-transform: uppercase; }
   .lo-L { position: relative; color: #3a2a26; }
   .lo-sp { width: 0.5em; }
   .lo-lit { position: absolute; inset: 0; font-style: normal; color: #ffe8b4; --o0: 0; --from: calc(36% + var(--k) * 0.7%); --to: calc(var(--from) + 0.5%);
@@ -241,8 +241,8 @@ const words = (() => { let n = 0; return chapter.title.split(' ').map((w) => [..
   .lo-lit.lo-flick { --to: calc(var(--from) + 1.3%); }
   .lo-halo { left: 12%; width: 76%; top: 22%; height: 22%; background: radial-gradient(closest-side, rgb(255 160 70 / 0.34), transparent); --o0: 0; --from: 36%; --to: 43%; }
   /* The street plate and the blade sign (bracket, chains, roundel with the tiger stamp). */
-  .lo-plate { left: 4.5%; top: calc(var(--c) * 8.4); width: calc(var(--c) * 21); margin: 0; padding: calc(var(--c) * 0.7) 0; text-align: center; background: #f2ecdd; color: #15233b; border: calc(var(--c) * 0.4) solid #15233b; box-shadow: inset 0 0 0 calc(var(--c) * 0.22) #f2ecdd, 0 calc(var(--c) * 0.3) calc(var(--c) * 0.6) rgb(0 0 0 / 0.35);
-    font-family: var(--font-display); font-weight: 700; font-size: calc(var(--c) * 1.5); line-height: 1; letter-spacing: 0.06em; text-transform: uppercase;
+  .lo-plate { left: 4.5%; top: calc(var(--c) * 8.4); width: calc(var(--c) * 21); margin: 0; padding: calc(var(--c) * 0.7) 0; text-align: center; background: #f2ecdd; color: var(--color-slate-deep); border: calc(var(--c) * 0.4) solid var(--color-slate-deep); box-shadow: inset 0 0 0 calc(var(--c) * 0.22) #f2ecdd, 0 calc(var(--c) * 0.3) calc(var(--c) * 0.6) rgb(0 0 0 / 0.35);
+    font-family: var(--font-display); font-weight: 700; font-size: calc(var(--c) * 1.5); line-height: 1; letter-spacing: var(--tracking-title); text-transform: uppercase;
     --sx0: 0.6; --sy0: 0.6; --o0: 0; --e: var(--ease-stamp); --from: 30%; --to: 32.5%; }
   .lo-arm { left: 77%; top: calc(var(--c) * 4.3); width: 12.6%; height: calc(var(--c) * 0.6); background: #241f1c; border-radius: 2px; --o0: 0; --from: 30.5%; --to: 31.5%; }
   .lo-blade { left: calc(89.4% - var(--c) * 6.25); top: calc(var(--c) * 4.6); width: calc(var(--c) * 12.5); height: auto; overflow: visible; transform-origin: 50% 0; filter: drop-shadow(0 calc(var(--c) * 0.4) calc(var(--c) * 0.4) rgb(0 0 0 / 0.4)); --from: 31%; --to: 38%; }

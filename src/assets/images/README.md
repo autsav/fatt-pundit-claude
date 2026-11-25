@@ -30,5 +30,5 @@ Rules
 Signature dish ids: momo-kid-goat, crackling-spinach, popcorn-cauliflower, hakka-chilly-paneer-lettuce-cups,
 bombay-chilly-prawns, malabar-monkfish-curry.
 
-"left" / "right" = position on the guidelines page. Confirm with the client which tiger is the Indian tiger (Soho)
-and which is the Chinese tiger (Covent Garden), then rename.
+"left" / "right" = position on the guidelines page. Both tigers are Fatt Pundit (client, 25 Nov 2026): neither belongs to
+one restaurant, so never label a tiger with a branch.

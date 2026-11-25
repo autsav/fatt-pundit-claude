@@ -233,7 +233,7 @@ const sideCls = (p: (typeof places)[number]) => {
   .rc-stamp { position: absolute; z-index: 1; display: grid; place-items: center; box-sizing: border-box; width: clamp(76px, 8vw, 120px); aspect-ratio: 1; padding: 6px; translate: -50% calc(-100% - 22px);
     border: 3px double var(--color-tiger); border-radius: 50%; background: var(--color-sand); color: var(--color-ink); text-align: center;
     --s0: 1.6; --r0: -18deg; --r1: -6deg; }
-  .rc-stamp span { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; white-space: nowrap;
+  .rc-stamp span { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); line-height: 1.05; white-space: nowrap;
     /* Sized from the name's length (--n letters, set inline) so long names fit on one line. */
     font-size: min(clamp(9px, 0.95vw, 14px), calc(clamp(76px, 8vw, 120px) * 1.35 / (var(--n, 6) + 2))); }
 
@@ -246,6 +246,6 @@ const sideCls = (p: (typeof places)[number]) => {
     .rc-pr { flex-direction: row; translate: -9px -50%; }
     /* Stamps grow with the name so the lettering stays at 11px or more (T24); the chart frames them inside the screen. */
     .rc-stamp { width: calc(var(--n, 6) * 7.6px + 22px); padding: 3px; border-width: 2px; }
-    .rc-stamp span { font-size: 11px; letter-spacing: 0.02em; }
+    .rc-stamp span { font-size: 11px; letter-spacing: var(--tracking-title); }
   }
 </style>

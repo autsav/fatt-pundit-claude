@@ -45,10 +45,10 @@
 
   /* Guidelines tracking 100 / 50 (InDesign units = 1/1000 em) */
   --tracking-title: 0.1em;
-  --tracking-copy: 0.01em;
-  /* Phase 3: AT Light section headlines (sentence case), and tracked caps on objects only. */
-  --tracking-display: -0.03em;
-  --tracking-tag: 0.16em;
+  --tracking-copy: 0.05em;
+  /* Subtitle = AT Semi Bold 600, sentence case, tracking 100 (same as title). Tag = tracked caps labels. */
+  --tracking-display: 0.1em;
+  --tracking-tag: 0.1em;
 }
 
 @layer base {
@@ -371,7 +371,7 @@
 :where(.story-scenes) .tl { display: inline-block; --from: calc(5% + var(--i, 0) * 0.25%); --to: calc(9% + var(--i, 0) * 0.25%); --o1: 0;
   --x1: calc((var(--i, 0) - var(--n, 0) / 2) * 0.5vw); --y1: calc(-3vh - var(--i, 0) * 0.15vh); --r1: calc((var(--i, 0) - var(--n, 0) / 2) * 1deg); }
 /* Sound word: lettering on the stage, aria-hidden. Tiger with an ink outline; tilt it with `rotate`, pop it with .fx fx-pop. */
-:where(.story-scenes) .scene-sfx { position: absolute; z-index: 2; margin: 0; pointer-events: none; white-space: nowrap; font-family: var(--font-display); font-weight: 700; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase;
+:where(.story-scenes) .scene-sfx { position: absolute; z-index: 2; margin: 0; pointer-events: none; white-space: nowrap; font-family: var(--font-display); font-weight: 700; line-height: 1; letter-spacing: var(--tracking-title); text-transform: uppercase;
   font-size: clamp(40px, 8vw, 110px); color: var(--color-tiger); -webkit-text-stroke: 3px var(--color-ink); paint-order: stroke fill; text-shadow: 4px 4px 0 var(--color-ink), 0 0 18px rgb(203 160 82 / 0.5); }
 /* Frame break: a panel with a hand-drawn jagged outline behind a key layer; the steam, flame or sound word
    above it spills over the edge. Size and place it per use; the SVG fills the box. */
@@ -426,7 +426,7 @@
 }
 @keyframes voyage-stamp { from { transform: scale(2.2); opacity: 0.3; } to { transform: none; opacity: 1; } }
 @keyframes voyage-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
-.voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 600; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
+.voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
 .voyage-port.is-reached .voyage-name { fill: var(--color-paper-light); }
 .voyage-compass { opacity: 0.9; }
 /* The ship moves every frame: no filters on it (a hard offset shadow, the hull masked from the art's alpha). */
@@ -461,11 +461,11 @@
   border: 7px solid transparent; border-image: repeating-linear-gradient(-45deg, var(--color-tiger) 0 10px, var(--color-paper) 10px 18px, var(--color-slate) 18px 28px, var(--color-paper) 28px 36px) 7;
   box-shadow: var(--shadow-photo); }
 .voyage-card:not(.is-static) .voyage-postcard { max-height: 100%; }
-.voyage-title { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: clamp(34px, 4vw, 52px); line-height: 1; letter-spacing: 0; text-transform: none; }
+.voyage-title { font-family: var(--font-lora); font-style: italic; font-weight: 500; font-size: clamp(34px, 4vw, 52px); line-height: 1; letter-spacing: var(--tracking-copy); text-transform: none; }
 .voyage-postmark { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 3px double var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; rotate: -12deg; opacity: 0.85; }
 .voyage-pic { display: block; width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: 62% 58%; border: 1px solid rgb(44 41 37 / 0.3); }
 @media (max-width: 1023px) { .voyage-pic { aspect-ratio: 16 / 5; } }
-.voyage-boarding { display: inline-block; margin-left: 4px; padding: 1px 8px; border: 2px solid var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; rotate: -4deg; }
+.voyage-boarding { display: inline-block; margin-left: 4px; padding: 1px 8px; border: 2px solid var(--color-tiger); color: var(--color-tiger-deep); font-family: var(--font-label); font-size: 12px; font-weight: 700; letter-spacing: var(--tracking-title); text-transform: uppercase; rotate: -4deg; }
 .fp-pill-swap { display: inline-block; animation: fp-pill-in var(--dur-panel) var(--curve-out) both; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -528,7 +528,7 @@ header.bar { view-transition-name: site-header; }
 .walk-btn[aria-disabled='true'] { opacity: 0.4; cursor: default; }
 .walk-count { min-width: 4.5em; text-align: center; font-size: var(--step-small); color: var(--color-sand); font-variant-numeric: tabular-nums; }
 .walk-stop { margin: 0; font-size: var(--step-label); font-weight: 700; line-height: 1.3; color: var(--color-gold); font-variant-numeric: tabular-nums; }
-.walk-title { margin: 0; padding-top: var(--space-2); font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; letter-spacing: var(--tracking-display); text-transform: none; color: var(--color-sand); }
+.walk-title { margin: 0; padding-top: var(--space-2); font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; letter-spacing: var(--tracking-display); text-transform: none; color: var(--color-sand); }
 /* A headline that is an object (the bar's embroidery) still sits on the rule, like .fp-h2. */
 @media (min-width: 1024px) { .chapter-head > h2:not(.fp-h2) { padding-top: var(--space-2); border-top: var(--border-rule) solid var(--fp-rule-strong); } }
 /* The menus toolbar: which room's book is open, or the list pages. Two groups side by side when there's room. */
@@ -574,7 +574,7 @@ header.bar { view-transition-name: site-header; }
 .room-frame { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 22px 8px; background:
     radial-gradient(circle at center, #f2e9dc 0 3.2px, transparent 3.6px) 0 6px / 16px 14px repeat-x,
     radial-gradient(circle at center, #f2e9dc 0 3.2px, transparent 3.6px) 0 calc(100% - 6px) / 16px 14px repeat-x; }
-.room-edge { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--color-gold); line-height: 1; }
+.room-edge { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: var(--tracking-title); color: var(--color-gold); line-height: 1; }
 .room-edge-n { color: var(--color-sand); }
 .room-shot { display: block; padding: 0; border: 0; background: #000; cursor: zoom-in; aspect-ratio: 3 / 2; overflow: hidden; }
 .room-shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-fast) var(--curve-out); }
@@ -612,7 +612,7 @@ header.bar { view-transition-name: site-header; }
 /* Menu by location: the restaurant choice, as the system's option chips (sentence case; chosen = ink, not tiger,
    which is kept for actions). */
 .menu-tag { position: relative; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 2px solid var(--color-ink); background: var(--color-paper); color: var(--color-ink);
-  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
+  font-family: var(--font-label); font-size: 16px; font-weight: 700; letter-spacing: var(--tracking-title); cursor: pointer; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out), transform var(--dur-spring) var(--curve-spring); }
 @media (hover: hover) { .menu-tag:hover { transform: translateY(-2px); } }
 .menu-tag:active { transform: translateY(1px) scale(0.98); transition-duration: var(--dur-press); }
 .menu-tag.is-on { background: var(--color-ink); color: var(--color-sand); }
@@ -634,8 +634,8 @@ html:has(.hero) { background: var(--color-ink); }
 /* Tonight's board (branch pages) */
 .tonight { background: var(--color-ink); padding: clamp(28px, 5vw, 56px) 16px; }
 .tonight-board { max-width: 760px; margin: 0 auto; border: 2px solid var(--color-gold); padding: 18px clamp(14px, 3vw, 28px) 22px; background: #1f1c19; box-shadow: inset 0 0 0 6px #1f1c19, inset 0 0 0 7px rgb(203 160 82 / 0.35); }
-.tonight-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 14px; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; font-size: 13px; color: var(--color-gold); }
-.tonight-demo { font-family: var(--font-note); font-style: italic; letter-spacing: 0; text-transform: none; font-size: 15px; color: rgb(218 199 181 / 0.85); }
+.tonight-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 14px; font-family: var(--font-label); font-weight: 700; letter-spacing: var(--tracking-title); text-transform: uppercase; font-size: 13px; color: var(--color-gold); }
+.tonight-demo { font-family: var(--font-note); font-style: italic; letter-spacing: var(--tracking-copy); text-transform: none; font-size: 15px; color: rgb(218 199 181 / 0.85); }
 .tonight-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; overflow: hidden; container-type: inline-size; }
 /* Tiles are 0.72em + 0.08em gap: a row of --n tiles is ~0.8n em wide. Fit the longest line to the
    board, capped at 32px. Unlayered, so it beats SplitFlapText's built-in text-3xl / sm:text-5xl
@@ -741,7 +741,6 @@ html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo
 /* Stand-in for the typewriter font while it loads: Courier New, resized per weight so lines break in
    the same places and nothing jumps when the brand font arrives. Measured on this site's own text:
    light and regular in sentence case. */
-@font-face { font-family: 'FP Typewriter Fallback'; src: local('Courier New'), local('Liberation Mono'), local('Cousine'); font-weight: 300; size-adjust: 79.8%; ascent-override: 111.4%; descent-override: 31.3%; }
 @font-face { font-family: 'FP Typewriter Fallback'; src: local('Courier New'), local('Liberation Mono'), local('Cousine'); font-weight: 400; size-adjust: 81%; ascent-override: 109.8%; descent-override: 30.9%; }
 /* Bold: in the brand font capitals are much wider than lower case; in Courier every glyph is the
    same width. Two cuts by character range keep both capital titles and bold words in sentences on

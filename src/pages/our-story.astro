@@ -19,7 +19,7 @@ import ChapterNextStop from '../components/story/scenes/ChapterNextStop.astro';
 import { getBranches } from '../lib/site-data';
 import { chapters, STORY_TITLE, STORY_LEDE } from '../data/story';
 import { stampSrc } from '../lib/stamp';
-import stampTiger from '../assets/images/brand/logo-stamp-tiger.png';
+import stampTiger from '../assets/images/brand/stamp-gold.png';
 
 const branches = await getBranches();
 const open = branches.filter((b) => b.status === 'open');
@@ -47,7 +47,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   <main id="content">
     <header class="story-hero">
       <div class="wrap narrow stack center">
-        <img class="story-stamp" src={stamp} alt="" width="120" height="120" />
+        <img class="story-stamp" src={stamp} alt="" width="431" height="564" />
         <p class="kicker">Our story</p>
         <h1 class="story-h1">{STORY_TITLE}</h1>
         <p class="story-lede">{STORY_LEDE}</p>
@@ -142,7 +142,7 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   .story-mode { margin: 4px 0 0; }
   .story-mode button { padding: 6px 4px; border: 0; background: none; color: var(--color-ink); font-family: var(--font-note); font-style: italic; font-size: 16px;
     text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
-  .story-mode button[aria-pressed='true'] { text-decoration-style: solid; font-weight: 600; }
+  .story-mode button[aria-pressed='true'] { text-decoration-style: solid; font-weight: 700; }
   .story-mode--end button { min-height: 44px; }
   .story-mode button:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
   /* The last scene hands over to #end by tearing in over it, as every stage does (global.css "Between stages"). */
@@ -154,10 +154,10 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
     }
   }
   .end-menus { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 0; }
-  .menu-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 1.5px solid var(--color-ink); border-radius: 999px; color: var(--color-ink); text-decoration: none; font-weight: 600; }
+  .menu-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 1.5px solid var(--color-ink); border-radius: 999px; color: var(--color-ink); text-decoration: none; font-weight: 700; }
   .menu-chip:hover { background: var(--color-ink); color: var(--color-sand); }
   .menu-chip:focus-visible { outline: 2px solid var(--fp-ring); outline-offset: 2px; }
-  .end-lead { margin: var(--space-4) 0 0; font-family: var(--font-note); font-style: italic; font-weight: 600; font-size: clamp(19px, 1.8vw, 23px); }
+  .end-lead { margin: var(--space-4) 0 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(19px, 1.8vw, 23px); }
   .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
   /* Equal-width buttons: each takes the same share, never narrower than its label. */
   .end-actions > .fp-btn { flex: 1 1 14rem; max-width: 20rem; justify-content: center; text-align: center; }

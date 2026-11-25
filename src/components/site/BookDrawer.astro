@@ -117,10 +117,10 @@ const data = branches.map((b) => ({
   @media (max-width: 640px) { .book-sheet { border-left: 0; border-top: 3px solid var(--color-ink); } }
   .book-head { position: relative; padding-right: 48px; }
   .book-kicker { margin: 0; font-family: var(--font-note); font-style: italic; font-size: 19px; color: var(--color-tiger-deep); }
-  .book-title { margin: 2px 0 0; font-size: clamp(26px, 6vw, 34px); text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.05; }
+  .book-title { margin: 2px 0 0; font-size: clamp(26px, 6vw, 34px); text-transform: uppercase; letter-spacing: var(--tracking-title); line-height: 1.05; }
   .book-x { position: absolute; top: -4px; right: -6px; width: 48px; height: 48px; font-size: 32px; line-height: 1; background: none; border: 2px solid var(--color-ink); color: var(--color-ink); cursor: pointer; }
   .book-field { border: 0; margin: 0; padding: 0; min-width: 0; }
-  .book-field legend { padding: 0; margin-bottom: 8px; font-weight: 700; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; }
+  .book-field legend { padding: 0; margin-bottom: 8px; font-weight: 700; font-size: 13px; letter-spacing: var(--tracking-title); text-transform: uppercase; }
   .book-choices, .book-times { display: flex; flex-wrap: wrap; gap: 8px; }
   .book-chip { position: relative; }
   .book-chip input { position: absolute; opacity: 0; pointer-events: none; }

@@ -68,13 +68,13 @@ const stamp = await stampSrc(mark === 'right' ? stampRight : stampLeft, 520);
   html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: var(--color-ink); }
   .card { box-sizing: border-box; width: 1200px; height: 630px; padding: 44px; display: grid; grid-template-columns: 1fr 330px; }
   .main { background: var(--color-sand); color: var(--color-ink); padding: 56px 60px; display: flex; flex-direction: column; justify-content: center; gap: 18px; border-right: 4px dashed var(--color-ink); }
-  .kicker { margin: 0; font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-tiger-deep); }
-  h1 { margin: 0; font-family: var(--font-typewriter); font-weight: 700; font-size: 92px; line-height: 0.95; letter-spacing: 0.04em; text-transform: uppercase; }
+  .kicker { margin: 0; font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: var(--tracking-title); text-transform: uppercase; color: var(--color-tiger-deep); }
+  h1 { margin: 0; font-family: var(--font-typewriter); font-weight: 700; font-size: 92px; line-height: 0.95; letter-spacing: var(--tracking-title); text-transform: uppercase; }
   .line { margin: 0; font-family: var(--font-typewriter); font-size: 30px; }
   .note { margin: 6px 0 0; font-family: var(--font-lora); font-style: italic; font-size: 30px; color: var(--color-gold-deep); }
   .stub { background: var(--color-tiger); color: var(--color-ink-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; position: relative; }
-  .gate-label { font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: 0.3em; text-transform: uppercase; }
-  .gate { font-family: var(--font-typewriter); font-weight: 700; font-size: 76px; letter-spacing: 0.04em; line-height: 1; text-align: center; padding: 0 12px; }
+  .gate-label { font-family: var(--font-typewriter); font-weight: 700; font-size: 22px; letter-spacing: var(--tracking-title); text-transform: uppercase; }
+  .gate { font-family: var(--font-typewriter); font-weight: 700; font-size: 76px; letter-spacing: var(--tracking-title); line-height: 1; text-align: center; padding: 0 12px; }
   .stamp { width: 200px; aspect-ratio: 1046 / 1369; margin-top: 18px; background: var(--color-ink); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; transform: rotate(-6deg); }
   .tiger { width: auto; height: 300px; margin-top: 12px; }
 </style>
