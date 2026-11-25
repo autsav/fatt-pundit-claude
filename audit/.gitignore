@@ -7,3 +7,4 @@ refs/
 lighthouse/**/*.full.json
 !screens/before/scenes/
 !screens/after/
+!screens/before/footer/
