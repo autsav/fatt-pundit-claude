@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { loc
 
 // AUDIT B-11: the first Tab stop is the page's own skip link, never "Skip to footer".
 // AUDIT B-11: on all 16 routes the first Tab stop is "Skip to content", landing on main#content.
-const ROUTES = ['/', '/book/', '/soho/', '/soho/menu/', '/covent-garden/', '/covent-garden/menu/', '/dubai/', '/private-dining/', '/our-story/', '/our-story/fatt/', '/our-story/pundit/', '/allergens/', '/accessibility/', '/privacy/', '/booking-terms/', '/no-such-page/'];
+const ROUTES = ['/', '/book/', '/soho/', '/soho/menu/', '/covent-garden/', '/covent-garden/menu/', '/dubai/', '/groups/', '/our-story/', '/our-story/fatt/', '/our-story/pundit/', '/allergens/', '/accessibility/', '/privacy/', '/booking-terms/', '/no-such-page/'];
 for (const path of ROUTES) {
   test(`first Tab is Skip to content: ${path}`, async ({ page }) => {
     await page.goto(path);

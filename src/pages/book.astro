@@ -45,7 +45,7 @@ const no = () => String(++n).padStart(2, '0');
         </div>
         <div class="desk-acts">
           <a class="fp-btn fp-btn--primary" href={b.booking!.url} data-book={b.id} data-desk-go target="_blank" rel="noopener">Book at {b.shortName}<span class="sr-only"> (opens in a new tab)</span></a>
-          <a class="fp-link fp-link--strong" href="/private-dining/" data-desk-group hidden>Plan a group →</a>
+          <a class="fp-link fp-link--strong" href="/groups/" data-desk-group hidden>Plan a group →</a>
           {b.phone && <a class="fp-link fp-link--strong" href={`tel:${b.phone}`}>Call {prettyPhone(b.phone)}</a>}
         </div>
       </li>
@@ -68,7 +68,7 @@ const no = () => String(++n).padStart(2, '0');
           <h2 class="desk-name">A bigger table</h2>
           <p class="desk-addr">{rules.setMenu} {rules.depositShort}</p>
         </div>
-        <div class="desk-acts"><a class="fp-btn" href="/private-dining/">Plan a group</a></div>
+        <div class="desk-acts"><a class="fp-btn" href="/groups/">Plan a group</a></div>
       </li>
     )}
   </ol>
@@ -176,7 +176,7 @@ const no = () => String(++n).padStart(2, '0');
         else go.innerHTML = go.dataset.label;
         if (n > r.max) {
           fit.textContent = `${r.name} books online for up to ${r.max}. For ${n}, call or plan a group.`;
-          go.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`;
+          go.href = `/groups/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`;
           go.removeAttribute('target');
         } else if (!ok) {
           const s = openStatus(r.hours as Hours, r.tz);
@@ -190,7 +190,7 @@ const no = () => String(++n).padStart(2, '0');
         // 9 or more: no room booking button, just the way to plan a group.
         const grp = el.querySelector<HTMLAnchorElement>('[data-desk-group]')!;
         go.hidden = n >= 9; grp.hidden = n < 9;
-        if (n >= 9) { fit.textContent = `${r.name} books online for up to ${r.max}. For ${n} or more, plan a group.`; grp.href = `/private-dining/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`; }
+        if (n >= 9) { fit.textContent = `${r.name} books online for up to ${r.max}. For ${n} or more, plan a group.`; grp.href = `/groups/?${new URLSearchParams({ branch: r.id, guests: String(n), date: day, ...(time ? { time } : {}) })}`; }
         fit.classList.toggle('is-off', n < r.max + 1 && !ok);
       }
     };

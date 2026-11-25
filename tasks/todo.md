@@ -121,7 +121,7 @@ Gate
 - [x] AUDIT.md "After" column for every route; home P ≥ 89 local, ≥ 96 live — done: home mobile local median of 5 = P89 (86–94); every route filled. Live: the branch isn't deployed, so live is measured on the PR preview
 - [ ] PR opened; then STOP (next: storyboard sign-off)
 
-Open with the client (code ready for a one-line data change): CG slot grid, CG pre-theatre window, form service (#5/#10/#41), review source.
+Open with the client (code ready for a one-line data change): CG slot grid. Answered 25 Nov 2026: CG pre-theatre 16:45–17:30 (confirmed), no private dining (page → /groups/; groups need no form service), reviews from Google, tiger art kept as final, prerender kept.
 
 ## Phase 3 — Direction C "The Walk-In" (storyboard approved 24 Nov; branch redesign/walk-in)
 Per scene: before/after frames at 375 + 1280 (audit/screens/{before,after}/scenes/, `node audit/scripts/scenes.mjs`), one line in audit/CHANGELOG.md, reduced-motion end state, Pause motion covers loops, tests green, perf budget (perf:budget home) not worse. No new libraries; transform/opacity (+ stroke-dashoffset) only.

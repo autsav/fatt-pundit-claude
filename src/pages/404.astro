@@ -44,7 +44,7 @@ const branches = await getBranches();
   if (f) { f.textContent = fortunes[Math.floor(Math.random() * fortunes.length)]; f.hidden = false; }
 
   // "Did you mean": nearest known route by edit distance (a prefix match counts as close).
-  const routes = ['/', '/soho/', '/covent-garden/', '/dubai/', '/soho/menu/', '/covent-garden/menu/', '/book/', '/private-dining/', '/our-story/', '/allergens/', '/accessibility/', '/privacy/', '/booking-terms/'];
+  const routes = ['/', '/soho/', '/covent-garden/', '/dubai/', '/soho/menu/', '/covent-garden/menu/', '/book/', '/groups/', '/our-story/', '/allergens/', '/accessibility/', '/privacy/', '/booking-terms/'];
   const dist = (a: string, b: string) => {
     let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
     for (let i = 1; i <= a.length; i++) {

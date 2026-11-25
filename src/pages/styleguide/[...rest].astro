@@ -253,7 +253,7 @@ const STATES = [['Default', ''], ['Hover', 'hover'], ['Focus', 'focus'], ['Activ
             <nav aria-label="Navigation sample" class="fp-cluster sg-nav">
               {open.map((b, i) => <a class="fp-nav-link" href={`/${b.id}/`} aria-current={b.id === 'covent-garden' ? 'page' : undefined}><span class="fp-section-no">{String(i + 1).padStart(2, '0')}</span>{b.shortName}</a>)}
               <a class="fp-nav-link" data-force="hover" href="#links"><span class="fp-section-no">03</span>Menus</a>
-              <a class="fp-nav-link" href="/private-dining/"><span class="fp-section-no">04</span>Groups</a>
+              <a class="fp-nav-link" href="/groups/"><span class="fp-section-no">04</span>Groups</a>
             </nav>
             <p class="fp-fine fp-muted">The live header, the Index sheet and the phone dock (under 640 px) on this page are the site's own; they already follow these rules.</p>
             <button type="button" class="fp-btn fp-btn--sm" data-index-open aria-haspopup="dialog">Open the Index</button>
@@ -337,7 +337,7 @@ const STATES = [['Default', ''], ['Hover', 'hover'], ['Focus', 'focus'], ['Activ
         <div class="sg-two">
           <div>
             <ol class="fp-ledger fp-ledger--numbered" role="list">
-              {[...open.map((b) => [b.shortName, b.address.street, `/${b.id}/menu/`]), ['Private dining', 'Tables for nine or more', '/private-dining/'], ['Allergens', 'Ask before you order', '/allergens/']].map(([n, note, href], i) => (
+              {[...open.map((b) => [b.shortName, b.address.street, `/${b.id}/menu/`]), ['Groups', 'Tables for nine or more', '/groups/'], ['Allergens', 'Ask before you order', '/allergens/']].map(([n, note, href], i) => (
                 <li><a class="fp-ledger-row" href={href} data-force={i === 1 ? 'hover' : undefined}><span class="fp-ledger-no">{String(i + 1).padStart(2, '0')}</span><span class="fp-ledger-name">{n}</span><span class="fp-ledger-meta">{note}</span></a></li>
               ))}
             </ol>
@@ -367,7 +367,7 @@ const STATES = [['Default', ''], ['Hover', 'hover'], ['Focus', 'focus'], ['Activ
           <p class="fp-body sg-measure">Six object types replace cards: print, ticket (above, in Layout), luggage tag, postcard, board and receipt. Board and receipt stay as built (Tonight's board on branch pages; the receipt in the footer below). Each object has one target of 44 px or more.</p>
         </div>
         <ul class="fp-grid-auto" role="list">
-          {[['Groups', 'Tables for nine or more are planned with you by phone.', 'Send an enquiry', '/private-dining/'], ['Allergens', 'Tell your server about any allergy before you order.', 'Read the allergen guide', '/allergens/'], ['Step-free', 'The ground floor has step-free access from the street.', 'Accessibility', '/accessibility/']].map(([t, p, l, href]) => (
+          {[['Groups', 'Tables for nine or more are planned with you by phone.', 'Send an enquiry', '/groups/'], ['Allergens', 'Tell your server about any allergy before you order.', 'Read the allergen guide', '/allergens/'], ['Step-free', 'The ground floor has step-free access from the street.', 'Accessibility', '/accessibility/']].map(([t, p, l, href]) => (
             <li class="fp-tag"><div class="fp-tag-in"><p class="fp-h4">{t}</p><p class="fp-small">{p}</p><a class="fp-link fp-small" href={href}>{l}</a></div></li>
           ))}
         </ul>

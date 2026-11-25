@@ -1,6 +1,7 @@
 ---
 /**
- * Groups and private dining (ux-structure.md §5, W6). What's possible per room first (from branches.json
+ * Groups (ux-structure.md §5, W6). There is no private dining (owner, 25 Nov 2026): big tables and set feasts
+ * only; /private-dining/ redirects here (vercel.json). What's possible per room first (from branches.json
  * `groups`), then an enquiry that ends in a clear outcome.
  * Sending: PUBLIC_FORM_ENDPOINT (a form-to-email service, e.g. Formspree or Web3Forms) receives a normal
  * POST and emails the restaurant; the page shows "Enquiry sent" or keeps everything if it fails.
@@ -18,8 +19,8 @@ const open = (await getBranches()).filter((b) => b.status === 'open' && b.email)
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined;
 const setFrom = open[0]?.groups?.setMenuFrom ?? 8;
 ---
-<InfoPage title="Groups and private dining" description="Birthdays, team dinners and whole-room bookings at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups and private dining" layout="full"
-  intro="Big tables, set feasts and whole-room bookings for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible."
+<InfoPage title="Groups" description="Birthdays, team dinners and big tables at Fatt Pundit Soho and Covent Garden. Send us your date and numbers." kicker="Bring everyone" heading="Groups" layout="full"
+  intro="Big tables and set feasts for birthdays, team dinners and celebrations. Tell us the date and how many of you there are, and the restaurant will come back to you with what's possible."
   next={{ label: 'See the rooms', title: 'Two rooms in London.', line: 'Long banquettes at Covent Garden, the bar and the kitchen at Soho.', actions: [...open.map((b) => ({ href: `/${b.id}/`, label: b.shortName }))], photo: tables }}>
   <figure class="pd-photo">
     <Image src={setTable} alt="A pink booth against a green plaster wall, glasses set for dinner" widths={[480, 800, 1200, 1600]} sizes="(min-width: 1240px) 1160px, 100vw" loading="eager" />

@@ -53,7 +53,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
         </ul>
       </details>
       <a href="/our-story/" aria-current={here('/our-story/')}>Our story</a>
-      <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
+      <a href="/groups/" aria-current={here('/groups/')}>Groups</a>
       <a class="fp-btn fp-btn--primary fp-btn--sm nav-book" href={book.href} {...bookAttrs} {...afterHero}><span class="lbl-long">{book.label}</span><span class="lbl-short">{book.short}</span>{book.sr && <span class="sr-only">{book.sr}</span>}</a>
     </nav>
     <a class="idx" href="#site-index" data-index-open aria-haspopup="dialog" aria-label="Site menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>Menu</a>
@@ -87,7 +87,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
       </li>
     ))}
     {[
-      { href: '/private-dining/', label: 'Groups and private dining', note: onlineSummary(branches) },
+      { href: '/groups/', label: 'Groups and big tables', note: onlineSummary(branches) },
       { href: '/our-story/', label: 'Our story', note: 'Guangdong, Calcutta, London' },
       { href: '/allergens/', label: 'Allergens and dietary needs', note: 'Diet codes and how we cook' },
     ].map((it, i) => (
@@ -127,11 +127,11 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
       {current.phone && <a href={`tel:${current.phone}`} aria-label={`Call ${current.shortName}`}>Call</a>}
     </>
   ) : current ? (
-    <a href="/private-dining/">Groups</a>
+    <a href="/groups/">Groups</a>
   ) : (
     <>
       <a href="#footer-menus" data-menus-open aria-haspopup="dialog">Menus</a>
-      <a href="/private-dining/" aria-current={here('/private-dining/')}>Groups</a>
+      <a href="/groups/" aria-current={here('/groups/')}>Groups</a>
     </>
   )}
   <a class="dock-book" href={book.href} {...bookAttrs} aria-current={path === '/book/' ? 'page' : undefined}>{book.list ? book.short : 'Book'}{book.sr && <span class="sr-only">{book.sr}</span>}</a>

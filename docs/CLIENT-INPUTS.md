@@ -1,7 +1,7 @@
 # What we need from Fatt Pundit
 
 The one list of everything to ask the client. Add new questions here as they come up; when one is answered, move it to "Answered" with the date and where it was used.
-Last updated: 21 Nov 2026 (#53–#54 from the Phase 7 build; #46–#52 from the Phase 7 premium plan; #45: Soho walk caption).
+Last updated: 25 Nov 2026 (owner answers: pre-theatre, no private dining, Google reviews, tiger art, prerender; #53–#54 from the Phase 7 build; #46–#52 from the Phase 7 premium plan; #45: Soho walk caption).
 
 Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** = improves the site · **N** = nice to have.
 
@@ -14,7 +14,8 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 2 | Set-menu price per person (groups of 8+ dine from it) | Set menu, groups page, booking terms; data warns "no set price yet" | H |
 | 3 | Pickup ordering link (Google shows "Order online"), and whether Covent Garden takes pickup too | "At home" row on branch pages; redirect for the old `/soho/food-pickup/` | H |
 | 4 | Gift vouchers: provider and link, or "we don't sell them online" | Footer link and the old `/soho/monetary-voucher/` URL (both hidden or redirected until then) | H |
-| 5 | Which form-to-email service to use, and who owns the account | Group enquiry form and Dubai list must send to email with a confirmation | H |
+| 5 | Which form-to-email service to use for the Dubai waiting list, and who owns the account (groups need none: no private dining, enquiries go by email or phone) | Dubai list form (until then the page offers Instagram) | M |
+| 41 | The form service's domain once chosen (#5), for the security policy | `vercel.json` / `_headers` `connect-src` | M |
 | 6 | Covent Garden booking system: SevenRooms or ResDiary? (old home page linked ResDiary, old reserve page used SevenRooms) | Book drawer deep links | L |
 | 7 | Check our pre-filled booking links work with OpenTable and SevenRooms (date, time, party size) | Book drawer | L |
 | 8 | Update the Google Business Profile "Reserve" link and the Instagram bio to `/book/?branch=…` after launch | Old reserve links and new booking desk | M |
@@ -22,7 +23,6 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 | 40 | Confirm online party limits: Soho online up to 7 (8+ set menu, inferred), Covent Garden online up to 4 and call for 5–7 (from its old note) | `branches.json` `groups`; drawer, Index, booking desk | H |
 | 42 | Dish names "Kolkata chilli duck" and "Kolkata chilly chicken": keep (menu names) or change to Calcutta? | Menus, plate wall | M |
 | 43 | The guidelines map art (menu back page) may carry its own printed labels ("Kalkata"): fine as artwork, or supply a version reading Calcutta? | Menu book back page, voyage | N |
-| 41 | The form service's domain once chosen (#5), for the security policy | `vercel.json` / `_headers` `connect-src` | L |
 
 ### Dubai
 | # | Need | Why / where it's used | Pri |
@@ -73,7 +73,6 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 ### Phase 7 (premium plan)
 | # | Need | Why / where it's used | Pri |
 | --- | --- | --- | --- |
-| 47 | Private dining: spaces per restaurant, seated and standing capacities, minimum spend (if any), photos | Groups page "Spaces" cards | M |
 | 48 | Allergen matrix: the 14 UK allergens confirmed per dish | `/allergens/` matrix, menu rows | H |
 | 49 | Story: founders' and chef's names, short bios, portraits; any archive photos of Tangra | New `/story/` page, "From the kitchen" block | M |
 | 50 | Dubai: Arabic version and AED prices at opening? | Dubai page, menus | N |
@@ -91,6 +90,11 @@ Priority: **L** = blocks launch · **H** = needed for a Phase 4 slice · **M** =
 ## Answered
 | Date | Answer | Used in |
 | --- | --- | --- |
+| 25 Nov 2026 | Covent Garden pre-theatre seating 4.45–5.30pm (confirms the data; Soho stays 5–5.45pm) | `branches.json` `preTheatre` (unchanged); closes the audit question |
+| 25 Nov 2026 | There is no private dining. Groups are big tables and the set menu; enquiries by email or phone, so groups need no form service (closes #47; #5 now covers only the Dubai list) | `/private-dining/` → `/groups/` (308), page renamed "Groups", no whole-room wording |
+| 25 Nov 2026 | Review figures come from Google reviews | `branches.json` `rating.source` "Google" (home and room pages already say so) |
+| 25 Nov 2026 | Keep the tiger artwork we have as the final art; nothing to commission | `story-art-slots.ts` (all `placeholder: false`), `docs/ILLUSTRATOR-BRIEF.md` (0 to commission) |
+| 25 Nov 2026 | Keep prerendering room pages (faster), even though a prerendered page skips the pass-to-page morph | `Base.astro` speculation rules (unchanged) |
 | 20 Nov 2026 | Covent Garden opens at 4.45pm | `branches.json` (Tue–Fri 16:45), hours test |
 | 20 Nov 2026 | Pre-theatre seating: Soho 5–5.45pm, Covent Garden 4.45–5.30pm | Phase 4 slice 4.9 |
 | 20 Nov 2026 | Deposit £10 a person for 4 or more, both restaurants; off the bill, or refunded in full if cancelled at least 24 hours before | `branches.json` `groups`; booking terms, home, drawer note, groups page |

@@ -27,8 +27,8 @@ interface Props {
 }
 const { mode, only } = Astro.props;
 
-// Illustrations come from the story-art manifest (src/data/story-art.ts, AUDIT B-08): today's placeholders,
-// the illustrator's files once delivered under the same slot ids.
+// Illustrations come from the story-art manifest (src/data/story-art.ts, AUDIT B-08): the owner-approved art,
+// or a redrawn file dropped in under the same slot id.
 const artFor = (id: string) => storyArt(id).image;
 
 const sketchSrc: Record<Sketch, ImageMetadata> = { ship, mountains, tiger, compass, map, stamp };

@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 test('groups page: no mailto form, Email us + Call per room, clean console', async ({ page }) => {
   const warnings: string[] = [];
   page.on('console', (m) => ['warning', 'error'].includes(m.type()) && !m.text().includes('GL Driver') && warnings.push(m.text()));
-  await page.goto('/private-dining/');
+  await page.goto('/groups/');
   await expect(page.locator('form[action^="mailto:"]')).toHaveCount(0);
   for (const room of ['Soho', 'Covent Garden']) {
     const box = page.locator('[data-contact-room]', { hasText: room });

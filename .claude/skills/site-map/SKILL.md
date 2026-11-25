@@ -10,7 +10,7 @@ Astro 7 + React islands + Tailwind 4, TypeScript strict. Copy the named pattern 
 ## src/pages
 - Routes. Info page: copy `accessibility.astro` (wraps `layouts/InfoPage.astro`).
 - `[branch]/index.astro` = one template for /soho/, /covent-garden/, /dubai/; `[branch]/menu.astro` = list menus.
-- `book.astro` booking desk, `private-dining.astro` groups form (copy for any form page).
+- `book.astro` booking desk, `groups.astro` groups page (copy for any form page).
 - `og/[id].astro` share images, `styleguide/` preview-only showcase, `sitemap.xml.ts` + `robots.txt.ts`.
 - New public page: add it to `INFO_PAGES` in `src/lib/pages.ts` (sitemap).
 

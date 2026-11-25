@@ -120,7 +120,7 @@ const tel = (p: string) => `tel:${p.replace(/\s/g, '')}`;
       <ul>
         {open.map((b) => <li><a href={`/${b.id}/menu/`} aria-current={cur(`/${b.id}/menu/`)}>{b.shortName} menus</a></li>)}
         <li><a href="/allergens/" aria-current={cur('/allergens/')}>Allergens</a></li>
-        <li><a href="/private-dining/" aria-current={cur('/private-dining/')}>Groups and private dining</a></li>
+        <li><a href="/groups/" aria-current={cur('/groups/')}>Groups and big tables</a></li>
         {vouchers && <li><a href={vouchers} target="_blank" rel="noopener">Gift vouchers<span aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a></li>}
       </ul>
     </div>
