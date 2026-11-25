@@ -151,7 +151,7 @@ const probes = {
       for (let i = 0; i < 120; i++) {
         // Times from navigation start (performance.now()), not from before the request was sent; the board is
         // gone once it is hidden or its shutter has left the screen.
-        const s = await page.evaluate(() => { const ov = document.querySelector('[data-arrival-overlay]'); const sk = document.querySelector('[data-skip]'); const top = document.querySelector('.arrival .half.top'); const cs = ov && getComputedStyle(ov); return { now: Math.round(performance.now()), ov: !!ov && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0' && !(top && top.getBoundingClientRect().bottom <= 0), sk: sk ? sk.getBoundingClientRect().height > 0 && getComputedStyle(sk).visibility !== 'hidden' : false }; }).catch(() => ({}));
+        const s = await page.evaluate(() => { const ov = document.querySelector('[data-arrival-overlay]'); const sk = document.querySelector('[data-skip]'); const doors = [...document.querySelectorAll('.arrival .half')]; const cs = ov && getComputedStyle(ov); return { now: Math.round(performance.now()), ov: !!ov && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0' && !(doors.length && doors.every((d) => getComputedStyle(d).opacity === '0')), sk: sk ? sk.getBoundingClientRect().height > 0 && getComputedStyle(sk).visibility !== 'hidden' : false }; }).catch(() => ({}));
         if (s.sk && skipVisibleAt === null) skipVisibleAt = s.now;
         if (s.now && !s.ov && i > 2) { goneAt = s.now; break; }
         await wait(page, 50);

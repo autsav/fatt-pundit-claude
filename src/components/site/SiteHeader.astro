@@ -182,18 +182,11 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
     new IntersectionObserver(([e]) => { document.documentElement.dataset.hero = e.isIntersecting || e.boundingClientRect.top > h ? 'in' : 'out'; }, { rootMargin: `-${h}px 0px 0px 0px` }).observe(hero);
   } else delete document.documentElement.dataset.hero;
 
-  // Phone dock: away on scroll down (12px threshold), back on scroll up, away while a field has focus.
+  // Phone dock: Book stays one tap away the whole way down (U-04: it used to slide away on every scroll down,
+  // through the home page's long scenes); it steps aside only while a form field has focus (the keyboard is up).
   const dock = document.querySelector<HTMLElement>('[data-dock]');
   if (dock) {
-    const root = document.documentElement;
-    const field = 'input, select, textarea';
-    let last = scrollY;
-    addEventListener('scroll', () => {
-      const y = scrollY;
-      if (Math.abs(y - last) < 12) return;
-      dock.toggleAttribute('data-away', y > last && y > 80);
-      last = y;
-    }, { passive: true });
+    const field = 'input:not([type=checkbox], [type=radio], [type=button], [type=submit]), select, textarea';
     addEventListener('focusin', (e) => { if ((e.target as Element).matches?.(field)) dock.setAttribute('data-typing', ''); });
     addEventListener('focusout', (e) => { if ((e.target as Element).matches?.(field)) dock.removeAttribute('data-typing'); });
   }
@@ -207,7 +200,7 @@ const afterHero = onBranchHome && current?.status === 'open' ? { 'data-after-her
   .idx { gap: 8px; text-decoration: none; }
   @media (max-width: 640px) {
     .dock[data-dock] { transition: translate var(--dur-panel) var(--curve-panel), transform var(--dur-panel) var(--curve-panel), visibility var(--dur-panel); }
-    .dock[data-away], .dock[data-typing] { translate: 0 100%; }
+    .dock[data-typing] { translate: 0 100%; }
     .dock:focus-within { translate: 0 0; }
   }
 </style>

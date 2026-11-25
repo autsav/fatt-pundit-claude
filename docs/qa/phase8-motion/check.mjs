@@ -19,7 +19,7 @@ const VIEWS = [
   ['1440', { width: 1440, height: 900 }],
 ];
 // Loops that are allowed to run for ever (all stopped by Pause motion).
-const KNOWN_LOOPS = new Set(['fp-pulse', 'voyage-ping', 'breathe', 'fp-typing', 'kokonutui-typewriter-caret', 'ping', 'o-cue-bob', 'lo-sway', 'lo-fall']);
+const KNOWN_LOOPS = new Set(['fp-pulse', 'voyage-ping', 'breathe', 'fp-typing', 'kokonutui-typewriter-caret', 'ping', 'o-cue-bob', 'lo-sway', 'lo-fall', 'hero-breathe', 'menu-steam']);
 
 // WebGL off, as in scripts/perf-budget.mjs: headless Chrome draws it in software, which would drown everything else.
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox', '--disable-gpu', '--disable-webgl', '--disable-webgl2'] });

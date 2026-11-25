@@ -77,6 +77,8 @@ const CLOSE = 360;
 // closest zoom, but drawn once instead of every frame).
 const seaScale = (k: number) => Math.min(k, 3200 / (SEA.w * (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1)));
 const SHIP_PX = 64;
+/** Where the ship docks at Dubai, east of the port: clears the "Dubai" label (Phase 10 nit; Direction C S6). */
+const DOCK = SHIP_PX * 0.7;
 /** Which port is current, shared with the postcards so only the one that changes re-renders. */
 type LiveStore = { v: number; subs: Set<() => void> };
 const NO_STORE: LiveStore = { v: -2, subs: new Set() };
@@ -194,7 +196,8 @@ export default function Voyage({ art }: { art: VoyageArt }) {
   };
 
   /** The ship is an HTML badge: its screen position follows from the camera, so it needs no SVG write. */
-  const placeShip = (x: number, y: number, dir: number) => {
+  /** ox: a screen-pixel nudge east, so the docked ship sits beside its port instead of over the label. */
+  const placeShip = (x: number, y: number, dir: number, ox = 0) => {
     if (dir && dir !== facing.current) {
       facing.current = dir;
       if (hullRef.current) hullRef.current.style.transform = `scaleX(${dir})`;
@@ -203,7 +206,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     if (!ship) return;
     const { fx, fy } = layout.current;
     const { cx, cy, ppu } = cam.current;
-    ship.style.transform = `translate3d(${fx + (x - cx) * ppu - SHIP_PX / 2}px, ${fy + (y - cy) * ppu - SHIP_PX / 2}px, 0)`;
+    ship.style.transform = `translate3d(${fx + (x - cx) * ppu - SHIP_PX / 2 + ox}px, ${fy + (y - cy) * ppu - SHIP_PX / 2}px, 0)`;
     if (!shipShown.current) {
       shipShown.current = true;
       ship.style.opacity = '1';
@@ -252,7 +255,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
     if ('hold' in s) {
       const [x, y] = PORTS[s.hold].at;
       camera(x, y, CLOSE * (1 - 0.05 * t));
-      placeShip(x, y, 0);
+      placeShip(x, y, 0, s.hold === 3 ? DOCK : 0);
       drawn = s.hold;
       paint(s.hold, -1, s.hold);
     } else if ('out' in s) {
@@ -260,7 +263,7 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       const [x, y] = PORTS[3].at;
       const e = smooth(t);
       camera(lerp(x, WHOLE[0], e), lerp(y, WHOLE[1], e), lerp(CLOSE * 0.95, WHOLE[2], e));
-      placeShip(x, y, 0);
+      placeShip(x, y, 0, DOCK);
       drawn = 3;
       paint(3, -1, 3);
     } else {
@@ -279,7 +282,8 @@ export default function Voyage({ art }: { art: VoyageArt }) {
       camera(lerp(pt.x, (a[0] + b[0]) / 2, pull), lerp(pt.y, (a[1] + b[1]) / 2, pull), lerp(CLOSE, s.peak, pull));
       // The drawing faces west; mirror it when sailing east.
       const dx = ahead.x - pt.x;
-      placeShip(pt.x, pt.y, Math.abs(dx) > 0.3 ? (dx > 0 ? -1 : 1) : 0);
+      // Arriving in Dubai, the ship eases a little east to dock beside the port, clear of its label.
+      placeShip(pt.x, pt.y, Math.abs(dx) > 0.3 ? (dx > 0 ? -1 : 1) : 0, s.leg === 2 ? DOCK * smooth(clamp((e - 0.8) / 0.2)) : 0);
       drawn = s.leg + e;
       paint(-1, s.leg, s.leg);
     }

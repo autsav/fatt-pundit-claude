@@ -302,4 +302,43 @@ const tel = (p: string) => `tel:${p.replace(/\s/g, '')}`;
   .motion-toggle:hover { color: var(--color-gold); }
   .fine { font-size: var(--step-fine); max-width: 80ch; padding-top: 4px; }
   @media (max-width: 640px) { .totop { margin-left: 0; } }
+
+  /* U-05 (Direction C scene 11): the footer in about one screen. Same links and words, tighter layout. */
+  .foot { padding-top: clamp(24px, 3vw, 40px); }
+  .wrap.rooms, .wrap.touch, .foot-index { padding-block: clamp(20px, 2.6vw, 36px); }
+  .mark-word { font-size: clamp(2.2rem, 9vw, 6.4rem); }
+  .legal-in { gap: 6px; padding-block: 12px 16px; }
+  @media (min-width: 761px) {
+    /* Keep in touch on one line: the note, the list or sign-up, then the socials. */
+    .touch { grid-template-columns: auto auto 1fr; align-items: center; }
+    .touch-l { display: contents; }
+    .touch .note { margin: 0; }
+    .touch-r { justify-self: end; display: flex; align-items: center; gap: 16px; }
+    .touch-r .small-caps { margin: 0; }
+  }
+  @media (max-width: 640px) {
+    .lead { display: none; }
+    /* A room in two lines: name and today's status on the left, Call and Book on the right; the rest behind
+       "Address and hours". */
+    .room { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 0; padding-block: 10px; }
+    .room-name { grid-column: 1; grid-row: 1; min-height: 40px; }
+    .status { grid-column: 1; grid-row: 2; }
+    .room-phone { display: contents; }
+    .room-btns { grid-column: 2; grid-row: 1 / span 2; align-self: center; display: flex; gap: 8px; margin: 0; }
+    .room-btns > .fp-btn { white-space: nowrap; }
+    .room-phone .hours { grid-column: 1 / -1; grid-row: 3; }
+    .touch .note { font-size: 17px; margin-bottom: 8px; }
+    .touch { gap: 12px; }
+    /* Socials as icons on phones; the link text stays as each link's name. */
+    .touch-r { display: flex; align-items: center; gap: 12px; }
+    .touch-r .small-caps { margin: 0; }
+    .social { gap: 0 6px; }
+    .social a { font-size: 0; min-width: 44px; justify-content: center; }
+    .social svg { width: 22px; height: 22px; }
+    .foot-index { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; font-size: 15px; }
+    .foot-index a { min-height: 40px; }
+    .mark { padding-top: 12px; }
+    .mark-strip { padding: 10px 12px; }
+  }
+  @media (max-width: 400px) { .room-btns { flex-direction: column; } .room-btns > .fp-btn { min-height: 40px; } }
 </style>

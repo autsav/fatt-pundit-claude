@@ -37,7 +37,8 @@ test('intro gone within 1.3 s, first Tab is Skip', async ({ page }) => {
   await page.waitForFunction(() => {
     const o = document.querySelector('[data-arrival-overlay]');
     return !o || getComputedStyle(o).visibility === 'hidden' || getComputedStyle(o).display === 'none'
-      || document.querySelector<HTMLElement>('.arrival .half.top')!.getBoundingClientRect().bottom <= 0;
+      // the doors have swung edge-on and faded
+      || [...document.querySelectorAll<HTMLElement>('.arrival .half')].every((d) => getComputedStyle(d).opacity === '0');
   }, null, { timeout: 4000, polling: 25 });
   expect(Date.now() - t0).toBeLessThanOrEqual(1300);
   // Once the board has gone, the next Tab starts from the top of the page.

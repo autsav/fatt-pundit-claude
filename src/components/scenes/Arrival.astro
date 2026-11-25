@@ -21,8 +21,9 @@ const stampImg = { src: await stampSrc(stamp, 320) };
 
 <noscript><style>[data-arrival-overlay] { display: none; }</style></noscript>
 <div class="arrival" data-arrival-overlay>
-  <div class="half top"></div>
-  <div class="half bottom"></div>
+  <!-- Two doors (Direction C scene 1): the board's halves are the restaurant's doors, and they swing open onto the window. -->
+  <div class="half left" aria-hidden="true"></div>
+  <div class="half right" aria-hidden="true"></div>
   <div class="center" aria-hidden="true">
     <p class="kicker">Now arriving</p>
     <div class="board"></div>
@@ -42,9 +43,16 @@ const stampImg = { src: await stampSrc(stamp, 320) };
   :global(html[data-arrival='play']) .arrival { display: grid; animation: arrival-failsafe 1ms linear 1.2s forwards; }
   /* Both ends hidden: a one-ended keyframe left visibility 'visible' and opacity at 1e-13 in Chromium. */
   @keyframes arrival-failsafe { from, to { opacity: 0; visibility: hidden; pointer-events: none; } }
-  .half { position: absolute; left: 0; right: 0; height: 50.5%; background: var(--color-ink); }
-  .half.top { top: 0; border-bottom: 1px solid rgb(203 160 82 / 0.25); }
-  .half.bottom { bottom: 0; }
+  /* The doors: each half a panelled door in ink, a gold-ruled panel and a brass pull by the seam. They swing on
+     their outer hinges (rotateY with perspective on the overlay), transform and opacity only. */
+  .arrival { perspective: 1400px; perspective-origin: 50% 45%; }
+  .half { position: absolute; top: 0; bottom: 0; width: 50.5%; background: var(--color-ink); backface-visibility: hidden; will-change: transform; }
+  .half.left { left: 0; transform-origin: 0 50%; border-right: 1px solid rgb(203 160 82 / 0.25); }
+  .half.right { right: 0; transform-origin: 100% 50%; }
+  .half::before { content: ''; position: absolute; inset: clamp(18px, 4vw, 48px); border: 1px solid rgb(203 160 82 / 0.22); }
+  .half::after { content: ''; position: absolute; top: calc(50% - clamp(28px, 5vh, 48px)); width: 6px; height: clamp(56px, 10vh, 96px); border-radius: 3px; background: linear-gradient(90deg, #8a6a2e, var(--color-gold), #8a6a2e); opacity: 0.75; }
+  .half.left::after { right: clamp(10px, 1.6vw, 18px); }
+  .half.right::after { left: clamp(10px, 1.6vw, 18px); }
   .center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 24px; text-align: center; }
   .kicker { margin: 0; font-family: var(--font-label); font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; color: var(--color-gold); font-size: 13px; }
   .route { margin: 0; font-family: var(--font-note); font-style: italic; color: rgb(218 199 181 / 0.88); font-size: 17px; letter-spacing: 0.04em; }
@@ -128,8 +136,12 @@ const stampImg = { src: await stampSrc(stamp, 320) };
           .add('.arrival .center', { x: [0, -6, 5, -3, 0], y: [0, 4, -2, 0], duration: 260, ease: 'outQuad' }, 60)
           .add('.arrival .center', { opacity: [1, 0], scale: [1, 0.96], duration: 300, ease: 'inQuad' }, 160);
       }
-      tl.add('.arrival .half.top', { y: ['0%', '-101%'], duration: fast ? 300 : 400, ease: 'inOutExpo' }, fast ? 0 : 100)
-        .add('.arrival .half.bottom', { y: ['0%', '101%'], duration: fast ? 300 : 400, ease: 'inOutExpo' }, '<<')
+      // The doors swing open on their hinges onto the rainy window (Direction C, scene 1): a door has weight,
+      // so it starts slowly and gathers speed, and fades as it turns edge-on.
+      const d = fast ? 300 : 440;
+      tl.add('.arrival .half.left', { rotateY: [0, -100], duration: d, ease: 'inOutQuad' }, fast ? 0 : 60)
+        .add('.arrival .half.right', { rotateY: [0, 100], duration: d, ease: 'inOutQuad' }, '<<')
+        .add('.arrival .half', { opacity: [1, 0], duration: Math.round(d * 0.3), ease: 'linear' }, `<<+=${Math.round(d * 0.7)}`)
         .add('.arrival .skip-arrival', { opacity: 0, duration: 150 }, '<<');
     };
     window.addEventListener('fp:board-done', () => open(false), { once: true });

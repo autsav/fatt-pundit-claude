@@ -390,8 +390,6 @@
   background: radial-gradient(ellipse at 50% 80%, rgb(255 236 170 / 0.95), var(--color-gold) 30%, var(--color-tiger) 58%, transparent 72%); }
 @media (max-width: 640px) {
   :where(.story-scenes) { --floor: calc(var(--dock-h, 60px) + env(safe-area-inset-bottom)); }
-  /* The dock slides away on scroll down (SiteHeader sets data-away), so the cast settles to the screen foot. */
-  html:has(.dock[data-away]) :where(.story-scenes) { --floor: env(safe-area-inset-bottom, 0px); }
 }
 @media (max-width: 599px) {
   :where(.story-scenes) { --top: 84px; --ship-w: 46vw; --sea-h: 22%; }
@@ -422,6 +420,11 @@
 .voyage-port.is-reached .voyage-ring { stroke: var(--color-tiger); stroke-opacity: 1; }
 .voyage-port.is-reached .voyage-dot { fill: var(--color-tiger); opacity: 1; }
 .voyage-port.is-here .voyage-ring { transform-box: fill-box; transform-origin: center; animation: voyage-ping 1.8s ease-out 3; }
+/* A reached port is stamped onto the chart: a press with weight (Direction C S6). */
+@media (prefers-reduced-motion: no-preference) {
+  .voyage-port.is-reached .voyage-dot { transform-box: fill-box; transform-origin: center; animation: voyage-stamp var(--dur-spring) var(--curve-stamp) both; }
+}
+@keyframes voyage-stamp { from { transform: scale(2.2); opacity: 0.3; } to { transform: none; opacity: 1; } }
 @keyframes voyage-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
 .voyage-name { font-family: var(--font-lora); font-style: italic; font-weight: 600; font-size: 22px; fill: var(--color-sand); paint-order: stroke; stroke: var(--color-ink); stroke-width: 6px; stroke-linejoin: round; }
 .voyage-port.is-reached .voyage-name { fill: var(--color-paper-light); }
@@ -443,12 +446,13 @@
 .voyage-sea-note { opacity: 0; transition: opacity var(--dur-panel) var(--curve-out); width: fit-content; max-width: calc(100% - 24px); margin-inline: auto; padding: 4px 14px; background: rgb(44 41 37 / 0.88); border: 1px solid rgb(203 160 82 / 0.5); }
 .voyage-sea-note.is-on { opacity: 1; }
 
-.voyage-card { position: absolute; z-index: 10; left: 12px; right: 12px; bottom: 12px; max-height: 46%; opacity: 0; transform: translateY(var(--rise)) rotate(-1deg); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-story) var(--curve-out); pointer-events: none; }
+/* Postcards arrive tilted and settle with a little weight (Direction C S6): the spring on transform only. */
+.voyage-card { position: absolute; z-index: 10; left: 12px; right: 12px; bottom: 12px; max-height: 46%; opacity: 0; transform: translateY(var(--rise)) rotate(-3.5deg); transition: opacity var(--dur-story) var(--curve-out), transform var(--dur-spring) var(--curve-spring); pointer-events: none; }
 .voyage-card.is-on { opacity: 1; transform: rotate(-1deg); pointer-events: auto; }
 /* The outgoing card leaves fast so two postcards never overlap on a phone. */
 .voyage-card:not(.is-on) { transition-duration: var(--dur-fast); }
 @media (min-width: 1024px) {
-  .voyage-card { left: 40px; right: auto; bottom: auto; top: 54%; width: min(430px, 34vw); max-height: 78%; transform: translateY(calc(-50% + var(--rise))) rotate(-1.5deg); }
+  .voyage-card { left: 40px; right: auto; bottom: auto; top: 54%; width: min(430px, 34vw); max-height: 78%; transform: translateY(calc(-50% + var(--rise))) rotate(-4deg); }
   .voyage-card.is-on { transform: translateY(-50%) rotate(-1.5deg); }
 }
 .voyage-card.is-static { position: relative; inset: auto; width: auto; max-height: none; transform: none; }
@@ -479,6 +483,8 @@
 @view-transition { navigation: auto; }
 ::view-transition-group(*) { animation-duration: var(--dur-panel); animation-timing-function: var(--curve-out); }
 ::view-transition-group(root) { animation-duration: var(--dur-fast); }
+/* The header stays put while the page underneath changes (Direction C scene 12). */
+header.bar { view-transition-name: site-header; }
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
 }
@@ -638,11 +644,99 @@ html:has(.hero) { background: var(--color-ink); }
 /* Branch hero name board: the intended size, but never wider than its column (container = .board-slot). */
 .arrival-flap { font-size: min(clamp(22px, 4.6vw, 56px), calc(100cqw / (var(--n, 13) * 0.8))); }
 
+/* Home hero (Direction C scene 2). The room behind the glass lags the scroll (depth), the shelf lamps breathe,
+   and the glass mists over as you leave for the street. Scroll-linked rules live here as longhands (Astro's
+   scoped pipeline drops them: tasks/lessons.md). Reduced motion: still photo, no mist, no breathing. */
+.hero-lamps { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 38% at 50% 14%, rgb(255 190 110 / 0.2), transparent 72%); opacity: 0.7; }
+.hero-mist { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; background: linear-gradient(rgb(218 199 181 / 0.28), rgb(218 199 181 / 0.42) 60%, rgb(218 199 181 / 0.12)); }
+/* The drifting glass carries its own bottom fade down out of the section, so the hand-off to the street is a
+   fixed fade that doesn't move. */
+#top.hero::after { content: ''; position: absolute; inset: auto 0 0; height: 22svh; z-index: 0; pointer-events: none; background: linear-gradient(transparent, var(--color-ink)); }
+@keyframes hero-breathe { from { opacity: 0.55; } to { opacity: 1; } }
+@keyframes hero-drift { to { transform: translateY(14svh) scale(1.03); } }
+@keyframes hero-mist { to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-lamps { animation: hero-breathe 4.8s ease-in-out infinite alternate; }
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-glass { animation-name: hero-drift; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 0 100svh; }
+    .hero-mist { animation-name: hero-mist; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(root); animation-range: 40svh 100svh; }
+  }
+}
+
+/* Menu book (Direction C scene 7). The cover swings open on the spine as the book comes on screen (wide
+   screens, where the book opens on a spread), and steam rises off the momos. */
+.menu-cover-swing { display: none; position: absolute; top: 0; bottom: 0; left: 50%; width: 50%; z-index: 5; pointer-events: none; container-type: inline-size; transform-origin: 0 50%; backface-visibility: hidden; }
+@keyframes menu-cover-open { from { transform: perspective(2000px) rotateY(0deg); } to { transform: perspective(2000px) rotateY(-180deg); } }
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .menu-cover-swing { display: block; animation-name: menu-cover-open; animation-timing-function: ease-in-out; animation-fill-mode: both; animation-timeline: view(); animation-range: entry 40% cover 42%; }
+  }
+}
+.menu-steam { position: absolute; left: 18%; right: 18%; top: -4%; height: 46%; pointer-events: none; z-index: 1; }
+.menu-steam i { position: absolute; bottom: 0; width: 16%; height: 100%; border-radius: 50%; background: radial-gradient(closest-side, rgb(255 255 255 / 0.6), transparent); opacity: 0; }
+.menu-steam i:nth-child(1) { left: 10%; } .menu-steam i:nth-child(2) { left: 42%; } .menu-steam i:nth-child(3) { left: 74%; }
+@keyframes menu-steam { 0% { opacity: 0; transform: translateY(18%) scale(0.7, 0.6); } 30% { opacity: 0.75; } 100% { opacity: 0; transform: translate(8%, -55%) scale(1, 1.25); } }
+@media (prefers-reduced-motion: no-preference) {
+  .menu-steam i { animation: menu-steam 3.2s ease-out infinite; }
+  .menu-steam i:nth-child(2) { animation-delay: 1.05s; } .menu-steam i:nth-child(3) { animation-delay: 2.1s; }
+}
+
+/* The bar (Direction C scene 8): a sheen runs along the shelf as the bar comes into view, the drink list prints
+   line by line, the two prints ease in. Named view timelines on the stage and the apron (the section clips with
+   overflow: clip, so they track the page). Reduced motion: all at rest. */
+.bar-sheen { position: absolute; inset: 0 auto 40% 0; width: 38%; pointer-events: none; opacity: 0; background: linear-gradient(100deg, transparent, rgb(255 222 168 / 0.2) 45%, rgb(255 236 200 / 0.32) 50%, rgb(255 222 168 / 0.2) 55%, transparent); }
+@keyframes bar-sheen { 0% { opacity: 0; transform: translateX(-110%) skewX(-12deg); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(290%) skewX(-12deg); } }
+@keyframes bar-ease-in { from { scale: 1.06; opacity: 0.4; } to { scale: 1; opacity: 1; } }
+@keyframes bar-print { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bar-stage { view-timeline-name: --bar-stage; view-timeline-axis: block; }
+    .bar-apron { view-timeline-name: --bar-apron; view-timeline-axis: block; }
+    .bar-sheen { animation-name: bar-sheen; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --bar-stage; animation-range: entry 30% cover 60%; }
+    .bar-print { animation-name: bar-ease-in; animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: --bar-stage; animation-range: entry 0% cover 35%; }
+    .bar-apron li { animation-name: bar-print; animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: --bar-apron; }
+    .bar-apron li:nth-child(1) { animation-range: entry 20% entry 50%; }
+    .bar-apron li:nth-child(2) { animation-range: entry 35% entry 65%; }
+    .bar-apron li:nth-child(3) { animation-range: entry 50% entry 80%; }
+    .bar-apron li:nth-child(n + 4) { animation-range: entry 65% entry 95%; }
+  }
+}
+
+/* The room (Direction C scene 9): each frame develops from sepia to colour as it comes into view (a tinted layer in
+   `color` blend fading out; no filter), and on wide screens the strip drifts a little sideways with the scroll,
+   like film through a gate. Named timelines on the frames: the photo box clips, which would capture view(). */
+.room-frame { view-timeline-name: --room-frame; view-timeline-axis: block; }
+.room-shot { position: relative; }
+.room-shot::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: rgb(124 86 44 / 0.75); mix-blend-mode: color; opacity: 0; }
+@keyframes room-develop { from { opacity: 1; } to { opacity: 0; } }
+@keyframes room-drift { from { transform: translateX(3%); } to { transform: translateX(-3%); } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .room-shot::after { animation-name: room-develop; animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: --room-frame; animation-range: entry 15% cover 45%; }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 761px) {
+    .room-strip { animation-name: room-drift; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+  }
+}
+
+/* Goodbye (Direction C scene 11): the room's warm light dims as you leave the page. */
+.foot .goodbye { position: relative; }
+.foot .goodbye::before { content: ''; position: absolute; inset: -12% -4%; z-index: 0; pointer-events: none; background: radial-gradient(45% 60% at 28% 45%, rgb(255 190 110 / 0.18), transparent 70%); }
+.foot .goodbye > * { position: relative; z-index: 1; }
+@keyframes goodbye-dim { from { opacity: 1; } to { opacity: 0.12; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .foot .goodbye::before { animation-name: goodbye-dim; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: view(); animation-range: cover 35% exit 90%; }
+  }
+}
+
 /* "Pause motion" (footer button): one rule holds every loop that never ends on its own where it is (AUDIT B-25).
    Scoped to the registered loops, not `*`: pausing everything would also freeze the booking drawer's entrance
    (off-screen) and the story's scroll scenes. Register each new infinite loop here and in
    docs/qa/phase8-motion/check.mjs KNOWN_LOOPS; tests/e2e/motion.spec.ts fails if one is missed. */
-html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, .o-cue, [data-idle='true']) { animation-play-state: paused; }
+html[data-motion='paused'] :is(.animate-ping, .voyage-pulse, .voyage-ring, .halo, .pin-b, .lo-rain, .lo-blade-in, .o-cue, .hero-lamps, .menu-steam i, [data-idle='true']) { animation-play-state: paused; }
 
 /* Stand-in for the typewriter font while it loads: Courier New, resized per weight so lines break in
    the same places and nothing jumps when the brand font arrives. Measured on this site's own text:
