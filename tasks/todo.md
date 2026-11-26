@@ -32,8 +32,13 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
   - [ ] Budget: ≤ 150 KB gz JS for the 3D chunk, ≤ 500 KB for models/textures (glTF + KTX2/Draco), 60 fps on mid-range Android, home perf stays ≥ 85
   - [x] Assets: none commissioned; leaf and covers are procedural, page faces come from the menu data (build-time screenshots or run-time rasterising, spiked in the prototype), lamp colour from the brass/ink tokens
   - [x] Prototype on /styleguide/book-3d/ (src/lib/page-curl.ts). 26 Nov 2026: 4.7 KB gz, 120 fps / worst frame 10 ms at 4× CPU on M1 Pro; first turn one 42 ms frame. Results in §M6
-  - [ ] Prototype follow-ups: client clip, a run on an integrated-GPU laptop, cover thickness, corner peel on hover
-  - [ ] Texture spike (§M6 step 2): real menu pages as textures, build-time screenshots vs run-time rasterising
+  - [x] Home swap (26 Nov 2026, owner asked; replaces the client sign-off gate): the 3D book replaces PageFlip on home. Verify green; e2e 127 pass / 0 fail; home perf 96, TBT 26 ms, 1077 KB, jank 0.2 %; taps ok (DOM fallback turn 96 ms); 0 errors at 1440 / 375 / reduced motion / no WebGL; client clip recorded. `/dubai/` CLS 0.124 > 0.05 in the same run: that page uses none of this (open item)
+    - [x] A. Texture: `src/lib/page-raster.ts` rasterises the real DOM pages (SVG foreignObject, CSS/fonts/images inlined) to ImageBitmaps at run time; tested in Chromium, WebKit, Firefox (taint, fidelity, ms per page at 4× CPU). Build-time screenshots ruled out: Vercel builds have no browser
+    - [x] B. `page-curl.ts`: faces streamed in near the open spread (texture window), covers as boards + page-stack thickness, corner peel on hover, one-page view on narrow screens, `goTo`, cover-opening turn on first view
+    - [x] C. `CurlBook.tsx` (same props as PageFlip): DOM spread underneath = screen-reader text + the fallback (no WebGL2, reduced motion, lost context: instant turns, same buttons/keys/swipe); canvas on top when 3D runs
+    - [x] D. Wire into MenuBook, delete `kokonutui/page-flip.tsx` and the cover-swing CSS; e2e `menubook.spec.ts` + `perf:taps` keep their "Next page" button
+    - [x] E. Check: verify, perf:budget (home ≥ 85, ≤ 1100 KB), perf:taps, e2e, desktop + 375 px + WebKit, reduced motion, WebGL off; client clip (Playwright video)
+  - [ ] Integrated-GPU laptop run (needs the machine)
 - [x] Motion roadmap M1 (docs/MOTION-ROADMAP.md): spring token + spatial/effects rule, dialog exits, unfolding lists, CSS scroll timelines. 21 Nov 2026: verify green, phase 8 check.mjs ok with the new dialog-exit assertion (5 pages × 2 widths), perf budget unchanged (home 84–85 / jank 3.2 %, the open item below)
 - [x] Motion roadmap M2 (docs/MOTION-ROADMAP.md §M2): springs on the seven signature moments + interruption test. 22 Nov 2026: verify green, check.mjs `interrupt` ok on 5 pages × 2 widths, probes in the roadmap's done note
 - [x] Motion roadmap M3, the part before the art (§M3): story panels rise on a CSS `view()` timeline (probe: 13 panels, both widths, opacity follows the scroll). 22 Nov 2026

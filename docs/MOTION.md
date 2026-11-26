@@ -159,7 +159,7 @@ and breathing loops, the bar's wandering light and the cycling "Open now" line.
   `PUBLIC_PLAUSIBLE_DOMAIN` is set; read it at p75 after the first week.
 - Interruptible: a second input mid-motion reverses or completes from where the thing is, never
   restarts it. CSS transitions do this by themselves (a plate tapped twice turns back); a scripted
-  spring takes the current position and the hand's velocity (`page-flip.tsx` `run`). The drawer opened
+  spring takes the current position and the hand's velocity (`page-curl.ts` `frame`). The drawer opened
   and closed within 100 ms, a plate flipped twice within 300 ms and a page turned and turned back are
   asserted by `docs/qa/phase8-motion/check.mjs` (`interrupt`).
 
@@ -184,10 +184,11 @@ Mechanisms whose timing is their own, kept outside the two-speed rule on purpose
   `height` (and the picker's block padding and border), the one layout property allowed: small boxes,
   on their own layer or inside a sheet, with `interpolate-size` so the browser does the measuring.
 - **Vendored components** (`kokonutui/`): the split-flap boards and marker pen keep their own
-  mechanical timings; each honours `prefers-reduced-motion` on its own. The page-flip book turns on
-  `SPRING.door` (near-critical: paper never passes its rest) and settles back on `SPRING.ui`, with the
-  swipe's speed carried in as velocity; a page in flight can be caught, dragged back or reversed by
-  the opposite button, key or swipe.
+  mechanical timings; each honours `prefers-reduced-motion` on its own.
+- **The menu book** (`CurlBook.tsx` + `src/lib/page-curl.ts`, raw WebGL2, MOTION-ROADMAP §M6): a leaf
+  follows the hand on a stiff spring and settles on `SPRING.page` (critically damped: paper lands, it
+  doesn't bounce), with the swipe's speed carried in as velocity; a leaf in flight can be caught and
+  dragged back. Reduced motion, no WebGL2 or a lost context: the DOM pages, turned at once.
 
 ## Adding motion
 
