@@ -19,6 +19,11 @@ interface Props {
   posterSizes?: string;
 }
 const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props;
+// The street plate at the foot of the window: you step back onto Maiden Lane before the door scene.
+// From the data: "6 Maiden Lane" -> "Maiden Lane"; "WC2E 7NA" -> "WC2" (plates show the district).
+const cg = branches.find((b) => b.id === 'covent-garden');
+const plateStreet = cg?.address.street.replace(/^\d+\s*/, '');
+const plateDistrict = cg?.address.postcode?.split(' ')[0].replace(/(\d)[A-Z]$/, '$1');
 ---
 <!-- The hero's Book is on screen at first, so the header's Book waits (set before the header paints;
      without JavaScript the attribute is never set and the header's Book simply stays). -->
@@ -40,6 +45,13 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
     </div>
     <p class="hero-wipe" aria-hidden="true">Wipe the glass to look inside</p>
   </div>
+  <!-- Decorative: the door scene names the street for screen readers. -->
+  {plateStreet && (
+    <div class="hero-plate fp-reveal" aria-hidden="true">
+      <span class="plate-name">{plateStreet}{plateDistrict && <span class="plate-district">{plateDistrict}</span>}</span>
+      <span class="plate-city">City of Westminster</span>
+    </div>
+  )}
 </section>
 
 <script>
@@ -112,7 +124,7 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
 </script>
 
 <style>
-  .hero { position: relative; display: grid; place-items: center; min-height: calc(100svh - var(--header-h, 72px)); overflow: hidden; background: var(--color-ink); color: var(--color-sand); }
+  .hero { position: relative; display: grid; grid-template-rows: 1fr auto; place-items: center; min-height: calc(100svh - var(--header-h, 72px)); overflow: hidden; background: var(--color-ink); color: var(--color-sand); }
   /* The glass dissolves into the street below over its last 20svh (no flat edge). */
   .hero-glass { position: absolute; inset: 0; transition: translate 900ms var(--curve-out); -webkit-mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); mask-image: linear-gradient(#000 calc(100% - 20svh), transparent); }
 
@@ -139,6 +151,16 @@ const { branches, rainSrc, rainPoster, posterSrcset, posterSizes } = Astro.props
   .hero-book { min-width: min(280px, 100%); }
   .hero-wipe { margin: 0; font-family: var(--font-note); font-style: italic; font-size: var(--step-small); color: rgb(218 199 181 / 0.8); opacity: 0; transition: opacity var(--dur-panel); }
   .hero-wipe.is-on { opacity: 1; }
+
+  /* The street plate: white enamel, black letters, red district, two screws, on the dark of the wall
+     (a London street name plate). Sits in the hero's bottom fade, above it (z-index). */
+  .hero-plate { position: relative; z-index: 1; display: grid; justify-items: center; gap: 0.35em; margin-block: var(--space-4) clamp(20px, 5svh, 48px); padding: 0.75em 2.4em 0.6em; font-size: clamp(12px, 1vw + 8.5px, 17px); background: linear-gradient(#fdfcf8, #ece8df); color: #161412; border-radius: 0.45em; box-shadow: inset 0 0 0 0.28em #fdfcf8, inset 0 0 0 0.4em #161412, 0 0.6em 1.4em rgb(0 0 0 / 0.55), 0 0.1em 0.2em rgb(0 0 0 / 0.4); text-align: center; white-space: nowrap; }
+  .hero-plate::before, .hero-plate::after { content: ''; position: absolute; top: 50%; width: 0.42em; height: 0.42em; margin-top: -0.21em; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #9a958c 70%); box-shadow: 0 1px 1px rgb(0 0 0 / 0.35); }
+  .hero-plate::before { left: 0.95em; }
+  .hero-plate::after { right: 0.95em; }
+  .plate-name { font-family: var(--font-display); font-weight: 700; font-size: 1.5em; line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; }
+  .plate-district { margin-left: 0.5em; color: #c8241b; }
+  .plate-city { font-family: var(--font-label); font-size: 0.6em; letter-spacing: 0.2em; text-transform: uppercase; color: #3a3631; }
 
   /* Header Book waits while the hero's is in view (≥640; on phones the dock holds Book). */
   :global(html[data-hero-book='in'] .bar .nav-book) { visibility: hidden; }

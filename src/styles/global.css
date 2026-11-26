@@ -655,6 +655,8 @@ html:has(.hero) { background: var(--color-ink); }
 @keyframes hero-breathe { from { opacity: 0.55; } to { opacity: 1; } }
 @keyframes hero-drift { to { transform: translateY(14svh) scale(1.03); } }
 @keyframes hero-mist { to { opacity: 1; } }
+/* Phones: the sand mist over the bottom fade read as a muddy grey band; the street plate holds that seam instead. */
+@media (max-width: 639px) { .hero-mist { display: none; } }
 @media (prefers-reduced-motion: no-preference) {
   .hero-lamps { animation: hero-breathe 4.8s ease-in-out infinite alternate; }
 }
