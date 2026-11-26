@@ -122,14 +122,15 @@ function grid(gl: WebGL2RenderingContext, cols: number, rows: number) {
     }
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  const buffers = [gl.createBuffer(), gl.createBuffer()];
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers[0]);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(0);
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers[1]);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idx), gl.STATIC_DRAW);
   gl.bindVertexArray(null);
-  return { vao, count: idx.length };
+  return { vao, buffers, count: idx.length };
 }
 
 export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[], opts: Options): CurlBook | null {
@@ -217,6 +218,7 @@ export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[]
   let downAt = 0;
   let downP = 0;
   let raf = 0;
+  let dead = false; // context lost or destroyed: draw nothing more
   let last = 0;
   let frames = 0;
   let total = 0;
@@ -324,7 +326,7 @@ export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[]
     if (!done) raf = requestAnimationFrame(frame);
   };
   const kick = () => {
-    if (!raf) raf = requestAnimationFrame(frame);
+    if (!raf && !dead) raf = requestAnimationFrame(frame);
   };
 
   const onDown = (e: PointerEvent) => {
@@ -339,7 +341,7 @@ export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[]
     grabRow = Math.min(1, Math.max(0, y / H + 0.5));
     downAt = performance.now();
     downP = p;
-    canvas.setPointerCapture(e.pointerId);
+    canvas.setPointerCapture(e.pointerId); // released by the browser on pointerup / pointercancel
     kick();
   };
   const onMove = (e: PointerEvent) => {
@@ -373,7 +375,10 @@ export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[]
   };
   const lost = (e: Event) => {
     e.preventDefault();
+    dead = true;
     cancelAnimationFrame(raf);
+    raf = 0;
+    ro.disconnect();
     opts.onLost?.();
   };
   const ro = new ResizeObserver(resize);
@@ -397,7 +402,11 @@ export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[]
     next: () => turn(1),
     prev: () => turn(-1),
     destroy() {
+      dead = true;
       cancelAnimationFrame(raf);
+      raf = 0;
+      if (dragging && canvas.hasPointerCapture(pointer)) canvas.releasePointerCapture(pointer);
+      dragging = false;
       ro.disconnect();
       canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('pointermove', onMove);
@@ -407,6 +416,10 @@ export function mountPageCurl(canvas: HTMLCanvasElement, pages: TexImageSource[]
       for (const t of tex) gl.deleteTexture(t);
       gl.deleteProgram(leafProg.p);
       gl.deleteProgram(pageProg.p);
+      for (const m of [leafMesh, quad]) {
+        gl.deleteVertexArray(m.vao);
+        for (const b of m.buffers) gl.deleteBuffer(b);
+      }
     },
   };
 }

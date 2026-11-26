@@ -139,7 +139,9 @@ const sections = await Promise.all(
     }
     document.querySelector('[data-next]')!.addEventListener('click', book.next);
     document.querySelector('[data-prev]')!.addEventListener('click', book.prev);
-    canvas.addEventListener('keydown', (e) => {
+    // Arrow keys anywhere on the page (not only with the canvas focused), except inside a field.
+    document.addEventListener('keydown', (e) => {
+      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable]')) return;
       if (e.key === 'ArrowRight') book.next();
       if (e.key === 'ArrowLeft') book.prev();
     });
