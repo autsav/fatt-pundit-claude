@@ -26,11 +26,14 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
   - [x] Hydration mismatch, `is-in`: `suppressHydrationWarning` on the two island chapter heads (MenuBook, BarAfterDark); reveal.ts owns that class
   - [x] Dead frames: checked frame by frame. The full curtain (~350 px of scroll) is the deliberate step-through beat and the beige is the title fading into the voyage map. Left as designed
 - [ ] Plan the 3D hero piece (starts after perf + hydration is green). Goal: one real 3D moment, not 3D everywhere. Output: a short plan section in docs/MOTION-ROADMAP.md (M6) + client sign-off (#new)
-  - [ ] Pick the piece: (a) menu book as a lit 3D object (page turn with real depth, replaces CSS PageFlip on desktop) or (b) brass door opening in depth (Doors scene). Judge by story value, asset needs, phone fallback
-  - [ ] Stack: three.js only (no R3F unless the piece lives in a React island); lazy-load on `client:visible` / IntersectionObserver so it adds 0 KB to first load; WebGL2 + reduced-motion + low-power fallback = current 2.5D scene
+  - [x] Pick the piece: (a) menu book chosen over (b) brass door. 26 Nov 2026, reasons in docs/MOTION-ROADMAP.md §M6 (procedural, no modeller; mid-page so 0 KB on first load; door scene is finished and sits under the hero)
+  - [x] Stack: raw WebGL2 like src/lib/rain-glass.ts (est. 6–10 KB gz) instead of three.js (120–150 KB gz); three.js only if glTF is ever needed. Loaded on the book's first fine-pointer `pointerenter`; fallback = current PageFlip (§M6)
+  - [ ] Client sign-off on the prototype clip: book over door, desktop-only 3D (#new)
   - [ ] Budget: ≤ 150 KB gz JS for the 3D chunk, ≤ 500 KB for models/textures (glTF + KTX2/Draco), 60 fps on mid-range Android, home perf stays ≥ 85
-  - [ ] Assets: who models it (door/book glTF), lighting match to brass/ink palette, bake lighting where possible
-  - [ ] Prototype on /styleguide/ first; measure with `perf:budget` + `perf:taps` before wiring into the home page
+  - [x] Assets: none commissioned; leaf and covers are procedural, page faces come from the menu data (build-time screenshots or run-time rasterising, spiked in the prototype), lamp colour from the brass/ink tokens
+  - [x] Prototype on /styleguide/book-3d/ (src/lib/page-curl.ts). 26 Nov 2026: 4.7 KB gz, 120 fps / worst frame 10 ms at 4× CPU on M1 Pro; first turn one 42 ms frame. Results in §M6
+  - [ ] Prototype follow-ups: client clip, a run on an integrated-GPU laptop, cover thickness, corner peel on hover
+  - [ ] Texture spike (§M6 step 2): real menu pages as textures, build-time screenshots vs run-time rasterising
 - [x] Motion roadmap M1 (docs/MOTION-ROADMAP.md): spring token + spatial/effects rule, dialog exits, unfolding lists, CSS scroll timelines. 21 Nov 2026: verify green, phase 8 check.mjs ok with the new dialog-exit assertion (5 pages × 2 widths), perf budget unchanged (home 84–85 / jank 3.2 %, the open item below)
 - [x] Motion roadmap M2 (docs/MOTION-ROADMAP.md §M2): springs on the seven signature moments + interruption test. 22 Nov 2026: verify green, check.mjs `interrupt` ok on 5 pages × 2 widths, probes in the roadmap's done note
 - [x] Motion roadmap M3, the part before the art (§M3): story panels rise on a CSS `view()` timeline (probe: 13 panels, both widths, opacity follows the scroll). 22 Nov 2026

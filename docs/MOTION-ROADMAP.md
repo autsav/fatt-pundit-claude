@@ -210,6 +210,62 @@ Book from the dock 64 ms, a plate 56, a page turn 40, a day chip 32, a passport 
 `docs/MOTION.md` carries the rules (Performance rules, Adding motion 7–8, Vendored components); the
 field INP note is in `docs/HANDOVER.md` "Keeping it fast".
 
+### M6. One real 3D moment: the menu book (planned 26 Nov 2026; waits for client sign-off)
+
+One piece in real depth, not 3D everywhere. Two candidates were judged on story value, assets, load
+and the phone fallback:
+
+| | (a) Menu book (chosen) | (b) Brass door |
+|---|---|---|
+| Story | The menu is the product, and the guest turns it by hand: depth and light answer the hand. | The biggest moment, but scroll-driven; real 3D adds little the 2.5D camera does not already show. |
+| Assets | Procedural: a leaf is a bent grid, the covers are boxes, the faces come from the menu data we already render. No modeller. | A model of the Maiden Lane front and room matched to the photographic art (`front/*.webp`), or the art replaced. Commissioned, with a lighting-match risk. |
+| Load | Scene 5, mid-page, already `client:visible`. | Scene 2, under the hero: the chunk loads on nearly every visit, home has 24 KB of weight headroom, and the rain-glass WebGL context is live just above. |
+| Finished work | The CSS PageFlip stays as the fallback and the accessible source. | The scene has its own plan and audit (`docs/qa/DOOR-SCENE-*.md`); a rebuild reopens both. |
+
+**What the guest gets** (fine pointer, WebGL2, not calm): the open book lies under a warm lamp. Dragging
+a corner bends the leaf as paper (a curl with stiffness that follows the pointer, springs to whichever
+side it crosses and can be caught mid-turn, per M2); it lifts into the light, casts a soft shadow on
+the page below, and the spine has gutter shading. Bookmarks, the branch switch, keys and screen
+readers stay on the DOM PageFlip.
+
+**How**
+- Hybrid. The DOM book stays the source of truth (text, links, focus, state). A canvas over the book
+  is shown only while a leaf moves; at rest the DOM shows (crisp text, no idle GPU), the way
+  `src/lib/rain-glass.ts` shows its canvas only when live.
+- Raw WebGL2, as in `rain-glass.ts`, not three.js: one grid mesh curled in the vertex shader, lamp
+  light and paper sheen in the fragment shader, the shadow as a second quad. Estimate 6–10 KB gz
+  against 120–150 KB gz for three.js core. Move to three.js only if the piece grows to need glTF or a
+  scene graph.
+- Page faces as textures; the prototype spikes two ways: (1) build time, Playwright screenshots of
+  each page into WebP (a script next to `make-og.mjs`); (2) run time, the page's DOM drawn through an
+  SVG `foreignObject` into a canvas (fonts and images must be inlined). Choose on fidelity and build
+  time. Only the leaf under the pointer and its neighbours are in memory.
+- Loading: `import()` of the WebGL module on the book's first `pointerenter` with a fine pointer.
+  First load and phones get 0 KB.
+- Fallback to the current PageFlip when: no WebGL2, `isCalm()` (reduced motion or the calm switch),
+  `(hover: none)`, Save-Data, or a lost context.
+
+**Budget**: JS ≤ 150 KB gz (target ≤ 15 KB); textures in flight ≤ 500 KB; 60 fps during a turn at 4×
+CPU on a laptop's integrated GPU; page turn ≤ 200 ms in `perf:taps` (40 ms now); home perf ≥ 85 and
+first-load weight unchanged (≤ 1100 KB). Phones keep the PageFlip, so the "mid-range Android" target
+in the todo becomes "unchanged on phones".
+
+**Steps**
+1. Prototype on `/styleguide/` (2 days): one leaf with a test texture; curl, light, shadow, drag and
+   spring. Measure fps and `perf:taps`; record a short clip.
+2. Texture spike (1 day): build time vs run time, on two real menu pages.
+3. Client sign-off on the clip: the book over the door, and desktop-only 3D.
+4. Wire into `MenuBook.tsx` behind the gates (2 days). Check the fallback at 375 px and with WebGL
+   off; `npm run verify`, `perf:budget`, `perf:taps`.
+
+**Step 1 done 26 Nov 2026.** `src/lib/page-curl.ts` + `/styleguide/book-3d/` (test pages drawn from
+the à la carte data): drag by a corner (the grabbed corner leads), tap or keys to turn, `SPRING.page`
+to settle, lamp light, sheen, gutter shading, the leaf's shadow on the page below. 4.7 KB gz with the
+test pages. Headed Chrome, M1 Pro, 1440 px: 120 fps, worst frame 10 ms at 1× and 4× CPU over button
+turns and a 60-move drag; the first turn after load has one 42 ms frame (82 ms before the leaf was
+drawn once at mount). Not yet: a clip for the client, a run on an Intel/integrated-GPU laptop, the
+covers' thickness and the corner peel on hover.
+
 ### Sequence and dependencies
 
 M1 → M2 (M2 uses the spring token and symmetrical sheets). M4 is independent and can run first if the
