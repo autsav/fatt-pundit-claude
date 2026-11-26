@@ -591,8 +591,9 @@ export default function MenuBook({
           )}
           </div>
           {/* Sized from the viewport height so the open book fits one screen, with a floor: on a phone on its
-              side (390px tall) the height rule alone gave a 75px book with 2px type. Past the floor it scrolls. */}
-          <div id="menu-panel" role="tabpanel" {...(menu.diet ? { "aria-label": `${menu.tab} menu` } : { "aria-labelledby": `menu-tab-${menu.id}` })} className="relative mx-auto max-sm:!max-w-[max(260px,40svh)] [transition:opacity_var(--dur-fast)_var(--curve-out)]" style={{ maxWidth: 'max(320px, min(1000px, calc((100svh - 340px) * 1.5)))', opacity: measured ? 1 : 0, viewTransitionName: 'menu-book' }}>
+              side (390px tall) the height rule alone gave a 75px book with 2px type. Past the floor it scrolls.
+              The 640px floor keeps short laptop windows on the full spread (under 520 it drops to one page). */}
+          <div id="menu-panel" role="tabpanel" {...(menu.diet ? { "aria-label": `${menu.tab} menu` } : { "aria-labelledby": `menu-tab-${menu.id}` })} className="relative mx-auto max-sm:!max-w-[max(260px,40svh)] [transition:opacity_var(--dur-fast)_var(--curve-out)]" style={{ maxWidth: 'max(min(640px, 100%), min(1000px, calc((100svh - 340px) * 1.5)))', opacity: measured ? 1 : 0, viewTransitionName: 'menu-book' }}>
             {/* Direction C scene 7: opened (wide screens, or a bookmark picked), the cover turns open as the book comes on screen. */}
             <CurlBook key={`${place?.id}-${menu.id}-${opened ? 'open' : 'shut'}`} pages={pages} label={`${place ? `${place.name} ` : ''}${menu.title} menu`} open={opened} />
           </div>
