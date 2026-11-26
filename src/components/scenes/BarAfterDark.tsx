@@ -110,7 +110,7 @@ export default function BarAfterDark({ room, prints, drinks, tiger }: { room: Ba
   return (
     <section id="bar" className="bar-dark relative overflow-clip text-sand" aria-labelledby="bar-title">
       <div className="wrap relative py-[var(--section-pad)]">
-        <header className="fp-section-head chapter-head fp-reveal">
+        <header className="fp-section-head chapter-head fp-reveal" suppressHydrationWarning /* reveal.ts adds is-in before hydration */>
           <p className="fp-section-label"><span className="fp-section-no">03</span> The bar</p>
           <h2 id="bar-title" className="fp-h2 bar-title m-0">
             <span className="sr-only">The bar</span>

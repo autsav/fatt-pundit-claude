@@ -20,6 +20,17 @@ Client question numbers (#n) refer to docs/CLIENT-INPUTS.md.
 - [ ] Story: approve characters + panel script (#49), then commission the illustrator (docs/STORY-BRIEF.md)
 
 ## Engineering
+- [x] Perf + hydration fixes (premium-3D review, 25 Nov 2026). 25 Nov 2026: `npm run verify` green; hydration errors gone (fresh tab, full home scroll, 0 console errors)
+  - [x] Budget: the breaches came from a stale snapshot (audit/data/perf-budget-phase3-before.txt). Current prod build, `PAGES=/ perf:budget` x3: perf 89, TBT 0 ms, 1076 KB, CLS 0.009, jank 0.2 %, all budgets met. Weight is 24 KB under the 1100 KB cap: any 3D work must lazy-load
+  - [x] Hydration mismatch, `loading`: `src/lib/prewarm.ts` now warms detached `new Image()` copies instead of flipping `img.loading` on island DOM
+  - [x] Hydration mismatch, `is-in`: `suppressHydrationWarning` on the two island chapter heads (MenuBook, BarAfterDark); reveal.ts owns that class
+  - [x] Dead frames: checked frame by frame. The full curtain (~350 px of scroll) is the deliberate step-through beat and the beige is the title fading into the voyage map. Left as designed
+- [ ] Plan the 3D hero piece (starts after perf + hydration is green). Goal: one real 3D moment, not 3D everywhere. Output: a short plan section in docs/MOTION-ROADMAP.md (M6) + client sign-off (#new)
+  - [ ] Pick the piece: (a) menu book as a lit 3D object (page turn with real depth, replaces CSS PageFlip on desktop) or (b) brass door opening in depth (Doors scene). Judge by story value, asset needs, phone fallback
+  - [ ] Stack: three.js only (no R3F unless the piece lives in a React island); lazy-load on `client:visible` / IntersectionObserver so it adds 0 KB to first load; WebGL2 + reduced-motion + low-power fallback = current 2.5D scene
+  - [ ] Budget: ≤ 150 KB gz JS for the 3D chunk, ≤ 500 KB for models/textures (glTF + KTX2/Draco), 60 fps on mid-range Android, home perf stays ≥ 85
+  - [ ] Assets: who models it (door/book glTF), lighting match to brass/ink palette, bake lighting where possible
+  - [ ] Prototype on /styleguide/ first; measure with `perf:budget` + `perf:taps` before wiring into the home page
 - [x] Motion roadmap M1 (docs/MOTION-ROADMAP.md): spring token + spatial/effects rule, dialog exits, unfolding lists, CSS scroll timelines. 21 Nov 2026: verify green, phase 8 check.mjs ok with the new dialog-exit assertion (5 pages × 2 widths), perf budget unchanged (home 84–85 / jank 3.2 %, the open item below)
 - [x] Motion roadmap M2 (docs/MOTION-ROADMAP.md §M2): springs on the seven signature moments + interruption test. 22 Nov 2026: verify green, check.mjs `interrupt` ok on 5 pages × 2 widths, probes in the roadmap's done note
 - [x] Motion roadmap M3, the part before the art (§M3): story panels rise on a CSS `view()` timeline (probe: 13 panels, both widths, opacity follows the scroll). 22 Nov 2026
