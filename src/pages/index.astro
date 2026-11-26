@@ -257,15 +257,16 @@ const orgLd = {
   #room::before { content: ''; position: absolute; inset: 0 0 auto; height: 112px; z-index: 0; pointer-events: none; background: linear-gradient(#171513, transparent); }
 
   /* Soft bands in place of hard ink/sand cuts: story to menu, menu to bar. */
-  :global(#menu)::after { content: ''; position: absolute; inset-inline: 0; height: 112px; pointer-events: none; bottom: 0; background: linear-gradient(transparent, #171513); }
+  :global(#menu)::after { content: ''; position: absolute; inset-inline: 0; height: 112px; pointer-events: none; bottom: 0; background: linear-gradient(rgb(23 21 19 / 0), rgb(23 21 19 / 0.12) 30%, rgb(23 21 19 / 0.5) 62%, rgb(23 21 19 / 0.85) 85%, #171513); }
   :global(#menu) { padding-top: calc(var(--section-pad) + 48px); padding-bottom: calc(var(--section-pad) + 48px); }
   /* Doors' sand melts into the voyage's ink. */
   :global(.voyage)::before { content: ''; position: absolute; inset: 0 0 auto; height: 25svh; z-index: 5; pointer-events: none; background: linear-gradient(var(--color-sand), transparent); }
   /* The postcard's Tangra circle sits behind the words. */
   :global(.voyage-card svg.z-10) { z-index: -1; }
-  /* The passes end in a band of gold melting into the footer's ink. */
-  #tables { position: relative; padding-bottom: calc(var(--section-pad) + 120px); }
-  #tables::after { content: ''; position: absolute; inset: auto 0 0; height: 120px; pointer-events: none; background: linear-gradient(var(--color-gold), #171513); }
+  /* The passes end in a band of gold melting into the footer's own ink (--color-ink, not a darker one, so no
+     step where the footer starts). Eased in and out (no line where it starts or ends), mixed in oklab: a dusk, not a muddy straight ramp. */
+  #tables { --melt: clamp(140px, 16vw, 220px); position: relative; padding-bottom: calc(var(--section-pad) + var(--melt)); }
+  #tables::after { content: ''; position: absolute; inset: auto 0 0; height: var(--melt); pointer-events: none; background: linear-gradient(var(--color-gold), color-mix(in oklab, var(--color-gold) 97%, var(--color-ink)) 10%, color-mix(in oklab, var(--color-gold) 86%, var(--color-ink)) 25%, color-mix(in oklab, var(--color-gold) 60%, var(--color-ink)) 42%, color-mix(in oklab, var(--color-gold) 32%, var(--color-ink)) 60%, color-mix(in oklab, var(--color-gold) 12%, var(--color-ink)) 78%, color-mix(in oklab, var(--color-gold) 3%, var(--color-ink)) 92%, var(--color-ink)); }
   .room-head { display: grid; gap: var(--space-4); }
   @media (min-width: 1024px) {
     #room > .wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--grid-gutter); align-items: start; }
