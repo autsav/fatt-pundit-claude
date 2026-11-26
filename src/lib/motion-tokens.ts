@@ -17,6 +17,8 @@ export const SPRING = {
   /** Also the CSS pair --dur-spring + --curve-spring (tokens.css). */
   stamp: { type: 'spring', stiffness: 420, damping: 22, mass: 1.1 },
   ui: { type: 'spring', stiffness: 500, damping: 34 },
+  /** A paper leaf settling after a turn (critically damped: paper lands, it doesn't bounce). */
+  page: { type: 'spring', stiffness: 140, damping: 26, mass: 1.2 },
 } as const;
 
 /** The same spring for anime.js (`spring(animeSpring(SPRING.stamp))`): anime takes its duration from the spring. */

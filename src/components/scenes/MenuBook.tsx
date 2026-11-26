@@ -464,7 +464,7 @@ export default function MenuBook({
       <Measure menu={menu} art={art} onSizes={onSizes} />
       <div className="wrap relative flex flex-col items-center">
         {/* Chapter head (the home page's numbered chapters), then one toolbar: which room's book, or the list. */}
-        <header className="fp-section-head chapter-head fp-reveal w-full">
+        <header className="fp-section-head chapter-head fp-reveal w-full" suppressHydrationWarning /* reveal.ts adds is-in before hydration */>
           <p className="fp-section-label"><span className="fp-section-no">02</span> The menus</p>
           <h2 className="fp-h2"><span className="sr-only">The menus: </span>Turn the pages</h2>
           <div className="menu-toolbar">

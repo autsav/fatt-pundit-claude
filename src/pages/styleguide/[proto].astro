@@ -1,0 +1,150 @@
+---
+/**
+ * Prototype for docs/MOTION-ROADMAP.md §M6: the menu book's leaves turned in real depth (src/lib/page-curl.ts).
+ * Test pages are drawn on a 2D canvas from the real à la carte menu; the texture spike (§M6 step 2) replaces them.
+ * Preview builds only, like /styleguide/: with PUBLIC_LAUNCH=true no path is generated. Not linked, noindex.
+ */
+import Base from '../../layouts/Base.astro';
+import { dish, priceOf } from '../../lib/site-data';
+import { getEntry } from 'astro:content';
+
+export function getStaticPaths() {
+  return import.meta.env.PUBLIC_LAUNCH === 'true' ? [] : [{ params: { proto: 'book-3d' } }];
+}
+
+const menu = await getEntry('menus', 'a-la-carte');
+if (!menu) throw new Error('a-la-carte menu missing');
+const sections = await Promise.all(
+  menu.data.sections.slice(0, 6).map(async (s) => ({
+    title: s.title,
+    rows: await Promise.all(s.items.slice(0, 6).map(async ({ dish: id }) => { const d = await dish(id); return { name: d.name, price: priceOf(d) ?? '' }; })),
+  })),
+);
+---
+<Base title="3D menu book prototype · Fatt Pundit" description="Prototype: the menu book turned in real depth." noindex>
+  <main class="proto surface-night">
+    <header class="wrap proto-head">
+      <p class="fp-caps">Prototype · Motion roadmap M6</p>
+      <h1 class="fp-h2">The menu book, in depth</h1>
+      <p>Drag a page by its corner, tap a page, or use the buttons or the arrow keys. Test pages; the real ones come from the texture spike.</p>
+    </header>
+    <div class="proto-table" data-book data-sections={JSON.stringify(sections)}>
+      <canvas class="proto-canvas" aria-label="Menu book prototype: drag a page to turn it" tabindex="0"></canvas>
+      <p class="proto-fallback" hidden>WebGL2 isn't available here (or motion is reduced), so the site keeps the current page flip.</p>
+    </div>
+    <div class="wrap proto-bar">
+      <button type="button" class="fp-btn fp-btn--sm" data-prev>Previous page</button>
+      <span class="fp-small" data-spread aria-live="polite"></span>
+      <button type="button" class="fp-btn fp-btn--sm" data-next>Next page</button>
+      <output class="fp-small proto-stats" data-stats>Turn a page to measure it.</output>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .proto { min-height: 100svh; padding-bottom: 48px; }
+  .proto-head { padding-block: 32px 8px; }
+  .proto-table {
+    position: relative;
+    height: min(78svh, 62vw);
+    min-height: 360px;
+    background: radial-gradient(ellipse at 30% 20%, #6b4a32 0%, #3a281c 55%, #1e1510 100%);
+  }
+  .proto-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  .proto-canvas:active { cursor: grabbing; }
+  .proto-fallback { position: absolute; inset: auto 16px 16px; margin: 0; }
+  .proto-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding-top: 16px; }
+  .proto-stats { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+</style>
+
+<script>
+  import { mountPageCurl } from '../../lib/page-curl';
+  import { isCalm } from '../../lib/motion-tokens';
+
+  type Section = { title: string; rows: { name: string; price: string }[] };
+  const root = document.querySelector<HTMLElement>('[data-book]')!;
+  const canvas = root.querySelector('canvas')!;
+  const fallback = root.querySelector<HTMLElement>('.proto-fallback')!;
+  const sections: Section[] = JSON.parse(root.dataset.sections ?? '[]');
+  const ASPECT = 1.414;
+  const W = 900;
+  const Hpx = Math.round(W * ASPECT);
+
+  /** A test page in the printed menu's manner: paper, a ruled frame, a section and "NAME | £price" rows. */
+  function page(n: number, font: string): HTMLCanvasElement {
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = Hpx;
+    const g = c.getContext('2d')!;
+    g.fillStyle = '#f6efe4';
+    g.fillRect(0, 0, W, Hpx);
+    for (let i = 0; i < 2500; i++) {
+      g.fillStyle = `rgba(80,60,40,${Math.random() * 0.05})`;
+      g.fillRect(Math.random() * W, Math.random() * Hpx, 2, 2);
+    }
+    g.strokeStyle = '#cba052';
+    g.lineWidth = 6;
+    g.strokeRect(40, 40, W - 80, Hpx - 80);
+    g.lineWidth = 2;
+    g.strokeRect(56, 56, W - 112, Hpx - 112);
+    g.fillStyle = '#2c2925';
+    g.textAlign = 'center';
+    const s = sections[n % Math.max(1, sections.length)];
+    if (n === 0 || !s) {
+      g.font = `700 64px ${font}`;
+      g.fillText('FATT PUNDIT', W / 2, Hpx / 2 - 20);
+      g.font = `400 30px ${font}`;
+      g.fillText('À la carte', W / 2, Hpx / 2 + 40);
+    } else {
+      g.fillStyle = '#f15d3d';
+      g.font = `700 48px ${font}`;
+      g.fillText(s.title.toUpperCase(), W / 2, 170);
+      g.fillStyle = '#2c2925';
+      s.rows.forEach((r, i) => {
+        g.font = `700 30px ${font}`;
+        g.fillText(`${r.name.toUpperCase()}  |  ${r.price}`, W / 2, 290 + i * 150, W - 160);
+        g.font = `400 24px ${font}`;
+        g.fillText('Hakka · Calcutta', W / 2, 330 + i * 150);
+      });
+    }
+    g.font = `400 24px ${font}`;
+    g.fillText(String(n + 1), W / 2, Hpx - 80);
+    return c;
+  }
+
+  async function start() {
+    if (isCalm()) {
+      fallback.hidden = false;
+      canvas.hidden = true;
+      return;
+    }
+    await document.fonts.ready;
+    const font = getComputedStyle(document.body).fontFamily;
+    const pages = Array.from({ length: 8 }, (_, i) => page(i, font));
+    const spread = document.querySelector<HTMLElement>('[data-spread]')!;
+    const stats = document.querySelector<HTMLOutputElement>('[data-stats]')!;
+    const book = mountPageCurl(canvas, pages, {
+      aspect: ASPECT,
+      onSpread: (k, n) => (spread.textContent = `Spread ${k + 1} of ${n}`),
+      onStats: (s) => (stats.textContent = `Last turn: ${s.fps} fps, worst frame ${s.worstMs} ms (${s.frames} frames)`),
+      onLost: () => {
+        fallback.hidden = false;
+        canvas.hidden = true;
+      },
+    });
+    if (!book) {
+      fallback.hidden = false;
+      canvas.hidden = true;
+      return;
+    }
+    document.querySelector('[data-next]')!.addEventListener('click', book.next);
+    document.querySelector('[data-prev]')!.addEventListener('click', book.prev);
+    // Arrow keys anywhere on the page (not only with the canvas focused), except inside a field.
+    document.addEventListener('keydown', (e) => {
+      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable]')) return;
+      if (e.key === 'ArrowRight') book.next();
+      if (e.key === 'ArrowLeft') book.prev();
+    });
+  }
+  start();
+</script>
