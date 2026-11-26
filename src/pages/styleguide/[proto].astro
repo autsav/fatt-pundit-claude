@@ -36,6 +36,10 @@ const sections = await Promise.all(
       <button type="button" class="fp-btn fp-btn--sm" data-prev>Previous page</button>
       <span class="fp-small" data-spread aria-live="polite"></span>
       <button type="button" class="fp-btn fp-btn--sm" data-next>Next page</button>
+      <button type="button" class="fp-btn fp-btn--sm" data-single aria-pressed="false">Single</button>
+      <button type="button" class="fp-btn fp-btn--sm" data-open>Open (animated)</button>
+      <button type="button" class="fp-btn fp-btn--sm" data-last>Go to end</button>
+      <button type="button" class="fp-btn fp-btn--sm" data-home>Jump to start</button>
       <output class="fp-small proto-stats" data-stats>Turn a page to measure it.</output>
     </div>
   </main>
@@ -50,6 +54,7 @@ const sections = await Promise.all(
     min-height: 360px;
     background: radial-gradient(ellipse at 30% 20%, #6b4a32 0%, #3a281c 55%, #1e1510 100%);
   }
+  .proto-table[data-single] { height: min(86svh, 150vw); }
   .proto-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
   .proto-canvas:active { cursor: grabbing; }
   .proto-fallback { position: absolute; inset: auto 16px 16px; margin: 0; }
@@ -67,11 +72,12 @@ const sections = await Promise.all(
   const fallback = root.querySelector<HTMLElement>('.proto-fallback')!;
   const sections: Section[] = JSON.parse(root.dataset.sections ?? '[]');
   const ASPECT = 1.414;
+  const FACES = 10;
   const W = 900;
   const Hpx = Math.round(W * ASPECT);
 
   /** A test page in the printed menu's manner: paper, a ruled frame, a section and "NAME | £price" rows. */
-  function page(n: number, font: string): HTMLCanvasElement {
+  function page(i: number, font: string): HTMLCanvasElement {
     const c = document.createElement('canvas');
     c.width = W;
     c.height = Hpx;
@@ -89,12 +95,13 @@ const sections = await Promise.all(
     g.strokeRect(56, 56, W - 112, Hpx - 112);
     g.fillStyle = '#2c2925';
     g.textAlign = 'center';
+    const n = i - 1;
     const s = sections[n % Math.max(1, sections.length)];
-    if (n === 0 || !s) {
+    if (i === 1 || i === FACES - 2 || !s) {
       g.font = `700 64px ${font}`;
       g.fillText('FATT PUNDIT', W / 2, Hpx / 2 - 20);
       g.font = `400 30px ${font}`;
-      g.fillText('À la carte', W / 2, Hpx / 2 + 40);
+      g.fillText(i === 1 ? 'À la carte' : 'Thank you', W / 2, Hpx / 2 + 40);
     } else {
       g.fillStyle = '#f15d3d';
       g.font = `700 48px ${font}`;
@@ -108,7 +115,7 @@ const sections = await Promise.all(
       });
     }
     g.font = `400 24px ${font}`;
-    g.fillText(String(n + 1), W / 2, Hpx - 80);
+    g.fillText(String(i), W / 2, Hpx - 80);
     return c;
   }
 
@@ -120,12 +127,22 @@ const sections = await Promise.all(
     }
     await document.fonts.ready;
     const font = getComputedStyle(document.body).fontFamily;
-    const pages = Array.from({ length: 8 }, (_, i) => page(i, font));
     const spread = document.querySelector<HTMLElement>('[data-spread]')!;
     const stats = document.querySelector<HTMLOutputElement>('[data-stats]')!;
-    const book = mountPageCurl(canvas, pages, {
+    const cache = new Map<number, HTMLCanvasElement>();
+    for (let i = 1; i < FACES - 1; i++) cache.set(i, page(i, font)); // rastered up front so a turn never waits on it
+    let single = matchMedia('(max-width: 640px)').matches;
+    root.toggleAttribute('data-single', single);
+    const btn = document.querySelector<HTMLElement>('[data-single]')!;
+    btn.setAttribute('aria-pressed', String(single));
+    const book = mountPageCurl(canvas, FACES, {
       aspect: ASPECT,
-      onSpread: (k, n) => (spread.textContent = `Spread ${k + 1} of ${n}`),
+      single,
+      onNeed: (faces) => faces.forEach((i) => {
+        if (!cache.has(i)) cache.set(i, page(i, font));
+        book?.setFace(i, cache.get(i)!);
+      }),
+      onSpread: (k, n, side) => (spread.textContent = `Spread ${k + 1} of ${n} (${side})`),
       onStats: (s) => (stats.textContent = `Last turn: ${s.fps} fps, worst frame ${s.worstMs} ms (${s.frames} frames)`),
       onLost: () => {
         fallback.hidden = false;
@@ -137,6 +154,15 @@ const sections = await Promise.all(
       canvas.hidden = true;
       return;
     }
+    btn.addEventListener('click', () => {
+      single = !single;
+      root.toggleAttribute('data-single', single);
+      btn.setAttribute('aria-pressed', String(single));
+      book.setSingle(single);
+    });
+    document.querySelector('[data-open]')!.addEventListener('click', () => (book.goTo(0, false), book.goTo(1, true)));
+    document.querySelector('[data-last]')!.addEventListener('click', () => book.goTo(FACES / 2 - 1, true));
+    document.querySelector('[data-home]')!.addEventListener('click', () => book.goTo(0, false));
     document.querySelector('[data-next]')!.addEventListener('click', book.next);
     document.querySelector('[data-prev]')!.addEventListener('click', book.prev);
     // Arrow keys anywhere on the page (not only with the canvas focused), except inside a field.

@@ -99,7 +99,7 @@ export const MENU_TABS: Record<string, string> = {
   drinks: 'Drinks',
 };
 
-/** Menus as the page-flip book prints them, in the order given. Prices only where the menu shows them. */
+/** Menus as the 3D menu book (CurlBook) prints them, in the order given. Prices only where the menu shows them. */
 export async function menuBooks(ids: string[]): Promise<MenuLite[]> {
   return Promise.all(
     ids.map(async (id) => {
