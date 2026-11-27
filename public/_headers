@@ -3,6 +3,9 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+/doors/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /og/*
   Cache-Control: public, max-age=86400
   # Fetchable for link previews (robots.txt allows /og/*.png) but kept out of search results (AUDIT B-07).
