@@ -19,6 +19,16 @@ export async function dish(id: string) {
 }
 export type Dish = Awaited<ReturnType<typeof dish>>;
 
+/** Diet tags as printed on the menus, with their spoken names. */
+export const TAGS = [
+  ['V', 'Vegetarian'],
+  ['VG', 'Vegan'],
+  ['GF', 'Gluten free'],
+  ['DF', 'Dairy free'],
+  ['H', 'Halal'],
+] as const;
+export const tagName = (t: string) => TAGS.find(([k]) => k === t)?.[1] ?? t;
+
 export const priceOf = (d: Dish) =>
   d.price ? formatPrice(d.price, 'GBP') : (d.options?.map((o) => `${o.label} ${formatPrice(o.price, 'GBP')}`).join(', ') ?? null);
 

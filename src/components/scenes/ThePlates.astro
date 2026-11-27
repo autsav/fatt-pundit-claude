@@ -1,0 +1,163 @@
+---
+/**
+ * Home scene before the menu book: twelve plates from the pass, in the order a table eats them
+ * (momos → small plates → wok → curry → sweet). Names, descriptions, prices and tags come from
+ * dishes.json; photos from src/assets/images/dishes/<id>.jpg (dish-photos.ts). Static: no island.
+ * Wide screens: the words stick on the left while two staggered columns of plates pass on the right.
+ * Narrow screens: one native scroll-snap strip (no scroll hijack).
+ */
+import { getImage } from 'astro:assets';
+import { dish, priceOf, tagName } from '@/lib/site-data';
+import { dishPhoto } from '@/lib/dish-photos';
+
+// None of these four repeats a photo the menu book already shows (veg momo, spinach, okra, brownie).
+const PLATES: [id: string, alt: string][] = [
+  ['momo-kid-goat', 'Kid goat momos on a wooden board with two dipping sauces'],
+  ['popcorn-cauliflower', 'Popcorn cauliflower on greaseproof paper in a white bowl'],
+  ['hakka-chilly-paneer-lettuce-cups', 'Chilli paneer with lettuce cups in a steel bowl'],
+  ['lollypop-chicken', 'Lollypop chicken on a black pedestal stand with a chilli dip beside it'],
+  ['bombay-chilly-prawns', 'Chopsticks lifting a chilli prawn from a bowl of peppers and spring onion'],
+  ['crunchy-pepper-crab', 'Pepper crab with chickpeas and curry leaves in a brass bowl'],
+  ['rabbit-wontons', 'Rabbit wontons in a glossy sauce, topped with herbs and flowers'],
+  ['shredded-chilly-venison', 'Shredded chilli venison in a steel pan, a bamboo steamer behind'],
+  ['ribeye-dry-red-chilly', 'Ribeye tossed with dried red chillies in a two-handled steel pan'],
+  ['lamb-chops-black-bean-dust', 'Lamb chops dusted with black bean, lifted from the grill'],
+  ['malabar-monkfish-curry', 'Malabar monkfish curry in a steel dish, with rice and flaky bread beside it'],
+  ['lady-kenny', 'A golden Lady Kenny on a banana leaf and a green and gold plate'],
+];
+
+const plates = await Promise.all(
+  PLATES.map(async ([id, alt], n) => {
+    const d = await dish(id);
+    const src = dishPhoto(id);
+    if (!src) throw new Error(`ThePlates: no photo for "${id}" in src/assets/images/dishes/`);
+    // Never ask for more pixels than the photo has (several are ~640–825px wide).
+    const widths = [360, 560, 760].filter((w) => w <= src.width);
+    const imgs = await Promise.all((widths.length ? widths : [src.width]).map((width) => getImage({ src, width, format: 'webp', quality: 80 })));
+    return {
+      id,
+      no: String(n + 1).padStart(2, '0'),
+      name: d.name,
+      desc: d.description,
+      price: priceOf(d),
+      tags: d.tags as string[],
+      sig: !!d.signature,
+      alt,
+      src: imgs.at(-1)!.src,
+      srcset: imgs.map((im, i) => `${im.src} ${widths[i] ?? src.width}w`).join(', '),
+      w: src.width,
+      h: src.height,
+    };
+  }),
+);
+---
+<section id="plates" class="plates surface-night" aria-labelledby="plates-title">
+  <div class="wrap plates-grid">
+    <header class="plates-head fp-reveal">
+      <p class="fp-section-label">From the pass</p>
+      <h2 id="plates-title" class="fp-h2">Twelve plates, <em>passed round</em></h2>
+      <p class="plates-intro">Hakka cooking from Tangra, Calcutta's Chinatown. Order a few for the middle of the table and share the lot.</p>
+      <ol class="plates-index" aria-label="The twelve plates">
+        {plates.map((p) => <li><a href={`#plate-${p.no}`}><span class="fp-num">{p.no}</span>{p.name}</a></li>)}
+      </ol>
+      <a class="fp-btn fp-btn--primary" href="#menu">Open the menus</a>
+    </header>
+
+    <div class="plates-rail" tabindex="0" role="region" aria-label="The twelve plates" data-plates-rail>
+      <ol class="plates-list">
+        {plates.map((p, i) => (
+          <li class="plate fp-reveal" id={`plate-${p.no}`} style={`--i:${i % 2}`}>
+            <figure>
+              <div class="plate-photo">
+                <img src={p.src} srcset={p.srcset} sizes="(min-width: 1024px) min(30vw, 370px), min(76vw, 320px)" alt={p.alt} width={p.w} height={p.h} loading="lazy" decoding="async" />
+              </div>
+              <figcaption class="plate-cap">
+                <span class="plate-no fp-num" aria-hidden="true">{p.no}</span>
+                <h3 class="plate-name">{p.name}</h3>
+                {p.desc && <p class="plate-desc">{p.desc}</p>}
+                <p class="plate-meta">
+                  {p.price && <span class="fp-num">{p.price}</span>}
+                  {p.tags.length > 0 && <span><span aria-hidden="true">{p.tags.join(' · ')}</span><span class="sr-only">{p.tags.map(tagName).join(', ')}</span></span>}
+                  {p.sig && <span class="plate-sig">Signature</span>}
+                </p>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  // The strip only scrolls below 1024px; on wide screens it is plain flow, so drop its keyboard stop there.
+  const rail = document.querySelector<HTMLElement>('[data-plates-rail]');
+  const wide = matchMedia('(min-width: 1024px)');
+  const sync = () => (wide.matches ? rail?.removeAttribute('tabindex') : rail?.setAttribute('tabindex', '0'));
+  sync();
+  wide.addEventListener('change', sync);
+</script>
+
+<style>
+  /* Ink, then a melt into the sand menu book below (moved here from .story-more). */
+  .plates { position: relative; padding-block: var(--space-8) calc(var(--space-9) + 112px); }
+  .plates::after { content: ''; position: absolute; inset: auto 0 0; height: 112px; pointer-events: none; background: linear-gradient(var(--color-ink), var(--color-sand)); }
+
+  .plates-grid { display: grid; gap: var(--space-7); }
+  .plates-head { display: grid; gap: var(--space-5); justify-items: start; }
+  .plates-intro { margin: 0; max-width: 38ch; font-family: var(--font-note); font-style: italic; font-size: clamp(17px, 1.4vw, 20px); line-height: 1.5; color: var(--fp-fg-muted); }
+  .plates-index { display: none; }
+
+  /* Narrow: one swipeable strip, full-bleed to the screen edge. */
+  .plates-rail {
+    --edge: clamp(16px, 4vw, 40px);
+    margin-inline: calc(-1 * var(--edge));
+    padding-inline: var(--edge);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--edge);
+    scrollbar-width: thin;
+    scrollbar-color: var(--fp-rule) transparent;
+  }
+  .plates-rail:focus-visible { outline: var(--ring-width) solid var(--fp-ring); outline-offset: var(--ring-offset); }
+  .plates-list { display: grid; grid-auto-flow: column; grid-auto-columns: min(76vw, 320px); gap: var(--space-5); margin: 0; padding: 0 0 var(--space-5); list-style: none; }
+  .plate { scroll-snap-align: start; }
+
+  figure { margin: 0; }
+  .plate-photo { position: relative; overflow: hidden; aspect-ratio: 4 / 5; background: var(--fp-field-bg); }
+  .plate-photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-story) var(--curve-out); }
+  /* A low shadow so the plate number reads where it crosses the photo. */
+  .plate-photo::after { content: ''; position: absolute; inset: auto 0 0; height: 40%; pointer-events: none; background: linear-gradient(transparent, var(--fp-shadow)); }
+  @media (hover: hover) { .plate:hover .plate-photo img { transform: scale(1.04); } }
+
+  .plate-cap { position: relative; display: grid; gap: var(--space-2); }
+  .plate-no { display: block; margin: -0.62em 0 0 -0.04em; font-family: var(--font-display); font-weight: 700; font-size: clamp(56px, 6vw, 88px); line-height: 1; color: var(--fp-label); }
+  .plate-name { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: var(--step-h3); line-height: var(--lh-h3); letter-spacing: var(--tracking-title); text-transform: uppercase; text-wrap: balance; }
+  .plate-desc { margin: 0; max-width: 34ch; font-family: var(--font-note); font-style: italic; line-height: 1.45; color: var(--fp-fg-muted); }
+  .plate-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-4); margin: var(--space-1) 0 0; padding-top: var(--space-2); border-top: var(--border-rule) solid var(--fp-rule); font-size: var(--step-small); font-weight: 700; color: var(--fp-fg-muted); }
+  .plate-meta > .fp-num { color: var(--fp-fg); font-size: 1.15em; }
+  .plate-sig { color: var(--fp-label); text-transform: uppercase; letter-spacing: var(--tracking-title); }
+
+  /* Wide: the words stay put on the left; two columns of plates pass on the right, the second set lower. */
+  @media (min-width: 1024px) {
+    .plates { padding-top: var(--space-10); }
+    .plates-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gutter); align-items: start; }
+    .plates-head { grid-column: 1 / 5; }
+    .plates-index { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; font-size: var(--step-small); }
+    .plates-index a { display: flex; gap: var(--space-3); padding-block: 3px; color: var(--fp-fg-muted); text-decoration: none; transition: color var(--dur-fast) var(--curve-out); }
+    .plates-index a:hover, .plates-index a:focus-visible { color: var(--fp-fg); }
+    .plates-index .fp-num { color: var(--fp-label); }
+    .plates-rail { grid-column: 5 / 13; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
+    .plates-list { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(32px, 4vw, 64px); row-gap: var(--space-8); padding: 0; }
+    .plate:nth-child(even) { margin-top: clamp(96px, 12vw, 176px); }
+    .plate { scroll-margin-top: calc(var(--header-h) + var(--space-5)); }
+  }
+  /* Sticky only where the whole column fits on screen; the index list only where there is room for it too. */
+  @media (min-width: 1024px) and (min-height: 700px) {
+    .plates-head { position: sticky; top: calc(var(--header-h) + var(--space-6)); }
+  }
+  @media (min-width: 1024px) and (max-height: 899px) {
+    .plates-index { display: none; }
+  }
+</style>

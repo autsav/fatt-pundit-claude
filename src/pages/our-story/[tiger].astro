@@ -34,6 +34,8 @@ const branches = await getBranches();
 </Base>
 
 <style>
+  /* The answer fills the screen and sits in its middle, not at the top of a short gold band. */
+  section.sec { display: grid; align-content: center; min-height: min(72svh, 760px); }
   .pick-img { width: clamp(120px, 24vw, 200px); height: auto; }
   .pick-h1 { margin: 0; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-title); font-size: clamp(40px, 7vw, 80px); line-height: 0.95; text-wrap: balance; }
   .pick-line { margin: 0; font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: clamp(19px, 1.8vw, 23px); }

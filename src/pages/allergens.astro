@@ -35,12 +35,13 @@ const open = (await getBranches()).filter((b) => b.status === 'open');
 </InfoPage>
 
 <style>
-  /* Two columns of plain list items (no markers: each is one allergen on its own line). */
-  .allergen-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2) var(--space-5); margin: 0 0 var(--space-5); padding: 0; list-style: none; max-width: 36rem; }
-  .allergen-grid li { padding: var(--space-2) 0; border-bottom: 1.5px solid var(--fp-fg-muted); }
-  /* Menu marks: same chip look as the menu's diet filters. */
-  .marks { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 var(--space-5); padding: 0; }
-  .marks div { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target-min, 44px); padding: 0 var(--space-4); border: var(--border-control, 2px) solid var(--fp-control, currentColor); background: var(--fp-field-bg, transparent); }
-  .marks dt { font-weight: 700; }
-  .marks dd { margin: 0; }
+  /* The fourteen, counted: a numbered ledger that reads down two columns (they are a fixed legal set). */
+  .allergen-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(7, auto); grid-auto-flow: column; column-gap: var(--space-5); margin: 0 0 var(--space-5); padding: 0; list-style: none; max-width: none; border-top: var(--border-rule) solid var(--fp-rule-strong); counter-reset: allergen; }
+  .allergen-grid li { display: flex; gap: var(--space-3); align-items: baseline; max-width: none; margin: 0; padding: var(--space-2) 0; border-bottom: var(--border-hair) solid var(--fp-rule); font-family: var(--font-display); font-size: var(--step-small); line-height: var(--lh-small); counter-increment: allergen; }
+  .allergen-grid li::before { content: counter(allergen, decimal-leading-zero) / ""; flex: none; color: var(--fp-label); font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* Menu marks: a key, not controls (the ink plate is the mark as it is printed on the menu). */
+  .marks { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); margin: 0 0 var(--space-5); padding: 0; }
+  .marks div { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .marks dt { min-width: 2.4em; box-sizing: border-box; padding: 2px var(--space-2); background: var(--fp-invert-bg); color: var(--fp-invert-fg); font-size: var(--step-small); font-weight: 700; text-align: center; }
+  .marks dd { margin: 0; font-size: var(--step-small); }
 </style>

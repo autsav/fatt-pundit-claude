@@ -77,12 +77,17 @@ const no = () => String(++n).padStart(2, '0');
 
 <style>
   .desk { margin: 0; padding: 0; }
-  .desk-when { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); max-width: 44rem; margin: 0 0 var(--space-4); padding: var(--space-4); background: var(--color-paper-light); border: 2px solid var(--color-ink); }
+  .desk-when { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); max-width: 44rem; margin: 0 0 var(--space-5); padding: var(--space-4) var(--space-5) var(--space-5); background: var(--fp-field-bg); border: var(--border-control) solid var(--fp-rule-strong); box-shadow: 6px 6px 0 var(--fp-rule-strong); }
+  @media (max-width: 639px) { .desk-when { padding: var(--space-4); box-shadow: 4px 4px 0 var(--fp-rule-strong); } }
   .desk-when .fp-field { display: grid; gap: var(--space-1); min-width: 0; }
   .desk-when .fp-field:first-child { grid-column: 1 / -1; }
   @media (min-width: 640px) { .desk-when { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); } .desk-when .fp-field:first-child { grid-column: auto; } }
   .desk-when select, .desk-when input { width: 100%; }
-  .desk-assure { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-5); margin: 0 0 var(--space-5); padding: 0; list-style: none; font-size: var(--step-small); color: var(--fp-fg-muted); }
+  /* The promises sit under the picker as one line, each ticked, the terms link last. */
+  .desk-assure { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-5); margin: 0 0 var(--space-6); padding: 0; list-style: none; font-size: var(--step-small); color: var(--fp-fg-muted); }
+  .desk-assure li { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 2rem; }
+  .desk-assure li:not(:has(a))::before { content: ''; flex: none; width: 0.3em; height: 0.6em; margin: 0 0.2em 0.15em; border: solid var(--fp-success); border-width: 0 2px 2px 0; rotate: 45deg; }
+  .desk-assure li:has(a) { min-height: var(--target-min); }
   .desk-acts [hidden] { display: none !important; }
   /* The line under each room says what its button will do for the chosen time and party. */
   /* Neutral, never red: the desk only knows opening hours, not whether a table is free. */
@@ -94,13 +99,16 @@ const no = () => String(++n).padStart(2, '0');
   /* Filled by the script: the line's height is reserved so nothing moves when it arrives (lesson 50). */
   .desk-status { margin: var(--space-1) 0 0; min-height: 1.3em; }
   .desk-addr, .desk-note { margin: 0; font-size: var(--step-body); line-height: var(--lh-body); }
-  .desk-note { color: var(--fp-fg-muted); font-size: var(--step-small); }
-  .desk-acts { grid-column: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); }
+  /* What the button will do, said plainly beside it: full ink, marked off with the accent rule. */
+  .desk-note { justify-self: start; margin-top: var(--space-2); padding-left: var(--space-3); border-left: 2px solid var(--fp-accent); font-size: var(--step-small); line-height: var(--lh-small); }
+  /* One column of actions: every room's button is the same width, its phone number under it. */
+  .desk-acts { grid-column: 2; display: grid; grid-template-columns: minmax(0, 22rem); gap: var(--space-1); justify-items: start; }
+  .desk-acts .fp-btn { width: 100%; padding-block: var(--space-2); white-space: normal; text-align: center; text-wrap: balance; }
   /* From 900px: actions on the right of each row, aligned to the name. (At 720–899px the two buttons
      and phone numbers squeezed the room's name and address against them; Phase 10.) */
   @media (min-width: 900px) {
     .desk-row { grid-template-columns: 2.75rem minmax(0, 1fr) auto; align-items: start; }
-    .desk-acts { grid-column: 3; justify-content: flex-end; padding-top: 0.2em; }
+    .desk-acts { grid-column: 3; grid-template-columns: 19rem; justify-items: center; padding-top: 0.2em; }
   }
   .desk-foot { margin: var(--space-5) 0 0; }
 </style>

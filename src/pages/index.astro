@@ -7,6 +7,7 @@ import Doors from '../components/scenes/Doors.astro';
 import HomeHero from '../components/scenes/HomeHero.astro';
 import Voyage from '../components/scenes/Voyage.tsx';
 import MenuBook from '../components/scenes/MenuBook.tsx';
+import ThePlates from '../components/scenes/ThePlates.astro';
 import BarAfterDark from '../components/scenes/BarAfterDark.tsx';
 import RoomContactSheet from '../components/scenes/RoomContactSheet.tsx';
 import BoardingPasses from '../components/scenes/BoardingPasses.astro';
@@ -176,6 +177,9 @@ const orgLd = {
     <!-- The full tale of Fatt & Pundit lives on its own page -->
     <div class="bg-ink story-more"><a class="fp-btn" href="/our-story/">Read the whole story</a></div>
 
+    <!-- 4.5 · Twelve plates from the pass (melts into the menu book) -->
+    <ThePlates />
+
 
     <!-- 5 · The menu book -->
     <MenuBook client:visible={{ rootMargin: '100% 0px' }} menus={menuBooksHome} art={menuArt} places={menuPlaces} signatures={signatureDishes} lists={branches.filter((b) => b.status === 'open').map((b) => ({ href: `/${b.id}/menu/`, label: `${b.shortName} menus` }))} next={{ href: '#bar', label: 'Continue to the bar' }} />
@@ -219,7 +223,7 @@ const orgLd = {
 
   <!-- Story rail: where you are in the visit. Lights up as you scroll, tap a stop to jump. Wide screens only;
        phones get the thin progress line under the header instead. -->
-  <ChapterRail chapters={[['top', 'The window'], ['story', 'Our story'], ['menu', 'The menus'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']]} />
+  <ChapterRail chapters={[['top', 'The window'], ['story', 'Our story'], ['plates', 'The plates'], ['menu', 'The menus'], ['bar', 'The bar'], ['room', 'The room'], ['tables', 'Your table']]} />
 
   <SiteFooter branches={branches} home />
 </Base>
@@ -235,13 +239,12 @@ const orgLd = {
 <script>
   import { prewarm } from '@/lib/prewarm';
   // Decode the long sections' pictures before the scroll gets there.
-  for (const id of ['menu', 'bar', 'room', 'tables']) prewarm(document.getElementById(id));
+  for (const id of ['plates', 'menu', 'bar', 'room', 'tables']) prewarm(document.getElementById(id));
 </script>
 
 <style>
-  .story-more { position: relative; display: flex; justify-content: center; padding: clamp(28px, 5vw, 56px) 20px calc(clamp(28px, 5vw, 56px) + 112px); }
-  /* Ink melts into the sand menu below (this band replaces the menu's own top band). */
-  .story-more::after { content: ''; position: absolute; inset: auto 0 0; height: 112px; pointer-events: none; background: linear-gradient(var(--color-ink), var(--color-sand)); }
+  /* Stays ink: the plates follow on ink, and their foot melts into the sand menu (ThePlates.astro). */
+  .story-more { position: relative; display: flex; justify-content: center; padding: clamp(28px, 5vw, 56px) 20px 0; }
   p { margin: 0; }
 
   /* Bar */
