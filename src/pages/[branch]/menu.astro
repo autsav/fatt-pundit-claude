@@ -148,7 +148,7 @@ const ld = {
     <p class="menu-hint" data-menu-hint hidden>There's also a full <a href="#" data-menu-hint-link></a>.</p>
     </div>
   </div>
-  <div class="menu-list">
+  <div class="menu-list surface-paper-light">
   <p class="menu-passport-tip" data-pp-tip>Tap the stamp beside a dish to collect it: your passport becomes tonight's shortlist, ready to show your server or send to the table. <button type="button" class="fp-btn fp-btn--text tip-x" data-pp-tip-x>Got it</button></p>
   <!-- Once, inline above the first menu; hidden before paint when already seen, so the menu never jumps up. -->
   <script is:inline>try{if(localStorage.getItem('fp-pp-tip'))document.currentScript.previousElementSibling.hidden=true}catch(e){}</script>
@@ -178,7 +178,7 @@ const ld = {
                   {i.price && <span class="mi-price">{i.price}</span>}
                 </div>
                 {i.desc && <p class="mi-desc">{i.desc}</p>}
-                {i.tags.length > 0 && <p class="mi-tags"><span aria-hidden="true">{i.tags.join(' · ')}</span><span class="sr-only">{i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}</span></p>}
+                {i.tags.length > 0 && <p class="mi-tags"><span aria-hidden="true">{i.tags.map((t) => <b>{t}</b>)}</span><span class="sr-only">{i.tags.map((t) => TAGS.find(([k]) => k === t)?.[1] ?? t).join(', ')}</span></p>}
               </li>
             ))}
           </ul>
@@ -230,17 +230,21 @@ const ld = {
   .menu-banner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--fp-rule); font-size: var(--step-small); }
   .mb-photo { width: 48px; height: 32px; object-fit: cover; border: 2px solid var(--color-ink); }
   .menu-banner p { margin: 0; }
+  .mb-name { flex: 1 1 12rem; min-width: 0; }
   .mb-name span { color: var(--fp-fg-muted); }
   .mb-links { display: flex; flex-wrap: wrap; gap: var(--space-1, 4px) var(--space-4); margin-inline-start: auto !important; }
   .menu-ask, .menu-key { margin: 6px 0 0 !important; font-size: var(--step-small); }
   .menu-ask a { color: var(--color-tiger-deep); font-weight: 700; }
-  .menu-key { font-size: var(--step-tag); letter-spacing: var(--tracking-copy); color: var(--fp-fg-muted); }
+  .menu-key { display: flex; flex-wrap: wrap; gap: 0 0.45em; margin-top: 10px !important; font-size: var(--step-tag); line-height: 2.1; letter-spacing: var(--tracking-copy); color: var(--fp-fg-muted); }
+  /* Diet marks read as small printed stamps, the same in the key and on each dish, so the key decodes them. */
+  .menu-key b, .mi-tags b { display: inline-block; min-width: 2em; padding: 0 4px; border: var(--border-hair) solid currentColor; font-weight: 700; line-height: 1.5; text-align: center; color: var(--fp-fg); }
   .menu-block h2:focus-visible { outline-offset: 4px; }
   /* Section jump chips: one sticky strip under the picker; a sideways scroll-snap row on phones. */
-  .menu-chips { position: sticky; top: calc(var(--menu-bar, 56px) + 44px); z-index: 4; display: flex; gap: 6px; margin: var(--space-3) 0 0; padding: 6px 0; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; background: var(--color-paper-light); border-bottom: 1px solid var(--fp-rule); }
+  .menu-chips { position: sticky; top: var(--header-h, 72px); z-index: 4; display: flex; gap: 6px; margin: var(--space-3) calc(-1 * var(--pad)) 0; padding: 6px var(--pad); overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--pad); scrollbar-width: none; background: var(--fp-bg); border-bottom: var(--border-hair) solid var(--fp-rule); }
   .menu-chips::-webkit-scrollbar { display: none; }
-  .menu-chips a { flex: none; scroll-snap-align: start; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 2px solid var(--color-ink); font-size: var(--step-small); font-weight: 700; text-decoration: none; color: var(--color-ink); white-space: nowrap; }
-  .menu-chips a[aria-current='true'] { background: var(--color-ink); color: var(--color-sand); }
+  .menu-chips a { flex: none; scroll-snap-align: start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: var(--border-control) solid var(--fp-rule-strong); font-size: var(--step-small); font-weight: 700; text-decoration: none; color: var(--fp-fg); white-space: nowrap; transition: background-color var(--dur-fast) var(--curve-out), color var(--dur-fast) var(--curve-out); }
+  @media (hover: hover) { .menu-chips a:hover { background: var(--fp-hover-tint); } }
+  .menu-chips a[aria-current='true'] { background: var(--fp-selected-bg); color: var(--fp-selected-fg); }
   .menu-chips a[hidden] { display: none; }
   .menu-sec { scroll-margin-top: 170px; }
   /* One menu at a time (Phase 4 D2). Without JavaScript every menu shows, as before. */
@@ -249,20 +253,20 @@ const ld = {
   .js-one:not(.js-ready) [data-menu-block] ~ [data-menu-block] { display: none; }
 
   /* The printed menu: paper, an ink edge and a hard shadow. Phones: edge to edge. */
-  .menu-list { min-width: 0; padding: clamp(20px, 4vw, 48px); background: var(--color-paper-light); border: 2px solid var(--color-ink); box-shadow: 8px 8px 0 var(--color-ink); }
-  @media (max-width: 639px) { .menu-list { margin-inline: calc(-1 * clamp(16px, 4vw, 40px)); border-inline: 0; box-shadow: none; } }
+  .menu-list { --pad: clamp(20px, 4vw, 48px); min-width: 0; padding: var(--pad); background: var(--fp-bg); border: 2px solid var(--color-ink); box-shadow: 8px 8px 0 var(--color-ink); }
+  @media (max-width: 639px) { .menu-list { margin-inline: calc(-1 * clamp(16px, 4vw, 40px)); border-inline: 0; box-shadow: none; } .mb-links { flex-basis: 100%; margin-inline-start: 0 !important; } }
 
   /* Phones and tablets: the menu button stays under the header; the list of menus opens beneath it. */
   @media (max-width: 899px) {
     .menu-tools { display: contents; }
     .menu-tools > * { margin-top: 10px; }
-    .js-one .menu-pickbar { position: sticky; top: var(--menu-bar, 56px); z-index: 6; display: flex; gap: 8px; align-items: stretch; height: 44px; box-sizing: border-box; margin: 10px calc(-1 * clamp(16px, 4vw, 40px)) 0; padding: 0 clamp(16px, 4vw, 40px); background: var(--color-sand); box-shadow: 0 2px 0 var(--color-ink); }
+    .js-one .menu-pickbar { position: sticky; top: var(--header-h, 72px); z-index: 6; display: flex; gap: 8px; align-items: stretch; height: 44px; box-sizing: border-box; margin: 10px calc(-1 * clamp(16px, 4vw, 40px)) 0; padding: 0 clamp(16px, 4vw, 40px); background: var(--color-sand); box-shadow: 0 2px 0 var(--color-ink); }
     .js-one .menu-pick { display: flex; flex: 1; min-width: 0; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: var(--step-body); cursor: pointer; }
     .js-one .menu-filter-btn { display: inline-flex; flex: none; align-items: center; min-height: 44px; padding: 0 14px; border: 2px solid var(--color-ink); background: var(--color-paper-light); color: var(--color-ink); font: inherit; font-size: var(--step-body); font-weight: 700; cursor: pointer; }
     .js-one .menu-filter-btn[aria-expanded='true'] { background: var(--color-ink); color: var(--color-sand); }
     .js-one .menu-filter { display: none; }
     .js-one .menu-filter.is-open { display: grid; margin-top: 10px; }
-    .menu-chips { top: calc(var(--menu-bar, 56px) + 46px); }
+    .menu-chips { top: calc(var(--header-h, 72px) + 46px); }
     .js-one .menu-pick::after { content: ""; margin-left: auto; width: 8px; height: 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg); }
     .js-one .menu-pick[aria-expanded='true']::after { transform: translateY(2px) rotate(-135deg); }
     /* The list unfolds under its button to its own height and folds back. Only where the browser can
@@ -286,16 +290,21 @@ const ld = {
   .menu-block + .menu-block { margin-top: var(--space-8); }
   .menu-block h2 { margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); text-transform: uppercase; letter-spacing: var(--tracking-title); border-bottom: 3px double var(--color-ink); padding-bottom: 8px; }
   .menu-intro, .menu-note { font-family: var(--font-note); font-style: italic; }
-  .menu-sec h3 { margin: 22px 0 6px; font-size: var(--step-small); letter-spacing: var(--tracking-title); text-transform: uppercase; color: var(--color-tiger-deep); }
+  /* A section opens like a printed menu's: caps in the accent, then a rule running out to the edge. */
+  .menu-sec + .menu-sec { margin-top: var(--space-6); }
+  .menu-sec h3 { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-5) 0 var(--space-1); font-size: var(--step-h4); line-height: var(--lh-h4); letter-spacing: var(--tracking-title); text-transform: uppercase; color: var(--fp-accent); break-after: avoid; }
+  .menu-sec h3::after { content: ''; flex: 1; min-width: var(--space-5); border-top: var(--border-rule) solid var(--fp-rule-strong); }
+  .menu-note { margin: 0 0 var(--space-1) !important; max-width: 62ch; font-size: var(--step-small); line-height: 1.5; color: var(--fp-fg-muted); }
   .menu-sec ul { list-style: none; padding: 0; margin: 0; }
-  .menu-item { padding: 10px 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); }
+  .menu-item { container-type: inline-size; padding: 12px 0; border-bottom: 1px dotted rgb(44 41 37 / 0.4); }
+  .menu-item:last-child { border-bottom: 0; }
   /* Name | price | passport stamp on the first line (a grid, so a long name wraps inside its own column
      instead of pushing the stamp onto a line of its own); diet marks on the second line. */
-  .menu-item { container-type: inline-size; }
   .mi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'name price stamp'; align-items: baseline; gap: 2px 12px; }
-  .mi-name { grid-area: name; font-weight: 700; font-size: var(--step-h4); }
+  .mi-name { grid-area: name; font-weight: 700; font-size: var(--step-h4); line-height: var(--lh-h4); }
   .mi-sig { font-size: var(--step-tag); font-weight: 700; color: var(--color-tiger-deep); white-space: nowrap; }
-  .mi-tags { margin: 2px 0 0 !important; font-size: var(--step-tag); letter-spacing: var(--tracking-copy); color: var(--fp-fg-muted); }
+  .mi-tags { margin: 6px 0 0 !important; font-size: var(--step-tag); letter-spacing: var(--tracking-copy); }
+  .mi-tags > span:first-child { display: flex; flex-wrap: wrap; gap: 4px; }
   .mi-price { grid-area: price; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* The stamp says what it does: a heart-stamp over "Save" ("Saved" once collected), set apart from the price. */
   .mi-head :global(.pp-stamp) { grid-area: stamp; align-self: center; width: auto; min-width: 44px; height: auto; min-height: 44px; margin: -8px 0 -8px 8px; padding: 2px 0 2px 12px; border-left: 1px dotted rgb(44 41 37 / 0.4); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
@@ -310,7 +319,7 @@ const ld = {
   .menu-item.has-photo { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 14px; align-items: start; }
   .menu-item.has-photo > :not(.mi-photo) { grid-column: 2; }
   .mi-photo { grid-row: 1 / span 3; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-ink); }
-  .mi-desc { margin: 2px 0 0 !important; font-size: var(--step-small); }
+  .mi-desc { margin: 4px 0 0 !important; max-width: 56ch; font-size: var(--step-small); line-height: 1.45; }
   .tip-x { min-height: 32px; padding: 0 4px; font-style: normal; }
   .menu-allergy { margin-top: 16px !important; font-size: var(--step-fine); }
   .menu-allergy a { color: var(--color-tiger-deep); font-weight: 700; }
@@ -342,11 +351,10 @@ const ld = {
     .menu-jump a[aria-current='true'] { background: none; color: var(--color-ink); box-shadow: inset 4px 0 0 var(--color-ink); padding-left: 12px; }
     .menu-list { max-width: 860px; }
     .menu-block { scroll-margin-top: 100px; }
-    .menu-chips { top: var(--header-h, 72px); }
     .menu-block h2 { font-size: 40px; }
   }
   @media print {
-    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), :global(.crumbs), .menu-tools, .menu-empty, :global([data-dock]), .menu-chips, .menu-banner, .menu-ask, .menu-passport-tip { display: none !important; }
+    :global(.bar), :global(.preview-flag), :global(footer.foot), :global(.skip), :global(.crumbs), .menu-tools, .menu-empty, :global([data-dock]), .menu-chips, .menu-banner, .menu-ask, .menu-passport-tip, .mi-head :global(.pp-stamp) { display: none !important; }
     :global(.info) { padding: 0 !important; background: none !important; }
     .menu-list { border: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
     .menu-block + .menu-block { break-before: page; }

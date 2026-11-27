@@ -161,6 +161,19 @@ const scenesFor: Partial<Record<string, typeof ChapterCanton>> = {
   .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
   /* Equal-width buttons: each takes the same share, never narrower than its label. */
   .end-actions > .fp-btn { flex: 1 1 14rem; max-width: 20rem; justify-content: center; text-align: center; }
+  /* The ending's own rhythm: one balanced headline, the three doors in a row on wide screens, a small rule before each further beat. */
+  .story-end .h2 { text-wrap: balance; }
+  .end-lead { margin-top: var(--space-7); text-wrap: balance; }
+  .end-lead::before { content: ''; display: block; width: 56px; height: 2px; margin: 0 auto var(--space-5); background: var(--fp-rule-strong); }
+  @media (min-width: 1040px) {
+    .story-end .h2, .end-actions { width: min(1000px, calc(100vw - 2 * var(--gutter, 16px))); }
+    .end-actions > .fp-btn { flex: 1 1 0; min-width: max-content; max-width: none; }
+  }
+  /* Phones: full-width doors; a long label wraps inside its button instead of touching the border. */
+  @media (max-width: 599px) {
+    .end-actions > .fp-btn { flex-basis: 100%; max-width: none; padding: 10px var(--space-4); white-space: normal; line-height: 1.2; text-wrap: balance; }
+    .end-menus > span { flex-basis: 100%; }
+  }
 </style>
 
 <script>

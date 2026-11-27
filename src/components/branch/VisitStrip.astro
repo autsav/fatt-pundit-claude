@@ -74,6 +74,7 @@ const { branch: b, stations } = Astro.props;
   .vs-facts { grid-template-columns: 1.7fr 1.1fr 1.3fr; }
   /* Status and today's times on one line (Phase 8): "Opens 12pm  12pm to 10.30pm" read as one fact. */
   .vs-facts dd:has(> :global(.vs-times)) { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+  .vs-facts dd { text-wrap: balance; }
   .vs-nowrap { white-space: nowrap; }
   .vs-act { display: flex; align-items: center; gap: var(--space-5); margin: 0; }
   @media (max-width: 1100px) { .vs-facts { grid-template-columns: 1.5fr 1fr; } .vs-stations { display: none; } }

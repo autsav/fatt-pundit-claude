@@ -73,7 +73,6 @@ const gallery = p.gallery.map((k) => ({ key: k, src: photo(k)!, alt: ALTS[k] ?? 
 
 const LEAD = { tiger: 'var(--color-tiger)', gold: 'var(--color-gold)', slate: 'var(--color-slate)' }[p.lead];
 // Small words in the branch colour on light paper use its text-safe partner.
-const LEAD_TEXT = { tiger: 'var(--color-tiger-deep)', gold: 'var(--color-gold-deep)', slate: 'var(--color-slate-deep)' }[p.lead];
 const img = async (src: ImageMetadata, width: number) => (await getImage({ src, width, format: 'webp', quality: 84 })).src;
 // The room's photos as the same contact sheet and lightbox the home page uses.
 const thumbSet = async (src: ImageMetadata) => (await Promise.all([360, 480, 640].map(async (w) => `${await img(src, w)} ${w}w`))).join(', ');
@@ -176,7 +175,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   <a slot="skip" class="skip" href={open ? '#visit' : '#waitlist'}>{open ? 'Skip to opening hours and directions' : 'Skip to the waiting list'}</a>
   <SiteHeader branches={branches} current={b} />
 
-  <main id="content" class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --lead-text: ${LEAD_TEXT}; --second: ${p.second};`}>
+  <main id="content" class={`branch branch-${b.id}`} style={`--lead: ${LEAD}; --second: ${p.second};`}>
     <!-- 1 · Arrival (Phase 8): the name on the departure board is the page's one bold thing; one Book,
          one link to the menus. Today's status lives once, in the facts strip directly below. -->
     <section class="arrival" data-room-hero style={`view-transition-name: branch-${b.id}`} aria-labelledby="branch-title">
@@ -507,7 +506,6 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 <style>
   .branch { overflow-x: clip; }
   .branch :global(p) { margin: 0; }
-  .lead-text { color: var(--lead-text); }
 
   /* Arrival: the photo fills the hero on every screen and the name sits bottom-left on a bottom shade.
      Phones: about 60svh (a 4:5 crop). 900px and up: taller. 1024px and up: the full screen under the header. */
@@ -545,7 +543,7 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
   /* Dubai: a departure gate in slate and gold. */
   .art-gate { background: radial-gradient(70% 60% at 70% 30%, rgb(203 160 82 / 0.28), transparent 70%), linear-gradient(160deg, #5f6e79, #2c2925 75%); display: grid; place-items: center end; padding-right: 6vw; }
-  @media (max-width: 899px) { .art-gate { place-items: center; padding: 0 0 6%; } }
+  @media (max-width: 899px) { .art-gate { place-items: start center; padding: 12% 0 0; } }
   .gate-code { font-size: clamp(90px, 22vw, 320px); font-weight: 700; letter-spacing: var(--tracking-title); color: transparent; -webkit-text-stroke: 2px rgb(203 160 82 / 0.7); line-height: 1; }
   .art-gate::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(180deg, transparent, rgb(44 41 37 / 0.9)); }
   @media (min-width: 1024px) {
@@ -569,12 +567,14 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
   /* The room */
   .room-spoken { color: var(--fp-fg-muted); }
   .room:has(.room-walk) .b-head { margin-bottom: 0; }
-  .room-wall { display: grid; gap: var(--space-6); }
+  .room-wall { display: grid; gap: var(--section-gap); }
+  .wall-intro { width: 100%; max-width: 980px; margin: 0 auto calc(var(--space-5) - var(--section-gap)); text-wrap: balance; }
 
   /* What to eat: the ticket (the one object) beside its story. */
-  .sig { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 34rem); gap: clamp(32px, 6vw, 80px); align-items: center; }
-  .sig-text { display: grid; gap: var(--space-4); }
-  .sig-tags { font-size: var(--step-small); color: var(--fp-fg-muted); }
+  .sig { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: clamp(32px, 7vw, 104px); align-items: center; }
+  .sig-text { display: grid; gap: var(--space-4); justify-items: start; }
+  .sig-text .fp-spoken { max-width: 19em; font-size: clamp(22px, 2.7vw, 38px); line-height: 1.22; }
+  .sig-tags { padding-top: var(--space-3); border-top: 1px solid var(--fp-rule-strong); font-size: var(--step-small); color: var(--fp-fg-muted); }
   @media (max-width: 760px) { .sig { grid-template-columns: 1fr; } }
   .sig-ticket { position: relative; background: var(--color-paper-light); padding: 26px 26px 30px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.6); border-top: 2px dashed rgb(44 41 37 / 0.4); rotate: -1.5deg; }
   .sig-no { font-family: var(--font-note); font-style: italic; font-weight: 500; font-size: 19px; color: var(--color-tiger-deep); border-bottom: 2px dotted rgb(44 41 37 / 0.4); padding-bottom: 8px; }
@@ -618,33 +618,32 @@ const description = `${p.lines.join(' ')} ${open ? `Book a table at ${fullAddres
 
   /* Every menu in a short ledger: one row of menus, one of dietary menus, one about allergies. */
   .menu-ledger { margin: var(--section-gap) 0 0; max-width: 60rem; border-top: var(--border-rule) solid var(--fp-rule-strong); }
-  .menu-ledger > div { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: var(--space-2) var(--space-5); padding-block: var(--space-4); border-bottom: 1px solid var(--fp-rule); }
+  .menu-ledger > div { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 0 var(--space-5); align-items: baseline; padding-block: var(--space-2); border-bottom: 1px solid var(--fp-rule); }
   @media (max-width: 639px) { .menu-ledger > div { grid-template-columns: 1fr; } }
-  .menu-ledger dt { padding-top: 3px; font-size: var(--step-small); font-weight: 700; color: var(--fp-fg-muted); }
-  .menu-ledger dd { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-5); }
-  .ledger-link { font-size: var(--step-h4); font-weight: 700; line-height: 1.4; color: var(--fp-fg); text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 6px; }
+  .menu-ledger dt { font-size: var(--step-small); font-weight: 700; color: var(--fp-fg-muted); }
+  .menu-ledger dd { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-5); }
+  .ledger-link { display: inline-flex; align-items: center; min-height: var(--target-min); font-size: var(--step-h4); font-weight: 700; line-height: 1.4; color: var(--fp-fg); text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 6px; }
   .ledger-link:hover { text-decoration-color: currentColor; text-decoration-thickness: 2px; }
-  .ledger-note { flex-basis: 100%; font-size: var(--step-small); color: var(--fp-fg-muted); }
+  .ledger-note { flex-basis: 100%; padding-bottom: var(--space-2); font-size: var(--step-small); color: var(--fp-fg-muted); }
 
   /* Visit and book: hours with the map, email and delivery links; the one Book with its proof beside it. */
   .visit-grid { display: grid; gap: var(--space-8); align-items: stretch; }
   @media (min-width: 900px) { .visit-grid { grid-template-columns: minmax(0, 34rem) minmax(0, 24rem); justify-content: space-between; } }
   .visit-hours { display: grid; gap: var(--space-5); }
   .visit-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
-  .visit-home { font-size: var(--step-small); }
   .hours-today { font-weight: 400; }
+  .visit-hours td { text-wrap: balance; }
   .visit-book { display: grid; gap: var(--space-4); justify-items: start; align-content: start; padding: var(--space-6); border: 2px solid var(--color-ink); background: var(--color-paper-light); }
   .visit-book .visit-book-h { width: 100%; border-top: 0; padding-top: 0; }
-  .visit-proof { width: 100%; }
   .visit-via { font-size: var(--step-small); color: var(--fp-fg-muted); }
-  .visit-proof { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1, 4px) var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--fp-rule); }
+  .visit-proof { width: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1, 4px) var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--fp-rule); }
   .proof-n { font-family: var(--font-display); font-weight: 700; font-size: clamp(40px, 4vw, 56px); line-height: 1; letter-spacing: var(--tracking-title); }
   .proof-src { font-size: var(--step-small); line-height: var(--lh-small); max-width: 18em; }
-  .visit-groups { font-size: var(--step-small); line-height: var(--lh-small); }
+  .visit-groups, .visit-home { font-size: var(--step-small); line-height: var(--lh-small); }
 
   /* The other rooms: postcards (the system's .fp-postcard), no numbers. */
   .others { margin-top: var(--section-pad); }
-  .others-h { margin: 0 0 var(--space-4); font-size: var(--step-h4); font-weight: 700; text-transform: none; letter-spacing: var(--tracking-title); }
+  .others-h { margin: 0 0 var(--space-5); padding-top: var(--space-3); border-top: var(--border-rule) solid var(--fp-rule-strong); font-size: var(--step-h4); font-weight: 700; text-transform: none; letter-spacing: var(--tracking-title); }
   .other-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: var(--grid-gutter); }
   .other-name { font-size: clamp(30px, 3.2vw, 46px); font-weight: 700; line-height: 1; letter-spacing: var(--tracking-title); }
   .other-go { margin-top: var(--space-2); font-weight: 700; color: var(--fp-fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
