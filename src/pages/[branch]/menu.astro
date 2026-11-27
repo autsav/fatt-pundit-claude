@@ -13,7 +13,7 @@ import { Image } from 'astro:assets';
 import { dishPhoto } from '../../lib/dish-photos';
 import type { ImageMetadata } from 'astro';
 import momosChutney from '../../assets/images/journey/04-momos-chutney.jpg';
-import { dish, getBranches, MENU_TABS, preTheatreText, priceOf, type Branch } from '../../lib/site-data';
+import { dish, getBranches, MENU_TABS, preTheatreText, priceOf, TAGS, type Branch } from '../../lib/site-data';
 
 export const getStaticPaths = (async () => {
   const branches = await getBranches();
@@ -38,7 +38,7 @@ const menus = await Promise.all(
           items: await Promise.all(
             sec.items.map(async ({ dish: did }) => {
               const d = await dish(did);
-              return { id: did, name: d.name, desc: d.description ?? '', price: m.showPrices ? priceOf(d) : null, tags: d.tags as string[], sig: !!d.signature, photo: d.signature ? dishPhoto(did) : undefined };
+              return { id: did, name: d.name, desc: d.description ?? '', price: m.showPrices ? priceOf(d) : null, tags: d.tags as string[], sig: !!d.signature, photo: dishPhoto(did) };
             }),
           ),
         })),
@@ -56,13 +56,6 @@ const preTheatre = preTheatreText(b);
 const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/{soho,covent-garden,dubai}/*.jpg', { eager: true });
 const bannerPhoto = (b.page.hero ? photos[`/src/assets/images/${b.id}/${b.page.hero}.jpg`]?.default : undefined) ?? (b.id === 'soho' ? momosChutney : undefined);
 const otherMenus = (await getBranches()).filter((o) => o.id !== b.id && o.status === 'open');
-const TAGS = [
-  ['V', 'Vegetarian'],
-  ['VG', 'Vegan'],
-  ['GF', 'Gluten free'],
-  ['DF', 'Dairy free'],
-  ['H', 'Halal'],
-] as const;
 
 // Search engines: the menu as schema.org Menu → sections → items.
 const ld = {
